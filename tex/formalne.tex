@@ -1,18 +1,22 @@
 \chapter{Pokus zavést hry formálně}
 
+\renewcommand{\|}{\;|\;}
+
 \newcommand{\game}{\mathcal{G}}
+
+\newcommand{\Var}{X}
+\newcommand{\initformula}{\iota}
+\newcommand{\Val}{V}
+\newcommand{\val}{v}
+\renewcommand{\Form}{\Phi}
+\newcommand{\form}{\phi}
+\newcommand{\emptyform}{\eps}
 
 \newcommand{\Exp}{E}
 \renewcommand{\exp}{e}
-\newcommand{\Code}{C}
-\newcommand{\Codeset}{D}
-\newcommand{\code}{c}
-
 
 \newcommand{\result}{\rho}
-\newcommand{\resultc}{\result_\code}
 
-\newcommand{\Expres}{\Delta}
 \newcommand{\hist}{\pi}
 \newcommand{\histstg}[2]{\hist^{#1,#2}}
 
@@ -22,46 +26,131 @@
 \newcommand{\lenmax}[1]{\len^{#1}_\textrm{max}}
 \newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
 
+\newcommand{\exactly}[1]{\textrm{Exactly-#1}\:}
+\newcommand{\atleast}[1]{\textrm{AtLeast-#1}\:}
+\newcommand{\atmost}[1]{\textrm{AtMost-#1}\:}
+
+$\Val_\Var$ is a set of all valuations; $\Form_\Var$ is a set of all formulas over variables $\Var$.
+
 \begin{definition}
 A \emph{code-breaking game} is a triple 
- $\game = (\Code, \Exp, (\resultc)_{\code\in\Code})$, where 
- $\Code$ is a finite set of possible codes, 
+ $\game = (\Var, \initformula, \Exp, \result)$, where 
+ $\Var$ is a finite set of propositional variables, 
+ $\initformula \in \Form_\Var$ is an initial prepositional formula, 
  $\Exp$ is a finite set of possible experiments and
- $\resultc: \Exp -> 2^\Code$ is the result function for code $\code\in\Code$ such that
- $\code\in\resultc(\exp)$ for every $\exp\in\Exp$.
+ $\result: \Val_\Var \times \Exp -> \Form_\Var $ is the inference function such that
+ $\val(\result(\val, \exp)) = 1$ for every $\val\in\Val$, $\exp\in\Exp$.
 \end{definition}
 
-\begin{definition}
-A \emph{history} is a sequence $\hist$
- of elements from $\Expres = (\Exp \times 2^\Code)$.
-Let $\hist[i]$ and $\hist[j..k]$ denote 
- the $i$-th element of $\hist$ and
- the subsequence from the $j$-th to the $k$-th element, respectively. 
- Furher, if $\hist[i] = (\exp, \Codeset)$, 
- let $\hist[i]^\exp = \exp$ and 
- $\hist[i]^\result = \Codeset$ denote the projections.
+\begin{example}[Fake-coin problem]
+Consider a fake-coin problem with $n$ coins, one of which is fake. This game can be formalized as follows:
+\begin{itemize}
+\item 
+$\Var = \{x_1, x_2, ..., x_n, y\}$ \\
+Intuitively, variable $x_i$ tells weather the coin $i$ is fake. Variable $y$ tells weather it's lighter or heavier.
 
-Let $\hist \in \Expres^n$ be a history and let 
- $m = \left|\bigcap_{i=1}^n\hist[i]^\result\right|$.
- We call a history \emph{finished} if $m = 1$ and \emph{invalid} if $m = 0$.
-\end{definition}
+\item 
+$\initformula = \exactly{1}(\{x_1, ..., x_n\})$ \\
+This is to ensure that exactly one coin is fake.
 
-\begin{definition}
-Strategy is a function $\stg: \Expres^* -> \Exp$
- giving the next experiment based on the history of the game.
-On a code $\code\in\Code$, a strategy $\stg$ generates a history $\hist(\stg, \code) \in\Expres^\omega$ defined by
- \[ \forall i>1\;.\;\;
- \histstg{\stg}{\code}[i+1] = 
- \left( \underline{\stg(\histstg{\stg}{\code}[1..i])},
- \resultc(\underline{\stg(\histstg{\stg}{\code}[1..i])}) \right). \]
-\end{definition}
+\item 
+$\Exp = 2^{\{1..n\}} \times 2^{\{1..n\}}$ \\
+Experiment consist of two sets of coins. 
+For the sake of simplicity, we allow non-disjoint sets and sets of different size, 
+however such experiments would give no new information.
 
-\begin{definition}
-Number of steps $\lenstg{\stg}{\code}$ of a strategy $\stg$ on a code $\code$ 
- is the least number $k$ such that $\histstg{\stg}{\code}[1..k]$ is finished.
-Let \[ \lenmax{\stg} = \max \{\lenstg{\stg}{\code} \;|\; \code\in\Code \} \] 
- is the worst-case number of steps of strategy $\stg$.
-Given a probability distribution on codes,
- let $\lenexp{\stg} = E(\lenstg{\stg}{\code})$ be the expected number of steps of strategy $\stg$. 
-\end{definition}
+\item $\result(v, (A,B)) = \left\{
+\begin{array}{ll}
+\emptyform & \textrm{if r = error} \\
+(\bigvee\{x_c \| c \in A\} \wedge \neg y) \vee (\bigvee\{x_c \| c \in B\} \wedge y) & 
+	\textrm{if r = lighter} \\
+(\bigvee\{x_c \| c \in A\} \wedge y) \vee (\bigvee\{x_c \| c \in B\} \wedge \neg y) & 
+	\textrm{if r = heavier} \\
+\neg \bigvee\{x_c \| c\in A\cup B\} &
+	\textrm{if r = equal}
+\end{array} \right.$
+
+The conditions correspond to the result $r$ of the experiment:
+\begin{itemize}
+\item r = error if $|A|\not=|B|$ or $A\cap B\not=\emptyset$
+\item r = lighter if $(v(c) = 1$ for some $c\in A$ and $v(y) = 0)$ or $(v(c) = 1$ for some $c \in B$ and $v(y) = 1)$ 
+\item r = heavier if $(v(c) = 1$ for some $c\in A$ and $v(y) = 1)$ or $(v(c) = 1$ for some $c \in B$ and $v(y) = 0)$
+\item r = equal if $v(c) = 0$ for every $c\in A\cup B$
+\end{itemize}
+\end{itemize}
+
+
+
+\end{example}
+
+\begin{example}[Mastermind]
+Consider a mastermind puzzle with $p$ pegs and color set $C$. This game can be formalized as follows:
+
+\begin{itemize}
+\item
+ $\Var = \{x_{i,c} \| 1<=i<=p, c\in C\}$. 
+
+ Variable $x_{i,c}$ tells whether there is color $c$ at position $i$.
+
+\item 
+ $\initformula = \bigwedge\left\{ \exactly{1} \{x_{i,c} \| c\in C\} \| 1<=i<=p\right\}$.
+
+ This guarantees that there is exactly one color at each position.
+
+\item $\Exp = C^p$.
+
+ Experiment is just a sequence of colors.
+
+\item Inference function is defined by
+\begin{align*}
+\result(v, g) =\;&\exactly{b}\{ x_{i, g[i]} \| 1<=i<=p \} \wedge \\
+& \exactly{t} \bigcup
+		\left\{ 
+			\{
+				\atleast{n}\{ x_{i,c} | 1<=i<=p \} 
+				\| 1<=n<=\#i.(g[i]=c)
+			\} 
+			\| c\in C 
+		\right\} 
+\end{align*}
+where $b = \# i . (v(x_{i,g[i]}) = 1)$ captures the number of black pegs in the response for the experiment and
+$t = \sum_{c\in C} \min( \#i.(v(x_{i,c}) = 1), \#i.(g[i]=c))$ is the total number of pegs (black + white). 
+
+\end{itemize}
+\end{example}
+
+
+% \begin{definition}
+% A \emph{history} is a sequence $\hist$
+%  of elements from $\Expres = (\Exp \times 2^\Code)$.
+% Let $\hist[i]$ and $\hist[j..k]$ denote 
+%  the $i$-th element of $\hist$ and
+%  the subsequence from the $j$-th to the $k$-th element, respectively. 
+%  Furher, if $\hist[i] = (\exp, \Codeset)$, 
+%  let $\hist[i]^\exp = \exp$ and 
+%  $\hist[i]^\result = \Codeset$ denote the projections.
+
+% Let $\hist \in \Expres^n$ be a history and let 
+%  $m = \left|\bigcap_{i=1}^n\hist[i]^\result\right|$.
+%  We call a history \emph{finished} if $m = 1$ and \emph{invalid} if $m = 0$.
+% \end{definition}
+
+% \begin{definition}
+% Strategy is a function $\stg: \Expres^* -> \Exp$
+%  giving the next experiment based on the history of the game.
+% On a code $\code\in\Code$, a strategy $\stg$ generates a history $\hist(\stg, \code) \in\Expres^\omega$ defined by
+%  \[ \forall i>1\;.\;\;
+%  \histstg{\stg}{\code}[i+1] = 
+%  \left( \underline{\stg(\histstg{\stg}{\code}[1..i])},
+%  \resultc(\underline{\stg(\histstg{\stg}{\code}[1..i])}) \right). \]
+% \end{definition}
+
+% \begin{definition}
+% Number of steps $\lenstg{\stg}{\code}$ of a strategy $\stg$ on a code $\code$ 
+%  is the least number $k$ such that $\histstg{\stg}{\code}[1..k]$ is finished.
+% Let \[ \lenmax{\stg} = \max \{\lenstg{\stg}{\code} \;|\; \code\in\Code \} \] 
+%  is the worst-case number of steps of strategy $\stg$.
+% Given a probability distribution on codes,
+%  let $\lenexp{\stg} = E(\lenstg{\stg}{\code})$ be the expected number of steps of strategy $\stg$. 
+% \end{definition}
 
