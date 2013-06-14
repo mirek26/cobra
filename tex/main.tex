@@ -1,0 +1,111 @@
+\input{header}
+
+\thesislang{en}
+\thesistitle{Synthesis of Minimal Schedulers \\ for Markov Decision Processes}
+\thesissubtitle{Bachelor Thesis}
+\thesisstudent{Miroslav Klimoš}
+\thesiswoman{false}
+\thesisfaculty{fi}
+\thesisyear{2012}
+\thesisadvisor{RNDr. Tomáš Brázdil, Ph.D.}
+
+\hypersetup{
+    unicode=true,
+    pdftitle={Synthesis of Minimal Schedulers for Markov Decision Processes},
+    pdfauthor={Miroslav Klimoš},
+    pdfkeywords={Markov decision process}{optimal scheduler}{minimal scheduler},
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=BrickRed, 	% color of internal links
+    citecolor=OliveGreen,   % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+\begin{document}
+
+% \FrontMatter
+% \setlength{\parindent}{0pt}
+% \ThesisTitlePage
+
+
+% \begin{ThesisDeclaration}
+% I declare that this thesis is my own work and has not been submitted 
+% in any form for another degree or diploma at any university or 
+% other institution of tertiary education. Information derived from the published
+% or unpublished work of others has been acknowledged in the text 
+% and a list of references is given.
+
+% \AdvisorName
+% \end{ThesisDeclaration}
+
+
+% \begin{ThesisThanks}
+% I would like to express my deepest gratitude to RNDr. Tomáš Brázdil Ph.D.
+%   for being my advisor,
+%   for suggesting a lot of related open problems and, in particular,
+%   for his understanding when I failed to solve them. 
+% I would also like to thank RNDr. Jan Krčál for all the discussions 
+%   about various problems regarding continuous-time systems.
+% Last but not least I thank my family for their support through my life
+%   and my friends for such a great study environment.
+% \end{ThesisThanks}
+
+
+% \begin{ThesisKeyWords}
+% stochastic processes,
+% Markov decision processes, 
+% continuous-time Markov decision processes, 
+% time-bounded reachability, 
+% optimal scheduler, 
+% minimal scheduler
+% \end{ThesisKeyWords}
+
+
+% \begin{ThesisAbstract}
+% Markov decision processes provide us with a mathematical framework
+%   for modeling decision-making in randomized systems, 
+%   where a scheduler controls the behavior of the system through the decisions.
+% Continuous-time Markov decision processes introduce 
+%   exponentially distributed time delays on the transitions to the model. 
+% Time-bounded reachability objective asks for a scheduler maximizing 
+%   the probability of reaching a set of goal states in a given time limit. 
+
+% Methods for computing optimal and $\eps$-optimal schedulers
+%   are available but they do not take into consideration 
+%   the size of representation of such schedulers. 
+% Indeed, the resulting schedulers can be very large and their potential usage
+%   in embedded systems, for example, is questionable. 
+% Hence, the thesis focuses on the size of schedulers and examines
+%   the problem of finding a minimal optimal ($\eps$-optimal) scheduler
+%   with respect to the time-bounded reachability. 
+
+% We propose an algorithm computing a minimal $\eps$-optimal scheduler
+%   for a given discrete-time system. 
+% For continuous-time processes, we adopt the discretization technique 
+%   to reduce the problem to the discrete-time case. 
+% \end{ThesisAbstract}
+
+
+% \MainMatter
+% \setlength{\parindent}{0pt}
+
+% \setcounter{secnumdepth}{1}
+% \setcounter{tocdepth}{2}
+% \begin{spacing}{1.2} \normalsize
+% \tableofcontents
+% \end{spacing}
+
+% \input{intro}
+% \input{preliminaries}
+% \input{reachability}
+% \input{discret}
+% \input{minimal-ctmdp}
+% \input{conclusions}
+
+\input{formalne}
+
+\pagestyle{plain}
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}

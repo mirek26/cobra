@@ -1,0 +1,126 @@
+\documentclass[12pt, final, twoside]{fithesis2}
+\usepackage[inner=38mm, outer=27mm, top=37mm, bottom=48mm]{geometry}
+\usepackage[utf8]{inputenc}
+
+% searchable and copyable pdf (special characters, accents)
+\usepackage{cmap} 
+
+% colours and graphics
+\usepackage[usenames,dvipsnames,svgnames]{xcolor}
+
+
+%\usepackage{subfig}
+% \usepackage[us,24hr]{datetime}
+% \newdateformat{mydate}{\THEDAY.\THEMONTH.\THEYEAR}
+% \newcommand{\verze}{  \scriptsize(v. \mydate\today\ \currenttime)}
+
+% font
+\usepackage[T1]{fontenc} % left bottom quote ,,  (,,bla'')
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{indentfirst}
+% \usepackage{verbatim}  
+% \usepackage{moreverb}
+\usepackage{setspace} % spacing environment
+
+\usepackage{enumitem}
+\setitemize{itemsep=.5ex, topsep=.5ex, parsep=0pt, partopsep=0pt}
+
+\usepackage[ruled,lined]{algorithm2e}
+\setlength{\algomargin}{0.5cm}
+
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+
+
+\usepackage[final]{hyperref}
+
+% theorems
+
+\usepackage{framed}
+
+
+\usepackage{amsmath}
+\usepackage{mathtools}  % (in texlive-latex3 package)
+\mathtoolsset{showonlyrefs}
+
+%\usepackage[amsmath, amsthm, framed, thmmarks]{ntheorem}
+\usepackage[amsmath, amsthm, framed]{ntheorem}
+\newcommand{\qed}{\hfill \mbox{\raggedright \ensuremath\blacksquare}}
+
+
+% \usepackage{amsthm}
+\usepackage{tikz}
+\tikzstyle{thmbox} = [rectangle, rounded corners, draw=gray!80, fill=gray!10, inner sep=10pt, inner ysep=5pt]
+\newcommand\thmbox[1]{%
+  \noindent\begin{tikzpicture}%
+  \node [thmbox] (box){%
+    \begin{minipage}{.94\textwidth}%
+      #1%
+    \end{minipage}%
+  };%
+  \end{tikzpicture}}
+\let\theoremframecommand\thmbox
+
+\theoremstyle{definition}
+\shadecolor{gray!5}
+\newshadedtheorem{definition}{Definition}
+%\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+\theoremstyle{plain}
+\newtheorem{problem}{Problem}
+\shadecolor{gray!15}
+\newshadedtheorem{theorem}{Theorem}
+\newshadedtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{lemma}{Lemma}
+
+
+%\theoremstyle{nonumberplain}
+%\newtheorem{proof}{Proof}
+
+\usepackage{graphicx}
+
+% cool symbols
+\usepackage{amssymb}
+\usepackage{MnSymbol}
+\usepackage{wasysym}
+% \usepackage{marvosym}
+
+% zkratky pro zprehledneni
+\usepackage[ligature]{semantic}
+\mathlig{<-}{\leftarrow}
+\mathlig{->}{\rightarrow}
+\mathlig{==>}{\Rightarrow}
+\mathlig{<==}{\Leftarrow}
+\mathlig{<=}{\leq}
+\mathlig{>=}{\geq}
+\mathlig{...}{\dotso}
+
+% FIXME :)
+\newcommand{\FIXME}[1]{\textcolor{Maroon}{#1}}
+
+% makra pro clanek
+\newcommand{\QED}{\qed}
+
+\newcommand{\Nset}{\mathbb{N}}
+\newcommand{\Nseto}{\Nset_0}
+\newcommand{\Qset}{\mathbb{Q}}
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\Rsetp}{\mathbb{R}_{>0}}
+\newcommand{\Rsetpo}{\mathbb{R}_{\ge 0}}
+\newcommand{\Zset}{\mathbb{Z}}
+
+\newcommand{\indicator}[1]{\mathbf{I}_#1}
+\newcommand{\field}{\mathfrak{F}}
+\newcommand{\borel}{\mathfrak{B}}
+
+\newcommand{\eps}{\varepsilon}
+
+
+\pagestyle{plain}
+\sloppy
+
+\setlength{\parskip}{.3ex plus .2ex minus .1ex}
+\setlength{\parindent}{0pt}

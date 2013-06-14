@@ -1,0 +1,67 @@
+\chapter{Pokus zavést hry formálně}
+
+\newcommand{\game}{\mathcal{G}}
+
+\newcommand{\Exp}{E}
+\renewcommand{\exp}{e}
+\newcommand{\Code}{C}
+\newcommand{\Codeset}{D}
+\newcommand{\code}{c}
+
+
+\newcommand{\result}{\rho}
+\newcommand{\resultc}{\result_\code}
+
+\newcommand{\Expres}{\Delta}
+\newcommand{\hist}{\pi}
+\newcommand{\histstg}[2]{\hist^{#1,#2}}
+
+\newcommand{\stg}{\sigma}
+\newcommand{\len}{\lambda}
+\newcommand{\lenstg}[2]{\len^{#1,#2}}
+\newcommand{\lenmax}[1]{\len^{#1}_\textrm{max}}
+\newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
+
+\begin{definition}
+A \emph{code-breaking game} is a triple 
+ $\game = (\Code, \Exp, (\resultc)_{\code\in\Code})$, where 
+ $\Code$ is a finite set of possible codes, 
+ $\Exp$ is a finite set of possible experiments and
+ $\resultc: \Exp -> 2^\Code$ is the result function for code $\code\in\Code$ such that
+ $\code\in\resultc(\exp)$ for every $\exp\in\Exp$.
+\end{definition}
+
+\begin{definition}
+A \emph{history} is a sequence $\hist$
+ of elements from $\Expres = (\Exp \times 2^\Code)$.
+Let $\hist[i]$ and $\hist[j..k]$ denote 
+ the $i$-th element of $\hist$ and
+ the subsequence from the $j$-th to the $k$-th element, respectively. 
+ Furher, if $\hist[i] = (\exp, \Codeset)$, 
+ let $\hist[i]^\exp = \exp$ and 
+ $\hist[i]^\result = \Codeset$ denote the projections.
+
+Let $\hist \in \Expres^n$ be a history and let 
+ $m = \left|\bigcap_{i=1}^n\hist[i]^\result\right|$.
+ We call a history \emph{finished} if $m = 1$ and \emph{invalid} if $m = 0$.
+\end{definition}
+
+\begin{definition}
+Strategy is a function $\stg: \Expres^* -> \Exp$
+ giving the next experiment based on the history of the game.
+On a code $\code\in\Code$, a strategy $\stg$ generates a history $\hist(\stg, \code) \in\Expres^\omega$ defined by
+ \[ \forall i>1\;.\;\;
+ \histstg{\stg}{\code}[i+1] = 
+ \left( \underline{\stg(\histstg{\stg}{\code}[1..i])},
+ \resultc(\underline{\stg(\histstg{\stg}{\code}[1..i])}) \right). \]
+\end{definition}
+
+\begin{definition}
+Number of steps $\lenstg{\stg}{\code}$ of a strategy $\stg$ on a code $\code$ 
+ is the least number $k$ such that $\histstg{\stg}{\code}[1..k]$ is finished.
+Let \[ \lenmax{\stg} = \max \{\lenstg{\stg}{\code} \;|\; \code\in\Code \} \] 
+ is the worst-case number of steps of strategy $\stg$.
+Given a probability distribution on codes,
+ let $\lenexp{\stg} = E(\lenstg{\stg}{\code})$ be the expected number of steps of strategy $\stg$. 
+\end{definition}
+
