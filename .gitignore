@@ -1,5 +1,23 @@
 *.py[cod]
 
+# executables
+
+limboole
+testlimboole
+dimacs2boole
+
+picosat
+!picosat/
+picomus
+picogcnf
+picomcs
+
+lingeling
+!lingeling/
+
+# sys blabla
+*.DS_Store
+
 # latex
 *.out
 *.log
@@ -11,6 +29,7 @@
 
 # C extensions
 *.so
+*.o
 
 # Packages
 *.egg
