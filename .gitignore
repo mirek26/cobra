@@ -1,5 +1,14 @@
 *.py[cod]
 
+# latex
+*.out
+*.log
+*.dvi
+*.blg
+*_latexmk
+*.fls
+*.aux
+
 # C extensions
 *.so
 
