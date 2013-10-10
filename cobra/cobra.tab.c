@@ -79,8 +79,10 @@
 #line 1 "cobra.y"
 
   #include <iostream>
+  #include <cstdlib>
   #include <cctype>
   #include <cstring>
+  #include <string>
   #include <vector>
 
   #include "formula.cpp"
@@ -111,13 +113,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 17 "cobra.y"
+#line 19 "cobra.y"
 {
-  Formula*  formula;   /* For the expressions. Since it is a pointer, no problem. */
-  char      ident;  /* For the lexical analyser. I tokens */
+  Formula* formula;   /* For the expressions. Since it is a pointer, no problem. */
+  char* ident;     /* For the lexical analyser. I tokens */
+  ListOfFormulas* list_of_formulas;
 }
 /* Line 193 of yacc.c.  */
-#line 121 "cobra.tab.c"
+#line 124 "cobra.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -130,7 +133,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 134 "cobra.tab.c"
+#line 137 "cobra.tab.c"
 
 #ifdef short
 # undef short
@@ -343,18 +346,18 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  5
+#define YYFINAL  7
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   14
+#define YYLAST   41
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  8
+#define YYNTOKENS  13
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  2
+#define YYNNTS  3
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  5
+#define YYNRULES  11
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  11
+#define YYNSTATES  25
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -369,10 +372,10 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     5,     2,
-       6,     7,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,    11,     2,     2,     5,     2,
+       9,    10,     2,     2,    12,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       7,     8,     6,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -399,20 +402,25 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     7,    11,    15
+       0,     0,     3,     7,    11,    15,    19,    23,    27,    33,
+      35,    37
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-       9,     0,    -1,     6,     9,     7,    -1,     9,     5,     9,
-      -1,     9,     4,     9,    -1,     3,    -1
+      14,     0,    -1,     9,    14,    10,    -1,    14,     5,    14,
+      -1,    14,     4,    14,    -1,    14,     6,    14,    -1,    14,
+       7,    14,    -1,    14,     8,    14,    -1,    11,     3,     9,
+      15,    10,    -1,     3,    -1,    14,    -1,    15,    12,    14,
+      -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    32,    32,    33,    34,    35
+       0,    39,    39,    40,    41,    42,    43,    44,    45,    46,
+      49,    50
 };
 #endif
 
@@ -421,8 +429,9 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "IDENT", "'|'", "'&'", "'('", "')'",
-  "$accept", "formula", 0
+  "$end", "error", "$undefined", "IDENT", "'|'", "'&'", "'>'", "'<'",
+  "'='", "'('", "')'", "'#'", "','", "$accept", "formula",
+  "list_of_formulas", 0
 };
 #endif
 
@@ -431,20 +440,23 @@ static const char *const yytname[] =
    token YYLEX-NUM.  */
 static const yytype_uint16 yytoknum[] =
 {
-       0,   256,   257,   258,   124,    38,    40,    41
+       0,   256,   257,   258,   124,    38,    62,    60,    61,    40,
+      41,    35,    44
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,     8,     9,     9,     9,     9
+       0,    13,    14,    14,    14,    14,    14,    14,    14,    14,
+      15,    15
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     3,     3,     3,     1
+       0,     2,     3,     3,     3,     3,     3,     3,     5,     1,
+       1,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -452,29 +464,31 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     5,     0,     0,     0,     1,     0,     0,     2,     4,
-       3
+       0,     9,     0,     0,     0,     0,     0,     1,     0,     0,
+       0,     0,     0,     2,     0,     4,     3,     5,     6,     7,
+      10,     0,     8,     0,    11
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3
+      -1,     4,    21
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -5
+#define YYPACT_NINF -4
 static const yytype_int8 yypact[] =
 {
-       8,    -5,     8,     0,     5,    -5,     8,     8,    -5,    -4,
-      -5
+      17,    -4,    17,    37,    11,    25,    32,    -4,    17,    17,
+      17,    17,    17,    -4,    17,    31,    16,     6,    26,    -4,
+      -3,    15,    -4,    17,    -3
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -5,     1
+      -4,    -2,    -4
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -484,22 +498,29 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       5,     7,     0,     4,     6,     7,     0,     9,    10,     6,
-       7,     1,     8,     0,     2
+       5,     8,     9,    10,    11,    12,    15,    16,    17,    18,
+      19,     7,    20,    11,    12,     8,     9,    10,    11,    12,
+       1,    24,    10,    11,    12,    22,     2,    23,     3,     8,
+       9,    10,    11,    12,    12,    13,     9,    10,    11,    12,
+       6,    14
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-       0,     5,    -1,     2,     4,     5,    -1,     6,     7,     4,
-       5,     3,     7,    -1,     6
+       2,     4,     5,     6,     7,     8,     8,     9,    10,    11,
+      12,     0,    14,     7,     8,     4,     5,     6,     7,     8,
+       3,    23,     6,     7,     8,    10,     9,    12,    11,     4,
+       5,     6,     7,     8,     8,    10,     5,     6,     7,     8,
+       3,     9
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     6,     9,     9,     0,     4,     5,     7,     9,
-       9
+       0,     3,     9,    11,    14,    14,     3,     0,     4,     5,
+       6,     7,     8,    10,     9,    14,    14,    14,    14,    14,
+      14,    15,    10,    12,    14
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1314,28 +1335,58 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 32 "cobra.y"
+#line 39 "cobra.y"
     { (yyval.formula) = (yyvsp[(2) - (3)].formula); ;}
     break;
 
   case 3:
-#line 33 "cobra.y"
+#line 40 "cobra.y"
     { (yyval.formula) = new AndOperator((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); f = (yyval.formula);;}
     break;
 
   case 4:
-#line 34 "cobra.y"
+#line 41 "cobra.y"
     { (yyval.formula) = new OrOperator((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); f = (yyval.formula); ;}
     break;
 
   case 5:
-#line 35 "cobra.y"
+#line 42 "cobra.y"
+    { (yyval.formula) = new ImpliesOperator((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); f = (yyval.formula); ;}
+    break;
+
+  case 6:
+#line 43 "cobra.y"
+    { (yyval.formula) = new ImpliesOperator((yyvsp[(3) - (3)].formula), (yyvsp[(1) - (3)].formula)); f = (yyval.formula); ;}
+    break;
+
+  case 7:
+#line 44 "cobra.y"
+    { (yyval.formula) = new EquivalenceOperator((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); f = (yyval.formula); ;}
+    break;
+
+  case 8:
+#line 45 "cobra.y"
+    { (yyval.formula) = new AtLeastOperator(atoi((yyvsp[(2) - (5)].ident)), (yyvsp[(4) - (5)].list_of_formulas)); f = (yyval.formula); ;}
+    break;
+
+  case 9:
+#line 46 "cobra.y"
     { (yyval.formula) = new Variable((yyvsp[(1) - (1)].ident)); f = (yyval.formula); ;}
+    break;
+
+  case 10:
+#line 49 "cobra.y"
+    { (yyval.list_of_formulas) = new ListOfFormulas((yyvsp[(1) - (1)].formula)); ;}
+    break;
+
+  case 11:
+#line 50 "cobra.y"
+    { (yyvsp[(1) - (3)].list_of_formulas)->add((yyvsp[(3) - (3)].formula)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1339 "cobra.tab.c"
+#line 1390 "cobra.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1549,7 +1600,7 @@ yyreturn:
 }
 
 
-#line 36 "cobra.y"
+#line 52 "cobra.y"
 
 
 
@@ -1567,22 +1618,30 @@ void yyerror(const char *error)
   std::cout << error << std::endl;
 }
 
+bool isIdentChar(char c) {
+  return isalnum(c) || c == '_';
+}
+
 int yylex()
 {
   do {
     auto ch = std::cin.peek();
-    if (isalpha(ch)) {
+    if (ch == ' ' || ch == '\n' || ch == '\t') {
       std::cin.get();
-      yylval.ident = ch;
-      return IDENT;
-    } else if (ch == '|' || ch == '&' || ch == '(' || ch == ')') {
-       std::cin.get();
-       return ch;
+    } else if (!isIdentChar(ch)) {
+      std::cin.get();
+      return ch;            
     } else {
-      std::cin.get();
+      std::string s;
+      while (isIdentChar(std::cin.peek())) {
+        s.push_back(std::cin.get());
+      }
+      yylval.ident = strdup(s.c_str());
+      return IDENT;
     }
   } while (!std::cin.eof());
 
+  std::cout << "end of input" << std::endl;
   return -1;
 }
 
