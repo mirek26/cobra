@@ -22,11 +22,13 @@ cobra
 *.DS_Store
 
 # bizon + flex
-.tab.c
-.tab.h
-.tab.cpp
-.yy.c
-.yy.cpp
+*.tab.c
+*.tab.h
+*.tab.cpp
+*.tab.hpp
+*.yy.c
+*.yy.cc
+*.yy.cpp
 
 # latex
 *.out

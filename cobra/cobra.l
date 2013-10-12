@@ -1,9 +1,7 @@
 %{
-#include <iostream>
 #include "formula.cpp"
-#include "cobra.tab.h"
+#include "cobra.tab.hpp"
 
-using namespace std;
 #define YY_DECL extern "C" int yylex()
 %}
 %%

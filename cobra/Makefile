@@ -1,24 +1,28 @@
-CXX=clang++
-CXXFLAGS=-c -Wall -std=c++11
+CC = clang++
+CCFLAGS = -Wall -pedantic -std=c++11
+FLEX = flex
+BISON = bison -d
 
-cobra: formula.o cobra.tab.o lex.yy.o 
-	$(CXX) cobra.tab.o formula.o lex.yy.o -o cobra -ll 
+default: cobra
 
-cobra.tab.c: cobra.y
-	bison -d cobra.y
-cobra.tab.h: cobra.tab.h
+cobra: formula.o cobra.tab.o cobra.yy.o
+	$(CC) formula.o cobra.tab.o cobra.yy.o -o cobra -ll 
 
-cobra.tab.o: cobra.tab.c
-	$(CXX) $(CXXFLAGS) cobra.tab.c
+# bison 
+cobra.tab.cpp: cobra.ypp
+	$(BISON) $<
 
-lex.yy.c: cobra.l
-	flex cobra.l
+# flex
+cobra.yy.c: cobra.l
+	$(FLEX) -o $@ $<
 
-lex.yy.o: lex.yy.c cobra.tab.h
-	$(CXX) $(CXXFLAGS) lex.yy.c
+cobra.yy.o: cobra.yy.c
+	# suppress all warnings (compiling c as c++)
+	$(CC) -c -std=c++11 -w $< -o $@
 
-formula.o: formula.cpp
-	$(CXX) $(CXXFLAGS) formula.cpp
+# general
+%.o: %.cpp
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 clean: 
-	rm -rf *.o cobra.tab.c cobra.tab.h cobra
+	rm -rf *.o cobra.tab.cpp cobra.tab.hpp cobra.yy.c cobra

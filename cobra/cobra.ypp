@@ -22,7 +22,7 @@
  * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence 
  */ 
 %left T_EQUIV
-%left T_IMPLIES, T_IMPLIED
+%left T_IMPLIES T_IMPLIED
 %left T_OR
 %left T_AND
 %left '!' 
