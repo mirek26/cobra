@@ -21,6 +21,13 @@ cobra
 # sys blabla
 *.DS_Store
 
+# bizon + flex
+.tab.c
+.tab.h
+.tab.cpp
+.yy.c
+.yy.cpp
+
 # latex
 *.out
 *.log

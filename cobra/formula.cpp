@@ -186,10 +186,10 @@ public:
 };
 
 // Simple negation.
-class NegOperator: public Formula {
+class NotOperator: public Formula {
   Formula* m_child;
 public:
-  NegOperator(Formula* child): m_child(child) {
+  NotOperator(Formula* child): m_child(child) {
   }
 
   virtual void dump() {
