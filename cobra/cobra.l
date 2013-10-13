@@ -1,6 +1,6 @@
 %{
-#include "formula.cpp"
-#include "cobra.tab.hpp"
+#include "./formula.h"
+#include "./cobra.tab.hpp"
 
 #define YY_DECL extern "C" int yylex()
 %}
@@ -8,7 +8,7 @@
 
  /* white space */
 [ \t\n]         ;
- /* comments */  
+ /* comments */
 \#.*\n			;  /**/
 
  /* number constants */

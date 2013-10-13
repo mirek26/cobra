@@ -1,3 +1,6 @@
+/*
+ * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ */
 %{
   #include <iostream>
   #include <cstdlib>
@@ -6,9 +9,9 @@
   #include <string>
   #include <vector>
 
-  #include "formula.cpp"
+  #include "./formula.h"
 
-  #define YYERROR_VERBOSE 
+  #define YYERROR_VERBOSE
   extern "C" int yylex();
   extern "C" int yyparse();
   void yyerror (const char *error);
@@ -18,23 +21,23 @@
 %token T_IDENT
 %token T_INT
 
-/* order of precedence from 
- * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence 
- */ 
+/* order of precedence from
+ * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence
+ */
 %left T_EQUIV
 %left T_IMPLIES T_IMPLIED
 %left T_OR
 %left T_AND
-%left '!' 
+%left '!'
 
 %token T_ATLEAST
 %token T_ATMOST
 %token T_EXACTLY
 
 %union {
-  Formula* formula;   
+  Formula* formula;
   ListOfFormulas* list_of_formulas;
-  char*    tstr; 
+  char*    tstr;
   int      tint;
 }
 
@@ -46,29 +49,29 @@
 
 %%
 
-formula : 
-    '(' formula ')'             
+formula :
+    '(' formula ')'
       { $$ = $2; }
-  | formula T_AND formula  
+  | formula T_AND formula
       { $$ = new AndOperator($1, $3); f = $$; }
-  | formula T_OR formula        
+  | formula T_OR formula
       { $$ = new OrOperator($1, $3); f = $$; }
-  | formula T_IMPLIES formula   
+  | formula T_IMPLIES formula
       { $$ = new ImpliesOperator($1, $3); f = $$; }
-  | formula T_IMPLIED formula   
-      { $$ = new ImpliesOperator($3, $1); f = $$; } 
-  | formula T_EQUIV formula 
+  | formula T_IMPLIED formula
+      { $$ = new ImpliesOperator($3, $1); f = $$; }
+  | formula T_EQUIV formula
       { $$ = new EquivalenceOperator($1, $3); f = $$; }
-  | T_ATLEAST '-' T_INT '(' list_of_formulas ')' 
+  | T_ATLEAST '-' T_INT '(' list_of_formulas ')'
       { $$ = new AtLeastOperator($3, $5); f = $$; }
-  | T_ATMOST '-' T_INT '(' list_of_formulas ')' 
+  | T_ATMOST '-' T_INT '(' list_of_formulas ')'
       { $$ = new AtMostOperator($3, $5); f = $$; }
-  | T_EXACTLY '-' T_INT '(' list_of_formulas ')' 
+  | T_EXACTLY '-' T_INT '(' list_of_formulas ')'
       { $$ = new ExactlyOperator($3, $5); f = $$; }
   | '!' formula
       { $$ = new NotOperator($2); f = $$; }
-  | T_IDENT       
-      { $$ = new Variable($1); f = $$; } 
+  | T_IDENT
+      { $$ = new Variable($1); f = $$; }
 
 list_of_formulas :
     formula    { $$ = new ListOfFormulas($1); }
@@ -81,7 +84,6 @@ int main()
 {
   yyparse();
   f->dump();
-  printf(".\n");
   delete f;
   return 0;
 }
