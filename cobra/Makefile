@@ -1,4 +1,4 @@
-CC = clang++
+CC = clang++ -g
 CCFLAGS = -Wall -pedantic -std=c++11
 FLEX = flex
 BISON = bison -d
@@ -21,7 +21,10 @@ cobra.yy.o: cobra.yy.c
 	$(CC) -c -std=c++11 -w $< -o $@
 
 # general
-%.o: %.cpp
+%.o: %.cpp %.h
+	$(CC) -c $(CCFLAGS) $< -o $@
+
+cobra.tab.o: cobra.tab.cpp cobra.ypp
 	$(CC) -c $(CCFLAGS) $< -o $@
 
 clean:

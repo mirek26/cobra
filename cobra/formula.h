@@ -2,6 +2,7 @@
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
 #include <cstdio>
+#include <cassert>
 #include <vector>
 #include <string>
 #include "./util.h"
@@ -17,20 +18,31 @@ class Construct {
   explicit Construct(int childCount)
       : ChildCount(childCount) { }
 
-  virtual int getChildCount() {
+  virtual uint getChildCount() {
     return ChildCount;
   }
 
   virtual ~Construct() { }
-  virtual Construct* getChild(int nth) = 0;
+  virtual Construct* getChild(uint nth) = 0;
+  virtual void setChild(uint nth, Construct* value) {
+    // by default, we expect no change
+    assert(getChild(nth) == value);
+  }
+
   virtual std::string getName() = 0;
   virtual void dump(int indent = 0);
+
+  virtual Construct* optimize() {
+    for (uint i = 0; i < getChildCount(); ++i) {
+      setChild(i, getChild(i)->optimize());
+    }
+    return this;
+  }
 };
 
 // Prepositional formula
 class Formula: public Construct {
  public:
-  virtual ~Formula() { }
   explicit Formula(int childCount)
       : Construct(childCount) { }
 };
@@ -61,16 +73,40 @@ class ListOfFormulas: public Construct {
     m_children.push_back(f);
   }
 
+  void add(ListOfFormulas* list) {
+    m_children.insert(m_children.end(), list->m_children.begin(), list->m_children.end());
+  }
+
+  void clear() {
+    m_children.clear();
+  }
+
+  void remove(int nth) {
+    m_children[nth] = m_children.back();
+    m_children.pop_back();
+  }
+
   virtual std::string getName() {
     return "ListOfFormulas";
   }
 
-  virtual int getChildCount() {
+  virtual uint getChildCount() {
     return m_children.size();
   }
 
-  virtual Construct* getChild(int nth) {
+  virtual Construct* getChild(uint nth) {
+    assert(nth < m_children.size());
     return m_children[nth];
+  }
+
+  virtual void setChild(uint nth, Construct* value) {
+    auto f = dynamic_cast<Formula*>(value);
+    assert(f);
+    m_children[nth] = f;
+  }
+
+  std::vector<Formula*>& getVector() {
+    return m_children;
   }
 };
 
@@ -90,7 +126,8 @@ class NaryOperator: public Formula {
     m_list = list;
   }
 
-  virtual Construct* getChild(int nth) {
+  virtual Construct* getChild(uint nth) {
+    assert(nth < getChildCount());
     return m_list;
   }
 
@@ -110,6 +147,8 @@ class AndOperator: public NaryOperator {
   virtual std::string getName() {
     return "AndOperator";
   }
+
+  virtual Construct* optimize();
 };
 
 // n-ary operator AND
@@ -123,6 +162,8 @@ class OrOperator: public NaryOperator {
   virtual std::string getName() {
     return "OrOperator";
   }
+
+  virtual Construct* optimize();
 };
 
 // At least m_value children are satisfied
@@ -182,12 +223,13 @@ class EquivalenceOperator: public Formula {
     return "EquivalenceOperator";
   }
 
-  virtual Construct* getChild(int nth) {
+  virtual Construct* getChild(uint nth) {
+    assert(nth < getChildCount());
     switch (nth) {
       case 0: return m_left;
       case 1: return m_right;
+      default: assert(false);
     }
-    return nullptr;
   }
 };
 
@@ -206,12 +248,13 @@ class ImpliesOperator: public Formula {
     return "ImpliesOperator";
   }
 
-  virtual Construct* getChild(int nth) {
+  virtual Construct* getChild(uint nth) {
+    assert(nth < getChildCount());
     switch (nth) {
       case 0: return m_premise;
       case 1: return m_consequence;
+      default: assert(false);
     }
-    return nullptr;
   }
 };
 
@@ -227,7 +270,8 @@ class NotOperator: public Formula {
     return "NotOperator";
   }
 
-  virtual Construct* getChild(int nth) {
+  virtual Construct* getChild(uint nth) {
+    assert(nth == 0);
     return m_child;
   }
 };
@@ -245,8 +289,8 @@ class Variable: public Formula {
     return "Variable " + m_ident;
   }
 
-  virtual Construct* getChild(int nth) {
-    return nullptr;
+  virtual Construct* getChild(uint nth) {
+    assert(false);
   }
 };
 

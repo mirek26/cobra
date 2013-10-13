@@ -24,11 +24,12 @@
 /* order of precedence from
  * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence
  */
-%left T_EQUIV
-%left T_IMPLIES T_IMPLIED
-%left T_OR
-%left T_AND
-%left '!'
+%right T_EQUIV
+%right T_IMPLIES
+%left T_IMPLIED
+%right T_OR
+%right T_AND
+%right '!'
 
 %token T_ATLEAST
 %token T_ATMOST
@@ -84,7 +85,9 @@ int main()
 {
   yyparse();
   f->dump();
-  delete f;
+  Construct* g = f->optimize();
+  g->dump();
+  delete g;
   return 0;
 }
 
