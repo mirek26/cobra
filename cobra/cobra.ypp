@@ -15,7 +15,6 @@
   extern "C" int yylex();
   extern "C" int yyparse();
   void yyerror (const char *error);
-  Formula* f;
 %}
 
 %token T_IDENT
@@ -79,17 +78,6 @@ list_of_formulas :
   | list_of_formulas ',' formula { $1->add($3); }
 
 %%
-
-
-int main()
-{
-  yyparse();
-  f->dump();
-  Construct* g = f->optimize();
-  g->dump();
-  delete g;
-  return 0;
-}
 
 void yyerror(const char *error)
 {

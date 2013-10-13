@@ -294,4 +294,7 @@ class Variable: public Formula {
   }
 };
 
+// TODO: remove this
+extern Formula* f;
+
 #endif  // COBRA_FORMULA_H_

@@ -3,10 +3,12 @@ CCFLAGS = -Wall -pedantic -std=c++11
 FLEX = flex
 BISON = bison -d
 
-default: cobra
+default: clean cobra
 
-cobra: formula.o util.o cobra.tab.o cobra.yy.o
-	$(CC) formula.o util.o cobra.tab.o cobra.yy.o -o cobra -ll
+cobra: formula.o util.o cobra.tab.o cobra.yy.o main.o
+	$(CC) formula.o util.o cobra.tab.o cobra.yy.o main.o -o cobra -ll
+
+main.cpp: cobra.tab.cpp
 
 # bison
 cobra.tab.cpp: cobra.ypp
@@ -22,6 +24,9 @@ cobra.yy.o: cobra.yy.c
 
 # general
 %.o: %.cpp %.h
+	$(CC) -c $(CCFLAGS) $< -o $@
+
+%.o: %.cpp
 	$(CC) -c $(CCFLAGS) $< -o $@
 
 cobra.tab.o: cobra.tab.cpp cobra.ypp
