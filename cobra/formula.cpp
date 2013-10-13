@@ -7,15 +7,36 @@
 
 // Base class for AST node 
 class Construct {
+  const int ChildCount;
+
 public:
+  Construct(int childCount)
+      : ChildCount(childCount) { }
+
+  virtual int getChildCount() {
+    return ChildCount;
+  }
+
   virtual ~Construct() { }
+  virtual Construct* getChild(int nth) = 0;
+  virtual std::string getName() = 0;
+  virtual void dump(int indent = 0) {
+    for (int i = 0; i < indent; ++i) {
+      std::cout << "   ";
+    }
+    std::cout << this << ": " << getName() << std::endl;
+    for (int i = 0; i < getChildCount(); ++i) {
+      getChild(i)->dump(indent + 1);
+    }
+  }
 };
 
 // Prepositional formula
 class Formula: public Construct {
 public:  
   virtual ~Formula() { }
-  virtual void dump() = 0;
+  Formula(int childCount)
+      : Construct(childCount) { }
 };
 
 // List of prepositional formulas
@@ -29,52 +50,56 @@ public:
     }
   }
 
-  ListOfFormulas(Formula* f) {
+  ListOfFormulas(Formula* f)
+      : Construct(0) {
     add(f); 
   }
 
-  ListOfFormulas(Formula* f1, Formula* f2) {
+  ListOfFormulas(Formula* f1, Formula* f2)
+      : Construct(0) {
     add(f1);
     add(f2);
-  }
-
-  ListOfFormulas(std::vector<Formula*> list) {
-    m_children = list;
   }
 
   void add(Formula* f) {
     m_children.push_back(f);
   }
 
-  virtual void dump(std::string sep = ",") {
-    for (auto it = m_children.begin(); it != m_children.end() - 1; ++it) {
-      (*it)->dump();
-      std::cout << sep;
-    }
-    m_children.back()->dump();
+  virtual std::string getName() {
+    return "ListOfFormulas";
+  }
+
+  virtual int getChildCount() {
+    return m_children.size();
+  }
+
+  virtual Construct* getChild(int nth) {
+    return m_children[nth];
   }
 };
 
 // Base class for any n-ary operator, abstract
 class NaryOperator: public Formula {
 protected:
-  ListOfFormulas* m_children;
+  ListOfFormulas* m_list;
  
 public:
-  NaryOperator(Formula* left, Formula* right) {
-    m_children = new ListOfFormulas(left, right);
+  NaryOperator(Formula* left, Formula* right)
+      : Formula(1) {
+    m_list = new ListOfFormulas(left, right);
   }
 
-  NaryOperator(std::vector<Formula*> list) {
-    m_children = new ListOfFormulas(list);
+  NaryOperator(ListOfFormulas* list)
+      : Formula(1) {
+    m_list = list;
   }
 
-  NaryOperator(ListOfFormulas* list) {
-    m_children = list;
+  virtual Construct* getChild(int nth) {
+    return m_list;
   }
 
   virtual ~NaryOperator() {
-    delete m_children;
+    delete m_list;
   }
 };
 
@@ -82,13 +107,10 @@ public:
 class AndOperator: public NaryOperator {
 public:
   AndOperator(Formula *left, Formula* right): NaryOperator(left, right) {}
-  AndOperator(std::vector<Formula*> list): NaryOperator(list) {}
   AndOperator(ListOfFormulas* list): NaryOperator(list) {}
 
-  virtual void dump() {
-    std::cout << "(";
-    m_children->dump(" & ");
-    std::cout << ")";
+  virtual std::string getName() {
+    return "AndOperator";
   }  
 };
 
@@ -96,14 +118,11 @@ public:
 class OrOperator: public NaryOperator {
 public:
   OrOperator(Formula *left, Formula* right): NaryOperator(left, right) {}
-  OrOperator(std::vector<Formula*> list): NaryOperator(list) {}
   OrOperator(ListOfFormulas* list): NaryOperator(list) {}
 
-  virtual void dump() {
-    std::cout << "(";
-    m_children->dump(" | ");
-    std::cout << ")";
-  }  
+  virtual std::string getName() {
+    return "OrOperator";
+  }
 };
 
 // At least m_value children are satisfied
@@ -114,11 +133,9 @@ public:
     NaryOperator(list),
     m_value(value) { }
 
-  virtual void dump() {
-    std::cout << "AtLeast-" << m_value << "(";
-    m_children->dump(", ");
-    std::cout << ")";
-  }  
+  virtual std::string getName() {
+    return "AtLeastOperator(" + std::to_string(m_value) + ")";
+  }
 };
 
 // At most m_value children are satisfied
@@ -129,11 +146,9 @@ public:
     NaryOperator(list), 
     m_value(value) { }
 
-  virtual void dump() {
-    std::cout << "AtMost-" << m_value << "(";
-    m_children->dump(", ");
-    std::cout << ")";
-  }  
+  virtual std::string getName() {
+    return "AtMostOperator(" + std::to_string(m_value) + ")";
+  }
 };
 
 // Exactly m_value of children are satisfied
@@ -144,11 +159,9 @@ public:
     NaryOperator(list), 
     m_value(value) { }
 
-  virtual void dump() {
-    std::cout << "Exactly-" << m_value << "(";
-    m_children->dump(", ");
-    std::cout << ")";
-  }  
+  virtual std::string getName() {
+    return "ExactlyOperator(" + std::to_string(m_value) + ")";
+  }
 };
 
 // Equivalence aka iff
@@ -156,32 +169,44 @@ class EquivalenceOperator: public Formula {
   Formula* m_left;
   Formula* m_right;
 public:
-  EquivalenceOperator(Formula* left, Formula* right): m_left(left), m_right(right) {
+  EquivalenceOperator(Formula* left, Formula* right)
+      : Formula(2), 
+        m_left(left),
+        m_right(right) { }
+
+  virtual std::string getName() {
+    return "EquivalenceOperator";
   }
 
-  virtual void dump() {
-    std::cout << "(";
-    m_left->dump();
-    std::cout << "<->";
-    m_right->dump();
-    std::cout << ")"; 
+  virtual Construct* getChild(int nth) {
+    switch (nth) {
+      case 0: return m_left;
+      case 1: return m_right;
+    }
+    return nullptr;
   }
 };
 
 // Implication
 class ImpliesOperator: public Formula { 
-  Formula* m_predpod;
-  Formula* m_dusled;
+  Formula* m_premise;
+  Formula* m_consequence;
 public:
-  ImpliesOperator(Formula* predpok, Formula* dusled): m_predpod(predpok), m_dusled(dusled) {
+  ImpliesOperator(Formula* premize, Formula* consequence)
+      : Formula(2), 
+        m_premise(premize),
+        m_consequence(consequence) { }
+
+  virtual std::string getName() {
+    return "ImpliesOperator";
   }
 
-  virtual void dump() {
-    std::cout << "(";
-    m_predpod->dump();
-    std::cout << "->";
-    m_dusled->dump();
-    std::cout << ")";
+  virtual Construct* getChild(int nth) {
+    switch (nth) {
+      case 0: return m_premise;
+      case 1: return m_consequence;
+    }
+    return nullptr;
   }
 };
 
@@ -189,12 +214,16 @@ public:
 class NotOperator: public Formula {
   Formula* m_child;
 public:
-  NotOperator(Formula* child): m_child(child) {
+  NotOperator(Formula* child)
+      : Formula(1), 
+        m_child(child) { }
+
+  virtual std::string getName() {
+    return "NotOperator";
   }
 
-  virtual void dump() {
-    std::cout << "!";
-    m_child->dump(); 
+  virtual Construct* getChild(int nth) {
+    return m_child;
   }
 };
 
@@ -203,11 +232,16 @@ class Variable: public Formula {
   std::string m_ident;
 
 public: 
-  Variable(std::string ident): m_ident(ident) {
+  Variable(std::string ident)
+      : Formula(0),
+        m_ident(ident) { }
+
+  virtual std::string getName() {
+    return "Variable " + m_ident;
   }
 
-  virtual void dump() {
-    std::cout << m_ident;
+  virtual Construct* getChild(int nth) {
+    return nullptr;
   }
 };
 

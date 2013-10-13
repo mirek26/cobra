@@ -1,4 +1,4 @@
-CC = clang++
+CC = g++
 CCFLAGS = -Wall -pedantic -std=c++11
 FLEX = flex
 BISON = bison -d
@@ -17,7 +17,7 @@ cobra.yy.c: cobra.l
 	$(FLEX) -o $@ $<
 
 cobra.yy.o: cobra.yy.c
-	# suppress all warnings (compiling c as c++ etc.)
+	@# suppress all warnings (compiling c as c++ etc.)
 	$(CC) -c -std=c++11 -w $< -o $@
 
 # general
