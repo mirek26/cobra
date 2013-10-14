@@ -2,8 +2,8 @@
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
 
-//#include "./cobra.tab.hpp"
 #include "./formula.h"
+#include "./util.h"
 
 extern "C" int yyparse();
 
@@ -13,8 +13,7 @@ int main()
 {
   yyparse();
   f->dump();
-  Construct* g = f->optimize();
+  Construct* g = f->to_cnf()->optimize();
   g->dump();
-  delete g;
   return 0;
 }

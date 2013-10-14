@@ -74,7 +74,7 @@ formula :
       { $$ = new Variable($1); f = $$; }
 
 list_of_formulas :
-    formula    { $$ = new std::vector<Formula*>(); }
+    formula    { $$ = new std::vector<Formula*>({ $1 }); }
   | list_of_formulas ',' formula { $1->push_back($3); }
 
 %%

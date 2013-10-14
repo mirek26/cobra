@@ -45,8 +45,17 @@ class Formula: public Construct {
  public:
   explicit Formula(int childCount)
       : Construct(childCount) { }
+
+  virtual Formula* to_cnf() {
+    return this;
+  }
+
+  virtual bool is_simple() {
+    return false;
+  }
 };
 
+class AndOperator;
 /*
  * Base class for any n-ary operator. Abstract.
  */
@@ -55,10 +64,24 @@ class NaryOperator: public Formula {
   std::vector<Formula*> m_list;
 
  public:
+  NaryOperator()
+      : Formula(1) {}
+
   NaryOperator(Formula* left, Formula* right)
       : Formula(1) {
     addChild(left);
     addChild(right);
+  }
+
+  explicit NaryOperator(std::vector<Formula*>* list)
+      : Formula(1) {
+    m_list.insert(m_list.end(), list->begin(), list->end());
+    delete list;
+  }
+
+  explicit NaryOperator(std::vector<Formula*>& list)
+      : Formula(1) {
+    m_list.insert(m_list.end(), list.begin(), list.end());
   }
 
   void addChild(Formula* child) {
@@ -74,12 +97,6 @@ class NaryOperator: public Formula {
     m_list.pop_back();
   }
 
-  explicit NaryOperator(std::vector<Formula*>* list)
-      : Formula(1) {
-    m_list.insert(m_list.end(), list->begin(), list->end());
-    delete list;
-  }
-
   virtual Construct* getChild(uint nth) {
     assert(nth < m_list.size());
     return m_list[nth];
@@ -88,6 +105,8 @@ class NaryOperator: public Formula {
   virtual uint getChildCount() {
     return m_list.size();
   }
+
+  AndOperator* to_cnf_prepare(std::vector<Formula*>& out_list);
 
   virtual ~NaryOperator() {
     for (auto& f: m_list) {
@@ -99,16 +118,22 @@ class NaryOperator: public Formula {
 // n-ary operator AND
 class AndOperator: public NaryOperator {
  public:
+  AndOperator()
+      : NaryOperator() { }
   AndOperator(Formula *left, Formula* right)
-      : NaryOperator(left, right) {}
+      : NaryOperator(left, right) { }
   explicit AndOperator(std::vector<Formula*>* list)
-      : NaryOperator(list) {}
+      : NaryOperator(list) { }
+  explicit AndOperator(std::vector<Formula*>& list)
+      : NaryOperator(list) { }
+
 
   virtual std::string getName() {
     return "AndOperator";
   }
 
   virtual Construct* optimize();
+  virtual Formula* to_cnf();
 };
 
 // n-ary operator AND
@@ -118,12 +143,15 @@ class OrOperator: public NaryOperator {
       : NaryOperator(left, right) {}
   explicit OrOperator(std::vector<Formula*>* list)
       : NaryOperator(list) {}
+  explicit OrOperator(std::vector<Formula*>& list)
+      : NaryOperator(list) {}
 
   virtual std::string getName() {
     return "OrOperator";
   }
 
   virtual Construct* optimize();
+  virtual Formula* to_cnf();
 };
 
 // At least m_value children are satisfied
@@ -138,6 +166,8 @@ class AtLeastOperator: public NaryOperator {
   virtual std::string getName() {
     return "AtLeastOperator(" + to_string(m_value) + ")";
   }
+
+  virtual Formula* to_cnf();
 };
 
 // At most m_value children are satisfied
@@ -152,6 +182,8 @@ class AtMostOperator: public NaryOperator {
   virtual std::string getName() {
     return "AtMostOperator(" + to_string(m_value) + ")";
   }
+
+  virtual Formula* to_cnf();
 };
 
 // Exactly m_value of children are satisfied
@@ -166,6 +198,8 @@ class ExactlyOperator: public NaryOperator {
   virtual std::string getName() {
     return "ExactlyOperator(" + to_string(m_value) + ")";
   }
+
+  virtual Formula* to_cnf();
 };
 
 // Equivalence aka iff
@@ -191,6 +225,8 @@ class EquivalenceOperator: public Formula {
       default: assert(false);
     }
   }
+
+  virtual Formula* to_cnf();
 };
 
 // Implication
@@ -216,6 +252,8 @@ class ImpliesOperator: public Formula {
       default: assert(false);
     }
   }
+
+  virtual Formula* to_cnf();
 };
 
 // Simple negation.
@@ -234,6 +272,11 @@ class NotOperator: public Formula {
     assert(nth == 0);
     return m_child;
   }
+
+  virtual Formula* to_cnf();
+  virtual bool is_simple() {
+    return m_child->is_simple();
+  }
 };
 
 // Just a variable, the only possible leaf
@@ -251,6 +294,14 @@ class Variable: public Formula {
 
   virtual Construct* getChild(uint nth) {
     assert(false);
+  }
+
+  virtual Formula* to_cnf() {
+    return this;
+  }
+
+  virtual bool is_simple() {
+    return true;
   }
 };
 
