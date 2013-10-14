@@ -1,4 +1,4 @@
-CC = clang++ -g
+CC = g++ -g
 CCFLAGS = -Wall -pedantic -std=c++11
 FLEX = flex
 BISON = bison -d
