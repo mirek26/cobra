@@ -19,15 +19,15 @@ void Construct::dump(int indent) {
 Construct* AndOperator::optimize() {
   Construct::optimize();
   int merged = 0;
-  int childCount = m_list->getChildCount();
+  int childCount = getChildCount();
   for (int i = 0; i < childCount; ++i) {
-    auto child = m_list->getChild(i - merged);
+    auto child = getChild(i - merged);
     auto andChild = dynamic_cast<AndOperator*>(child);
     if (andChild) {
-      m_list->remove(i - merged);
-      m_list->add(andChild->m_list);
+      removeChild(i - merged);
+      addChilds(andChild->m_list);
       merged++;
-      andChild->m_list->clear();
+      andChild->m_list.clear();
       delete andChild;
     }
   }
@@ -37,16 +37,16 @@ Construct* AndOperator::optimize() {
 Construct* OrOperator::optimize() {
   Construct::optimize();
   int merged = 0;
-  int childCount = m_list->getChildCount();
+  int childCount = getChildCount();
   for (int i = 0; i < childCount; ++i) {
-    auto child = m_list->getChild(i - merged);
-    auto andChild = dynamic_cast<OrOperator*>(child);
-    if (andChild) {
-      m_list->remove(i - merged);
-      m_list->add(andChild->m_list);
+    auto child = getChild(i - merged);
+    auto orChild = dynamic_cast<OrOperator*>(child);
+    if (orChild) {
+      removeChild(i - merged);
+      addChilds(orChild->m_list);
       merged++;
-      andChild->m_list->clear();
-      delete andChild;
+      orChild->m_list.clear();
+      delete orChild;
     }
   }
   return this;

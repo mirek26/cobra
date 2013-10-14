@@ -36,7 +36,7 @@
 
 %union {
   Formula* formula;
-  ListOfFormulas* list_of_formulas;
+  std::vector<Formula*>* list_of_formulas;
   char*    tstr;
   int      tint;
 }
@@ -74,8 +74,8 @@ formula :
       { $$ = new Variable($1); f = $$; }
 
 list_of_formulas :
-    formula    { $$ = new ListOfFormulas($1); }
-  | list_of_formulas ',' formula { $1->add($3); }
+    formula    { $$ = new std::vector<Formula*>(); }
+  | list_of_formulas ',' formula { $1->push_back($3); }
 
 %%
 

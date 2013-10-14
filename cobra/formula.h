@@ -47,92 +47,52 @@ class Formula: public Construct {
       : Construct(childCount) { }
 };
 
-// List of prepositional formulas
-class ListOfFormulas: public Construct {
-  std::vector<Formula*> m_children;
-
- public:
-  virtual ~ListOfFormulas() {
-    for (auto& f : m_children) {
-      delete f;
-    }
-  }
-
-  explicit ListOfFormulas(Formula* f)
-      : Construct(0) {
-    add(f);
-  }
-
-  ListOfFormulas(Formula* f1, Formula* f2)
-      : Construct(0) {
-    add(f1);
-    add(f2);
-  }
-
-  void add(Formula* f) {
-    m_children.push_back(f);
-  }
-
-  void add(ListOfFormulas* list) {
-    m_children.insert(m_children.end(), list->m_children.begin(), list->m_children.end());
-  }
-
-  void clear() {
-    m_children.clear();
-  }
-
-  void remove(int nth) {
-    m_children[nth] = m_children.back();
-    m_children.pop_back();
-  }
-
-  virtual std::string getName() {
-    return "ListOfFormulas";
-  }
-
-  virtual uint getChildCount() {
-    return m_children.size();
-  }
-
-  virtual Construct* getChild(uint nth) {
-    assert(nth < m_children.size());
-    return m_children[nth];
-  }
-
-  virtual void setChild(uint nth, Construct* value) {
-    auto f = dynamic_cast<Formula*>(value);
-    assert(f);
-    m_children[nth] = f;
-  }
-
-  std::vector<Formula*>& getVector() {
-    return m_children;
-  }
-};
-
-// Base class for any n-ary operator, abstract
+/*
+ * Base class for any n-ary operator. Abstract.
+ */
 class NaryOperator: public Formula {
  protected:
-  ListOfFormulas* m_list;
+  std::vector<Formula*> m_list;
 
  public:
   NaryOperator(Formula* left, Formula* right)
       : Formula(1) {
-    m_list = new ListOfFormulas(left, right);
+    addChild(left);
+    addChild(right);
   }
 
-  explicit NaryOperator(ListOfFormulas* list)
+  void addChild(Formula* child) {
+    m_list.push_back(child);
+  }
+
+  void addChilds(std::vector<Formula*> childs) {
+    m_list.insert(m_list.end(), childs.begin(), childs.end());
+  }
+
+  void removeChild(int nth) {
+    m_list[nth] = m_list.back();
+    m_list.pop_back();
+  }
+
+  explicit NaryOperator(std::vector<Formula*>* list)
       : Formula(1) {
-    m_list = list;
+    m_list.insert(m_list.end(), list->begin(), list->end());
+    delete list;
   }
 
   virtual Construct* getChild(uint nth) {
-    assert(nth < getChildCount());
-    return m_list;
+    assert(nth < m_list.size());
+    return m_list[nth];
+  }
+
+  virtual uint getChildCount() {
+    return m_list.size();
   }
 
   virtual ~NaryOperator() {
-    delete m_list;
+    for (auto& f: m_list) {
+      delete f;
+    }
   }
 };
 
@@ -141,7 +101,7 @@ class AndOperator: public NaryOperator {
  public:
   AndOperator(Formula *left, Formula* right)
       : NaryOperator(left, right) {}
-  explicit AndOperator(ListOfFormulas* list)
+  explicit AndOperator(std::vector<Formula*>* list)
       : NaryOperator(list) {}
 
   virtual std::string getName() {
@@ -156,7 +116,7 @@ class OrOperator: public NaryOperator {
  public:
   OrOperator(Formula *left, Formula* right)
       : NaryOperator(left, right) {}
-  explicit OrOperator(ListOfFormulas* list)
+  explicit OrOperator(std::vector<Formula*>* list)
       : NaryOperator(list) {}
 
   virtual std::string getName() {
@@ -171,7 +131,7 @@ class AtLeastOperator: public NaryOperator {
   int m_value;
 
  public:
-  AtLeastOperator(int value, ListOfFormulas* list)
+  AtLeastOperator(int value, std::vector<Formula*>* list)
       : NaryOperator(list),
         m_value(value) { }
 
@@ -185,7 +145,7 @@ class AtMostOperator: public NaryOperator {
   int m_value;
 
  public:
-  AtMostOperator(int value, ListOfFormulas* list)
+  AtMostOperator(int value, std::vector<Formula*>* list)
       : NaryOperator(list),
         m_value(value) { }
 
@@ -199,7 +159,7 @@ class ExactlyOperator: public NaryOperator {
   int m_value;
 
  public:
-  ExactlyOperator(int value, ListOfFormulas* list)
+  ExactlyOperator(int value, std::vector<Formula*>* list)
       : NaryOperator(list),
         m_value(value) { }
 
