@@ -10,6 +10,15 @@
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
 
+class Formula;
+class Variable;
+class OrOperator;
+class AndOperator;
+class NotOperator;
+Variable* get_temp();
+
+typedef std::vector<Formula*> FormulaVec;
+
 // Base class for AST node
 class Construct {
   const int ChildCount;
@@ -42,26 +51,31 @@ class Construct {
 
 // Prepositional formula
 class Formula: public Construct {
+  // variable that is equivalent to this subformula,
+  // for Tseitin transformation
+  Variable* var;
+
  public:
   explicit Formula(int childCount)
       : Construct(childCount) { }
 
-  virtual Formula* to_cnf() {
-    return this;
-  }
+  Formula* get_var();
+
+  virtual void tseitin(FormulaVec& clauses) = 0;
 
   virtual bool is_simple() {
     return false;
   }
+
+  virtual AndOperator* to_cnf();
 };
 
-class AndOperator;
 /*
  * Base class for any n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
-  std::vector<Formula*> m_list;
+  FormulaVec m_list;
 
  public:
   NaryOperator()
@@ -73,13 +87,13 @@ class NaryOperator: public Formula {
     addChild(right);
   }
 
-  explicit NaryOperator(std::vector<Formula*>* list)
+  explicit NaryOperator(FormulaVec* list)
       : Formula(1) {
     m_list.insert(m_list.end(), list->begin(), list->end());
     delete list;
   }
 
-  explicit NaryOperator(std::vector<Formula*>& list)
+  explicit NaryOperator(FormulaVec& list)
       : Formula(1) {
     m_list.insert(m_list.end(), list.begin(), list.end());
   }
@@ -88,7 +102,7 @@ class NaryOperator: public Formula {
     m_list.push_back(child);
   }
 
-  void addChilds(std::vector<Formula*> childs) {
+  void addChilds(FormulaVec childs) {
     m_list.insert(m_list.end(), childs.begin(), childs.end());
   }
 
@@ -106,7 +120,7 @@ class NaryOperator: public Formula {
     return m_list.size();
   }
 
-  AndOperator* to_cnf_prepare(std::vector<Formula*>& out_list);
+  AndOperator* expand_prepare(FormulaVec& out_list);
 
   virtual ~NaryOperator() {
     for (auto& f: m_list) {
@@ -122,18 +136,18 @@ class AndOperator: public NaryOperator {
       : NaryOperator() { }
   AndOperator(Formula *left, Formula* right)
       : NaryOperator(left, right) { }
-  explicit AndOperator(std::vector<Formula*>* list)
+  explicit AndOperator(FormulaVec* list)
       : NaryOperator(list) { }
-  explicit AndOperator(std::vector<Formula*>& list)
+  explicit AndOperator(FormulaVec list)
       : NaryOperator(list) { }
-
 
   virtual std::string getName() {
     return "AndOperator";
   }
 
   virtual Construct* optimize();
-  virtual Formula* to_cnf();
+
+  virtual void tseitin(FormulaVec& clauses);
 };
 
 // n-ary operator AND
@@ -141,9 +155,9 @@ class OrOperator: public NaryOperator {
  public:
   OrOperator(Formula *left, Formula* right)
       : NaryOperator(left, right) {}
-  explicit OrOperator(std::vector<Formula*>* list)
+  explicit OrOperator(FormulaVec* list)
       : NaryOperator(list) {}
-  explicit OrOperator(std::vector<Formula*>& list)
+  explicit OrOperator(FormulaVec list)
       : NaryOperator(list) {}
 
   virtual std::string getName() {
@@ -151,7 +165,8 @@ class OrOperator: public NaryOperator {
   }
 
   virtual Construct* optimize();
-  virtual Formula* to_cnf();
+
+  virtual void tseitin(FormulaVec& clauses);
 };
 
 // At least m_value children are satisfied
@@ -159,7 +174,7 @@ class AtLeastOperator: public NaryOperator {
   int m_value;
 
  public:
-  AtLeastOperator(int value, std::vector<Formula*>* list)
+  AtLeastOperator(int value, FormulaVec* list)
       : NaryOperator(list),
         m_value(value) { }
 
@@ -167,7 +182,8 @@ class AtLeastOperator: public NaryOperator {
     return "AtLeastOperator(" + to_string(m_value) + ")";
   }
 
-  virtual Formula* to_cnf();
+  virtual void tseitin(FormulaVec& clauses);
+  AndOperator* expand();
 };
 
 // At most m_value children are satisfied
@@ -175,7 +191,7 @@ class AtMostOperator: public NaryOperator {
   int m_value;
 
  public:
-  AtMostOperator(int value, std::vector<Formula*>* list)
+  AtMostOperator(int value, FormulaVec* list)
       : NaryOperator(list),
         m_value(value) { }
 
@@ -183,7 +199,8 @@ class AtMostOperator: public NaryOperator {
     return "AtMostOperator(" + to_string(m_value) + ")";
   }
 
-  virtual Formula* to_cnf();
+  virtual void tseitin(FormulaVec& clauses);
+  AndOperator* expand();
 };
 
 // Exactly m_value of children are satisfied
@@ -191,7 +208,7 @@ class ExactlyOperator: public NaryOperator {
   int m_value;
 
  public:
-  ExactlyOperator(int value, std::vector<Formula*>* list)
+  ExactlyOperator(int value, FormulaVec* list)
       : NaryOperator(list),
         m_value(value) { }
 
@@ -199,7 +216,8 @@ class ExactlyOperator: public NaryOperator {
     return "ExactlyOperator(" + to_string(m_value) + ")";
   }
 
-  virtual Formula* to_cnf();
+  virtual void tseitin(FormulaVec& clauses);
+  AndOperator* expand();
 };
 
 // Equivalence aka iff
@@ -226,19 +244,19 @@ class EquivalenceOperator: public Formula {
     }
   }
 
-  virtual Formula* to_cnf();
+  virtual void tseitin(FormulaVec& clauses);
 };
 
 // Implication
 class ImpliesOperator: public Formula {
-  Formula* m_premise;
-  Formula* m_consequence;
+  Formula* m_left;
+  Formula* m_right;
 
  public:
   ImpliesOperator(Formula* premise, Formula* consequence)
       : Formula(2),
-        m_premise(premise),
-        m_consequence(consequence) { }
+        m_left(premise),
+        m_right(consequence) { }
 
   virtual std::string getName() {
     return "ImpliesOperator";
@@ -247,13 +265,13 @@ class ImpliesOperator: public Formula {
   virtual Construct* getChild(uint nth) {
     assert(nth < getChildCount());
     switch (nth) {
-      case 0: return m_premise;
-      case 1: return m_consequence;
+      case 0: return m_left;
+      case 1: return m_right;
       default: assert(false);
     }
   }
 
-  virtual Formula* to_cnf();
+  virtual void tseitin(FormulaVec& clauses);
 };
 
 // Simple negation.
@@ -273,10 +291,11 @@ class NotOperator: public Formula {
     return m_child;
   }
 
-  virtual Formula* to_cnf();
   virtual bool is_simple() {
     return m_child->is_simple();
   }
+
+  virtual void tseitin(FormulaVec& clauses);
 };
 
 // Just a variable, the only possible leaf
@@ -296,13 +315,14 @@ class Variable: public Formula {
     assert(false);
   }
 
-  virtual Formula* to_cnf() {
-    return this;
-  }
-
   virtual bool is_simple() {
     return true;
   }
+
+  virtual void tseitin(FormulaVec& clauses) {
+    // ok.
+  }
+
 };
 
 // TODO: remove this

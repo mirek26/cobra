@@ -31,5 +31,10 @@ void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::v
   }
 }
 
+template<class T, class R>
+void transform(std::vector<T> from, std::vector<R> to, std::function<R(T)> fun) {
+  to.resize(from.size());
+  std::transform(from.begin(), from.end(), to.begin(), fun);
+}
 
 #endif  // COBRA_UTIL_H_
