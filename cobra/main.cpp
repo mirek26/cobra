@@ -12,9 +12,9 @@ Formula* f = nullptr;
 int main()
 {
   yyparse();
-  f = dynamic_cast<Formula*>(f->optimize());
+  f = dynamic_cast<Formula*>(f->Simplify());
   f->dump();
-  Construct* g = f->to_cnf();
+  Construct* g = f->ToCnf();
   g->dump();
   return 0;
 }

@@ -15,35 +15,27 @@ class Variable;
 class OrOperator;
 class AndOperator;
 class NotOperator;
-Variable* get_temp();
+Variable* newAuxVar();
 
 typedef std::vector<Formula*> FormulaVec;
 
 // Base class for AST node
 class Construct {
-  const int ChildCount;
+  const int kChildCount;
 
  public:
   explicit Construct(int childCount)
-      : ChildCount(childCount) { }
+      : kChildCount(childCount) { }
 
-  virtual uint getChildCount() {
-    return ChildCount;
-  }
-
-  virtual ~Construct() { }
-  virtual Construct* getChild(uint nth) = 0;
-  virtual void setChild(uint nth, Construct* value) {
-    // by default, we expect no change
-    assert(getChild(nth) == value);
-  }
-
-  virtual std::string getName() = 0;
+  virtual uint child_count() { return kChildCount; }
+  virtual Construct* child(uint nth) = 0;
+  virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
+  virtual std::string name() = 0;
   virtual void dump(int indent = 0);
 
-  virtual Construct* optimize() {
-    for (uint i = 0; i < getChildCount(); ++i) {
-      setChild(i, getChild(i)->optimize());
+  virtual Construct* Simplify() {
+    for (uint i = 0; i < child_count(); ++i) {
+      set_child(i, child(i)->Simplify());
     }
     return this;
   }
@@ -53,21 +45,16 @@ class Construct {
 class Formula: public Construct {
   // variable that is equivalent to this subformula,
   // for Tseitin transformation
-  Variable* var;
+  Variable* tseitin_var_;
 
  public:
   explicit Formula(int childCount)
       : Construct(childCount) { }
 
-  Formula* get_var();
-
-  virtual void tseitin(FormulaVec& clauses) = 0;
-
-  virtual bool is_simple() {
-    return false;
-  }
-
-  virtual AndOperator* to_cnf();
+  Formula* tseitin_var();
+  virtual void TseitinTransformation(FormulaVec& clauses) = 0;
+  virtual bool isSimple() { return false; }
+  virtual AndOperator* ToCnf();
 };
 
 /*
@@ -75,7 +62,7 @@ class Formula: public Construct {
  */
 class NaryOperator: public Formula {
  protected:
-  FormulaVec m_list;
+  FormulaVec children_;
 
  public:
   NaryOperator()
@@ -89,43 +76,35 @@ class NaryOperator: public Formula {
 
   explicit NaryOperator(FormulaVec* list)
       : Formula(1) {
-    m_list.insert(m_list.end(), list->begin(), list->end());
+    children_.insert(children_.end(), list->begin(), list->end());
     delete list;
   }
 
   explicit NaryOperator(FormulaVec& list)
       : Formula(1) {
-    m_list.insert(m_list.end(), list.begin(), list.end());
+    children_.insert(children_.end(), list.begin(), list.end());
   }
 
   void addChild(Formula* child) {
-    m_list.push_back(child);
+    children_.push_back(child);
   }
 
   void addChilds(FormulaVec childs) {
-    m_list.insert(m_list.end(), childs.begin(), childs.end());
+    children_.insert(children_.end(), childs.begin(), childs.end());
   }
 
   void removeChild(int nth) {
-    m_list[nth] = m_list.back();
-    m_list.pop_back();
+    children_[nth] = children_.back();
+    children_.pop_back();
   }
 
-  virtual Construct* getChild(uint nth) {
-    assert(nth < m_list.size());
-    return m_list[nth];
+  virtual Construct* child(uint nth) {
+    assert(nth < children_.size());
+    return children_[nth];
   }
 
-  virtual uint getChildCount() {
-    return m_list.size();
-  }
-
-  AndOperator* expand_prepare(FormulaVec& out_list);
-
-  virtual ~NaryOperator() {
-    for (auto& f: m_list) {
-      delete f;
-    }
+  virtual uint child_count() {
+    return children_.size();
   }
 };
 
@@ -141,13 +120,12 @@ class AndOperator: public NaryOperator {
   explicit AndOperator(FormulaVec list)
       : NaryOperator(list) { }
 
-  virtual std::string getName() {
+  virtual std::string name() {
     return "AndOperator";
   }
 
-  virtual Construct* optimize();
-
-  virtual void tseitin(FormulaVec& clauses);
+  virtual Construct* Simplify();
+  virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
 // n-ary operator AND
@@ -160,166 +138,165 @@ class OrOperator: public NaryOperator {
   explicit OrOperator(FormulaVec list)
       : NaryOperator(list) {}
 
-  virtual std::string getName() {
+  virtual std::string name() {
     return "OrOperator";
   }
 
-  virtual Construct* optimize();
-
-  virtual void tseitin(FormulaVec& clauses);
+  virtual Construct* Simplify();
+  virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// At least m_value children are satisfied
+// At least value_ children are satisfied
 class AtLeastOperator: public NaryOperator {
-  int m_value;
+  int value_;
 
  public:
   AtLeastOperator(int value, FormulaVec* list)
       : NaryOperator(list),
-        m_value(value) { }
+        value_(value) { }
 
-  virtual std::string getName() {
-    return "AtLeastOperator(" + to_string(m_value) + ")";
+  virtual std::string name() {
+    return "AtLeastOperator(" + to_string(value_) + ")";
   }
 
-  virtual void tseitin(FormulaVec& clauses);
-  AndOperator* expand();
+  virtual void TseitinTransformation(FormulaVec& clauses);
+  AndOperator* Expand();
 };
 
-// At most m_value children are satisfied
+// At most value_ children are satisfied
 class AtMostOperator: public NaryOperator {
-  int m_value;
+  int value_;
 
  public:
   AtMostOperator(int value, FormulaVec* list)
       : NaryOperator(list),
-        m_value(value) { }
+        value_(value) { }
 
-  virtual std::string getName() {
-    return "AtMostOperator(" + to_string(m_value) + ")";
+  virtual std::string name() {
+    return "AtMostOperator(" + to_string(value_) + ")";
   }
 
-  virtual void tseitin(FormulaVec& clauses);
-  AndOperator* expand();
+  virtual void TseitinTransformation(FormulaVec& clauses);
+  AndOperator* Expand();
 };
 
-// Exactly m_value of children are satisfied
+// Exactly value_ of children are satisfied
 class ExactlyOperator: public NaryOperator {
-  int m_value;
+  int value_;
 
  public:
   ExactlyOperator(int value, FormulaVec* list)
       : NaryOperator(list),
-        m_value(value) { }
+        value_(value) { }
 
-  virtual std::string getName() {
-    return "ExactlyOperator(" + to_string(m_value) + ")";
+  virtual std::string name() {
+    return "ExactlyOperator(" + to_string(value_) + ")";
   }
 
-  virtual void tseitin(FormulaVec& clauses);
-  AndOperator* expand();
+  virtual void TseitinTransformation(FormulaVec& clauses);
+  AndOperator* Expand();
 };
 
 // Equivalence aka iff
 class EquivalenceOperator: public Formula {
-  Formula* m_left;
-  Formula* m_right;
+  Formula* left_;
+  Formula* right_;
 
  public:
   EquivalenceOperator(Formula* left, Formula* right)
       : Formula(2),
-        m_left(left),
-        m_right(right) { }
+        left_(left),
+        right_(right) { }
 
-  virtual std::string getName() {
+  virtual std::string name() {
     return "EquivalenceOperator";
   }
 
-  virtual Construct* getChild(uint nth) {
-    assert(nth < getChildCount());
+  virtual Construct* child(uint nth) {
+    assert(nth < child_count());
     switch (nth) {
-      case 0: return m_left;
-      case 1: return m_right;
+      case 0: return left_;
+      case 1: return right_;
       default: assert(false);
     }
   }
 
-  virtual void tseitin(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
 // Implication
 class ImpliesOperator: public Formula {
-  Formula* m_left;
-  Formula* m_right;
+  Formula* left_;
+  Formula* right_;
 
  public:
   ImpliesOperator(Formula* premise, Formula* consequence)
       : Formula(2),
-        m_left(premise),
-        m_right(consequence) { }
+        left_(premise),
+        right_(consequence) { }
 
-  virtual std::string getName() {
+  virtual std::string name() {
     return "ImpliesOperator";
   }
 
-  virtual Construct* getChild(uint nth) {
-    assert(nth < getChildCount());
+  virtual Construct* child(uint nth) {
+    assert(nth < child_count());
     switch (nth) {
-      case 0: return m_left;
-      case 1: return m_right;
+      case 0: return left_;
+      case 1: return right_;
       default: assert(false);
     }
   }
 
-  virtual void tseitin(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
 // Simple negation.
 class NotOperator: public Formula {
-  Formula* m_child;
+  Formula* child_;
  public:
   explicit NotOperator(Formula* child)
       : Formula(1),
-        m_child(child) { }
+        child_(child) { }
 
-  virtual std::string getName() {
+  virtual std::string name() {
     return "NotOperator";
   }
 
-  virtual Construct* getChild(uint nth) {
+  virtual Construct* child(uint nth) {
     assert(nth == 0);
-    return m_child;
+    return child_;
   }
 
-  virtual bool is_simple() {
-    return m_child->is_simple();
+  virtual bool isSimple() {
+    return child_->isSimple();
   }
 
-  virtual void tseitin(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
 // Just a variable, the only possible leaf
 class Variable: public Formula {
-  std::string m_ident;
+  std::string ident_;
 
  public:
   explicit Variable(std::string ident)
       : Formula(0),
-        m_ident(ident) { }
+        ident_(ident) { }
 
-  virtual std::string getName() {
-    return "Variable " + m_ident;
+  virtual std::string name() {
+    return "Variable " + ident_;
   }
 
-  virtual Construct* getChild(uint nth) {
+  virtual Construct* child(uint nth) {
     assert(false);
   }
 
-  virtual bool is_simple() {
+  virtual bool isSimple() {
     return true;
   }
 
-  virtual void tseitin(FormulaVec& clauses) {
+  virtual void TseitinTransformation(FormulaVec& clauses) {
     // ok.
   }
 
