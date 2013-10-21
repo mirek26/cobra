@@ -53,14 +53,18 @@ Construct* OrOperator::Simplify() {
   return this;
 }
 
+// Tseitin transformation of arbitrary formula to CNF
 AndOperator* Formula::ToCnf() {
   FormulaVec clauses;
+  // recursively create clauses capturing relationships between nodes
   TseitinTransformation(clauses);
+  // the variable corresponding to the root node must be always true
   clauses.push_back(new OrOperator(FormulaVec{ tseitin_var() }));
   auto root = new AndOperator(clauses);
   return root;
 }
 
+// return the variable corresponding to the node during Tseitin transformation
 Formula* Formula::tseitin_var() {
   if (isSimple()) return this;
   if (!tseitin_var_) tseitin_var_ = newAuxVar();
@@ -73,7 +77,7 @@ AndOperator* AtLeastOperator::Expand() {
   transform(children_, vars, tseitin_vars);
   auto root = new AndOperator();
   std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l){
+    [&](FormulaVec l) {
     root->addChild(new OrOperator(l));
   };
   for_all_combinations(vars.size() - value_ + 1, vars, addToNode);
@@ -86,7 +90,7 @@ AndOperator* AtMostOperator::Expand() {
   transform(children_, vars, tseitin_vars);
   auto root = new AndOperator();
   std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l){
+    [&](FormulaVec l) {
     FormulaVec negl;
     negl.resize(l.size());
     std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return new NotOperator(f); });
@@ -101,16 +105,16 @@ AndOperator* ExactlyOperator::Expand() {
   std::function<Formula*(Formula*)> tseitin_vars = [](Formula* f){ return f->tseitin_var(); };
   transform(children_, vars, tseitin_vars);
   auto root = new AndOperator();
-  // At most
+  // At most part
   std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l){
+    [&](FormulaVec l) {
     FormulaVec negl;
     negl.resize(l.size());
     std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return new NotOperator(f); });
     root->addChild(new OrOperator(negl));
   };
   for_all_combinations(value_ + 1, vars, addToNode);
-  // At least
+  // At least part
   addToNode =
     [&](FormulaVec l){
     root->addChild(new OrOperator(l));
@@ -230,6 +234,3 @@ void ExactlyOperator::TseitinTransformation(FormulaVec& clauses) {
   expanded->addChild(new EquivalenceOperator(tseitin_var(), expanded->tseitin_var()));
   expanded->TseitinTransformation(clauses);
 }
-
-
-

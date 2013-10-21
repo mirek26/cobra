@@ -45,7 +45,7 @@ class Construct {
 class Formula: public Construct {
   // variable that is equivalent to this subformula,
   // for Tseitin transformation
-  Variable* tseitin_var_;
+  Variable* tseitin_var_ = nullptr;
 
  public:
   explicit Formula(int childCount)

@@ -1,6 +1,7 @@
 /*
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
+#include <cassert>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -19,6 +20,7 @@ void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::v
 
 template<class T>
 void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::vector<T>)> action, int offset) {
+  assert(k >= 0);
   static std::vector<T> combination;
   if (k == 0) {
     action(combination);
@@ -32,7 +34,7 @@ void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::v
 }
 
 template<class T, class R>
-void transform(std::vector<T> from, std::vector<R> to, std::function<R(T)> fun) {
+void transform(std::vector<T>& from, std::vector<R>& to, std::function<R(T)>& fun) {
   to.resize(from.size());
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
