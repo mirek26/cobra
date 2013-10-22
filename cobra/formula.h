@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "./util.h"
+#include "./ast-manager.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -15,31 +16,7 @@ class Variable;
 class OrOperator;
 class AndOperator;
 class NotOperator;
-Variable* newAuxVar();
-
 typedef std::vector<Formula*> FormulaVec;
-
-// Base class for AST node
-class Construct {
-  const int kChildCount;
-
- public:
-  explicit Construct(int childCount)
-      : kChildCount(childCount) { }
-
-  virtual uint child_count() { return kChildCount; }
-  virtual Construct* child(uint nth) = 0;
-  virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
-  virtual std::string name() = 0;
-  virtual void dump(int indent = 0);
-
-  virtual Construct* Simplify() {
-    for (uint i = 0; i < child_count(); ++i) {
-      set_child(i, child(i)->Simplify());
-    }
-    return this;
-  }
-};
 
 // Prepositional formula
 class Formula: public Construct {
@@ -58,7 +35,7 @@ class Formula: public Construct {
 };
 
 /*
- * Base class for any n-ary operator. Abstract.
+ * Base class for associative n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
@@ -278,11 +255,21 @@ class NotOperator: public Formula {
 // Just a variable, the only possible leaf
 class Variable: public Formula {
   std::string ident_;
+  bool generated_;
+  static int generated_counter_;
 
  public:
+  /*  */
+  Variable()
+      : Formula(0),
+        generated_(true) {
+    ident_ = "g" + to_string(generated_counter_++);
+  }
+
   explicit Variable(std::string ident)
       : Formula(0),
-        ident_(ident) { }
+        ident_(ident),
+        generated_(false) { }
 
   virtual std::string name() {
     return "Variable " + ident_;
@@ -297,12 +284,14 @@ class Variable: public Formula {
   }
 
   virtual void TseitinTransformation(FormulaVec& clauses) {
-    // ok.
+    // do nothing
   }
 
+  void set_generated_counter(int value) {
+    generated_counter_ = value;
+  }
 };
 
-// TODO: remove this
-extern Formula* f;
+extern AstManager m;
 
 #endif  // COBRA_FORMULA_H_

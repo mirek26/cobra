@@ -10,11 +10,14 @@
   #include <vector>
 
   #include "./formula.h"
+  #include "./ast-manager.h"
 
   #define YYERROR_VERBOSE
   extern "C" int yylex();
   extern "C" int yyparse();
   void yyerror (const char *error);
+
+  extern AstManager m;
 %}
 
 %token T_IDENT
@@ -53,25 +56,25 @@ formula :
     '(' formula ')'
       { $$ = $2; }
   | formula T_AND formula
-      { $$ = new AndOperator($1, $3); f = $$; }
+      { $$ = m.get<AndOperator>($1, $3); }
   | formula T_OR formula
-      { $$ = new OrOperator($1, $3); f = $$; }
+      { $$ = m.get<OrOperator>($1, $3); }
   | formula T_IMPLIES formula
-      { $$ = new ImpliesOperator($1, $3); f = $$; }
+      { $$ = m.get<ImpliesOperator>($1, $3); }
   | formula T_IMPLIED formula
-      { $$ = new ImpliesOperator($3, $1); f = $$; }
+      { $$ = m.get<ImpliesOperator>($3, $1); }
   | formula T_EQUIV formula
-      { $$ = new EquivalenceOperator($1, $3); f = $$; }
+      { $$ = m.get<EquivalenceOperator>($1, $3); }
   | T_ATLEAST '-' T_INT '(' list_of_formulas ')'
-      { $$ = new AtLeastOperator($3, $5); f = $$; }
+      { $$ = m.get<AtLeastOperator>($3, $5); }
   | T_ATMOST '-' T_INT '(' list_of_formulas ')'
-      { $$ = new AtMostOperator($3, $5); f = $$; }
+      { $$ = m.get<AtMostOperator>($3, $5); }
   | T_EXACTLY '-' T_INT '(' list_of_formulas ')'
-      { $$ = new ExactlyOperator($3, $5); f = $$; }
+      { $$ = m.get<ExactlyOperator>($3, $5); }
   | '!' formula
-      { $$ = new NotOperator($2); f = $$; }
+      { $$ = m.get<NotOperator>($2); }
   | T_IDENT
-      { $$ = new Variable($1); f = $$; }
+      { $$ = m.get<Variable>($1); }
 
 list_of_formulas :
     formula    { $$ = new std::vector<Formula*>({ $1 }); }

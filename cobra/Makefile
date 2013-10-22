@@ -5,8 +5,8 @@ BISON = bison -d
 
 default: clean cobra
 
-cobra: formula.o util.o cobra.tab.o cobra.yy.o main.o
-	$(CC) formula.o util.o cobra.tab.o cobra.yy.o main.o -o cobra -ll
+cobra: formula.o ast-manager.o util.o cobra.tab.o cobra.yy.o main.o
+	$(CC) formula.o ast-manager.o util.o cobra.tab.o cobra.yy.o main.o -o cobra -ll
 
 main.cpp: cobra.tab.cpp
 

@@ -7,14 +7,15 @@
 
 extern "C" int yyparse();
 
-Formula* f = nullptr;
+AstManager m;
 
 int main()
 {
   yyparse();
-  f = dynamic_cast<Formula*>(f->Simplify());
+  auto f = dynamic_cast<Formula*>(m.last()->Simplify());
   f->dump();
   Construct* g = f->ToCnf();
   g->dump();
+  m.deleteAll();
   return 0;
 }
