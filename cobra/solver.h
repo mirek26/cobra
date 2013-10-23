@@ -5,7 +5,10 @@
 #include <vector>
 #include "formula.h"
 #include "util.h"
-#include "sat-solvers/picosat/picosat.h"
+
+extern "C" {
+  #include "sat-solvers/picosat/picosat.h"
+}
 
 #ifndef COBRA_SOLVER_H_
 #define COBRA_SOLVER_H_

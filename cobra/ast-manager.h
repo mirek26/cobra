@@ -3,6 +3,7 @@
  */
 
 #include <vector>
+#include <map>
 #include "util.h"
 
 #ifndef COBRA_AST_MANAGER_H_

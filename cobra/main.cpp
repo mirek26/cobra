@@ -5,6 +5,7 @@
 #include "formula.h"
 #include "util.h"
 #include "solver.h"
+#include "ast-manager.h"
 
 extern "C" int yyparse();
 
