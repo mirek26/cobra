@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cassert>
 #include <vector>
+#include <map>
 #include <string>
 #include "./util.h"
 #include "./ast-manager.h"
@@ -66,7 +67,7 @@ class NaryOperator: public Formula {
     children_.push_back(child);
   }
 
-  void addChilds(FormulaVec childs) {
+  void addChildren(FormulaVec childs) {
     children_.insert(children_.end(), childs.begin(), childs.end());
   }
 
@@ -78,6 +79,10 @@ class NaryOperator: public Formula {
   virtual Construct* child(uint nth) {
     assert(nth < children_.size());
     return children_[nth];
+  }
+
+  FormulaVec& children() {
+    return children_;
   }
 
   virtual uint child_count() {
@@ -256,20 +261,29 @@ class NotOperator: public Formula {
 class Variable: public Formula {
   std::string ident_;
   bool generated_;
-  static int generated_counter_;
+  int id_;
+
+  static int id_counter_;
 
  public:
   /*  */
   Variable()
       : Formula(0),
         generated_(true) {
-    ident_ = "g" + to_string(generated_counter_++);
+    id_ = id_counter_++;
+    ident_ = "var" + to_string(id_);
   }
 
   explicit Variable(std::string ident)
       : Formula(0),
         ident_(ident),
-        generated_(false) { }
+        generated_(false) {
+    id_ = id_counter_++;
+  }
+
+  int id() {
+    return id_;
+  }
 
   virtual std::string name() {
     return "Variable " + ident_;
@@ -285,10 +299,6 @@ class Variable: public Formula {
 
   virtual void TseitinTransformation(FormulaVec& clauses) {
     // do nothing
-  }
-
-  void set_generated_counter(int value) {
-    generated_counter_ = value;
   }
 };
 

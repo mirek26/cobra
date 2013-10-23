@@ -12,6 +12,9 @@
 
 typedef unsigned int uint;
 
+template<typename T>
+struct identity { typedef T type; };
+
 // convert int to string, equivalent to std::to_string (for llvm/clang)
 std::string to_string(int n);
 

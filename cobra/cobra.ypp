@@ -74,7 +74,7 @@ formula :
   | '!' formula
       { $$ = m.get<NotOperator>($2); }
   | T_IDENT
-      { $$ = m.get<Variable>($1); }
+      { std::string x($1); $$ = m.get<Variable>(x); }
 
 list_of_formulas :
     formula    { $$ = new std::vector<Formula*>({ $1 }); }

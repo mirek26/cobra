@@ -8,6 +8,8 @@
 #ifndef COBRA_AST_MANAGER_H_
 #define COBRA_AST_MANAGER_H_
 
+class Variable;
+
 // Base class for AST node
 class Construct {
   const int kChildCount;
@@ -33,15 +35,17 @@ class Construct {
 
 class AstManager {
   std::vector<Construct*> nodes_;
+  std::map<std::string, Variable*> variables_;
   Construct* last_;
 
  public:
+  /* Create a new node of type T; call the constructor with parameters ts.
+   * This just calls a private get method with the itenity<T> as the first argument,
+   * which can be easily overloaded for different types (e.g., for Variable and string).
+   */
   template<class T, typename... Ts>
   T* get(const Ts&... ts) {
-    T* node = new T(ts...);
-    nodes_.push_back(node);
-    last_ = node;
-    return node;
+    return get(identity<T>(), ts...);
   }
 
   void deleteAll() {
@@ -52,6 +56,27 @@ class AstManager {
   Construct* last() {
     return last_;
   }
+
+ private:
+  /* Generic template for a get method, which creates a new node.
+   * It just calls the constructor with given parameters (ts) and stores the
+   * created object to nodes_ vector.
+   */
+  template<typename T, typename... Ts>
+  T* get(identity<T>, const Ts&... ts) {
+    T* node = new T(ts...);
+    nodes_.push_back(node);
+    last_ = node;
+    return node;
+  }
+
+  /* Overloaded instance of get method for a Variable and string as the only
+   * argument for the constructor.
+   * If first looks into the variable map and creates a new one only if
+   * it isn't there yet. This ensures that we don't create more than one node
+   * for the same variable.
+   */
+  Variable* get(identity<Variable>, const std::string& ident);
 };
 
 #endif   // COBRA_AST_MANAGER_H_

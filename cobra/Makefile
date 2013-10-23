@@ -6,7 +6,7 @@ BISON = bison -d
 default: clean cobra
 
 cobra: solver.o formula.o ast-manager.o util.o cobra.tab.o cobra.yy.o main.o
-	$(CC) solver.o formula.o ast-manager.o util.o cobra.tab.o cobra.yy.o main.o -o cobra -ll
+	$(CC) sat-solvers/picosat/picosat.o solver.o formula.o ast-manager.o util.o cobra.tab.o cobra.yy.o main.o -L sat-solvers/picosat -l picosat -o cobra -ll
 
 main.cpp: cobra.tab.cpp
 

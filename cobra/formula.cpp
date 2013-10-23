@@ -18,7 +18,7 @@ void Construct::dump(int indent) {
   }
 }
 
-int Variable::generated_counter_ = 0;
+int Variable::id_counter_ = 0;
 
 Construct* AndOperator::Simplify() {
   Construct::Simplify();
@@ -28,7 +28,7 @@ Construct* AndOperator::Simplify() {
     auto andChild = dynamic_cast<AndOperator*>(child(i - merged));
     if (andChild) {
       removeChild(i - merged);
-      addChilds(andChild->children_);
+      addChildren(andChild->children_);
       merged++;
     }
   }
@@ -43,7 +43,7 @@ Construct* OrOperator::Simplify() {
     auto orChild = dynamic_cast<OrOperator*>(child(i - merged));
     if (orChild) {
       removeChild(i - merged);
-      addChilds(orChild->children_);
+      addChildren(orChild->children_);
       merged++;
     }
   }
