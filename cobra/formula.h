@@ -19,10 +19,12 @@ class AndOperator;
 class NotOperator;
 typedef std::vector<Formula*> FormulaVec;
 
-// Prepositional formula
+/* Prepositional formula
+ */
 class Formula: public Construct {
-  // variable that is equivalent to this subformula,
-  // for Tseitin transformation
+  /* variable (possibly negated) that is equivalent to this subformula,
+   * used for Tseitin transformation
+   */
   Variable* tseitin_var_ = nullptr;
 
  public:
@@ -30,13 +32,16 @@ class Formula: public Construct {
       : Construct(childCount) { }
 
   Formula* tseitin_var();
+  virtual Formula* neg();
+  virtual void dump(int indent = 0);
+  virtual std::string pretty() = 0;
+
   virtual void TseitinTransformation(FormulaVec& clauses) = 0;
   virtual bool isSimple() { return false; }
   virtual AndOperator* ToCnf();
 };
 
-/*
- * Base class for associative n-ary operator. Abstract.
+/* Base class for associative n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
@@ -67,8 +72,8 @@ class NaryOperator: public Formula {
     children_.push_back(child);
   }
 
-  void addChildren(FormulaVec childs) {
-    children_.insert(children_.end(), childs.begin(), childs.end());
+  void addChildren(FormulaVec& children) {
+    children_.insert(children_.end(), children.begin(), children.end());
   }
 
   void removeChild(int nth) {
@@ -88,6 +93,18 @@ class NaryOperator: public Formula {
   virtual uint child_count() {
     return children_.size();
   }
+
+ protected:
+  std::string pretty_join(std::string sep) {
+    if (children_.empty()) return "()";
+    std::string s = "(" + children_.front()->pretty();
+    for (auto it = std::next(children_.begin()); it != children_.end(); ++it) {
+      s += sep;
+      s += (*it)->pretty();
+    }
+    s += ")";
+    return s;
+  }
 };
 
 // n-ary operator AND
@@ -104,6 +121,10 @@ class AndOperator: public NaryOperator {
 
   virtual std::string name() {
     return "AndOperator";
+  }
+
+  virtual std::string pretty() {
+    return pretty_join(" & ");
   }
 
   virtual Construct* Simplify();
@@ -124,6 +145,10 @@ class OrOperator: public NaryOperator {
     return "OrOperator";
   }
 
+  virtual std::string pretty() {
+    return pretty_join(" | ");
+  }
+
   virtual Construct* Simplify();
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
@@ -139,6 +164,10 @@ class AtLeastOperator: public NaryOperator {
 
   virtual std::string name() {
     return "AtLeastOperator(" + to_string(value_) + ")";
+  }
+
+  virtual std::string pretty() {
+    return "AtLeast-" + to_string(value_) + pretty_join(", ");
   }
 
   virtual void TseitinTransformation(FormulaVec& clauses);
@@ -158,6 +187,10 @@ class AtMostOperator: public NaryOperator {
     return "AtMostOperator(" + to_string(value_) + ")";
   }
 
+  virtual std::string pretty() {
+    return "AtMost-" + to_string(value_) + pretty_join(", ");
+  }
+
   virtual void TseitinTransformation(FormulaVec& clauses);
   AndOperator* Expand();
 };
@@ -173,6 +206,10 @@ class ExactlyOperator: public NaryOperator {
 
   virtual std::string name() {
     return "ExactlyOperator(" + to_string(value_) + ")";
+  }
+
+  virtual std::string pretty() {
+    return "Exactly-" + to_string(value_) + pretty_join(", ");
   }
 
   virtual void TseitinTransformation(FormulaVec& clauses);
@@ -192,6 +229,10 @@ class EquivalenceOperator: public Formula {
 
   virtual std::string name() {
     return "EquivalenceOperator";
+  }
+
+  virtual std::string pretty() {
+    return "(" + left_->pretty() + " <-> " + right_->pretty() + ")";
   }
 
   virtual Construct* child(uint nth) {
@@ -221,6 +262,10 @@ class ImpliesOperator: public Formula {
     return "ImpliesOperator";
   }
 
+  virtual std::string pretty() {
+    return "(" + left_->pretty() + " -> " + right_->pretty() + ")";
+  }
+
   virtual Construct* child(uint nth) {
     assert(nth < child_count());
     switch (nth) {
@@ -245,8 +290,16 @@ class NotOperator: public Formula {
     return "NotOperator";
   }
 
+  virtual std::string pretty() {
+    return "!" + child_->pretty();
+  }
+
   virtual Construct* child(uint nth) {
     assert(nth == 0);
+    return child_;
+  }
+
+  virtual Formula* neg() {
     return child_;
   }
 
@@ -285,8 +338,16 @@ class Variable: public Formula {
     return id_;
   }
 
+  virtual std::string ident() {
+    return ident_;
+  }
+
+  virtual std::string pretty() {
+    return ident_;
+  }
+
   virtual std::string name() {
-    return "Variable " + ident_;
+    return "Variable " + ident();
   }
 
   virtual Construct* child(uint nth) {

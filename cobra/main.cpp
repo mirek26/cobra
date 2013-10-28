@@ -15,11 +15,16 @@ int main()
 {
   yyparse();
   auto f = dynamic_cast<Formula*>(m.last()->Simplify());
-  f->dump();
 
   Solver s;
   s.AddConstraint(f);
+
+  printf("INPUT: %s\n", f->pretty().c_str());
+  f->dump();
+  printf("\nCNF: %s\n", s.formula()->pretty().c_str());
+
   bool sat = s.Satisfiable();
+  if (sat) s.PrintAssignment();
   printf(sat ? "Jo.\n" : "Ne.\n" );
 
   m.deleteAll();

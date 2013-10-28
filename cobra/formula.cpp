@@ -8,17 +8,22 @@
 #include "./formula.h"
 #include "./util.h"
 
-void Construct::dump(int indent) {
+int Variable::id_counter_ = 1;
+
+void Formula::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
     printf("   ");
   }
-  printf("%p: %s\n", (void*)this, name().c_str());
+  std::string var = tseitin_var_ ? tseitin_var_->pretty() : isSimple() ? pretty() : "-";
+  printf("%p: %s (%s)\n", (void*)this, name().c_str(), var.c_str());
   for (uint i = 0; i < child_count(); ++i) {
     child(i)->dump(indent + 1);
   }
 }
 
-int Variable::id_counter_ = 0;
+Formula* Formula::neg() {
+  return m.get<NotOperator>(this);
+}
 
 Construct* AndOperator::Simplify() {
   Construct::Simplify();
@@ -90,7 +95,7 @@ AndOperator* AtMostOperator::Expand() {
     [&](FormulaVec l) {
     FormulaVec negl;
     negl.resize(l.size());
-    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return m.get<NotOperator>(f); });
+    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return f->neg(); });
     root->addChild(m.get<OrOperator>(negl));
   };
   for_all_combinations(value_ + 1, vars, addToNode);
@@ -107,7 +112,7 @@ AndOperator* ExactlyOperator::Expand() {
     [&](FormulaVec l) {
     FormulaVec negl;
     negl.resize(l.size());
-    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return m.get<NotOperator>(f); });
+    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return f->neg(); });
     root->addChild(m.get<OrOperator>(negl));
   };
   for_all_combinations(value_ + 1, vars, addToNode);
@@ -126,12 +131,12 @@ void AndOperator::TseitinTransformation(FormulaVec& clauses) {
   FormulaVec first;
   first.resize(children_.size());
   std::transform(children_.begin(), children_.end(), first.begin(), [](Formula* f) {
-    return m.get<NotOperator>(f->tseitin_var());
+    return f->tseitin_var()->neg();
   });
   first.push_back(tseitin_var());
   clauses.push_back(m.get<OrOperator>(first));
 
-  auto not_this = m.get<NotOperator>(tseitin_var());
+  auto not_this = tseitin_var()->neg();
   for (auto& f: children_) {
     clauses.push_back(m.get<OrOperator>(FormulaVec{
       not_this, f->tseitin_var()
@@ -152,12 +157,12 @@ void OrOperator::TseitinTransformation(FormulaVec& clauses) {
   std::transform(children_.begin(), children_.end(), first.begin(), [](Formula* f) {
     return f->tseitin_var();
   });
-  first.push_back(m.get<NotOperator>(tseitin_var()));
+  first.push_back(tseitin_var()->neg());
   clauses.push_back(m.get<OrOperator>(first));
 
   for (auto& f: children_) {
     clauses.push_back(m.get<OrOperator>(FormulaVec{
-      tseitin_var(), m.get<NotOperator>(f->tseitin_var())
+      tseitin_var(), f->tseitin_var()->neg()
     }));
   }
 
@@ -172,9 +177,7 @@ void NotOperator::TseitinTransformation(FormulaVec& clauses) {
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var();
   auto childVar = child_->tseitin_var();
-  auto notThis = m.get<NotOperator>(thisVar);
-  auto notChild = m.get<NotOperator>(childVar);
-  clauses.push_back(m.get<OrOperator>(FormulaVec{notThis, notChild}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), childVar->neg()}));
   clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, childVar}));
   child_->TseitinTransformation(clauses);
 }
@@ -185,12 +188,9 @@ void ImpliesOperator::TseitinTransformation(FormulaVec& clauses) {
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  auto notThis = m.get<NotOperator>(thisVar);
-  auto notLeft = m.get<NotOperator>(leftVar);
-  auto notRight = m.get<NotOperator>(rightVar);
-  clauses.push_back(m.get<OrOperator>(FormulaVec{notThis, notLeft, rightVar}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
   clauses.push_back(m.get<OrOperator>(FormulaVec{leftVar, thisVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{notRight, thisVar}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{rightVar->neg(), thisVar}));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);
@@ -198,17 +198,14 @@ void ImpliesOperator::TseitinTransformation(FormulaVec& clauses) {
 
 void EquivalenceOperator::TseitinTransformation(FormulaVec& clauses) {
   // X <-> (L <-> R)
-  // (X | L | R) & (!X | L | R) & (X | !L | R) & (X | L | !R)
+  // (X | L | R) & (!X | !L | R) & (!X | L | !R) & (X | !L | !R)
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  auto notThis = m.get<NotOperator>(thisVar);
-  auto notLeft = m.get<NotOperator>(leftVar);
-  auto notRight = m.get<NotOperator>(rightVar);
   clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, leftVar, rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{notThis, leftVar, rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, notLeft, rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, leftVar, notRight}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar, rightVar->neg()}));
+  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, leftVar->neg(), rightVar->neg()}));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);

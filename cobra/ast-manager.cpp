@@ -7,6 +7,16 @@
 #include "ast-manager.h"
 #include "formula.h"
 
+void Construct::dump(int indent) {
+  for (int i = 0; i < indent; ++i) {
+    printf("   ");
+  }
+  printf("%p: %s\n", (void*)this, name().c_str());
+  for (uint i = 0; i < child_count(); ++i) {
+    child(i)->dump(indent + 1);
+  }
+}
+
 // Overloaded insance of get method for a Variable.
 // It first looks into the variable map and creates a new one
 // only if it isn't there.

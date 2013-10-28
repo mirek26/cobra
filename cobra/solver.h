@@ -3,6 +3,7 @@
  */
 
 #include <vector>
+#include <set>
 #include "formula.h"
 #include "util.h"
 
@@ -17,9 +18,11 @@ class Solver
 {
   AndOperator* formula_;
   PicoSAT* picosat_;
+  std::set<Variable*> variables_;
 
  public:
   Solver() {
+    formula_ = m.get<AndOperator>();
     picosat_ = picosat_init();
   }
 
@@ -35,17 +38,35 @@ class Solver
   void AddConstraint(Formula* constraint) {
     auto cnf = constraint->ToCnf();
     formula_->addChildren(cnf->children());
-    for (auto& clause: cnf->children()) {
-      picosat_add(picosat_, 0);
+    for (auto clause: cnf->children()) {
       auto orOperator = dynamic_cast<OrOperator*>(clause);
       assert(orOperator);
       for (auto& literal: orOperator->children()) {
         auto neg = dynamic_cast<NotOperator*>(literal);
         auto var = dynamic_cast<Variable*>(neg ? neg->child(0) : literal);
         assert(var);
+        variables_.insert(var);
         picosat_add(picosat_, (neg ? -1 : 1) * var->id());
       }
+      picosat_add(picosat_, 0);
     }
+  }
+
+  void PrintAssignment() {
+    std::vector<std::string> trueVar;
+    std::vector<std::string> falseVar;
+    for (auto& var: variables_) {
+      if (picosat_deref(picosat_, var->id()) == 1) {
+        trueVar.push_back(var->ident());
+      } else {
+        falseVar.push_back(var->ident());
+      }
+    }
+    printf("TRUE: ");
+    for (auto& s: trueVar) printf("%s ", s.c_str());
+    printf("\nFALSE: ");
+    for (auto& s: falseVar) printf("%s ", s.c_str());
+    printf("\n");
   }
 };
 #endif   // COBRA_SOLVER_H_

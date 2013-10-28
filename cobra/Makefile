@@ -1,5 +1,5 @@
-CC = g++ -g
-CCFLAGS = -Wall -pedantic -std=c++11
+CC = g++ 
+CCFLAGS = -g -Wall -pedantic -std=c++11
 FLEX = flex
 BISON = bison -d
 
