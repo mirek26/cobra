@@ -73,56 +73,50 @@ Formula* Formula::tseitin_var() {
   return tseitin_var_;
 }
 
-AndOperator* AtLeastOperator::Expand() {
+Formula* MacroOperator::tseitin_var() {
+  return expanded_->tseitin_var();
+}
+
+
+MacroOperator::MacroOperator(FormulaVec* list)
+      : NaryOperator(list) {
+    expanded_ = m.get<AndOperator>();
+}
+
+void MacroOperator::ExpandHelper(int size, bool negate) {
   FormulaVec vars;
   std::function<Formula*(Formula*)> tseitin_vars = [](Formula* f){ return f->tseitin_var(); };
   transform(children_, vars, tseitin_vars);
-  auto root = m.get<AndOperator>();
-  std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l) {
-    root->addChild(m.get<OrOperator>(l));
+  //
+  AndOperator* root = expanded_;
+  std::function<void(FormulaVec)> add = [&](FormulaVec list) {
+    if (negate) {
+      for (auto& f: list) f = f->neg();
+    }
+    root->addChild(m.get<OrOperator>(list));
   };
-  for_all_combinations(vars.size() - value_ + 1, vars, addToNode);
-  return root;
+  //
+  for_all_combinations(size, vars, add);
+}
+
+AndOperator* AtLeastOperator::Expand() {
+  ExpandHelper(children_.size() - value_ + 1, false);
+  expanded_->dump();
+  return expanded_;
 }
 
 AndOperator* AtMostOperator::Expand() {
-  FormulaVec vars;
-  std::function<Formula*(Formula*)> tseitin_vars = [](Formula* f){ return f->tseitin_var(); };
-  transform(children_, vars, tseitin_vars);
-  auto root = m.get<AndOperator>();
-  std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l) {
-    FormulaVec negl;
-    negl.resize(l.size());
-    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return f->neg(); });
-    root->addChild(m.get<OrOperator>(negl));
-  };
-  for_all_combinations(value_ + 1, vars, addToNode);
-  return root;
+  ExpandHelper(value_ + 1, true);
+  expanded_->dump();
+  return expanded_;
 }
 
 AndOperator* ExactlyOperator::Expand() {
-  FormulaVec vars;
-  std::function<Formula*(Formula*)> tseitin_vars = [](Formula* f){ return f->tseitin_var(); };
-  transform(children_, vars, tseitin_vars);
-  auto root = m.get<AndOperator>();
   // At most part
-  std::function<void(FormulaVec)> addToNode =
-    [&](FormulaVec l) {
-    FormulaVec negl;
-    negl.resize(l.size());
-    std::transform(l.begin(), l.end(), negl.begin(), [](Formula* f){ return f->neg(); });
-    root->addChild(m.get<OrOperator>(negl));
-  };
-  for_all_combinations(value_ + 1, vars, addToNode);
+  ExpandHelper(value_ + 1, true);
   // At least part
-  addToNode =
-    [&](FormulaVec l){
-    root->addChild(m.get<OrOperator>(l));
-  };
-  for_all_combinations(vars.size() - value_ + 1, vars, addToNode);
-  return root;
+  ExpandHelper(children_.size() - value_ + 1, false);
+  return expanded_;
 }
 
 void AndOperator::TseitinTransformation(FormulaVec& clauses) {
@@ -211,20 +205,7 @@ void EquivalenceOperator::TseitinTransformation(FormulaVec& clauses) {
   right_->TseitinTransformation(clauses);
 }
 
-void AtMostOperator::TseitinTransformation(FormulaVec& clauses) {
+void MacroOperator::TseitinTransformation(FormulaVec& clauses) {
   auto expanded = Expand();
-  expanded->addChild(m.get<EquivalenceOperator>(tseitin_var(), expanded->tseitin_var()));
-  expanded->TseitinTransformation(clauses);
-}
-
-void AtLeastOperator::TseitinTransformation(FormulaVec& clauses) {
-  auto expanded = Expand();
-  expanded->addChild(m.get<EquivalenceOperator>(tseitin_var(), expanded->tseitin_var()));
-  expanded->TseitinTransformation(clauses);
-}
-
-void ExactlyOperator::TseitinTransformation(FormulaVec& clauses) {
-  auto expanded = Expand();
-  expanded->addChild(m.get<EquivalenceOperator>(tseitin_var(), expanded->tseitin_var()));
   expanded->TseitinTransformation(clauses);
 }

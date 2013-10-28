@@ -31,7 +31,7 @@ class Formula: public Construct {
   explicit Formula(int childCount)
       : Construct(childCount) { }
 
-  Formula* tseitin_var();
+  virtual Formula* tseitin_var();
   virtual Formula* neg();
   virtual void dump(int indent = 0);
   virtual std::string pretty() = 0;
@@ -153,13 +153,28 @@ class OrOperator: public NaryOperator {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
+/* Base class for AtLeast/AtMost/ExactlyOperator.
+ */
+class MacroOperator: public NaryOperator {
+ protected:
+  AndOperator* expanded_;
+ public:
+  explicit MacroOperator(FormulaVec* list);
+
+  virtual Formula* tseitin_var();
+
+  void ExpandHelper(int size, bool negate);
+  virtual AndOperator* Expand() = 0;
+  virtual void TseitinTransformation(FormulaVec& clauses);
+};
+
 // At least value_ children are satisfied
-class AtLeastOperator: public NaryOperator {
+class AtLeastOperator: public MacroOperator {
   int value_;
 
  public:
   AtLeastOperator(int value, FormulaVec* list)
-      : NaryOperator(list),
+      : MacroOperator(list),
         value_(value) { }
 
   virtual std::string name() {
@@ -170,17 +185,16 @@ class AtLeastOperator: public NaryOperator {
     return "AtLeast-" + to_string(value_) + pretty_join(", ");
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
-  AndOperator* Expand();
+  virtual AndOperator* Expand();
 };
 
 // At most value_ children are satisfied
-class AtMostOperator: public NaryOperator {
+class AtMostOperator: public MacroOperator {
   int value_;
 
  public:
   AtMostOperator(int value, FormulaVec* list)
-      : NaryOperator(list),
+      : MacroOperator(list),
         value_(value) { }
 
   virtual std::string name() {
@@ -191,17 +205,16 @@ class AtMostOperator: public NaryOperator {
     return "AtMost-" + to_string(value_) + pretty_join(", ");
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
-  AndOperator* Expand();
+  virtual AndOperator* Expand();
 };
 
 // Exactly value_ of children are satisfied
-class ExactlyOperator: public NaryOperator {
+class ExactlyOperator: public MacroOperator {
   int value_;
 
  public:
   ExactlyOperator(int value, FormulaVec* list)
-      : NaryOperator(list),
+      : MacroOperator(list),
         value_(value) { }
 
   virtual std::string name() {
@@ -212,8 +225,7 @@ class ExactlyOperator: public NaryOperator {
     return "Exactly-" + to_string(value_) + pretty_join(", ");
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
-  AndOperator* Expand();
+  virtual AndOperator* Expand();
 };
 
 // Equivalence aka iff
