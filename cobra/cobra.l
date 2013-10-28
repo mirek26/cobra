@@ -18,8 +18,10 @@
 -\>				{ return T_IMPLIES; }
 \<-				{ return T_IMPLIED; }
 \<-\>		    { return T_EQUIV; }
+\&\& 			{ return T_AND; }
 \& 				{ return T_AND; }
 "and" 			{ return T_AND; }
+\|\|			{ return T_OR; }
 \| 				{ return T_OR; }
 "or" 			{ return T_OR; }
 
