@@ -4,9 +4,8 @@
 #include <cstdio>
 #include <algorithm>
 #include <string>
-
-#include "./formula.h"
-#include "./util.h"
+#include "formula.h"
+#include "util.h"
 
 int Variable::id_counter_ = 1;
 
@@ -14,7 +13,8 @@ void Formula::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
     printf("   ");
   }
-  std::string var = tseitin_var_ ? tseitin_var_->pretty() : isSimple() ? pretty() : "-";
+  std::string var = tseitin_var_ ? tseitin_var_->pretty() :
+                    isLiteral() ? pretty() : "-";
   printf("%p: %s (%s)\n", (void*)this, name().c_str(), var.c_str());
   for (uint i = 0; i < child_count(); ++i) {
     child(i)->dump(indent + 1);
@@ -68,24 +68,31 @@ AndOperator* Formula::ToCnf() {
 
 // return the variable corresponding to the node during Tseitin transformation
 Formula* Formula::tseitin_var() {
-  if (isSimple()) return this;
+  if (isLiteral()) return this;
   if (!tseitin_var_) tseitin_var_ = m.get<Variable>();
   return tseitin_var_;
 }
 
+/******************************************************************************
+ * Expansion of macros.
+ */
+
 Formula* MacroOperator::tseitin_var() {
+  /* Macros must be expanded before tseitin tranformation. Never create a
+   * tseitin_var_, return a tseitin_var_ of the root of the expanded subtree.
+   */
   return expanded_->tseitin_var();
 }
 
-
 MacroOperator::MacroOperator(FormulaVec* list)
       : NaryOperator(list) {
-    expanded_ = m.get<AndOperator>();
+  expanded_ = m.get<AndOperator>();
 }
 
 void MacroOperator::ExpandHelper(int size, bool negate) {
   FormulaVec vars;
-  std::function<Formula*(Formula*)> tseitin_vars = [](Formula* f){ return f->tseitin_var(); };
+  std::function<Formula*(Formula*)> tseitin_vars =
+    [](Formula* f){ return f->tseitin_var(); };
   transform(children_, vars, tseitin_vars);
   //
   AndOperator* root = expanded_;
@@ -101,17 +108,18 @@ void MacroOperator::ExpandHelper(int size, bool negate) {
 
 AndOperator* AtLeastOperator::Expand() {
   ExpandHelper(children_.size() - value_ + 1, false);
-  expanded_->dump();
   return expanded_;
 }
 
 AndOperator* AtMostOperator::Expand() {
   ExpandHelper(value_ + 1, true);
-  expanded_->dump();
   return expanded_;
 }
 
 AndOperator* ExactlyOperator::Expand() {
+  /* TODO: it might be better to have expanded_ as an OrOperator and just
+   * list all the possible combinations here.
+   */
   // At most part
   ExpandHelper(value_ + 1, true);
   // At least part
@@ -119,14 +127,17 @@ AndOperator* ExactlyOperator::Expand() {
   return expanded_;
 }
 
+/******************************************************************************
+ * Tseitin transformation.
+ */
+
 void AndOperator::TseitinTransformation(FormulaVec& clauses) {
   // X <-> AND(A1, A2, ..)
   // (X | !A1 | !A2 | ...) & (A1 | !X) & (A2 | !X) & ...
   FormulaVec first;
   first.resize(children_.size());
-  std::transform(children_.begin(), children_.end(), first.begin(), [](Formula* f) {
-    return f->tseitin_var()->neg();
-  });
+  std::transform(children_.begin(), children_.end(), first.begin(),
+    [](Formula* f) { return f->tseitin_var()->neg(); });
   first.push_back(tseitin_var());
   clauses.push_back(m.get<OrOperator>(first));
 
@@ -148,9 +159,8 @@ void OrOperator::TseitinTransformation(FormulaVec& clauses) {
   // (!X | A1 | A2 | ...) & (!A1 | X) & (!A2 | X) & ...
   FormulaVec first;
   first.resize(children_.size());
-  std::transform(children_.begin(), children_.end(), first.begin(), [](Formula* f) {
-    return f->tseitin_var();
-  });
+  std::transform(children_.begin(), children_.end(), first.begin(),
+    [](Formula* f) { return f->tseitin_var(); });
   first.push_back(tseitin_var()->neg());
   clauses.push_back(m.get<OrOperator>(first));
 
@@ -171,8 +181,10 @@ void NotOperator::TseitinTransformation(FormulaVec& clauses) {
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var();
   auto childVar = child_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), childVar->neg()}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, childVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar->neg(), childVar->neg()}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar, childVar}));
   child_->TseitinTransformation(clauses);
 }
 
@@ -182,9 +194,12 @@ void ImpliesOperator::TseitinTransformation(FormulaVec& clauses) {
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{leftVar, thisVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{rightVar->neg(), thisVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{leftVar, thisVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{rightVar->neg(), thisVar}));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);
@@ -196,10 +211,14 @@ void EquivalenceOperator::TseitinTransformation(FormulaVec& clauses) {
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, leftVar, rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar->neg(), leftVar, rightVar->neg()}));
-  clauses.push_back(m.get<OrOperator>(FormulaVec{thisVar, leftVar->neg(), rightVar->neg()}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar, leftVar, rightVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar->neg(), leftVar, rightVar->neg()}));
+  clauses.push_back(m.get<OrOperator>(
+    FormulaVec{thisVar, leftVar->neg(), rightVar->neg()}));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);

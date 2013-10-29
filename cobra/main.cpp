@@ -20,12 +20,11 @@ int main()
   s.AddConstraint(f);
 
   printf("INPUT: %s\n", f->pretty().c_str());
-  f->dump();
-  printf("\nCNF: %s\n", s.formula()->pretty().c_str());
+  printf("CNF: %s\n", s.formula()->pretty().c_str());
 
   bool sat = s.Satisfiable();
+  printf(sat ? "\nSATISFIABLE.\n" : "\nNON-SATISFIABLE.\n" );
   if (sat) s.PrintAssignment();
-  printf(sat ? "Jo.\n" : "Ne.\n" );
 
   m.deleteAll();
   return 0;

@@ -6,8 +6,8 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "./util.h"
-#include "./ast-manager.h"
+#include "util.h"
+#include "ast-manager.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -19,7 +19,25 @@ class AndOperator;
 class NotOperator;
 typedef std::vector<Formula*> FormulaVec;
 
-/* Prepositional formula
+/* Global AstManager. You should never create a ast node directly,
+ * always use m.get<Type>(...).
+ */
+extern AstManager m;
+
+/* Prepositional formula, base class for
+ * Derived classes:
+ *  - NaryOperator - base class for associative n-ary operators
+ *    - AndOperator - logical conjunction
+ *    - OrOperator - logical disjunction
+ *    - MacroOperator - syntax sugar - expansion can lead to exponential blowup
+ *      - AtLeastOperator - at least k of n formulas must be true
+ *      - AtMostOperator - at most k of n formulas must be true
+ *      - ExactlyOperator - exactly k of n formulas must be true
+ *  - EquivalenceOperator - logical equivalence (binary, symmetric)
+ *  - ImpliesOperator - logical implication (binary)
+ *  - NotOperator - negation of any other formula
+ *  - Variable - the only possible leaf of the formula tree
+ *  TODO: how about true/false leaves?
  */
 class Formula: public Construct {
   /* variable (possibly negated) that is equivalent to this subformula,
@@ -28,20 +46,52 @@ class Formula: public Construct {
   Variable* tseitin_var_ = nullptr;
 
  public:
+  /*
+   */
   explicit Formula(int childCount)
       : Construct(childCount) { }
 
+  /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
+   * a new variable will be created.
+   */
   virtual Formula* tseitin_var();
+
+  /* Negate the formula. Equivalent to m.get<NotOperator>(this), except for
+   * NotOperator nodes, for which it just returns the child (and thus avoids
+   * having two NotOperator nodes under each other).
+   */
   virtual Formula* neg();
+
+  /* Dump this subtree in the same format as Construct::dump, but also
+   * prints information about tseitin_var_.
+   */
   virtual void dump(int indent = 0);
+
+  /* Returns formula as a string. If utf8 is set to true, special math symbols
+   * for conjunction, disjunction, implication etc. will be used.
+   */
   virtual std::string pretty(bool utf8 = true) = 0;
 
+  /* Returns true for variables or a negations of a variable, false otherwise.
+   */
+  virtual bool isLiteral() { return false; }
+
+  /* Tseitin transformation - used for conversion to CNF.
+   * Capures the relationsships between this node and its children as clauses
+   * that are added to the vector 'clauses'. Recursively calls the same
+   * on all children.
+   */
   virtual void TseitinTransformation(FormulaVec& clauses) = 0;
-  virtual bool isSimple() { return false; }
+
+  /* Converts the formula to CNF using Tseitin transformation.
+   * All children of the returned AndOperator are guarenteed to be
+   * OrOperators and its children are literals.
+   */
   virtual AndOperator* ToCnf();
 };
 
-/* Base class for associative n-ary operator. Abstract.
+/******************************************************************************
+ * Base class for associative n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
@@ -107,7 +157,9 @@ class NaryOperator: public Formula {
   }
 };
 
-// n-ary operator AND
+/******************************************************************************
+ * Logical conjunctions - n-ary, associative.
+ */
 class AndOperator: public NaryOperator {
  public:
   AndOperator()
@@ -131,7 +183,9 @@ class AndOperator: public NaryOperator {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// n-ary operator AND
+/******************************************************************************
+ * Logical disjunction - n-ary, associative.
+ */
 class OrOperator: public NaryOperator {
  public:
   OrOperator(Formula *left, Formula* right)
@@ -153,7 +207,9 @@ class OrOperator: public NaryOperator {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-/* Base class for AtLeast/AtMost/ExactlyOperator.
+/******************************************************************************
+ * Base class syntax sugar like AtLeast/AtMost/ExactlyOperator.
+ * Expansion of these operator causes exponential blowup.
  */
 class MacroOperator: public NaryOperator {
  protected:
@@ -168,7 +224,9 @@ class MacroOperator: public NaryOperator {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// At least value_ children are satisfied
+/******************************************************************************
+ *
+ */
 class AtLeastOperator: public MacroOperator {
   int value_;
 
@@ -188,7 +246,9 @@ class AtLeastOperator: public MacroOperator {
   virtual AndOperator* Expand();
 };
 
-// At most value_ children are satisfied
+/******************************************************************************
+ *
+ */
 class AtMostOperator: public MacroOperator {
   int value_;
 
@@ -208,7 +268,9 @@ class AtMostOperator: public MacroOperator {
   virtual AndOperator* Expand();
 };
 
-// Exactly value_ of children are satisfied
+/******************************************************************************
+ *
+ */
 class ExactlyOperator: public MacroOperator {
   int value_;
 
@@ -228,7 +290,9 @@ class ExactlyOperator: public MacroOperator {
   virtual AndOperator* Expand();
 };
 
-// Equivalence aka iff
+/******************************************************************************
+ * Logical equivalence - binary, symmetric, associative.
+ */
 class EquivalenceOperator: public Formula {
   Formula* left_;
   Formula* right_;
@@ -244,7 +308,11 @@ class EquivalenceOperator: public Formula {
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return "(" + left_->pretty(utf8) +  (utf8 ? " ⇔ " : " <-> ") + right_->pretty(utf8) + ")";
+    return "(" +
+      left_->pretty(utf8) +
+      (utf8 ? " ⇔ " : " <-> ") +
+      right_->pretty(utf8) +
+      ")";
   }
 
   virtual Construct* child(uint nth) {
@@ -259,7 +327,9 @@ class EquivalenceOperator: public Formula {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// Implication
+/******************************************************************************
+ * Logical implication - binary, non-symmetric.
+ */
 class ImpliesOperator: public Formula {
   Formula* left_;
   Formula* right_;
@@ -275,7 +345,11 @@ class ImpliesOperator: public Formula {
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return "(" + left_->pretty(utf8) + (utf8 ? " ⇒ " : " -> ") + right_->pretty(utf8) + ")";
+    return "(" +
+      left_->pretty(utf8) +
+      (utf8 ? " ⇒ " : " -> ") +
+      right_->pretty(utf8) +
+      ")";
   }
 
   virtual Construct* child(uint nth) {
@@ -290,7 +364,9 @@ class ImpliesOperator: public Formula {
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// Simple negation.
+/******************************************************************************
+ * Negation of a formula.
+ */
 class NotOperator: public Formula {
   Formula* child_;
  public:
@@ -315,23 +391,27 @@ class NotOperator: public Formula {
     return child_;
   }
 
-  virtual bool isSimple() {
-    return child_->isSimple();
+  virtual bool isLiteral() {
+    return child_->isLiteral();
   }
 
   virtual void TseitinTransformation(FormulaVec& clauses);
 };
 
-// Just a variable, the only possible leaf
+/******************************************************************************
+ * Prepositional variable. The only possible leaf of the formula AST.
+ */
 class Variable: public Formula {
   std::string ident_;
   bool generated_;
   int id_;
 
-  static int id_counter_;
+  static int id_counter_; // initialy 1
 
  public:
-  /*  */
+  /* Parameterless constructor creates a generated variable with next
+   * available id and named var_ID.
+   */
   Variable()
       : Formula(0),
         generated_(true) {
@@ -363,10 +443,11 @@ class Variable: public Formula {
   }
 
   virtual Construct* child(uint nth) {
+    // this have no children - child() should never be called
     assert(false);
   }
 
-  virtual bool isSimple() {
+  virtual bool isLiteral() {
     return true;
   }
 
@@ -374,7 +455,5 @@ class Variable: public Formula {
     // do nothing
   }
 };
-
-extern AstManager m;
 
 #endif  // COBRA_FORMULA_H_
