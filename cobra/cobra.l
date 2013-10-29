@@ -16,14 +16,23 @@
 
  /* operators */
 -\>				{ return T_IMPLIES; }
+→ 				{ return T_IMPLIES; }
+⇒				{ return T_IMPLIES; }
 \<-				{ return T_IMPLIED; }
+←				{ return T_IMPLIED; }
 \<-\>		    { return T_EQUIV; }
+⇔			    { return T_EQUIV; }
+↔			    { return T_EQUIV; }
 \&\& 			{ return T_AND; }
 \& 				{ return T_AND; }
+∧				{ return T_AND; }
 "and" 			{ return T_AND; }
 \|\|			{ return T_OR; }
 \| 				{ return T_OR; }
+∨				{ return T_OR; }
 "or" 			{ return T_OR; }
+¬				{ return T_NOT; }
+!				{ return T_NOT; }
 
 "AtLeast"		{ return T_ATLEAST; }
 "AtMost"		{ return T_ATMOST; }

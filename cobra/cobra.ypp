@@ -31,7 +31,7 @@
 %left T_IMPLIED
 %right T_OR
 %right T_AND
-%right '!'
+%right T_NOT
 
 %token T_ATLEAST
 %token T_ATMOST
@@ -71,7 +71,7 @@ formula :
       { $$ = m.get<AtMostOperator>($3, $5); }
   | T_EXACTLY '-' T_INT '(' list_of_formulas ')'
       { $$ = m.get<ExactlyOperator>($3, $5); }
-  | '!' formula
+  | T_NOT formula
       { $$ = m.get<NotOperator>($2); }
   | T_IDENT
       { std::string x($1); $$ = m.get<Variable>(x); }

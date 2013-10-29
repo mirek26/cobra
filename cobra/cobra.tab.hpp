@@ -46,9 +46,10 @@
      T_IMPLIED = 262,
      T_OR = 263,
      T_AND = 264,
-     T_ATLEAST = 265,
-     T_ATMOST = 266,
-     T_EXACTLY = 267
+     T_NOT = 265,
+     T_ATLEAST = 266,
+     T_ATMOST = 267,
+     T_EXACTLY = 268
    };
 #endif
 /* Tokens.  */
@@ -59,9 +60,10 @@
 #define T_IMPLIED 262
 #define T_OR 263
 #define T_AND 264
-#define T_ATLEAST 265
-#define T_ATMOST 266
-#define T_EXACTLY 267
+#define T_NOT 265
+#define T_ATLEAST 266
+#define T_ATMOST 267
+#define T_EXACTLY 268
 
 
 
@@ -76,7 +78,7 @@ typedef union YYSTYPE
   int      tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 80 "cobra.tab.hpp"
+#line 82 "cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

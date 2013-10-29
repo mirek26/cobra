@@ -34,7 +34,7 @@ class Formula: public Construct {
   virtual Formula* tseitin_var();
   virtual Formula* neg();
   virtual void dump(int indent = 0);
-  virtual std::string pretty() = 0;
+  virtual std::string pretty(bool utf8 = true) = 0;
 
   virtual void TseitinTransformation(FormulaVec& clauses) = 0;
   virtual bool isSimple() { return false; }
@@ -95,12 +95,12 @@ class NaryOperator: public Formula {
   }
 
  protected:
-  std::string pretty_join(std::string sep) {
+  std::string pretty_join(std::string sep, bool utf8) {
     if (children_.empty()) return "()";
-    std::string s = "(" + children_.front()->pretty();
+    std::string s = "(" + children_.front()->pretty(utf8);
     for (auto it = std::next(children_.begin()); it != children_.end(); ++it) {
       s += sep;
-      s += (*it)->pretty();
+      s += (*it)->pretty(utf8);
     }
     s += ")";
     return s;
@@ -123,8 +123,8 @@ class AndOperator: public NaryOperator {
     return "AndOperator";
   }
 
-  virtual std::string pretty() {
-    return pretty_join(" & ");
+  virtual std::string pretty(bool utf8 = true) {
+    return pretty_join(utf8 ? " ∧ " : " & ", utf8);
   }
 
   virtual Construct* Simplify();
@@ -145,8 +145,8 @@ class OrOperator: public NaryOperator {
     return "OrOperator";
   }
 
-  virtual std::string pretty() {
-    return pretty_join(" | ");
+  virtual std::string pretty(bool utf8 = true) {
+    return pretty_join(utf8 ? " ∨ " : " | ", utf8);
   }
 
   virtual Construct* Simplify();
@@ -181,8 +181,8 @@ class AtLeastOperator: public MacroOperator {
     return "AtLeastOperator(" + to_string(value_) + ")";
   }
 
-  virtual std::string pretty() {
-    return "AtLeast-" + to_string(value_) + pretty_join(", ");
+  virtual std::string pretty(bool utf8 = true) {
+    return "AtLeast-" + to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -201,8 +201,8 @@ class AtMostOperator: public MacroOperator {
     return "AtMostOperator(" + to_string(value_) + ")";
   }
 
-  virtual std::string pretty() {
-    return "AtMost-" + to_string(value_) + pretty_join(", ");
+  virtual std::string pretty(bool utf8 = true) {
+    return "AtMost-" + to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -221,8 +221,8 @@ class ExactlyOperator: public MacroOperator {
     return "ExactlyOperator(" + to_string(value_) + ")";
   }
 
-  virtual std::string pretty() {
-    return "Exactly-" + to_string(value_) + pretty_join(", ");
+  virtual std::string pretty(bool utf8 = true) {
+    return "Exactly-" + to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -243,8 +243,8 @@ class EquivalenceOperator: public Formula {
     return "EquivalenceOperator";
   }
 
-  virtual std::string pretty() {
-    return "(" + left_->pretty() + " <-> " + right_->pretty() + ")";
+  virtual std::string pretty(bool utf8 = true) {
+    return "(" + left_->pretty(utf8) +  (utf8 ? " ⇔ " : " <-> ") + right_->pretty(utf8) + ")";
   }
 
   virtual Construct* child(uint nth) {
@@ -274,8 +274,8 @@ class ImpliesOperator: public Formula {
     return "ImpliesOperator";
   }
 
-  virtual std::string pretty() {
-    return "(" + left_->pretty() + " -> " + right_->pretty() + ")";
+  virtual std::string pretty(bool utf8 = true) {
+    return "(" + left_->pretty(utf8) + (utf8 ? " ⇒ " : " -> ") + right_->pretty(utf8) + ")";
   }
 
   virtual Construct* child(uint nth) {
@@ -302,8 +302,8 @@ class NotOperator: public Formula {
     return "NotOperator";
   }
 
-  virtual std::string pretty() {
-    return "!" + child_->pretty();
+  virtual std::string pretty(bool utf8 = true) {
+    return (utf8 ? "¬" : "!") + child_->pretty(utf8);
   }
 
   virtual Construct* child(uint nth) {
@@ -354,7 +354,7 @@ class Variable: public Formula {
     return ident_;
   }
 
-  virtual std::string pretty() {
+  virtual std::string pretty(bool utf8 = true) {
     return ident_;
   }
 

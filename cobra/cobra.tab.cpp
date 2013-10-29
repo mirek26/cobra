@@ -73,9 +73,10 @@
      T_IMPLIED = 262,
      T_OR = 263,
      T_AND = 264,
-     T_ATLEAST = 265,
-     T_ATMOST = 266,
-     T_EXACTLY = 267
+     T_NOT = 265,
+     T_ATLEAST = 266,
+     T_ATMOST = 267,
+     T_EXACTLY = 268
    };
 #endif
 /* Tokens.  */
@@ -86,9 +87,10 @@
 #define T_IMPLIED 262
 #define T_OR 263
 #define T_AND 264
-#define T_ATLEAST 265
-#define T_ATMOST 266
-#define T_EXACTLY 267
+#define T_NOT 265
+#define T_ATLEAST 266
+#define T_ATMOST 267
+#define T_EXACTLY 268
 
 
 
@@ -142,7 +144,7 @@ typedef union YYSTYPE
   int      tint;
 }
 /* Line 193 of yacc.c.  */
-#line 146 "cobra.tab.cpp"
+#line 148 "cobra.tab.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -155,7 +157,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 159 "cobra.tab.cpp"
+#line 161 "cobra.tab.cpp"
 
 #ifdef short
 # undef short
@@ -383,7 +385,7 @@ union yyalloc
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   267
+#define YYMAXUTOK   268
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -394,7 +396,7 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    10,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
       14,    15,     2,     2,    17,    16,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -417,7 +419,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    11,    12,    13
+       5,     6,     7,     8,     9,    10,    11,    12,    13
 };
 
 #if YYDEBUG
@@ -454,7 +456,7 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "T_IDENT", "T_INT", "T_EQUIV",
-  "T_IMPLIES", "T_IMPLIED", "T_OR", "T_AND", "'!'", "T_ATLEAST",
+  "T_IMPLIES", "T_IMPLIED", "T_OR", "T_AND", "T_NOT", "T_ATLEAST",
   "T_ATMOST", "T_EXACTLY", "'('", "')'", "'-'", "','", "$accept",
   "formula", "list_of_formulas", 0
 };
@@ -466,7 +468,7 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-      33,   265,   266,   267,    40,    41,    45,    44
+     265,   266,   267,   268,    40,    41,    45,    44
 };
 # endif
 
@@ -1431,7 +1433,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1435 "cobra.tab.cpp"
+#line 1437 "cobra.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
