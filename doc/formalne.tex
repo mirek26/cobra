@@ -1,156 +1,294 @@
-\chapter{Pokus zavést hry formálně}
+\chapter{Code-breaking Games}
 
-\renewcommand{\|}{\;|\;}
+% znaceni
+\newcommand{\Val}{V} % mnoz vsech valuaci
+\newcommand{\val}{v} % jedna valuace
+\newcommand{\numval}{\$} % number of sat valutaions
+\renewcommand{\Form}{\textrm{Form}} % mnoz vsech formuli
+\newcommand{\form}{\varphi} % jedna formule
+\newcommand{\aform}[1]{\form_{0..#1}} % accumulated formula
 
+% code-breaking game
 \newcommand{\game}{\mathcal{G}}
-
 \newcommand{\Var}{X}
-\newcommand{\initformula}{\iota}
-\newcommand{\Val}{V}
-\newcommand{\val}{v}
-\renewcommand{\Form}{\Phi}
-\newcommand{\form}{\phi}
-\newcommand{\emptyform}{\eps}
-
+\newcommand{\init}{\varphi_0}
+\newcommand{\Expt}{T}
+\newcommand{\expt}{t}
 \newcommand{\Exp}{E}
 \renewcommand{\exp}{e}
+%\newcommand{\Param}{\Pi}
+\newcommand{\param}{p}
+\newcommand{\infer}{\Phi}
 
+% dalsi veci
+\newcommand{\Perm}{\textrm{Perm}}
+\newcommand{\perm}{\pi}
 \newcommand{\result}{\rho}
 
-\newcommand{\hist}{\pi}
-\newcommand{\histstg}[2]{\hist^{#1,#2}}
-
+% nep
 \newcommand{\stg}{\sigma}
+
+\newcommand{\proc}{\pi}
+\newcommand{\procstg}[2]{\proc_{#1,#2}}
+
 \newcommand{\len}{\lambda}
 \newcommand{\lenstg}[2]{\len^{#1,#2}}
-\newcommand{\lenmax}[1]{\len^{#1}_\textrm{max}}
+\newcommand{\lenmax}[1]{\len^{#1}}
 \newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
 
 \newcommand{\exactly}[1]{\textrm{Exactly-#1}\:}
 \newcommand{\atleast}[1]{\textrm{AtLeast-#1}\:}
 \newcommand{\atmost}[1]{\textrm{AtMost-#1}\:}
 
-$\Val_\Var$ is a set of all valuations; $\Form_\Var$ is a set of all formulas over variables $\Var$.
+\section[0]{Notation}
+$\Val_\Var$ is the set of all valuations on variable set $\Var$;
+$\Form_\Var$ is a set of all formulas over variables $\Var$;
+$\Perm_\Var$ is the set of all permutations of $\Var$;
+Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
+  written $\form_0 \equiv \form_1$, if
+  $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
+For any unary predicate $P$, $\#i\in A.P(i) = |\{ i\in A \| P(i)\}|$.
+  We usually omit the ``$\in A$'' part and write only $\#i.P(i)$
+  if the range of $i$ is clear from the context.
+For a formula $\form\in\Form_\Var$,
+  $\numval(\form) = \#\val\in\Val_\Var.(\val(\form) = 1)$
+  is the number of valuations by which $\form$ is satisfied.
 
-\begin{definition}
-A \emph{code-breaking game} is a triple 
- $\game = (\Var, \initformula, \Exp, \result)$, where 
- $\Var$ is a finite set of propositional variables, 
- $\initformula \in \Form_\Var$ is an initial prepositional formula, 
- $\Exp$ is a finite set of possible experiments and
- $\result: \Val_\Var \times \Exp -> \Form_\Var $ is the inference function such that
- $\val(\result(\val, \exp)) = 1$ for every $\val\in\Val$, $\exp\in\Exp$.
+
+
+%-------------------------------------------------------------------------------
+% DEF: CODE BREAKING GAME
+\section{Formal definition}
+
+\begin{definition} \label{def-game}
+A \emph{code-breaking game} is a quintuple
+  $\game = (\Var, \init, \Expt, \Exp, \infer)$, where
+  \begin{itemize}
+  \item $\Var$ is a finite set of propositional variables,
+  \item $\init \in \Form_\Var$ is a satisfiable prepositional formula,
+  \item $\Expt$ is a finite set of types of experiments,
+  \item $\Exp \subseteq \Expt \times \Var^\star$ is \emph{experiment} relation,
+  and
+  \item $\infer: \Val_\Var \times \Exp -> \Form_\Var$ is
+  \emph{inference function} such that
+    \begin{enumerate}[label=(\roman*)]
+    \item $\forall\val\in\Val_\Var, \exp\in\Exp$:
+      $\val(\infer(\val, \exp)) = 1$ and
+    \item $\forall\val\in\Val_\Var, (\expt, \param)\in\Exp, \perm\in \Perm_\Var$:
+        \[
+        \init \equiv \perm(\init) \;==>\;
+          \infer(\val, (\expt, \perm(\param)))
+          \equiv
+          \perm(\infer(\val, (\expt, \param))).
+        \]
+    \end{enumerate}
+ \end{itemize}
 \end{definition}
 
+The inference function gives us the partial information as a formula,
+  given the secret valuation, an experiment and its parametrization.
+The condition (i) requires that this formula is satisfied
+  by the secret valuation.
+Intuitively, the condition (ii) says that if $\perm$ is a symmetry
+  of the initial formula $\init$, we do not get different information
+  if we permutate the variables in a parametrization by $\perm$.
+
+%-------------------------------------------------------------------------------
+% EXAMPLE: FAKE-COIN PROBLEM
+
 \begin{example}[Fake-coin problem]
-Consider a fake-coin problem with $n$ coins, one of which is fake. This game can be formalized as follows:
-\begin{itemize}
-\item 
-$\Var = \{x_1, x_2, ..., x_n, y\}$ \\
-Intuitively, variable $x_i$ tells weather the coin $i$ is fake. Variable $y$ tells weather it's lighter or heavier.
-
-\item 
-$\initformula = \exactly{1}(\{x_1, ..., x_n\})$ \\
-This is to ensure that exactly one coin is fake.
-
-\item 
-$\Exp = 2^{\{1..n\}} \times 2^{\{1..n\}}$ \\
-Experiment consist of two sets of coins. 
-For the sake of simplicity, we allow non-disjoint sets and sets of different size, 
-however such experiments would give no new information.
-
-\item $\result(v, (A,B)) = \left\{
-\begin{array}{ll}
-\emptyform & \textrm{if r = error} \\
-(\bigvee\{x_c \| c \in A\} \wedge \neg y) \vee (\bigvee\{x_c \| c \in B\} \wedge y) & 
-	\textrm{if r = lighter} \\
-(\bigvee\{x_c \| c \in A\} \wedge y) \vee (\bigvee\{x_c \| c \in B\} \wedge \neg y) & 
-	\textrm{if r = heavier} \\
-\neg \bigvee\{x_c \| c\in A\cup B\} &
-	\textrm{if r = equal}
-\end{array} \right.$
-
-The conditions correspond to the result $r$ of the experiment:
-\begin{itemize}
-\item r = error if $|A|\not=|B|$ or $A\cap B\not=\emptyset$
-\item r = lighter if $(v(c) = 1$ for some $c\in A$ and $v(y) = 0)$ or $(v(c) = 1$ for some $c \in B$ and $v(y) = 1)$ 
-\item r = heavier if $(v(c) = 1$ for some $c\in A$ and $v(y) = 1)$ or $(v(c) = 1$ for some $c \in B$ and $v(y) = 0)$
-\item r = equal if $v(c) = 0$ for every $c\in A\cup B$
-\end{itemize}
-\end{itemize}
-
-
-
-\end{example}
-
-\begin{example}[Mastermind]
-Consider a mastermind puzzle with $p$ pegs and color set $C$. This game can be formalized as follows:
+Fake-coin problem with $n$ coins, one of which is fake, can be formalized as
+a code breaking game
+$\mathcal{F}_n = (\Var, \init, \Expt, \Exp, \infer)$, where
 
 \begin{itemize}
 \item
- $\Var = \{x_{i,c} \| 1<=i<=p, c\in C\}$. 
+$\Var = \{x_1, x_2, ..., x_n, y\}$ \\
+Intuitively, variable $x_i$ tells weather the coin $i$ is fake.
+Variable $y$ tells weather it's lighter or heavier.
 
- Variable $x_{i,c}$ tells whether there is color $c$ at position $i$.
+\item
+$\init = \exactly{1}(\{x_1, ..., x_n\})$ \\
+This is to ensure that exactly one coin is fake.
 
-\item 
- $\initformula = \bigwedge\left\{ \exactly{1} \{x_{i,c} \| c\in C\} \| 1<=i<=p\right\}$.
+\item
+$\Expt = \{\expt\}$ \\
+There is only one type of experiment -- weighting the coins.
 
- This guarantees that there is exactly one color at each position.
+\item
+$\Exp = \{ (\expt, \param) \|
+  \param \in \{x_1, ..., x_n\}^{2n},
+  n >= 0,
+  \forall x\in\Var: \#_x(\param)<=1 \} $\\
+Any sequence of variables of even length with no repetitions
+  is a permitted parametrization of type $\expt$.
 
-\item $\Exp = C^p$.
+\item
+$\infer(\val, (\expt, \param)) = \left\{
+\begin{array}{ll}
+(\bigvee A \wedge \neg y) \vee (\bigvee B \wedge y) &
+    \textrm{if r = lighter,} \\
+(\bigvee A \wedge y) \vee (\bigvee B \wedge \neg y) &
+    \textrm{if r = heavier,} \\
+\neg \bigvee(A\cup B) &
+    \textrm{if r = equal,}
+\end{array} \right.$
 
- Experiment is just a sequence of colors.
-
-\item Inference function is defined by
-\begin{align*}
-\result(v, g) =\;&\exactly{b}\{ x_{i, g[i]} \| 1<=i<=p \} \wedge \\
-& \exactly{t} \bigcup
-		\left\{ 
-			\{
-				\atleast{n}\{ x_{i,c} | 1<=i<=p \} 
-				\| 1<=n<=\#i.(g[i]=c)
-			\} 
-			\| c\in C 
-		\right\} 
-\end{align*}
-where $b = \# i . (v(x_{i,g[i]}) = 1)$ captures the number of black pegs in the response for the experiment and
-$t = \sum_{c\in C} \min( \#i.(v(x_{i,c}) = 1), \#i.(g[i]=c))$ is the total number of pegs (black + white). 
-
+where
+$A = \{ \param[i] \| 1 <= i <= |\param|/2 \}$,
+$B = \{ \param[i] \| |\param|/2 < i <= |\param| \}$.
+The conditions correspond to the result $r$ of the experiment:
+\begin{itemize}
+\item r = lighter if $(v(c) = 1$ for some $c\in A$ and $v(y) = 0)$
+  or $(v(c) = 1$ for some $c \in B$ and $v(y) = 1)$
+\item r = heavier if $(v(c) = 1$ for some $c\in A$ and $v(y) = 1)$
+  or $(v(c) = 1$ for some $c \in B$ and $v(y) = 0)$
+\item r = equal if $v(c) = 0$ for every $c\in A\cup B$
+\end{itemize}
 \end{itemize}
 \end{example}
 
+%-------------------------------------------------------------------------------
+% EXAMPLE: MASTERMIND
 
-% \begin{definition}
-% A \emph{history} is a sequence $\hist$
-%  of elements from $\Expres = (\Exp \times 2^\Code)$.
-% Let $\hist[i]$ and $\hist[j..k]$ denote 
-%  the $i$-th element of $\hist$ and
-%  the subsequence from the $j$-th to the $k$-th element, respectively. 
-%  Furher, if $\hist[i] = (\exp, \Codeset)$, 
-%  let $\hist[i]^\exp = \exp$ and 
-%  $\hist[i]^\result = \Codeset$ denote the projections.
+\begin{example}[Mastermind]
+Mastermind puzzle with $n$ pegs and color set $C$ can be formalized as
+a code breaking game
+$\mathcal{M}_{n,C} = (\Var, \init, \Expt, \Exp, \infer)$, where
 
-% Let $\hist \in \Expres^n$ be a history and let 
-%  $m = \left|\bigcap_{i=1}^n\hist[i]^\result\right|$.
-%  We call a history \emph{finished} if $m = 1$ and \emph{invalid} if $m = 0$.
-% \end{definition}
+\begin{itemize}
+\item
+$\Var = \{x_{i,c} \| 1<=i<=n, c\in C\}$. \\
+Variable $x_{i,c}$ tells whether there is the color $c$ at position $i$.
+For simplicity, let us use the notation $\Var_c = \{ x_{i,c} \| 1<=i<=n \}$.
 
-% \begin{definition}
-% Strategy is a function $\stg: \Expres^* -> \Exp$
-%  giving the next experiment based on the history of the game.
-% On a code $\code\in\Code$, a strategy $\stg$ generates a history $\hist(\stg, \code) \in\Expres^\omega$ defined by
-%  \[ \forall i>1\;.\;\;
-%  \histstg{\stg}{\code}[i+1] = 
-%  \left( \underline{\stg(\histstg{\stg}{\code}[1..i])},
-%  \resultc(\underline{\stg(\histstg{\stg}{\code}[1..i])}) \right). \]
-% \end{definition}
+\item
+$\init = \bigwedge\left\{
+  \exactly{1} \{x_{i,c} \| c\in C\} \| 1<=i<=n\right\}$. \\
+This guarantees that there is exactly one color at each position.
 
-% \begin{definition}
-% Number of steps $\lenstg{\stg}{\code}$ of a strategy $\stg$ on a code $\code$ 
-%  is the least number $k$ such that $\histstg{\stg}{\code}[1..k]$ is finished.
-% Let \[ \lenmax{\stg} = \max \{\lenstg{\stg}{\code} \;|\; \code\in\Code \} \] 
-%  is the worst-case number of steps of strategy $\stg$.
-% Given a probability distribution on codes,
-%  let $\lenexp{\stg} = E(\lenstg{\stg}{\code})$ be the expected number of steps of strategy $\stg$. 
-% \end{definition}
+\item $\Expt = \{\expt\}$.\\
+There is only one type of experiment -- guessing a combination.
+
+\item $\Exp = \{(\expt, \param) \| \param = x_{1,c_1}x_{2,c_2}...x_{n,c_n}\}$.\\
+Parametrization of $\expt$ can be any string of length $n$,
+$i$-th symbol of which belongs to $\{ x_{i,c} \| c \in C\}$.
+
+\item Inference function is defined by
+\begin{align*}
+\infer(\val, (\expt, \param)) =\;
+ & \exactly{b}\{ \param[i] \| 1<=i<=n \} \;\wedge \\
+ & \exactly{t}\bigcup
+      \big\{ \\
+          & \{
+                \atleast{k}\{ x_{i,c} \| 1<=i<=n \}
+                \| 1 <= k <= \#i.(\param[i]\in\Var_c)
+            \} \\
+            & \| c\in C
+      \big\}
+\end{align*}
+where $b = \# i . (\val(\param[i]) = 1)$ captures the number of black pegs
+  in the response for the experiment $(t, p)$ and
+  $t = \sum_{c\in C} \min( \#i.(v(x_{i,c}) = 1), \#i.(\param[i]\in\Var_c))$
+  is the total number of pegs (black + white).
+
+% TODO:
+\TODO{Fakt to nejde nějak jednodušej?}
+\end{itemize}
+\end{example}
+
+%-------------------------------------------------------------------------------
+% DEF: STRATEGY
+\section{Strategies}
+
+\begin{definition}
+A \emph{strategy} is a function $\stg: \Form_\Var -> \Exp$,
+determining the next experiment for given accumulated knowledge,
+such that
+\[
+\form_0 \equiv \form_1 ==> \stg(\form_0) = \stg(\form_1).
+\]
+\end{definition}
+
+A strategy $\stg$ together with a secret valuation $\val$ induce
+  a \emph{solving process}, which is an infinite sequence
+\[
+\procstg{\stg}{\val} = \form_0 \arrow{\exp_1} \form_1 \arrow{\exp_2}
+  \form_2 \arrow{\exp_3} ...
+\]
+such that
+$\exp_{i+1} = \stg(\form_0 \wedge \form_1 \wedge ... \wedge \form_i)$ and
+$\form_{i+1} = \infer(\val, \exp_{i+1})$ for all $i\in\Nseto$.
+For the sake of simplicity, let us write $\aform{k}$
+instead of $\form_0 \wedge \form_1 \wedge ... \wedge \form_k$.
+
+We define \emph{length} of the solving proces,
+  denoted $|\procstg{\stg}{\val}|$
+  (despite the inifinite length of the sequence),
+  as the smallest $k\in\Nseto$ such that
+  $\numval(\aform{k}) = 1$.
+This corresponds to the situation in which we can unambigously
+  determine the secret code.
+
+Note that it always holds $\numval(\aform{k}) > 0$ because
+  $\val(\aform{k}) = 1$ thanks to the condition (i)
+  in Definition \ref{def-game}.
+
+The following lemma is a straightforward consequence
+  of the memory-less nature of the games. It says that once a strategy
+  gives us an experiment that yields no new information, we will never more get
+  any new information (using the strategy).
+
+\begin{lemma}
+If $\numval(\aform{k}) = \numval(\aform{k+1})$ for some $k\in\Nset$,
+then $\numval(\aform{k}) = \numval(\aform{k+l})$ for any $l\in\Nset$.
+\end{lemma}
+
+\begin{proof}
+If $\aform{k+1} = \aform{k} \wedge \form_{k+1}$
+is satisfied by valuation $\val$, so must be $\aform{k}$.
+Since $\numval(\aform{k}) = \numval(\aform{k+1})$, the sets of
+valuations satisfying $\aform{k}$ and $\aform{k+1}$ must be exactly the same
+and the formulas are thus equivalent. This implies
+$\stg(\aform{k}) = \stg(\aform{k+1})$ and thus also $\form_{k+2} = \form_{k+1}$.
+By induction, $\form_{k+l} = \form_{k+1}$ and $\aform{k+l} \equiv \aform{k}$
+ for any $l\in\Nset$.\qed
+\end{proof}
+
+The \emph{worst-case number of experiments} $\lenmax{\stg}$
+  of a strategy $\stg$ is the maximal length of the solving process
+  $\procstg{\stg}{\val}$ over all valuations $\val$, i.e.
+  $\lenmax{\stg} = \max_{\val\in\Val_\Var} |\procstg{\stg}{\val}|$.
+We say that the strategy \emph{solves the game} if $\lenmax{\stg}$ is finite.
+The game is \emph{solvable} if there exists a strategy that solves the game.
+
+\begin{problem}
+Given a code-breaking game $\game$, decide whether $\game$ is solvable.
+\end{problem}
+
+\begin{definition}
+A strategy $\stg$ is \emph{optimal} if
+  $\lenmax{\stg} <= \lenmax{\stg'}$ for any strategy $\stg'$.
+
+A strategy $\stg$ is \emph{greedy} if
+  for every $\form\in\Form_X$ and $\exp'\in\Exp$,
+\[
+\max_{\val\in\Val_\Var} \numval(\form \wedge \infer(\val, \stg(\form))) <=
+\max_{\val\in\Val_\Var} \numval(\form \wedge \infer(\val, \exp')).
+\]
+In words, a greedy strategy minimizes
+  the worst-case number of possible valuations in the next step.
+\end{definition}
+
+\begin{problem}
+Given a code-breaking game $\game$,
+  decide whether all greedy strategies are optimal.
+This seems to be the case for Fake-coin problem (?)
+  but it is not the case for Mastermind[ref].
+\end{problem}
+
+%Given a probability distribution on valuations that satisfy $\init$,
+%the \emph{expected number of experiments} $\lenexp{\stg}$ of a strategy $\stg$,
+%is the expected length of the solving process, i.e.
+%$\lenexp{\stg} = E(\|\procstg{\stg}{\val} \|)$. (!!!)
 

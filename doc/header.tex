@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 
 % searchable and copyable pdf (special characters, accents)
-\usepackage{cmap} 
+\usepackage{cmap}
 
 % colours and graphics
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
@@ -19,7 +19,7 @@
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{indentfirst}
-% \usepackage{verbatim}  
+% \usepackage{verbatim}
 % \usepackage{moreverb}
 \usepackage{setspace} % spacing environment
 
@@ -62,19 +62,22 @@
   \end{tikzpicture}}
 \let\theoremframecommand\thmbox
 
+\newcounter{common}
+%\numberwithin{common}{section}
+
 \theoremstyle{definition}
 \shadecolor{gray!5}
-\newshadedtheorem{definition}{Definition}
+\newshadedtheorem{definition}[common]{Definition}
 %\newtheorem{definition}{Definition}
-\newtheorem{example}{Example}
+\newtheorem{example}[common]{Example}
 
 \theoremstyle{plain}
-\newtheorem{problem}{Problem}
+\newtheorem{problem}[common]{Problem}
 \shadecolor{gray!15}
-\newshadedtheorem{theorem}{Theorem}
-\newshadedtheorem{lemma}{Lemma}
+\newshadedtheorem{theorem}[common]{Theorem}
+%\newshadedtheorem{lemma}{Lemma}
 %\newtheorem{theorem}{Theorem}
-%\newtheorem{lemma}{Lemma}
+\newtheorem{lemma}[common]{Lemma}
 
 
 %\theoremstyle{nonumberplain}
@@ -97,9 +100,10 @@
 \mathlig{<=}{\leq}
 \mathlig{>=}{\geq}
 \mathlig{...}{\dotso}
+\renewcommand{\|}{\:\:|\:\:}
 
-% FIXME :)
-\newcommand{\FIXME}[1]{\textcolor{Maroon}{#1}}
+% TODO :)
+\newcommand{\TODO}[1]{\textcolor{Red}{#1}}
 
 % makra pro clanek
 \newcommand{\QED}{\qed}
@@ -118,6 +122,7 @@
 
 \newcommand{\eps}{\varepsilon}
 
+\newcommand{\arrow}[1]{\xrightarrow{#1}}
 
 \pagestyle{plain}
 \sloppy
