@@ -1,0 +1,42 @@
+# kobra
+
+Vars = { x1..x12, y }
+Init = Exactly-1(x1..x12)
+
+# rekneme ze do parametrizace lezou by default ruzne promenne
+Exp(vazeni2, {x1..x12}^2 ) {
+  (Or(p1) & !y) | (Or(p2) & y),
+  (Or(p1) & y) | (Or(p2) & !y),
+  !Or(p1..p2)
+}
+
+Exp(vazeni4, {x1..x12}^4 ) {
+  (Or(p1..p2) & !y) | (Or(p3..p4) & y),
+  (Or(p1..p2) & y) | (Or(p3..p4) & !y),
+  !Or(p1..p4)
+}
+
+Exp(vazeni6, {x1..x12}^6 ) {
+  (Or(p1..p3) & !y) | (Or(p4..p6) & y),
+  (Or(p1..p3) & y) | (Or(p4..p6) & !y),
+  !Or(p1..p4)
+}
+
+Exp(vazeni8, {x1..x12}^8 ) {
+  (Or(p1..p4) & !y) | (Or(p5..p8) & y),
+  (Or(p1..p4) & y) | (Or(p5..p8) & !y),
+  !Or(p1..p4)
+}
+
+Exp(vazeni10, {x1..x12}^10 ) {
+  (Or(p1..p5) & !y) | (Or(p6..p10) & y),
+  (Or(p1..p5) & y) | (Or(p6..p10) & !y),
+  !Or(p1..p4)
+}
+
+Exp(vazeni12, {x1..x12}^12 ) {
+  (Or(p1..p6) & !y) | (Or(p7..p12) & y),
+  (Or(p1..p6) & y) | (Or(p7..p12) & !y),
+  !Or(p1..p12)
+}
+

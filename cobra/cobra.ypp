@@ -15,6 +15,8 @@
   #define YYERROR_VERBOSE
   extern "C" int yylex();
   extern "C" int yyparse();
+  extern "C" int yylineno;
+  extern "C" char* yytext;
   void yyerror (const char *error);
 
   extern AstManager m;
@@ -36,21 +38,69 @@
 %token T_ATLEAST
 %token T_ATMOST
 %token T_EXACTLY
+%token T_VARS
+%token T_INIT
+%token T_EXP
 
 %union {
   Formula* formula;
-  std::vector<Formula*>* list_of_formulas;
+  Variable* variable;
+  std::vector<Formula*>* formula_list;
+  std::vector<Variable*>* variable_list;
   char*    tstr;
   int      tint;
 }
 
 /* Lets inform Bison about the type of each terminal and non-terminal */
-%type <formula>  formula
 %type <tstr>     T_IDENT
 %type <tint>     T_INT
-%type <list_of_formulas> list_of_formulas
-
+%type <formula>  formula
+%type <formula_list> formula_list
+%type <variable> variable
+%type <variable_list> variable_list
 %%
+
+definition :
+    assignment
+  | definition assignment
+
+assignment :
+    T_VARS '=' '{' variable_list '}'
+    {  }
+  | T_INIT '=' formula
+    {  }
+  | T_EXP '(' T_IDENT ',' param_range ')' '{' formula_list '}'
+    {  }
+
+variable :
+    T_IDENT
+      { std::string x($1); $$ = m.get<Variable>(x); }
+
+variable_range :
+    variable '.' '.' variable
+      {  }
+
+variable_list :
+    variable
+      { }
+  | variable_range
+      { }
+  | variable_list ',' variable
+      { }
+  | variable_list ',' variable_range
+      {  }
+
+param_range_single:
+    '{' variable_list '}'
+      { }
+  | '{' variable_list '}' '^' T_INT
+      { }
+
+param_range :
+     param_range_single
+      { }
+  |  param_range param_range_single
+      { }
 
 formula :
     '(' formula ')'
@@ -65,24 +115,30 @@ formula :
       { $$ = m.get<ImpliesOperator>($3, $1); }
   | formula T_EQUIV formula
       { $$ = m.get<EquivalenceOperator>($1, $3); }
-  | T_ATLEAST '-' T_INT '(' list_of_formulas ')'
+  | T_ATLEAST '-' T_INT '(' formula_list ')'
       { $$ = m.get<AtLeastOperator>($3, $5); }
-  | T_ATMOST '-' T_INT '(' list_of_formulas ')'
+  | T_ATMOST '-' T_INT '(' formula_list ')'
       { $$ = m.get<AtMostOperator>($3, $5); }
-  | T_EXACTLY '-' T_INT '(' list_of_formulas ')'
+  | T_EXACTLY '-' T_INT '(' formula_list ')'
       { $$ = m.get<ExactlyOperator>($3, $5); }
+  | T_AND '(' formula_list ')'
+      { $$ = m.get<AndOperator>($3); }
+  | T_OR '(' formula_list ')'
+      { $$ = m.get<OrOperator>($3); }
   | T_NOT formula
       { $$ = m.get<NotOperator>($2); }
-  | T_IDENT
-      { std::string x($1); $$ = m.get<Variable>(x); }
+  | variable
+      { $$ = $1; }
 
-list_of_formulas :
+formula_list :
     formula    { $$ = new std::vector<Formula*>({ $1 }); }
-  | list_of_formulas ',' formula { $1->push_back($3); }
+  | formula_list ',' formula { $1->push_back($3); }
+  | variable_range { $$ = new std::vector<Formula*>({ });  }
 
 %%
 
 void yyerror(const char *error)
 {
-  std::cout << error << std::endl;
+  printf("%d: %s at %s\n", yylineno, error, yytext);
+ // std::cout << error << std::endl;
 }

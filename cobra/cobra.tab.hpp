@@ -49,7 +49,10 @@
      T_NOT = 265,
      T_ATLEAST = 266,
      T_ATMOST = 267,
-     T_EXACTLY = 268
+     T_EXACTLY = 268,
+     T_VARS = 269,
+     T_INIT = 270,
+     T_EXP = 271
    };
 #endif
 /* Tokens.  */
@@ -64,21 +67,26 @@
 #define T_ATLEAST 266
 #define T_ATMOST 267
 #define T_EXACTLY 268
+#define T_VARS 269
+#define T_INIT 270
+#define T_EXP 271
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 40 "cobra.ypp"
+#line 45 "cobra.ypp"
 {
   Formula* formula;
-  std::vector<Formula*>* list_of_formulas;
+  Variable* variable;
+  std::vector<Formula*>* formula_list;
+  std::vector<Variable*>* variable_list;
   char*    tstr;
   int      tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 82 "cobra.tab.hpp"
+#line 90 "cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
