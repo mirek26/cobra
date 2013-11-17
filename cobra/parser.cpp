@@ -34,20 +34,14 @@ Variable* Parser::get(identity<Variable>, const std::string& ident) {
   }
 }
 
-std::vector<Variable*>* Parser::getVariableRange(Variable* from,
-                                                     Variable* to) {
-  auto vars = new std::vector<Variable*>();
-  if (from->ident() != to->ident()) {
-    throw new ParserException("Invalid range.");
-  }
-
-  for (int i = from->index(); i <= to->index(); i++) {
-    vars->push_back(get<Variable>(from->ident(), i));
-  }
-  return vars;
+void Parser::setVars(VariableSet* vars) {
+  vars_ = vars;
+  vars_->dump();
 }
+
 
 void Parser::addExp(Experiment* exp) {
   exp->dump();
+  printf("\n");
 }
 

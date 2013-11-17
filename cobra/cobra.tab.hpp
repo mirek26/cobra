@@ -81,9 +81,9 @@ typedef union YYSTYPE
 #line 47 "cobra.ypp"
 {
   Formula* formula;
+  FormulaList* formula_list;
   Variable* variable;
-  std::vector<Formula*>* formula_list;
-  std::vector<Variable*>* variable_list;
+  VariableSet* variable_list;
   Parametrization* param_range;
   char*    tstr;
   int      tint;

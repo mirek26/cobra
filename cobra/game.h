@@ -11,13 +11,18 @@
 #ifndef COBRA_GAME_H_
 #define COBRA_GAME_H_
 
-class Parametrization: public Construct {
+class Parametrization: public Construct, public std::vector<VariableSet*> {
  public:
   Parametrization()
       : Construct(0) { }
 
+  virtual uint child_count() {
+    return size();
+  }
+
   virtual Construct* child(uint nth) {
-    assert(false);
+    assert(nth < size());
+    return at(nth);
   }
 
   virtual void set_child(uint nth, Construct* value) {
@@ -25,39 +30,32 @@ class Parametrization: public Construct {
   }
 
   virtual std::string name() {
-    return "Construct.";
+    return "Parametrization";
   };
 };
 
 class Experiment: public Construct {
   std::string name_;
   Parametrization* param_;
-  FormulaVec outcomes_;
+  FormulaList* outcomes_;
 
  public:
   Experiment()
-      : Construct(0) { }
+      : Construct(2) { }
 
-  Experiment(std::string name, Parametrization* param, FormulaVec* outcomes)
-      : Construct(0),
+  Experiment(std::string name, Parametrization* param, FormulaList* outcomes)
+      : Construct(2),
         name_(name),
-        param_(param) {
-    outcomes_.insert(outcomes_.begin(), outcomes->begin(), outcomes->end());
-    delete outcomes;
-  }
-
-  virtual uint child_count() {
-    return outcomes_.size();
-  }
+        param_(param),
+        outcomes_(outcomes) { }
 
   virtual Construct* child(uint nth) {
-    assert(nth < outcomes_.size());
-    return outcomes_[nth];
+    switch (nth) {
+      case 0: return param_;
+      case 1: return outcomes_;
+      default: assert(false);
+    }
   };
-
-  virtual void set_child(uint nth, Construct* value) {
-    assert(false);
-  }
 
   virtual std::string name() {
     return "Experiment " + name_;

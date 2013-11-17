@@ -14,7 +14,6 @@ Parser m;
 int main()
 {
   yyparse();
-  m.init()->dump();
   auto f = dynamic_cast<Formula*>(m.init()->Simplify());
 
   Solver s;
@@ -27,6 +26,6 @@ int main()
   printf(sat ? "\nSATISFIABLE.\n" : "\nNON-SATISFIABLE.\n" );
   if (sat) s.PrintAssignment();
 
-  m.deleteAll();
+  //m.deleteAll();
   return 0;
 }

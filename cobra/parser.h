@@ -11,6 +11,7 @@
 #define COBRA_AST_MANAGER_H_
 
 class Variable;
+class VariableSet;
 class Formula;
 class Experiment;
 
@@ -55,7 +56,7 @@ class Parser {
   std::map<std::string, Variable*> variables_;
   Construct* last_;
   Formula* init_;
-  std::vector<Variable*> vars_;
+  VariableSet* vars_;
 
  public:
   /* Create a new node of type T; call the constructor with parameters ts.
@@ -80,14 +81,8 @@ class Parser {
     init_ = init;
   }
 
-  void setVars(std::vector<Variable*>* vars) {
-    vars_.insert(vars_.begin(), vars->begin(), vars->end());
-    delete vars;
-  }
-
+  void setVars(VariableSet* vars);
   void addExp(Experiment* exp);
-
-  std::vector<Variable*>* getVariableRange(Variable* from, Variable* to);
 
  private:
   /* Generic template for a get method, which creates a new node.

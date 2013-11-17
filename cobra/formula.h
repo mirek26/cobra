@@ -17,7 +17,7 @@ class Variable;
 class OrOperator;
 class AndOperator;
 class NotOperator;
-typedef std::vector<Formula*> FormulaVec;
+class FormulaList;
 
 /* Global Parser object. You should never create a ast node directly,
  * always use m.get<Type>(...).
@@ -81,7 +81,7 @@ class Formula: public Construct {
    * that are added to the vector 'clauses'. Recursively calls the same
    * on all children.
    */
-  virtual void TseitinTransformation(FormulaVec& clauses) = 0;
+  virtual void TseitinTransformation(FormulaList& clauses) = 0;
 
   /* Converts the formula to CNF using Tseitin transformation.
    * All children of the returned AndOperator are guarenteed to be
@@ -90,16 +90,39 @@ class Formula: public Construct {
   virtual AndOperator* ToCnf();
 };
 
+class FormulaList: public Construct, public std::vector<Formula*> {
+ public:
+  FormulaList(): Construct(0) { }
+
+  virtual std::string name() {
+    return "FormulaList";
+  }
+
+  virtual uint child_count() {
+    return size();
+  }
+
+  virtual Construct* child(uint nth) {
+    assert(nth < size());
+    return at(nth);
+  }
+};
+
 /******************************************************************************
  * Base class for associative n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
-  FormulaVec children_;
+  FormulaList children_;
 
  public:
   NaryOperator()
       : Formula(1) {}
+
+  NaryOperator(Formula* f)
+      : Formula(1) {
+    addChild(f);
+  }
 
   NaryOperator(Formula* left, Formula* right)
       : Formula(1) {
@@ -107,13 +130,12 @@ class NaryOperator: public Formula {
     addChild(right);
   }
 
-  explicit NaryOperator(FormulaVec* list)
+  explicit NaryOperator(FormulaList* list)
       : Formula(1) {
     children_.insert(children_.end(), list->begin(), list->end());
-    delete list;
   }
 
-  explicit NaryOperator(FormulaVec& list)
+  explicit NaryOperator(std::vector<Formula*>& list)
       : Formula(1) {
     children_.insert(children_.end(), list.begin(), list.end());
   }
@@ -122,7 +144,7 @@ class NaryOperator: public Formula {
     children_.push_back(child);
   }
 
-  void addChildren(FormulaVec& children) {
+  void addChildren(FormulaList& children) {
     children_.insert(children_.end(), children.begin(), children.end());
   }
 
@@ -136,7 +158,7 @@ class NaryOperator: public Formula {
     return children_[nth];
   }
 
-  FormulaVec& children() {
+  FormulaList& children() {
     return children_;
   }
 
@@ -166,9 +188,9 @@ class AndOperator: public NaryOperator {
       : NaryOperator() { }
   AndOperator(Formula *left, Formula* right)
       : NaryOperator(left, right) { }
-  explicit AndOperator(FormulaVec* list)
+  explicit AndOperator(FormulaList* list)
       : NaryOperator(list) { }
-  explicit AndOperator(FormulaVec list)
+  explicit AndOperator(FormulaList list)
       : NaryOperator(list) { }
 
   virtual std::string name() {
@@ -180,7 +202,7 @@ class AndOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -188,11 +210,16 @@ class AndOperator: public NaryOperator {
  */
 class OrOperator: public NaryOperator {
  public:
-  OrOperator(Formula *left, Formula* right)
-      : NaryOperator(left, right) {}
-  explicit OrOperator(FormulaVec* list)
+  OrOperator(Formula *f)
+      : NaryOperator(f) {}
+  OrOperator(Formula *f1, Formula* f2)
+      : NaryOperator(f1, f2) {}
+  OrOperator(Formula *f1, Formula* f2, Formula* f3)
+      : NaryOperator(f1, f2) { addChild(f3); }
+
+  explicit OrOperator(FormulaList* list)
       : NaryOperator(list) {}
-  explicit OrOperator(FormulaVec list)
+  explicit OrOperator(std::vector<Formula*> list)
       : NaryOperator(list) {}
 
   virtual std::string name() {
@@ -204,7 +231,7 @@ class OrOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -215,13 +242,13 @@ class MacroOperator: public NaryOperator {
  protected:
   AndOperator* expanded_;
  public:
-  explicit MacroOperator(FormulaVec* list);
+  explicit MacroOperator(FormulaList* list);
 
   virtual Formula* tseitin_var();
 
   void ExpandHelper(int size, bool negate);
   virtual AndOperator* Expand() = 0;
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -231,7 +258,7 @@ class AtLeastOperator: public MacroOperator {
   int value_;
 
  public:
-  AtLeastOperator(int value, FormulaVec* list)
+  AtLeastOperator(int value, FormulaList* list)
       : MacroOperator(list),
         value_(value) { }
 
@@ -253,7 +280,7 @@ class AtMostOperator: public MacroOperator {
   int value_;
 
  public:
-  AtMostOperator(int value, FormulaVec* list)
+  AtMostOperator(int value, FormulaList* list)
       : MacroOperator(list),
         value_(value) { }
 
@@ -275,7 +302,7 @@ class ExactlyOperator: public MacroOperator {
   int value_;
 
  public:
-  ExactlyOperator(int value, FormulaVec* list)
+  ExactlyOperator(int value, FormulaList* list)
       : MacroOperator(list),
         value_(value) { }
 
@@ -324,7 +351,7 @@ class EquivalenceOperator: public Formula {
     }
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -361,7 +388,7 @@ class ImpliesOperator: public Formula {
     }
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -395,7 +422,7 @@ class NotOperator: public Formula {
     return child_->isLiteral();
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses);
+  virtual void TseitinTransformation(FormulaList& clauses);
 };
 
 /******************************************************************************
@@ -466,8 +493,43 @@ class Variable: public Formula {
     return true;
   }
 
-  virtual void TseitinTransformation(FormulaVec& clauses) {
+  virtual void TseitinTransformation(FormulaList& clauses) {
     // do nothing
+  }
+};
+
+class VariableSet: public Construct, public std::vector<Variable*> {
+ public:
+  VariableSet(): Construct(0) { }
+
+  virtual std::string name() {
+    return "VariableSet";
+  }
+
+  virtual uint child_count() {
+    return size();
+  }
+
+  virtual Construct* child(uint nth) {
+    assert(nth < size());
+    return at(nth);
+  }
+
+  FormulaList* asFormulaList() {
+    auto v = m.get<FormulaList>();
+    v->insert(v->begin(), this->begin(), this->end());
+    return v;
+  }
+
+  static VariableSet* Range(Variable* from, Variable* to) {
+    auto vars = m.get<VariableSet>();
+    if (from->ident() != to->ident()) {
+      throw new ParserException("Invalid range.");
+    }
+    for (int i = from->index(); i <= to->index(); i++) {
+      vars->push_back(m.get<Variable>(from->ident(), i));
+    }
+    return vars;
   }
 };
 

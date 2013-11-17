@@ -57,11 +57,11 @@ Construct* OrOperator::Simplify() {
 
 // Tseitin transformation of arbitrary formula to CNF
 AndOperator* Formula::ToCnf() {
-  FormulaVec clauses;
+  FormulaList clauses;
   // recursively create clauses capturing relationships between nodes
   TseitinTransformation(clauses);
   // the variable corresponding to the root node must be always true
-  clauses.push_back(m.get<OrOperator>(FormulaVec{ tseitin_var() }));
+  clauses.push_back(m.get<OrOperator>(tseitin_var()));
   auto root = m.get<AndOperator>(clauses);
   return root;
 }
@@ -84,19 +84,19 @@ Formula* MacroOperator::tseitin_var() {
   return expanded_->tseitin_var();
 }
 
-MacroOperator::MacroOperator(FormulaVec* list)
+MacroOperator::MacroOperator(FormulaList* list)
       : NaryOperator(list) {
   expanded_ = m.get<AndOperator>();
 }
 
 void MacroOperator::ExpandHelper(int size, bool negate) {
-  FormulaVec vars;
+  std::vector<Formula*> vars;
   std::function<Formula*(Formula*)> tseitin_vars =
     [](Formula* f){ return f->tseitin_var(); };
   transform(children_, vars, tseitin_vars);
   //
   AndOperator* root = expanded_;
-  std::function<void(FormulaVec)> add = [&](FormulaVec list) {
+  std::function<void(std::vector<Formula*>)> add = [&](std::vector<Formula*> list) {
     if (negate) {
       for (auto& f: list) f = f->neg();
     }
@@ -131,10 +131,10 @@ AndOperator* ExactlyOperator::Expand() {
  * Tseitin transformation.
  */
 
-void AndOperator::TseitinTransformation(FormulaVec& clauses) {
+void AndOperator::TseitinTransformation(FormulaList& clauses) {
   // X <-> AND(A1, A2, ..)
   // (X | !A1 | !A2 | ...) & (A1 | !X) & (A2 | !X) & ...
-  FormulaVec first;
+  FormulaList first;
   first.resize(children_.size());
   std::transform(children_.begin(), children_.end(), first.begin(),
     [](Formula* f) { return f->tseitin_var()->neg(); });
@@ -143,9 +143,7 @@ void AndOperator::TseitinTransformation(FormulaVec& clauses) {
 
   auto not_this = tseitin_var()->neg();
   for (auto& f: children_) {
-    clauses.push_back(m.get<OrOperator>(FormulaVec{
-      not_this, f->tseitin_var()
-    }));
+    clauses.push_back(m.get<OrOperator>(not_this, f->tseitin_var()));
   }
 
   // recurse down
@@ -154,10 +152,10 @@ void AndOperator::TseitinTransformation(FormulaVec& clauses) {
   }
 }
 
-void OrOperator::TseitinTransformation(FormulaVec& clauses) {
+void OrOperator::TseitinTransformation(FormulaList& clauses) {
   // X <-> OR(A1, A2, ..)
   // (!X | A1 | A2 | ...) & (!A1 | X) & (!A2 | X) & ...
-  FormulaVec first;
+  FormulaList first;
   first.resize(children_.size());
   std::transform(children_.begin(), children_.end(), first.begin(),
     [](Formula* f) { return f->tseitin_var(); });
@@ -165,9 +163,7 @@ void OrOperator::TseitinTransformation(FormulaVec& clauses) {
   clauses.push_back(m.get<OrOperator>(first));
 
   for (auto& f: children_) {
-    clauses.push_back(m.get<OrOperator>(FormulaVec{
-      tseitin_var(), f->tseitin_var()->neg()
-    }));
+    clauses.push_back(m.get<OrOperator>(tseitin_var(), f->tseitin_var()->neg()));
   }
 
   // recurse down
@@ -176,55 +172,53 @@ void OrOperator::TseitinTransformation(FormulaVec& clauses) {
   }
 }
 
-void NotOperator::TseitinTransformation(FormulaVec& clauses) {
+void NotOperator::TseitinTransformation(FormulaList& clauses) {
   // X <-> (!Y)
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var();
   auto childVar = child_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar->neg(), childVar->neg()}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar, childVar}));
+  clauses.push_back(m.get<OrOperator>(thisVar->neg(), childVar->neg()));
+  clauses.push_back(m.get<OrOperator>(thisVar, childVar));
   child_->TseitinTransformation(clauses);
 }
 
-void ImpliesOperator::TseitinTransformation(FormulaVec& clauses) {
+void ImpliesOperator::TseitinTransformation(FormulaList& clauses) {
   // X <-> (L -> R)
   // (!X | !L | R) & (L | X) & (!R | X)
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{leftVar, thisVar}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{rightVar->neg(), thisVar}));
+  clauses.push_back(
+    m.get<OrOperator>(thisVar->neg(), leftVar->neg(), rightVar));
+  clauses.push_back(
+    m.get<OrOperator>(leftVar, thisVar));
+  clauses.push_back(
+    m.get<OrOperator>(rightVar->neg(), thisVar));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);
 }
 
-void EquivalenceOperator::TseitinTransformation(FormulaVec& clauses) {
+void EquivalenceOperator::TseitinTransformation(FormulaList& clauses) {
   // X <-> (L <-> R)
   // (X | L | R) & (!X | !L | R) & (!X | L | !R) & (X | !L | !R)
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar, leftVar, rightVar}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar->neg(), leftVar->neg(), rightVar}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar->neg(), leftVar, rightVar->neg()}));
-  clauses.push_back(m.get<OrOperator>(
-    FormulaVec{thisVar, leftVar->neg(), rightVar->neg()}));
+  clauses.push_back(
+    m.get<OrOperator>(thisVar, leftVar, rightVar));
+  clauses.push_back(
+    m.get<OrOperator>(thisVar->neg(), leftVar->neg(), rightVar));
+  clauses.push_back(
+    m.get<OrOperator>(thisVar->neg(), leftVar, rightVar->neg()));
+  clauses.push_back(
+    m.get<OrOperator>(thisVar, leftVar->neg(), rightVar->neg()));
 
   left_->TseitinTransformation(clauses);
   right_->TseitinTransformation(clauses);
 }
 
-void MacroOperator::TseitinTransformation(FormulaVec& clauses) {
+void MacroOperator::TseitinTransformation(FormulaList& clauses) {
   auto expanded = Expand();
   expanded->TseitinTransformation(clauses);
 }
