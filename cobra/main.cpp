@@ -14,7 +14,8 @@ AstManager m;
 int main()
 {
   yyparse();
-  auto f = dynamic_cast<Formula*>(m.last()->Simplify());
+  m.init()->dump();
+  auto f = dynamic_cast<Formula*>(m.init()->Simplify());
 
   Solver s;
   s.AddConstraint(f);

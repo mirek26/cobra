@@ -57,9 +57,9 @@ class Solver
     std::vector<std::string> falseVar;
     for (auto& var: variables_) {
       if (picosat_deref(picosat_, var->id()) == 1) {
-        trueVar.push_back(var->ident());
+        trueVar.push_back(var->pretty());
       } else {
-        falseVar.push_back(var->ident());
+        falseVar.push_back(var->pretty());
       }
     }
     printf("TRUE: ");

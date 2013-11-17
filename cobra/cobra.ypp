@@ -9,8 +9,9 @@
   #include <string>
   #include <vector>
 
-  #include "./formula.h"
-  #include "./ast-manager.h"
+  #include "formula.h"
+  #include "ast-manager.h"
+  #include "game.h"
 
   #define YYERROR_VERBOSE
   extern "C" int yylex();
@@ -24,6 +25,7 @@
 
 %token T_IDENT
 %token T_INT
+%token T_STRING
 
 /* order of precedence from
  * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence
@@ -47,17 +49,21 @@
   Variable* variable;
   std::vector<Formula*>* formula_list;
   std::vector<Variable*>* variable_list;
+  Parametrization* param_range;
   char*    tstr;
   int      tint;
 }
 
 /* Lets inform Bison about the type of each terminal and non-terminal */
 %type <tstr>     T_IDENT
+%type <tstr>     T_STRING
 %type <tint>     T_INT
 %type <formula>  formula
 %type <formula_list> formula_list
 %type <variable> variable
 %type <variable_list> variable_list
+%type <variable_list> variable_range
+%type <param_range> param_range
 %%
 
 definition :
@@ -66,29 +72,32 @@ definition :
 
 assignment :
     T_VARS '=' '{' variable_list '}'
-    {  }
+    {  m.setVars($4);  }
   | T_INIT '=' formula
-    {  }
-  | T_EXP '(' T_IDENT ',' param_range ')' '{' formula_list '}'
-    {  }
+    {  m.setInit($3);  }
+  | T_EXP '(' T_STRING ',' param_range ')' '{' formula_list '}'
+    {  m.addExp(m.get<Experiment>($3, $5, $8)); }
 
 variable :
     T_IDENT
       { std::string x($1); $$ = m.get<Variable>(x); }
+  | T_IDENT T_INT
+      { std::string x($1); $$ = m.get<Variable>(x, $2); }
 
 variable_range :
     variable '.' '.' variable
-      {  }
+      { $$ = m.getVariableRange($1, $4); }
 
 variable_list :
     variable
-      { }
+      { $$ = new std::vector<Variable*>({ $1 }); }
   | variable_range
-      { }
+      { $$ = $1; }
   | variable_list ',' variable
-      { }
+      { $$->push_back($3); }
   | variable_list ',' variable_range
-      {  }
+      { $$->insert($$->begin(), $3->begin(), $3->end());
+        delete $3; }
 
 param_range_single:
     '{' variable_list '}'
@@ -131,9 +140,13 @@ formula :
       { $$ = $1; }
 
 formula_list :
-    formula    { $$ = new std::vector<Formula*>({ $1 }); }
-  | formula_list ',' formula { $1->push_back($3); }
-  | variable_range { $$ = new std::vector<Formula*>({ });  }
+    formula
+      { $$ = new std::vector<Formula*>({ $1 }); }
+  | formula_list ',' formula
+      { $1->push_back($3); }
+  | variable_range
+      { $$ = new std::vector<Formula*>();
+        $$->insert($$->begin(), $1->begin(), $1->end()); }
 
 %%
 

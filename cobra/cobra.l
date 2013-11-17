@@ -44,7 +44,8 @@
 "Exp"           { return T_EXP; }
 
  /* identifiers */
-[a-zA-Z][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
+[a-zA-Z][a-zA-Z_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
+\".*\" { yylval.tstr = strdup(yytext); return T_STRING; }
 
  /* default: return char on input */
  .              { return yytext[0]; }

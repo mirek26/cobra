@@ -41,52 +41,55 @@
    enum yytokentype {
      T_IDENT = 258,
      T_INT = 259,
-     T_EQUIV = 260,
-     T_IMPLIES = 261,
-     T_IMPLIED = 262,
-     T_OR = 263,
-     T_AND = 264,
-     T_NOT = 265,
-     T_ATLEAST = 266,
-     T_ATMOST = 267,
-     T_EXACTLY = 268,
-     T_VARS = 269,
-     T_INIT = 270,
-     T_EXP = 271
+     T_STRING = 260,
+     T_EQUIV = 261,
+     T_IMPLIES = 262,
+     T_IMPLIED = 263,
+     T_OR = 264,
+     T_AND = 265,
+     T_NOT = 266,
+     T_ATLEAST = 267,
+     T_ATMOST = 268,
+     T_EXACTLY = 269,
+     T_VARS = 270,
+     T_INIT = 271,
+     T_EXP = 272
    };
 #endif
 /* Tokens.  */
 #define T_IDENT 258
 #define T_INT 259
-#define T_EQUIV 260
-#define T_IMPLIES 261
-#define T_IMPLIED 262
-#define T_OR 263
-#define T_AND 264
-#define T_NOT 265
-#define T_ATLEAST 266
-#define T_ATMOST 267
-#define T_EXACTLY 268
-#define T_VARS 269
-#define T_INIT 270
-#define T_EXP 271
+#define T_STRING 260
+#define T_EQUIV 261
+#define T_IMPLIES 262
+#define T_IMPLIED 263
+#define T_OR 264
+#define T_AND 265
+#define T_NOT 266
+#define T_ATLEAST 267
+#define T_ATMOST 268
+#define T_EXACTLY 269
+#define T_VARS 270
+#define T_INIT 271
+#define T_EXP 272
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 45 "cobra.ypp"
+#line 47 "cobra.ypp"
 {
   Formula* formula;
   Variable* variable;
   std::vector<Formula*>* formula_list;
   std::vector<Variable*>* variable_list;
+  Parametrization* param_range;
   char*    tstr;
   int      tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 90 "cobra.tab.hpp"
+#line 93 "cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

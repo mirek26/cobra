@@ -403,6 +403,7 @@ class NotOperator: public Formula {
  */
 class Variable: public Formula {
   std::string ident_;
+  int index_;
   bool generated_;
   int id_;
 
@@ -414,6 +415,7 @@ class Variable: public Formula {
    */
   Variable()
       : Formula(0),
+        index_(-1),
         generated_(true) {
     id_ = id_counter_++;
     ident_ = "var" + to_string(id_);
@@ -422,6 +424,15 @@ class Variable: public Formula {
   explicit Variable(std::string ident)
       : Formula(0),
         ident_(ident),
+        index_(-1),
+        generated_(false) {
+    id_ = id_counter_++;
+  }
+
+  Variable(std::string ident, int index)
+      : Formula(0),
+        ident_(ident),
+        index_(index),
         generated_(false) {
     id_ = id_counter_++;
   }
@@ -430,16 +441,20 @@ class Variable: public Formula {
     return id_;
   }
 
+  int index() {
+    return index_;
+  }
+
   virtual std::string ident() {
     return ident_;
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return ident_;
+    return index_ == -1 ? ident_  : ident_ + to_string(index_);
   }
 
   virtual std::string name() {
-    return "Variable " + ident();
+    return "Variable " + pretty();
   }
 
   virtual Construct* child(uint nth) {

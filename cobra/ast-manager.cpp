@@ -6,6 +6,7 @@
 #include <map>
 #include "ast-manager.h"
 #include "formula.h"
+#include "game.h"
 
 void Construct::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
@@ -31,3 +32,21 @@ Variable* AstManager::get(identity<Variable>, const std::string& ident) {
     return node;
   }
 }
+
+std::vector<Variable*>* AstManager::getVariableRange(Variable* from,
+                                                     Variable* to) {
+  auto vars = new std::vector<Variable*>();
+  if (from->ident() != to->ident()) {
+    throw new ParserException("Invalid range.");
+  }
+
+  for (int i = from->index(); i <= to->index(); i++) {
+    vars->push_back(get<Variable>(from->ident(), i));
+  }
+  return vars;
+}
+
+void AstManager::addExp(Experiment* exp) {
+  exp->dump();
+}
+
