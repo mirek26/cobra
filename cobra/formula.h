@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #include "util.h"
-#include "ast-manager.h"
+#include "parser.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -19,10 +19,10 @@ class AndOperator;
 class NotOperator;
 typedef std::vector<Formula*> FormulaVec;
 
-/* Global AstManager. You should never create a ast node directly,
+/* Global Parser object. You should never create a ast node directly,
  * always use m.get<Type>(...).
  */
-extern AstManager m;
+extern Parser m;
 
 /* Prepositional formula, base class for
  * Derived classes:

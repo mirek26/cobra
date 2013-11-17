@@ -114,7 +114,7 @@
   #include <vector>
 
   #include "formula.h"
-  #include "ast-manager.h"
+  #include "parser.h"
   #include "game.h"
 
   #define YYERROR_VERBOSE
@@ -124,7 +124,7 @@
   extern "C" char* yytext;
   void yyerror (const char *error);
 
-  extern AstManager m;
+  extern Parser m;
 
 
 /* Enabling traces.  */

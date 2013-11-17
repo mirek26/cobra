@@ -50,7 +50,7 @@ class ParserException: public std::exception {
   }
 };
 
-class AstManager {
+class Parser {
   std::vector<Construct*> nodes_;
   std::map<std::string, Variable*> variables_;
   Construct* last_;

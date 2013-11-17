@@ -4,9 +4,10 @@
 
 #include <vector>
 #include <map>
-#include "ast-manager.h"
 #include "formula.h"
 #include "game.h"
+
+#include "parser.h"
 
 void Construct::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
@@ -21,7 +22,7 @@ void Construct::dump(int indent) {
 // Overloaded insance of get method for a Variable.
 // It first looks into the variable map and creates a new one
 // only if it isn't there.
-Variable* AstManager::get(identity<Variable>, const std::string& ident) {
+Variable* Parser::get(identity<Variable>, const std::string& ident) {
   if (variables_.count(ident) > 0) {
     return variables_[ident];
   } else {
@@ -33,7 +34,7 @@ Variable* AstManager::get(identity<Variable>, const std::string& ident) {
   }
 }
 
-std::vector<Variable*>* AstManager::getVariableRange(Variable* from,
+std::vector<Variable*>* Parser::getVariableRange(Variable* from,
                                                      Variable* to) {
   auto vars = new std::vector<Variable*>();
   if (from->ident() != to->ident()) {
@@ -46,7 +47,7 @@ std::vector<Variable*>* AstManager::getVariableRange(Variable* from,
   return vars;
 }
 
-void AstManager::addExp(Experiment* exp) {
+void Parser::addExp(Experiment* exp) {
   exp->dump();
 }
 

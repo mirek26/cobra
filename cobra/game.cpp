@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <map>
-#include "ast-manager.h"
+#include "parser.h"
 #include "formula.h"
 
 #include "game.h"

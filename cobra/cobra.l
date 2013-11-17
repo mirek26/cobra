@@ -1,6 +1,7 @@
 %option yylineno
 %{
 #include "formula.h"
+#include "game.h"
 #include "cobra.tab.hpp"
 
 #define YY_DECL extern "C" int yylex()

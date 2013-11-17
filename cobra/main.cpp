@@ -5,11 +5,11 @@
 #include "formula.h"
 #include "util.h"
 #include "solver.h"
-#include "ast-manager.h"
+#include "parser.h"
 
 extern "C" int yyparse();
 
-AstManager m;
+Parser m;
 
 int main()
 {
