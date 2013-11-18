@@ -38,10 +38,10 @@ class Solver
   void AddConstraint(Formula* constraint) {
     auto cnf = constraint->ToCnf();
     formula_->addChildren(cnf->children());
-    for (auto clause: cnf->children()) {
+    for (auto clause: *cnf->children()) {
       auto orOperator = dynamic_cast<OrOperator*>(clause);
       assert(orOperator);
-      for (auto& literal: orOperator->children()) {
+      for (auto& literal: *orOperator->children()) {
         auto neg = dynamic_cast<NotOperator*>(literal);
         auto var = dynamic_cast<Variable*>(neg ? neg->child(0) : literal);
         assert(var);

@@ -1509,12 +1509,12 @@ yyreduce:
 
   case 20:
 #line 121 "cobra.ypp"
-    { (yyval.formula) = m.get<AndOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
+    { (yyval.formula) = m.get<AndOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
     break;
 
   case 21:
 #line 123 "cobra.ypp"
-    { (yyval.formula) = m.get<OrOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
+    { (yyval.formula) = m.get<OrOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
     break;
 
   case 22:

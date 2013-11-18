@@ -38,6 +38,21 @@ class Construct {
   }
 };
 
+template<class C>
+class VectorConstruct: public Construct, public std::vector<C> {
+ public:
+  VectorConstruct(): Construct(0) { }
+
+  virtual uint child_count() {
+    return this->size();
+  }
+
+  virtual Construct* child(uint nth) {
+    assert(nth < this->size());
+    return this->at(nth);
+  }
+};
+
 class ParserException: public std::exception {
   std::string what_;
 
@@ -66,6 +81,11 @@ class Parser {
   template<class T, typename... Ts>
   T* get(const Ts&... ts) {
     return get(identity<T>(), ts...);
+  }
+
+  template<class T, class R>
+  T* get(std::initializer_list<R> l) {
+    return get(identity<T>(), l);
   }
 
   void deleteAll() {

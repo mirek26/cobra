@@ -36,12 +36,12 @@ Variable* Parser::get(identity<Variable>, const std::string& ident) {
 
 void Parser::setVars(VariableSet* vars) {
   vars_ = vars;
-  vars_->dump();
+  //vars_->dump();
 }
 
 
 void Parser::addExp(Experiment* exp) {
-  exp->dump();
-  printf("\n");
+  //exp->dump();
+  //printf(" -\n");
 }
 
