@@ -97,6 +97,10 @@ class Parser {
     return init_;
   }
 
+  VariableSet* vars() {
+    return vars_;
+  }
+
   void setInit(Formula* init) {
     init_ = init;
   }

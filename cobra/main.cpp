@@ -28,6 +28,9 @@ int main()
   printf(sat ? "\nSATISFIABLE.\n" : "\nNON-SATISFIABLE.\n" );
   if (sat) s.PrintAssignment();
 
+  int x = s.GetFixedVariables(m.vars());
+  printf("FIXED: %i\n", x);
+
   //m.deleteAll();
   return 0;
 }

@@ -30,6 +30,24 @@ class Solver
     return formula_;
   }
 
+  int GetFixedVariables(VariableSet* vars) {
+    int r = 0;
+    for (auto& var: variables_) {
+      // printf("Fixed test %i - %s\n", var->id(), var->pretty().c_str());
+      picosat_assume(picosat_, var->id());
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) {
+        printf("%s must be FALSE.\n", var->pretty().c_str());
+        r++;
+      }
+      picosat_assume(picosat_, -var->id());
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) {
+        printf("%s must be TRUE.\n", var->pretty().c_str());
+        r++;
+      }
+    }
+    return r;
+  }
+
   bool Satisfiable() {
     auto result = picosat_sat(picosat_, -1);
     return (result == PICOSAT_SATISFIABLE);
@@ -46,6 +64,7 @@ class Solver
         auto var = dynamic_cast<Variable*>(neg ? neg->child(0) : literal);
         assert(var);
         variables_.insert(var);
+        printf("%i ", var->id());
         picosat_add(picosat_, (neg ? -1 : 1) * var->id());
       }
       picosat_add(picosat_, 0);

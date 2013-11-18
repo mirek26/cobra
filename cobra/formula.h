@@ -83,7 +83,7 @@ class Formula: public Construct {
    * that are added to the vector 'clauses'. Recursively calls the same
    * on all children.
    */
-  virtual void TseitinTransformation(FormulaList* clauses) = 0;
+  virtual void TseitinTransformation(FormulaList* clauses, bool top) = 0;
 
   /* Converts the formula to CNF using Tseitin transformation.
    * All children of the returned AndOperator are guarenteed to be
@@ -183,7 +183,7 @@ class AndOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -207,7 +207,7 @@ class OrOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -224,7 +224,7 @@ class MacroOperator: public NaryOperator {
 
   void ExpandHelper(int size, bool negate);
   virtual AndOperator* Expand() = 0;
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -327,7 +327,7 @@ class EquivalenceOperator: public Formula {
     }
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -364,7 +364,7 @@ class ImpliesOperator: public Formula {
     }
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -398,7 +398,7 @@ class NotOperator: public Formula {
     return child_->isLiteral();
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses);
+  virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
 /******************************************************************************
@@ -469,8 +469,10 @@ class Variable: public Formula {
     return true;
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses) {
-    // do nothing
+  virtual void TseitinTransformation(FormulaList* clauses, bool top) {
+    if (top) {
+      clauses->push_back(m.get<OrOperator>({ (Formula*)this }));
+    }
   }
 };
 
