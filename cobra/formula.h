@@ -41,6 +41,7 @@ extern Parser m;
  *  TODO: how about true/false leaves?
  */
 class Formula: public Construct {
+ protected:
   /* variable (possibly negated) that is equivalent to this subformula,
    * used for Tseitin transformation
    */
