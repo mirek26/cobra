@@ -64,7 +64,6 @@ class Solver
         auto var = dynamic_cast<Variable*>(neg ? neg->child(0) : literal);
         assert(var);
         variables_.insert(var);
-        printf("%i ", var->id());
         picosat_add(picosat_, (neg ? -1 : 1) * var->id());
       }
       picosat_add(picosat_, 0);

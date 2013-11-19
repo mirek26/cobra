@@ -406,7 +406,7 @@ class NotOperator: public Formula {
  */
 class Variable: public Formula {
   std::string ident_;
-  int index_;
+  std::vector<int> indices_;
   bool generated_;
   int id_;
 
@@ -418,7 +418,6 @@ class Variable: public Formula {
    */
   Variable()
       : Formula(0),
-        index_(-1),
         generated_(true) {
     id_ = id_counter_++;
     ident_ = "var" + to_string(id_);
@@ -427,16 +426,15 @@ class Variable: public Formula {
   explicit Variable(std::string ident)
       : Formula(0),
         ident_(ident),
-        index_(-1),
         generated_(false) {
     id_ = id_counter_++;
   }
 
-  Variable(std::string ident, int index)
+  Variable(std::string ident, const std::vector<int>& indices)
       : Formula(0),
         ident_(ident),
-        index_(index),
         generated_(false) {
+    indices_.insert(indices_.begin(), indices.begin(), indices.end());
     id_ = id_counter_++;
   }
 
@@ -444,8 +442,8 @@ class Variable: public Formula {
     return id_;
   }
 
-  int index() {
-    return index_;
+  const std::vector<int>& indices() {
+    return indices_;
   }
 
   virtual std::string ident() {
@@ -453,11 +451,11 @@ class Variable: public Formula {
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return index_ == -1 ? ident_  : ident_ + to_string(index_);
+    return ident_ + joinIndices(indices_);
   }
 
   virtual std::string name() {
-    return "Variable " + pretty();
+    return "Variable " + pretty() + "(" + to_string(id_) +")";
   }
 
   virtual Construct* child(uint nth) {
@@ -473,6 +471,15 @@ class Variable: public Formula {
     if (top) {
       clauses->push_back(m.get<OrOperator>({ (Formula*)this }));
     }
+  }
+
+  static std::string joinIndices(const std::vector<int> list) {
+    if (list.empty()) return "";
+    std::string s = to_string(list.front());
+    for (auto it = std::next(list.begin()); it != list.end(); ++it) {
+      s += "_" + to_string(*it);
+    }
+    return s;
   }
 };
 
@@ -498,8 +505,13 @@ class VariableSet: public VectorConstruct<Variable*> {
     if (from->ident() != to->ident()) {
       throw new ParserException("Invalid range.");
     }
-    for (int i = from->index(); i <= to->index(); i++) {
-      vars->push_back(m.get<Variable>(from->ident(), i));
+    std::vector<int> v;
+    v.insert(v.begin(), from->indices().begin(), from->indices().end());
+    assert(from->indices().size() >= 1);
+    assert(to->indices().size() >= 1);
+    for (int i = from->indices()[0]; i <= to->indices()[0]; i++) {
+      v[0] = i;
+      vars->push_back(m.get<Variable>(from->ident(), v));
     }
     return vars;
   }

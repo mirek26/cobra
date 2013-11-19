@@ -72,6 +72,7 @@ class Parser {
   Construct* last_;
   Formula* init_;
   VariableSet* vars_;
+  std::vector<int> variableIndices_;
 
  public:
   /* Create a new node of type T; call the constructor with parameters ts.
@@ -101,6 +102,14 @@ class Parser {
     return vars_;
   }
 
+  void variableIndex(int n) {
+    variableIndices_.push_back(n);
+  }
+
+  std::vector<int>& variableIndices(){
+    return variableIndices_;
+  }
+
   void setInit(Formula* init) {
     init_ = init;
   }
@@ -127,7 +136,12 @@ class Parser {
    * it isn't there yet. This ensures that we don't create more than one node
    * for the same variable.
    */
-  Variable* get(identity<Variable>, const std::string& ident);
+  Variable* get(identity<Variable>,
+                const std::string& ident);
+  Variable* get(identity<Variable>,
+                const std::string& ident,
+                const std::vector<int>& incides);
+
 };
 
 #endif   // COBRA_AST_MANAGER_H_

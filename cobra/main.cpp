@@ -16,8 +16,6 @@ int main()
   yyparse();
   auto f = dynamic_cast<Formula*>(m.init()->Simplify());
 
-  printf("LOADED.\n");
-
   Solver s;
   s.AddConstraint(f);
 

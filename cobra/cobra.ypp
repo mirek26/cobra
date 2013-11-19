@@ -82,8 +82,14 @@ assignment :
 variable :
     T_IDENT
       { std::string x($1); $$ = m.get<Variable>(x); }
-  | T_IDENT T_INT
-      { std::string x($1); $$ = m.get<Variable>(x, $2); }
+  | T_IDENT variable_indices
+      { std::string x($1); $$ = m.get<Variable>(x, m.variableIndices()); }
+
+variable_indices :
+    T_INT
+      { m.variableIndices().clear(); m.variableIndex($1); }
+  | variable_indices '_' T_INT
+      { m.variableIndex($3); }
 
 variable_range :
     variable '.' '.' variable

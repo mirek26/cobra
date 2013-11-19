@@ -34,6 +34,21 @@ Variable* Parser::get(identity<Variable>, const std::string& ident) {
   }
 }
 
+Variable* Parser::get(identity<Variable> i,
+                      const std::string& ident,
+                      const std::vector<int>& incides) {
+  std::string fullIdent = ident + Variable::joinIndices(incides);
+  if (variables_.count(fullIdent) > 0) {
+    return variables_[fullIdent];
+  } else {
+    auto node = new Variable(ident, incides);
+    nodes_.push_back(node);
+    last_ = node;
+    variables_[fullIdent] = node;
+    return node;
+  }
+}
+
 void Parser::setVars(VariableSet* vars) {
   vars_ = vars;
   //vars_->dump();
