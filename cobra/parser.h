@@ -71,6 +71,7 @@ class Parser {
   std::map<std::string, Variable*> variables_;
   Construct* last_;
   Formula* init_;
+  Formula* onlyFormula_;
   VariableSet* vars_;
   std::vector<int> variableIndices_;
 
@@ -116,6 +117,14 @@ class Parser {
 
   void setVars(VariableSet* vars);
   void addExp(Experiment* exp);
+
+  void setOnlyFormula(Formula* f) {
+    onlyFormula_ = f;
+  }
+
+  Formula* onlyFormula() {
+    return onlyFormula_;
+  }
 
  private:
   /* Generic template for a get method, which creates a new node.

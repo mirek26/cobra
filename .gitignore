@@ -33,6 +33,7 @@ cobra
 # C extensions
 *.so
 *.o
+*.a
 
 # Packages
 *.egg

@@ -90,6 +90,8 @@ class Formula: public Construct {
    * OrOperators and its children are literals.
    */
   virtual AndOperator* ToCnf();
+
+  static Formula* Parse(std::string str);
 };
 
 /******************************************************************************

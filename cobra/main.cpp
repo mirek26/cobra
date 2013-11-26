@@ -13,6 +13,7 @@ extern Parser m;
 int main()
 {
   yyparse();
+  assert(m.init());
   auto f = dynamic_cast<Formula*>(m.init()->Simplify());
 
   Solver s;

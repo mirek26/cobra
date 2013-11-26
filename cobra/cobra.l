@@ -4,6 +4,7 @@
 #include "game.h"
 #include "cobra.tab.hpp"
 
+extern "C" int yyparse();
 #define YY_DECL extern "C" int yylex()
 %}
 %%
@@ -51,3 +52,8 @@
  /* default: return char on input */
  .              { return yytext[0]; }
 %%
+
+void parse_string(std::string str) {
+  yy_switch_to_buffer(yy_scan_string(str.c_str()));
+  yyparse();
+}

@@ -9,6 +9,14 @@
 
 int Variable::id_counter_ = 1;
 
+extern void parse_string(std::string s);
+
+Formula* Formula::Parse(std::string str) {
+  parse_string(str);
+  assert(m.onlyFormula());
+  return m.onlyFormula();
+}
+
 void Formula::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
     printf("   ");

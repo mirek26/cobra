@@ -67,9 +67,14 @@
 %type <param_range> param_range
 %%
 
-definition :
+start:
+    assignments
+  | formula
+    {  m.setOnlyFormula($1);  }
+
+assignments :
     assignment
-  | definition assignment
+  | assignments assignment
 
 assignment :
     T_VARS '=' '{' variable_list '}'
@@ -158,8 +163,6 @@ formula_list :
 
 %%
 
-void yyerror(const char *error)
-{
+void yyerror(const char *error) {
   printf("%d: %s at %s\n", yylineno, error, yytext);
- // std::cout << error << std::endl;
 }
