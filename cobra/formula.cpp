@@ -87,7 +87,8 @@ MacroOperator::MacroOperator(FormulaList* list)
   expanded_ = m.get<AndOperator>();
 }
 
-void MacroOperator::ExpandHelper(int size, bool negate) {
+void MacroOperator::ExpandHelper(uint size, bool negate) {
+  assert(size <= children_->size());
   std::vector<Formula*> vars;
   for (auto& f: *children_) {
     vars.push_back(f->tseitin_var());
@@ -104,12 +105,16 @@ void MacroOperator::ExpandHelper(int size, bool negate) {
 }
 
 AndOperator* AtLeastOperator::Expand() {
-  ExpandHelper(children_->size() - value_ + 1, false);
+  if (value_ > 0) {
+    ExpandHelper(children_->size() - value_ + 1, false);
+  }
   return expanded_;
 }
 
 AndOperator* AtMostOperator::Expand() {
-  ExpandHelper(value_ + 1, true);
+  if (value_ < children_->size()) {
+    ExpandHelper(value_ + 1, true);
+  }
   return expanded_;
 }
 
@@ -118,9 +123,13 @@ AndOperator* ExactlyOperator::Expand() {
    * list all the possible combinations here.
    */
   // At most part
-  ExpandHelper(value_ + 1, true);
+  if (value_ < children_->size()) {
+    ExpandHelper(value_ + 1, true);
+  }
   // At least part
-  ExpandHelper(children_->size() - value_ + 1, false);
+  if (value_ > 0) {
+    ExpandHelper(children_->size() - value_ + 1, false);
+  }
   return expanded_;
 }
 

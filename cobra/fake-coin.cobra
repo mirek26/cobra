@@ -1,7 +1,7 @@
 # kobra
 
 Vars = { x1..x12, y }
-Init = Exactly-1(x1..x12) & !(Or(x1..x4))
+Init = Exactly-1(x1..x12)
 
 # rekneme ze do parametrizace lezou by default ruzne promenne
 Exp("vazeni2", {x1..x12}^2 ) {

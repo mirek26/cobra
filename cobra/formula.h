@@ -125,7 +125,9 @@ class NaryOperator: public Formula {
 
   explicit NaryOperator(FormulaList* list)
       : Formula(1),
-        children_(list) { }
+        children_(list) {
+    assert(list);
+  }
 
   void addChild(Formula* child) {
     children_->push_back(child);
@@ -222,7 +224,7 @@ class MacroOperator: public NaryOperator {
 
   virtual Formula* tseitin_var();
 
-  void ExpandHelper(int size, bool negate);
+  void ExpandHelper(uint size, bool negate);
   virtual AndOperator* Expand() = 0;
   virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
@@ -231,12 +233,14 @@ class MacroOperator: public NaryOperator {
  *
  */
 class AtLeastOperator: public MacroOperator {
-  int value_;
+  uint value_;
 
  public:
-  AtLeastOperator(int value, FormulaList* list)
+  AtLeastOperator(uint value, FormulaList* list)
       : MacroOperator(list),
-        value_(value) { }
+        value_(value) {
+    assert(value <= list->size());
+  }
 
   virtual std::string name() {
     return "AtLeastOperator(" + to_string(value_) + ")";
@@ -253,12 +257,14 @@ class AtLeastOperator: public MacroOperator {
  *
  */
 class AtMostOperator: public MacroOperator {
-  int value_;
+  uint value_;
 
  public:
-  AtMostOperator(int value, FormulaList* list)
+  AtMostOperator(uint value, FormulaList* list)
       : MacroOperator(list),
-        value_(value) { }
+        value_(value) {
+    assert(value <= list->size());
+  }
 
   virtual std::string name() {
     return "AtMostOperator(" + to_string(value_) + ")";
@@ -275,12 +281,14 @@ class AtMostOperator: public MacroOperator {
  *
  */
 class ExactlyOperator: public MacroOperator {
-  int value_;
+  uint value_;
 
  public:
-  ExactlyOperator(int value, FormulaList* list)
+  ExactlyOperator(uint value, FormulaList* list)
       : MacroOperator(list),
-        value_(value) { }
+        value_(value) {
+    assert(value <= list->size());
+  }
 
   virtual std::string name() {
     return "ExactlyOperator(" + to_string(value_) + ")";
