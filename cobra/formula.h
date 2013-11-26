@@ -243,11 +243,11 @@ class AtLeastOperator: public MacroOperator {
   }
 
   virtual std::string name() {
-    return "AtLeastOperator(" + to_string(value_) + ")";
+    return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return "AtLeast-" + to_string(value_) + pretty_join(", ", utf8);
+    return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -267,11 +267,11 @@ class AtMostOperator: public MacroOperator {
   }
 
   virtual std::string name() {
-    return "AtMostOperator(" + to_string(value_) + ")";
+    return "AtMostOperator(" + std::to_string(value_) + ")";
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return "AtMost-" + to_string(value_) + pretty_join(", ", utf8);
+    return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -291,11 +291,11 @@ class ExactlyOperator: public MacroOperator {
   }
 
   virtual std::string name() {
-    return "ExactlyOperator(" + to_string(value_) + ")";
+    return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
 
   virtual std::string pretty(bool utf8 = true) {
-    return "Exactly-" + to_string(value_) + pretty_join(", ", utf8);
+    return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
   virtual AndOperator* Expand();
@@ -428,7 +428,7 @@ class Variable: public Formula {
       : Formula(0),
         generated_(true) {
     id_ = id_counter_++;
-    ident_ = "var" + to_string(id_);
+    ident_ = "var" + std::to_string(id_);
   }
 
   explicit Variable(std::string ident)
@@ -454,19 +454,23 @@ class Variable: public Formula {
     return indices_;
   }
 
+  bool generated() {
+    return generated_;
+  }
+
   virtual std::string ident() {
     return ident_;
   }
 
-  virtual std::string pretty(bool utf8 = true) {
+  virtual std::string pretty(bool = true) {
     return ident_ + joinIndices(indices_);
   }
 
   virtual std::string name() {
-    return "Variable " + pretty() + "(" + to_string(id_) +")";
+    return "Variable " + pretty() + "(" + std::to_string(id_) +")";
   }
 
-  virtual Construct* child(uint nth) {
+  virtual Construct* child(uint) {
     // this have no children - child() should never be called
     assert(false);
   }
@@ -483,9 +487,9 @@ class Variable: public Formula {
 
   static std::string joinIndices(const std::vector<int> list) {
     if (list.empty()) return "";
-    std::string s = to_string(list.front());
+    std::string s = std::to_string(list.front());
     for (auto it = std::next(list.begin()); it != list.end(); ++it) {
-      s += "_" + to_string(*it);
+      s += "_" + std::to_string(*it);
     }
     return s;
   }

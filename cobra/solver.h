@@ -30,7 +30,7 @@ class Solver
     return formula_;
   }
 
-  int GetFixedVariables(VariableSet* vars) {
+  int GetFixedVariables(VariableSet* /* vars*/) {
     int r = 0;
     for (auto& var: variables_) {
       // printf("Fixed test %i - %s\n", var->id(), var->pretty().c_str());

@@ -8,9 +8,3 @@
 #include <functional>
 
 #include "util.h"
-
-std::string to_string(int n) {
-  std::ostringstream convert;
-  convert << n;
-  return convert.str();
-}

@@ -34,7 +34,7 @@ Variable* Parser::get(identity<Variable>, const std::string& ident) {
   }
 }
 
-Variable* Parser::get(identity<Variable> i,
+Variable* Parser::get(identity<Variable>,
                       const std::string& ident,
                       const std::vector<int>& incides) {
   std::string fullIdent = ident + Variable::joinIndices(incides);

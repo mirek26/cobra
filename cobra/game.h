@@ -25,7 +25,7 @@ class Parametrization: public Construct, public std::vector<VariableSet*> {
     return at(nth);
   }
 
-  virtual void set_child(uint nth, Construct* value) {
+  virtual void set_child(uint, Construct*) {
     assert(false);
   }
 
