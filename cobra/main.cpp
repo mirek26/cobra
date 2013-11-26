@@ -8,8 +8,7 @@
 #include "parser.h"
 
 extern "C" int yyparse();
-
-Parser m;
+extern Parser m;
 
 int main()
 {

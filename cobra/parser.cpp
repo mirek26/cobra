@@ -9,6 +9,8 @@
 
 #include "parser.h"
 
+Parser m;
+
 void Construct::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
     printf("   ");
