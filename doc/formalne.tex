@@ -41,8 +41,9 @@
 \newcommand{\atmost}[1]{\textrm{AtMost-#1}\:}
 
 \section[0]{Notation}
-Let $\Form_\Var$ be the set of all formulas over the set of prepositional variables $\Var$;
-$\Val_\Var$ be the set of all valuations of variables $\Var$.
+Let $\Form_\Var$ be the set of all prepositional formulas over
+  the set of variables $\Var$;
+  $\Val_\Var$ be the set of all valuations of variables $\Var$.
 Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
   written $\form_0 \equiv \form_1$, if
   $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
@@ -69,19 +70,15 @@ A \emph{code-breaking game} is a quintuple
   \item $\Expt$ is a finite set of types of experiments,
   \item $\Exp \subseteq \Expt \times \Var^\star$ is an \emph{experiment} relation,
   and
-  \item $\infer: \Val_\Var \times \Exp -> \Form_\Var$ is an
-  \emph{inference function} such that
-    \begin{enumerate}[label=(\roman*)]
-    \item $\forall\val\in\Val_\Var, \exp\in\Exp$:
-      $\val(\infer(\val, \exp)) = 1$ and
-    \item $\forall\val\in\Val_\Var, (\expt, \param)\in\Exp, \perm\in \Perm_\Var$:
-        \[
-        \init \equiv \perm(\init) \;==>\;
-          \infer(\val, (\expt, \perm(\param)))
-          \equiv
-          \perm(\infer(\val, (\expt, \param))).
-        \]
-    \end{enumerate}
+  \item $\infer: \Exp -> 2^{\Form_\Var}$ is an
+  \emph{outcome function} such that $\infer(\exp)$ is finite
+  for any $\exp\in\Exp$, (and for $\infer(\exp) = \{\psi_1, ..., \psi_k\}$,
+  it holds
+  \[
+  \forall\val\in\Val_\Var:  \val(\init) = 1 ==> \exists\psi\in\infer(\exp)\;.\; \val(\psi) = 1
+  \]
+  i.e. $\init ==> \psi_1 \vee \psi_2 \vee ... \vee \psi_k$ is true.
+
  \end{itemize}
 \end{definition}
 
@@ -93,19 +90,14 @@ The search space is reduced by formula $\init$,
 
 Experiments consist of a type, which is from the set $\Expt$ and a
   parametrization, which is a string of variables from $\Var$.
-The experiment relation $\Exp$ specifies all permitted parametrizations
+The experiment relation $\Exp$ specifies all permitted parameterizations
   for each type of experiment and, therefore, $\Exp$ is the set of
   all possible experiments as pairs.
 
-The inference function is the entity that evaluates the experiment.
-Given the wanted valuation and an experiment, it gives the player
-  partial information about the valuation,
-  in the form of a formula that is guaranteed
-  to be satisfied by the wanted valuation (see condition (i)).
-Put simply, condition (ii) says that if $\perm$ is a symmetry
-  of the initial formula $\init$, we do not get different information
-  if we permutate the variables in the parametrization of the experiment
-  by $\perm$.
+The outcome function gives us the possible outcomes of an experiment.
+  We require that at least one of them must be satisfied by every valuation
+  by which $\init$ is satisfied.
+
 
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM
@@ -138,27 +130,15 @@ Any sequence of variables of even length with no repetitions
   is a permitted parametrization of type $\expt$.
 
 \item
-$\infer(\val, (\expt, \param)) = \left\{
-\begin{array}{ll}
-(\bigvee A \wedge \neg y) \vee (\bigvee B \wedge y) &
-    \textrm{if r = lighter,} \\
-(\bigvee A \wedge y) \vee (\bigvee B \wedge \neg y) &
-    \textrm{if r = heavier,} \\
-\neg \bigvee(A\cup B) &
-    \textrm{if r = equal,}
-\end{array} \right.$
-
+\begin{align*}
+\infer((\expt, \param)) = \big\{
+& (\bigvee A \wedge \neg y) \vee (\bigvee B \wedge y), \\
+& (\bigvee A \wedge y) \vee (\bigvee B \wedge \neg y), \\
+& \neg \bigvee(A\cup B) \big\},
+\end{align*}
 where
 $A = \{ \param[i] \| 1 <= i <= |\param|/2 \}$,
 $B = \{ \param[i] \| |\param|/2 < i <= |\param| \}$.
-The conditions correspond to the result $r$ of the experiment:
-\begin{itemize}
-\item r = lighter if $(v(c) = 1$ for some $c\in A$ and $v(y) = 0)$
-  or $(v(c) = 1$ for some $c \in B$ and $v(y) = 1)$
-\item r = heavier if $(v(c) = 1$ for some $c\in A$ and $v(y) = 1)$
-  or $(v(c) = 1$ for some $c \in B$ and $v(y) = 0)$
-\item r = equal if $v(c) = 0$ for every $c\in A\cup B$
-\end{itemize}
 \end{itemize}
 \end{example}
 
@@ -236,12 +216,12 @@ $\form_{i+1} = \infer(\val, \exp_{i+1})$ for all $i\in\Nseto$.
 For the sake of simplicity, let us write $\aform{k}$
 instead of $\form_0 \wedge \form_1 \wedge ... \wedge \form_k$.
 
-We define \emph{length} of the solving proces,
+We define \emph{length} of the solving process,
   denoted $|\procstg{\stg}{\val}|$
-  (despite the inifinite length of the sequence),
+  (despite the infinite length of the sequence),
   as the smallest $k\in\Nseto$ such that
   $\numval_\Var(\aform{k}) = 1$.
-This corresponds to the situation in which we can unambigously
+This corresponds to the situation in which we can unambiguously
   determine the secret code.
 
 Note that it always holds $\numval(\aform{k}) > 0$ because
@@ -300,9 +280,3 @@ Given a code-breaking game $\game$,
 This seems to be the case for Fake-coin problem (?)
   but it is not the case for Mastermind[ref].
 \end{problem}
-
-%Given a probability distribution on valuations that satisfy $\init$,
-%the \emph{expected number of experiments} $\lenexp{\stg}$ of a strategy $\stg$,
-%is the expected length of the solving process, i.e.
-%$\lenexp{\stg} = E(\|\procstg{\stg}{\val} \|)$. (!!!)
-
