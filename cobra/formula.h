@@ -46,6 +46,7 @@ class Formula: public Construct {
    * used for Tseitin transformation
    */
   Variable* tseitin_var_ = nullptr;
+  static std::map<Variable*, Variable*>* variable_substitude_; // = nullptr
 
  public:
   /*
@@ -91,6 +92,10 @@ class Formula: public Construct {
    */
   virtual AndOperator* ToCnf();
 
+  virtual Formula* clone() = 0;
+
+  Formula* Substitude(std::map<Variable*, Variable*>& table);
+
   static Formula* Parse(std::string str);
 };
 
@@ -103,6 +108,14 @@ class FormulaList: public VectorConstruct<Formula*> {
 
   virtual std::string name() {
     return "FormulaList";
+  }
+
+  FormulaList* clone() {
+    auto n = m.get<FormulaList>();
+    for (auto c: *this) {
+      n->push_back(c->clone());
+    }
+    return n;
   }
 };
 
@@ -186,6 +199,10 @@ class AndOperator: public NaryOperator {
     return pretty_join(utf8 ? " ∧ " : " & ", utf8);
   }
 
+  virtual Formula* clone() {
+    return m.get<AndOperator>(children_->clone());
+  }
+
   virtual Construct* Simplify();
   virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
@@ -208,6 +225,10 @@ class OrOperator: public NaryOperator {
 
   virtual std::string pretty(bool utf8 = true) {
     return pretty_join(utf8 ? " ∨ " : " | ", utf8);
+  }
+
+  virtual Formula* clone() {
+    return m.get<OrOperator>(children_->clone());
   }
 
   virtual Construct* Simplify();
@@ -252,6 +273,10 @@ class AtLeastOperator: public MacroOperator {
     return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
+  virtual Formula* clone() {
+    return m.get<AtLeastOperator>(value_, children_->clone());
+  }
+
   virtual AndOperator* Expand();
 };
 
@@ -276,6 +301,10 @@ class AtMostOperator: public MacroOperator {
     return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
+  virtual Formula* clone() {
+    return m.get<AtMostOperator>(value_, children_->clone());
+  }
+
   virtual AndOperator* Expand();
 };
 
@@ -298,6 +327,10 @@ class ExactlyOperator: public MacroOperator {
 
   virtual std::string pretty(bool utf8 = true) {
     return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8);
+  }
+
+  virtual Formula* clone() {
+    return m.get<ExactlyOperator>(value_, children_->clone());
   }
 
   virtual AndOperator* Expand();
@@ -337,6 +370,10 @@ class EquivalenceOperator: public Formula {
     }
   }
 
+  virtual Formula* clone() {
+    return m.get<EquivalenceOperator>(left_->clone(), right_->clone());
+  }
+
   virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
@@ -374,6 +411,10 @@ class ImpliesOperator: public Formula {
     }
   }
 
+  virtual Formula* clone() {
+    return m.get<ImpliesOperator>(left_->clone(), right_->clone());
+  }
+
   virtual void TseitinTransformation(FormulaList* clauses, bool top);
 };
 
@@ -398,6 +439,10 @@ class NotOperator: public Formula {
   virtual Construct* child(uint nth) {
     assert(nth == 0);
     return child_;
+  }
+
+  virtual Formula* clone() {
+    return m.get<NotOperator>(child_->clone());
   }
 
   virtual Formula* neg() {
@@ -475,6 +520,14 @@ class Variable: public Formula {
   virtual Construct* child(uint) {
     // this have no children - child() should never be called
     assert(false);
+  }
+
+  virtual Formula* clone() {
+    if (variable_substitude_ && variable_substitude_->count(this) > 0) {
+      return variable_substitude_->at(this);
+    } else {
+      return this;
+    }
   }
 
   virtual bool isLiteral() {

@@ -4,10 +4,14 @@
 #include <cstdio>
 #include <algorithm>
 #include <string>
+#include <vector>
+#include <map>
+
 #include "formula.h"
 #include "util.h"
 
 int Variable::id_counter_ = 1;
+std::map<Variable*, Variable*>* Formula::variable_substitude_ = nullptr;
 
 extern void parse_string(std::string s);
 
@@ -15,6 +19,13 @@ Formula* Formula::Parse(std::string str) {
   parse_string(str);
   assert(m.onlyFormula());
   return m.onlyFormula();
+}
+
+Formula* Formula::Substitude(std::map<Variable*, Variable*>& table) {
+  variable_substitude_ = &table;
+  auto n = this->clone();
+  variable_substitude_ = nullptr;
+  return n;
 }
 
 void Formula::dump(int indent) {
