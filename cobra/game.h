@@ -4,63 +4,51 @@
 
 #include <cassert>
 #include <vector>
-#include "parser.h"
-#include "formula.h"
 #include "util.h"
+#include "cnf-formula.h"
 
 #ifndef COBRA_GAME_H_
 #define COBRA_GAME_H_
 
-class Parametrization: public Construct, public std::vector<VariableSet*> {
- public:
-  Parametrization()
-      : Construct(0) { }
+class Formula;
+class VariableSet;
+class Experiment;
 
-  virtual uint child_count() {
-    return size();
-  }
-
-  virtual Construct* child(uint nth) {
-    assert(nth < size());
-    return at(nth);
-  }
-
-  virtual void set_child(uint, Construct*) {
-    assert(false);
-  }
-
-  virtual std::string name() {
-    return "Parametrization";
-  };
-};
-
-class Experiment: public Construct {
-  std::string name_;
-  Parametrization* param_;
-  FormulaList* outcomes_;
+class Game {
+  VariableSet* variables_;
+  Formula* init_;
+  std::vector<Experiment*> experiments_;
 
  public:
-  Experiment()
-      : Construct(2) { }
+  void setVariables(VariableSet* vars) {
+    variables_ = vars;
+  }
 
-  Experiment(std::string name, Parametrization* param, FormulaList* outcomes)
-      : Construct(2),
-        name_(name),
-        param_(param),
-        outcomes_(outcomes) { }
+  void setInit(Formula* init) {
+    init_ = init;
+  }
 
-  virtual Construct* child(uint nth) {
-    switch (nth) {
-      case 0: return param_;
-      case 1: return outcomes_;
-      default: assert(false);
+  void addExperiment(Experiment* e) {
+    experiments_.push_back(e);
+  }
+
+  bool complete() {
+    if (!variables_) {
+      printf("Nothing assigned to 'Vars'.\n");
+      return false;
     }
-  };
+    if (!init_) {
+      printf("Nothing assigned to 'Init'.\n");
+      return false;
+    }
+    if (experiments_.empty()) {
+      printf("No experiment defined.\n");
+      return false;
+    }
+    return true;
+  }
 
-  virtual std::string name() {
-    return "Experiment " + name_;
-  };
+  void doAll();
 };
-
 
 #endif   // COBRA_GAME_H_

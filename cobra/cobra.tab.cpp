@@ -1441,17 +1441,17 @@ yyreduce:
 
   case 6:
 #line 81 "cobra.ypp"
-    {  m.setVars((yyvsp[(4) - (5)].variable_list));  ;}
+    {  m.game().setVariables((yyvsp[(4) - (5)].variable_list));  ;}
     break;
 
   case 7:
 #line 83 "cobra.ypp"
-    {  m.setInit((yyvsp[(3) - (3)].formula));  ;}
+    {  m.game().setInit((yyvsp[(3) - (3)].formula));  ;}
     break;
 
   case 8:
 #line 85 "cobra.ypp"
-    {  m.addExp(m.get<Experiment>((yyvsp[(3) - (9)].tstr), (yyvsp[(5) - (9)].param_range), (yyvsp[(8) - (9)].formula_list))); ;}
+    {  m.game().addExperiment(m.get<Experiment>((yyvsp[(3) - (9)].tstr), (yyvsp[(5) - (9)].param_range), (yyvsp[(8) - (9)].formula_list))); ;}
     break;
 
   case 9:

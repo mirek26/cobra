@@ -6,6 +6,7 @@
 #include <map>
 #include <exception>
 #include "util.h"
+#include "game.h"
 
 #ifndef COBRA_AST_MANAGER_H_
 #define COBRA_AST_MANAGER_H_
@@ -13,7 +14,9 @@
 class Variable;
 class VariableSet;
 class Formula;
+class FormulaList;
 class Experiment;
+class Game;
 
 // Base class for AST node
 class Construct {
@@ -53,6 +56,68 @@ class VectorConstruct: public Construct, public std::vector<C> {
   }
 };
 
+
+class Parametrization: public Construct, public std::vector<VariableSet*> {
+ public:
+  Parametrization()
+      : Construct(0) { }
+
+  virtual uint child_count() {
+    return size();
+  }
+
+  virtual Construct* child(uint nth) {
+    assert(nth < size());
+    return (Construct*)at(nth);
+  }
+
+  virtual void set_child(uint, Construct*) {
+    assert(false);
+  }
+
+  virtual std::string name() {
+    return "Parametrization";
+  };
+
+  void ForAll(std::function<void(std::vector<Variable*>&)> call, uint n = 0);
+};
+
+class Experiment: public Construct {
+  std::string name_;
+  Parametrization* param_;
+  FormulaList* outcomes_;
+
+ public:
+  Experiment()
+      : Construct(2) { }
+
+  Experiment(std::string name, Parametrization* param, FormulaList* outcomes)
+      : Construct(2),
+        name_(name),
+        param_(param),
+        outcomes_(outcomes) { }
+
+  virtual Construct* child(uint nth) {
+    switch (nth) {
+      case 0: return param_;
+      case 1: return (Construct*)outcomes_;
+      default: assert(false);
+    }
+  };
+
+  virtual std::string name() {
+    return "Experiment " + name_;
+  };
+
+  std::string experiment_name() {
+    return name_;
+  }
+
+  Parametrization* param() {
+    return param_;
+  }
+};
+
 class ParserException: public std::exception {
   std::string what_;
 
@@ -70,10 +135,9 @@ class Parser {
   std::vector<Construct*> nodes_;
   std::map<std::string, Variable*> variables_;
   Construct* last_;
-  Formula* init_;
   Formula* onlyFormula_;
-  VariableSet* vars_;
   std::vector<int> variableIndices_;
+  Game game_;
 
  public:
   /* Create a new node of type T; call the constructor with parameters ts.
@@ -95,12 +159,8 @@ class Parser {
     nodes_.clear();
   }
 
-  Formula* init() {
-    return init_;
-  }
-
-  VariableSet* vars() {
-    return vars_;
+  Game& game() {
+    return game_;
   }
 
   void variableIndex(int n) {
@@ -110,13 +170,6 @@ class Parser {
   std::vector<int>& variableIndices(){
     return variableIndices_;
   }
-
-  void setInit(Formula* init) {
-    init_ = init;
-  }
-
-  void setVars(VariableSet* vars);
-  void addExp(Experiment* exp);
 
   void setOnlyFormula(Formula* f) {
     onlyFormula_ = f;

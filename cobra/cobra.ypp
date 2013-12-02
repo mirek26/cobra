@@ -78,11 +78,11 @@ assignments :
 
 assignment :
     T_VARS '=' '{' variable_list '}'
-    {  m.setVars($4);  }
+    {  m.game().setVariables($4);  }
   | T_INIT '=' formula
-    {  m.setInit($3);  }
+    {  m.game().setInit($3);  }
   | T_EXP '(' T_STRING ',' param_range ')' '{' formula_list '}'
-    {  m.addExp(m.get<Experiment>($3, $5, $8)); }
+    {  m.game().addExperiment(m.get<Experiment>($3, $5, $8)); }
 
 variable :
     T_IDENT

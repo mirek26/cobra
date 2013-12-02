@@ -4,7 +4,6 @@
 
 #include "formula.h"
 #include "util.h"
-#include "solver.h"
 #include "parser.h"
 
 extern "C" int yyparse();
@@ -13,22 +12,10 @@ extern Parser m;
 int main()
 {
   yyparse();
-  assert(m.init());
-  auto f = dynamic_cast<Formula*>(m.init()->Simplify());
-
-  Solver s;
-  s.AddConstraint(f);
-
-  printf("INPUT: %s\n", f->pretty().c_str());
-  printf("CNF: %s\n", s.formula()->pretty().c_str());
-
-  bool sat = s.Satisfiable();
-  printf(sat ? "\nSATISFIABLE.\n" : "\nNON-SATISFIABLE.\n" );
-  if (sat) s.PrintAssignment();
-
-  int x = s.GetFixedVariables(m.vars());
-  printf("FIXED: %i\n", x);
-
+  Game& g = m.game();
+  if (!g.complete()) exit(1);
+  //
+  g.doAll();
   //m.deleteAll();
   return 0;
 }

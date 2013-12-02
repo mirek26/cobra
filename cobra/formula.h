@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include "util.h"
 #include "parser.h"
+#include "cnf-formula.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -84,13 +85,11 @@ class Formula: public Construct {
    * that are added to the vector 'clauses'. Recursively calls the same
    * on all children.
    */
-  virtual void TseitinTransformation(FormulaList* clauses, bool top) = 0;
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top) = 0;
 
   /* Converts the formula to CNF using Tseitin transformation.
-   * All children of the returned AndOperator are guarenteed to be
-   * OrOperators and its children are literals.
    */
-  virtual AndOperator* ToCnf();
+  CnfFormula* ToCnf();
 
   virtual Formula* clone() = 0;
 
@@ -204,7 +203,7 @@ class AndOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -232,7 +231,7 @@ class OrOperator: public NaryOperator {
   }
 
   virtual Construct* Simplify();
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -249,7 +248,7 @@ class MacroOperator: public NaryOperator {
 
   void ExpandHelper(uint size, bool negate);
   virtual AndOperator* Expand() = 0;
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -374,7 +373,7 @@ class EquivalenceOperator: public Formula {
     return m.get<EquivalenceOperator>(left_->clone(), right_->clone());
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -415,7 +414,7 @@ class ImpliesOperator: public Formula {
     return m.get<ImpliesOperator>(left_->clone(), right_->clone());
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -453,7 +452,7 @@ class NotOperator: public Formula {
     return child_->isLiteral();
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses, bool top);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
@@ -534,9 +533,9 @@ class Variable: public Formula {
     return true;
   }
 
-  virtual void TseitinTransformation(FormulaList* clauses, bool top) {
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top) {
     if (top) {
-      clauses->push_back(m.get<OrOperator>({ (Formula*)this }));
+      cnf->addClause({ (Formula*)this });
     }
   }
 

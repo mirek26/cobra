@@ -1,7 +1,7 @@
 #include <vector>
 #include "include/gtest/gtest.h"
 #include "../formula.h"
-#include "../solver.h"
+#include "../cnf-formula.h"
 #include "../parser.h"
 
 extern Parser m;
@@ -79,7 +79,7 @@ TEST(FormulaSubstitude, FormulaListSubstitude) {
 }
 
 TEST(SolverTest, BasicSatisfiability) {
-  Solver s;
+  CnfFormula s;
   s.AddConstraint(Formula::Parse("a -> b"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("c -> d"));
@@ -91,12 +91,12 @@ TEST(SolverTest, BasicSatisfiability) {
 }
 
 TEST(SolverTest, BasicFixed) {
-  Solver s;
+  CnfFormula s;
   s.AddConstraint(Formula::Parse("Exactly-2(x1..x5)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("AtLeast-2(x1..x3)"));
   EXPECT_TRUE(s.Satisfiable());
-  EXPECT_EQ(s.GetFixedVariables(NULL), 2); // x4 and x5 must be false.
+  EXPECT_EQ(s.GetFixedVariables(), 2); // x4 and x5 must be false.
 }
 
 

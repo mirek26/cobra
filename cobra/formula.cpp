@@ -75,12 +75,10 @@ Construct* OrOperator::Simplify() {
 }
 
 // Tseitin transformation of arbitrary formula to CNF
-AndOperator* Formula::ToCnf() {
-  FormulaList* clauses = m.get<FormulaList>();
-  // recursively create clauses capturing relationships between nodes
-  TseitinTransformation(clauses, true);
-  auto root = m.get<AndOperator>(clauses);
-  return root;
+CnfFormula* Formula::ToCnf() {
+  CnfFormula* r = new CnfFormula();
+  TseitinTransformation(r, true);
+  return r;
 }
 
 // return the variable corresponding to the node during Tseitin transformation
@@ -156,7 +154,7 @@ AndOperator* ExactlyOperator::Expand() {
  * Tseitin transformation.
  */
 
-void AndOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void AndOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   // if tseitin_var_ was not passigned yet, just recurse down
   if (!top) {
     // X <-> AND(A1, A2, ..)
@@ -166,20 +164,19 @@ void AndOperator::TseitinTransformation(FormulaList* clauses, bool top) {
       first->push_back(f->tseitin_var()->neg());
     }
     first->push_back(tseitin_var());
-    clauses->push_back(m.get<OrOperator>(first));
-
+    cnf->addClause(first);
     auto not_this = tseitin_var()->neg();
     for (auto& f: *children_) {
-      clauses->push_back(m.get<OrOperator>({ not_this, f->tseitin_var() }));
+      cnf->addClause({ not_this, f->tseitin_var() });
     }
   }
   // recurse down
   for (auto& f: *children_) {
-    f->TseitinTransformation(clauses, top);
+    f->TseitinTransformation(cnf, top);
   }
 }
 
-void OrOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void OrOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   auto first = m.get<FormulaList>();
   for (auto& f: *children_) {
     first->push_back(f->tseitin_var());
@@ -189,78 +186,69 @@ void OrOperator::TseitinTransformation(FormulaList* clauses, bool top) {
     // X <-> OR(A1, A2, ..)
     // (!X | A1 | A2 | ...) & (!A1 | X) & (!A2 | X) & ...
     first->push_back(tseitin_var()->neg());
-    clauses->push_back(m.get<OrOperator>(first));
-
+    cnf->addClause(first);
     for (auto& f: *children_) {
-      clauses->push_back(
-        m.get<OrOperator>({ tseitin_var(), f->tseitin_var()->neg() }));
+      cnf->addClause({ tseitin_var(), f->tseitin_var()->neg() });
     }
   } else {
-    clauses->push_back(m.get<OrOperator>(first));
+    cnf->addClause(first);
   }
   // recurse down
   for (auto&f : *children_) {
-    f->TseitinTransformation(clauses, false);
+    f->TseitinTransformation(cnf, false);
   }
 }
 
-void NotOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void NotOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   // X <-> (!Y)
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var();
   auto childVar = child_->tseitin_var();
-  if (top) clauses->push_back(m.get<OrOperator>({ tseitin_var() }));
+  if (top) cnf->addClause({ tseitin_var() });
   if (!this->isLiteral()) {
-    clauses->push_back(m.get<OrOperator>({ thisVar->neg(), childVar->neg() }));
-    clauses->push_back(m.get<OrOperator>({ thisVar, childVar }));
-    child_->TseitinTransformation(clauses, false);
+    cnf->addClause({ thisVar->neg(), childVar->neg() });
+    cnf->addClause({ thisVar, childVar });
+    child_->TseitinTransformation(cnf, false);
   }
 }
 
-void ImpliesOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void ImpliesOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
   if (top) {
-    clauses->push_back(m.get<OrOperator>({ leftVar->neg(), rightVar }));
+    cnf->addClause({ leftVar->neg(), rightVar });
   } else {
     // X <-> (L -> R)
     // (!X | !L | R) & (L | X) & (!R | X)
-    clauses->push_back(
-      m.get<OrOperator>({ thisVar->neg(), leftVar->neg(), rightVar }));
-    clauses->push_back(
-      m.get<OrOperator>({ leftVar, thisVar }));
-    clauses->push_back(
-      m.get<OrOperator>({ rightVar->neg(), thisVar }));
+    cnf->addClause({ thisVar->neg(), leftVar->neg(), rightVar });
+    cnf->addClause({ leftVar, thisVar });
+    cnf->addClause({ rightVar->neg(), thisVar });
   }
-  left_->TseitinTransformation(clauses, false);
-  right_->TseitinTransformation(clauses, false);
+  left_->TseitinTransformation(cnf, false);
+  right_->TseitinTransformation(cnf, false);
 }
 
-void EquivalenceOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void EquivalenceOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   auto thisVar = tseitin_var();
   auto leftVar = left_->tseitin_var();
   auto rightVar = right_->tseitin_var();
   if (top) {
-    clauses->push_back(m.get<OrOperator>({ leftVar->neg(), rightVar }));
-    clauses->push_back(m.get<OrOperator>({ leftVar, rightVar->neg() }));
+    cnf->addClause({ leftVar->neg(), rightVar });
+    cnf->addClause({ leftVar, rightVar->neg() });
   } else {
     // X <-> (L <-> R)
     // (X | L | R) & (!X | !L | R) & (!X | L | !R) & (X | !L | !R)
-    clauses->push_back(
-      m.get<OrOperator>({ thisVar, leftVar, rightVar }));
-    clauses->push_back(
-      m.get<OrOperator>({ thisVar->neg(), leftVar->neg(), rightVar }));
-    clauses->push_back(
-      m.get<OrOperator>({ thisVar->neg(), leftVar, rightVar->neg() }));
-    clauses->push_back(
-      m.get<OrOperator>({ thisVar, leftVar->neg(), rightVar->neg() }));
+    cnf->addClause({ thisVar, leftVar, rightVar });
+    cnf->addClause({ thisVar->neg(), leftVar->neg(), rightVar });
+    cnf->addClause({ thisVar->neg(), leftVar, rightVar->neg() });
+    cnf->addClause({ thisVar, leftVar->neg(), rightVar->neg() });
   }
-  left_->TseitinTransformation(clauses, false);
-  right_->TseitinTransformation(clauses, false);
+  left_->TseitinTransformation(cnf, false);
+  right_->TseitinTransformation(cnf, false);
 }
 
-void MacroOperator::TseitinTransformation(FormulaList* clauses, bool top) {
+void MacroOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   auto expanded = Expand();
-  expanded->TseitinTransformation(clauses, top);
+  expanded->TseitinTransformation(cnf, top);
 }

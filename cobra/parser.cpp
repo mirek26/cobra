@@ -51,14 +51,16 @@ Variable* Parser::get(identity<Variable>,
   }
 }
 
-void Parser::setVars(VariableSet* vars) {
-  vars_ = vars;
-  //vars_->dump();
+void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
+                             uint n) {
+  static std::vector<Variable*> comb;
+  if (n == size()) {
+    call(comb);
+  } else {
+    for (auto& v: *this->at(n)) {
+      comb.push_back(v);
+      ForAll(call, n+1);
+      comb.pop_back();
+    }
+  }
 }
-
-
-void Parser::addExp(Experiment* exp) {
-  //exp->dump();
-  //printf(" -\n");
-}
-
