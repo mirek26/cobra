@@ -1,6 +1,7 @@
 /*
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
+#include <set>
 
 #include "formula.h"
 #include "util.h"
@@ -13,7 +14,8 @@ int main()
 {
   yyparse();
   Game& g = m.game();
-  if (!g.complete()) exit(1);
+  //g.setInit(Formula::Parse("a & b | c"));
+  //if (!g.complete()) exit(1);
   //
   g.doAll();
   //m.deleteAll();

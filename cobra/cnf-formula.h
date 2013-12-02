@@ -17,8 +17,10 @@ class Variable;
 class Formula;
 class FormulaList;
 
+typedef std::set<int> TClause;
+
 class CnfFormula {
-  std::vector<std::vector<int>> clauses_;
+  std::set<TClause> clauses_;
   std::map<int, Variable*> variables_;
   std::set<int> original_;
   PicoSAT* picosat_;
@@ -26,10 +28,12 @@ class CnfFormula {
  private:
   Variable* getVariable(int id);
   void addVariable(Variable* var);
-  void addLiteral(Formula* literal);
+  void addLiteral(TClause& clause, Formula* literal);
 
   std::string pretty_literal(int id, bool unicode = true);
-  std::string pretty_clause(std::vector<int>& clause, bool unicode);
+  std::string pretty_clause(const TClause& clause, bool unicode = true);
+
+  bool ProbeEquivalence(const TClause& clause, int var1, int var2);
 
  public:
   CnfFormula() {
@@ -44,6 +48,8 @@ class CnfFormula {
   int GetFixedVariables();
   bool Satisfiable();
   void PrintAssignment();
+
+  std::vector<std::vector<int>> ComputeVariableEquivalence();
 
   std::string pretty(bool unicode = true);
 };

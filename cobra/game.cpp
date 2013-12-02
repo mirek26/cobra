@@ -28,5 +28,12 @@ void Game::doAll() {
     printf("Satisfiable.\n");
     f.PrintAssignment();
   }
+
+  auto x = f.ComputeVariableEquivalence();
+  for (auto& i: x) {
+    for (auto& j: i)
+      printf("%i ", j);
+    printf("\n");
+  }
 }
 

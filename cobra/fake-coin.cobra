@@ -1,6 +1,6 @@
 
 Vars = { x1..x12, y }
-Init = Exactly-1(x1..x12)
+Init = Exactly-1(x1..x12) & Or(x1..x4)
 
 Exp("vazeni2", {x1..x12}^2 ) {
   (Or(p1) & !y) | (Or(p2) & y),

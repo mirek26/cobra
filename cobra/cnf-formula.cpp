@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #include "formula.h"
 #include "util.h"
@@ -31,7 +32,7 @@ void CnfFormula::addVariable(Variable* var) {
   }
 }
 
-void CnfFormula::addLiteral(Formula* literal) {
+void CnfFormula::addLiteral(TClause& clause, Formula* literal) {
   assert(literal->isLiteral());
   auto var = dynamic_cast<Variable*>(literal);
   auto neg = false;
@@ -42,23 +43,25 @@ void CnfFormula::addLiteral(Formula* literal) {
   addVariable(var);
   // add to the last clause
   int add = neg ? -var->id(): var->id();
-  clauses_.back().push_back(add);
+  clause.insert(add);
   picosat_add(picosat_, add);
 }
 
 void CnfFormula::addClause(FormulaList* list) {
-  clauses_.push_back(std::vector<int>());
+  TClause c;
   for (auto f: *list) {
-    addLiteral(f);
+    addLiteral(c, f);
   }
+  clauses_.insert(c);
   picosat_add(picosat_, 0);
 }
 
 void CnfFormula::addClause(std::initializer_list<Formula*> list) {
-  clauses_.push_back(std::vector<int>());
+  TClause c;
   for (auto f: list) {
-    addLiteral(f);
+    addLiteral(c, f);
   }
+  clauses_.insert(c);
   picosat_add(picosat_, 0);
 }
 
@@ -69,10 +72,8 @@ void CnfFormula::AddConstraint(Formula* formula) {
 }
 
 void CnfFormula::AddConstraint(CnfFormula& cnf) {
-  clauses_.insert(clauses_.end(),
-                  cnf.clauses_.begin(),
-                  cnf.clauses_.end());
   for (auto& clause: cnf.clauses_) {
+    clauses_.insert(clause);
     for (auto lit: clause) {
       picosat_add(picosat_, lit);
       if (variables_.count(abs(lit)) == 0) {
@@ -90,8 +91,8 @@ std::string CnfFormula::pretty_literal(int id, bool unicode) {
   return (id > 0 ? variables_[id] : variables_[-id]->neg())->pretty(unicode);
 }
 
-std::string CnfFormula::pretty_clause(std::vector<int>& clause, bool unicode) {
-  std::string s = "(" + pretty_literal(clause.front(), unicode);
+std::string CnfFormula::pretty_clause(const TClause& clause, bool unicode) {
+  std::string s = "(" + pretty_literal(*clause.begin(), unicode);
   for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
     s += unicode ? "|" : "|";
     s += pretty_literal(*it, unicode);
@@ -101,7 +102,7 @@ std::string CnfFormula::pretty_clause(std::vector<int>& clause, bool unicode) {
 }
 
 std::string CnfFormula::pretty(bool unicode) {
-  std::string s = pretty_clause(clauses_.front(), unicode);
+  std::string s = pretty_clause(*clauses_.begin(), unicode);
   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
     s += unicode ? " & " : " & ";
     s += pretty_clause(*it, unicode);
@@ -140,4 +141,42 @@ void CnfFormula::PrintAssignment() {
   printf("\nFALSE: ");
   for (auto s: falseVar) printf("%s ", pretty_literal(s).c_str());
   printf("\n");
+}
+
+//------------------------------------------------------------------------------
+// Symmetry-breaking stuff
+
+bool CnfFormula::ProbeEquivalence(const TClause& clause, int var1, int var2) {
+  TClause test(clause);
+  bool p1 = test.erase(var1);
+  bool p2 = test.erase(var2);
+  bool n1 = test.erase(-var1);
+  bool n2 = test.erase(-var2);
+  if (p1) test.insert(var2);
+  if (p2) test.insert(var1);
+  if (n1) test.insert(-var2);
+  if (n2) test.insert(-var1);
+  return clauses_.count(test);
+}
+
+std::vector<std::vector<int>> CnfFormula::ComputeVariableEquivalence() {
+  // TODO: this compute 'syntactical' equivalence; how about semantical?
+  std::vector<std::vector<int>> result;
+  std::set<int> rest(original_);
+  for (auto v1 = original_.begin(); v1 != original_.end(); ++v1) {
+    if (rest.count(*v1) == 0) continue;
+    result.push_back(std::vector<int>());
+    for (auto v2 = rest.begin(); v2 != rest.end(); ++v2) {
+      bool equiv = true;
+      for (auto& clause: clauses_) {
+        equiv = equiv && ProbeEquivalence(clause, *v1, *v2);
+        if (!equiv) break;
+      }
+      if (equiv) {
+        result.back().push_back(*v2);
+      }
+    }
+    for (int &i: result.back()) rest.erase(i);
+  }
+  return result;
 }
