@@ -79,7 +79,9 @@ class Parametrization: public Construct, public std::vector<VariableSet*> {
     return "Parametrization";
   };
 
-  void ForAll(std::function<void(std::vector<Variable*>&)> call, uint n = 0);
+  void ForAll(std::function<void(std::vector<Variable*>&)> call,
+              std::map<int, int> equiv,
+              uint n = 0);
 };
 
 class Experiment: public Construct {

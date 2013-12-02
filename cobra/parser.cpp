@@ -52,14 +52,24 @@ Variable* Parser::get(identity<Variable>,
 }
 
 void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
+                             std::map<int, int> equiv,
                              uint n) {
+  static std::set<Variable*> used;
   static std::vector<Variable*> comb;
   if (n == size()) {
     call(comb);
   } else {
+    std::set<int> equiv_classes;
     for (auto& v: *this->at(n)) {
+      int equiv_class = equiv.count(v->id()) ? equiv[v->id()] : -1;
+      if (used.count(v) || equiv_classes.count(equiv_class)) {
+        continue;
+      }
       comb.push_back(v);
-      ForAll(call, n+1);
+      used.insert(v);
+      equiv_classes.insert(equiv_class);
+      ForAll(call, equiv, n+1);
+      used.erase(v);
       comb.pop_back();
     }
   }

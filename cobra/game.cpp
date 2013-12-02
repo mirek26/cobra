@@ -16,11 +16,7 @@ void print(std::vector<Variable*>& params) {
 }
 
 void Game::doAll() {
-  //for (auto& e: experiments_) {
-  //auto& e = experiments_[0];
-  //  printf("%s\n\n", e->name().c_str());
-  //  e->param()->ForAll(print);
-  //}
+
   CnfFormula f;
   f.AddConstraint(init_);
   printf("CNF: %s\n", f.pretty().c_str());
@@ -29,11 +25,16 @@ void Game::doAll() {
     f.PrintAssignment();
   }
 
-  auto x = f.ComputeVariableEquivalence();
-  for (auto& i: x) {
-    for (auto& j: i)
-      printf("%i ", j);
-    printf("\n");
+  std::map<int, int> equiv = f.ComputeVariableEquivalence();
+  printf("Equivelnce classes:\n");
+  for (auto& i: equiv) {
+    printf("%i: %i\n", i.first, i.second);
+  }
+
+  for (auto& e: experiments_) {
+  //auto& e = experiments_[0];
+    printf("\n%s\n", e->name().c_str());
+    e->param()->ForAll(print, equiv);
   }
 }
 

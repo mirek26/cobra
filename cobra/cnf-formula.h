@@ -49,7 +49,7 @@ class CnfFormula {
   bool Satisfiable();
   void PrintAssignment();
 
-  std::vector<std::vector<int>> ComputeVariableEquivalence();
+  std::map<int, int> ComputeVariableEquivalence();
 
   std::string pretty(bool unicode = true);
 };

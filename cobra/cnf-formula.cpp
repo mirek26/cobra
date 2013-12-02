@@ -159,24 +159,24 @@ bool CnfFormula::ProbeEquivalence(const TClause& clause, int var1, int var2) {
   return clauses_.count(test);
 }
 
-std::vector<std::vector<int>> CnfFormula::ComputeVariableEquivalence() {
+std::map<int, int> CnfFormula::ComputeVariableEquivalence() {
   // TODO: this compute 'syntactical' equivalence; how about semantical?
-  std::vector<std::vector<int>> result;
+  std::map<int, int> components;
+  for (auto v: original_) components[v] = -1;
+  int cid = 0;
   std::set<int> rest(original_);
   for (auto v1 = original_.begin(); v1 != original_.end(); ++v1) {
-    if (rest.count(*v1) == 0) continue;
-    result.push_back(std::vector<int>());
-    for (auto v2 = rest.begin(); v2 != rest.end(); ++v2) {
+    if (components[*v1] > -1) continue;
+    components[*v1] = cid++;
+    for (auto v2 = std::next(v1); v2 != original_.end(); ++v2) {
+      if (components[*v2] > -1) continue;
       bool equiv = true;
       for (auto& clause: clauses_) {
         equiv = equiv && ProbeEquivalence(clause, *v1, *v2);
         if (!equiv) break;
       }
-      if (equiv) {
-        result.back().push_back(*v2);
-      }
+      if (equiv) components[*v2] = components[*v1];
     }
-    for (int &i: result.back()) rest.erase(i);
   }
-  return result;
+  return components;
 }
