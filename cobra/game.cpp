@@ -10,7 +10,7 @@
 
 void print(std::vector<Variable*>& params) {
   for (auto& v: params) {
-    printf("%s ", v->pretty().c_str());
+    printf("%i ", v->id());
   }
   printf("\n");
 }

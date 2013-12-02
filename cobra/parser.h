@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <exception>
+#include <cassert>
 #include "util.h"
 #include "game.h"
 
@@ -28,7 +29,7 @@ class Construct {
 
   virtual ~Construct() { }
   virtual uint child_count() { return kChildCount; }
-  virtual Construct* child(uint nth) = 0;
+  virtual Construct* child(uint) { assert(false); };
   virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
   virtual std::string name() = 0;
   virtual void dump(int indent = 0);
@@ -52,33 +53,40 @@ class VectorConstruct: public Construct, public std::vector<C> {
 
   virtual Construct* child(uint nth) {
     assert(nth < this->size());
-    return this->at(nth);
+    return (Construct*)this->at(nth);
   }
 };
 
-
-class Parametrization: public Construct, public std::vector<VariableSet*> {
+class ParamRestrictions: public Construct {
+  std::vector<std::pair<Variable*, Variable*>> restrictions_;
  public:
-  Parametrization()
-      : Construct(0) { }
-
-  virtual uint child_count() {
-    return size();
+  ParamRestrictions(Variable* v1, Variable* v2): Construct(0) {
+    add(v1, v2);
   }
 
-  virtual Construct* child(uint nth) {
-    assert(nth < size());
-    return (Construct*)at(nth);
+  virtual std::string name() {
+    return "ParamRestrictions";
+  };
+
+  std::vector<std::pair<Variable*, Variable*>>& restrictions() {
+    return restrictions_;
   }
 
-  virtual void set_child(uint, Construct*) {
-    assert(false);
+  void add(Variable* v1, Variable* v2) {
+    restrictions_.push_back(std::make_pair(v1, v2));
   }
+};
+
+class Parametrization: public VectorConstruct<VariableSet*> {
+  std::vector<std::vector<int>> restrictions_;
+ public:
+  Parametrization() { }
 
   virtual std::string name() {
     return "Parametrization";
   };
 
+  void addRestrictions(ParamRestrictions* r);
   void ForAll(std::function<void(std::vector<Variable*>&)> call,
               std::map<int, int> equiv,
               uint n = 0);
@@ -90,14 +98,8 @@ class Experiment: public Construct {
   FormulaList* outcomes_;
 
  public:
-  Experiment()
-      : Construct(2) { }
-
-  Experiment(std::string name, Parametrization* param, FormulaList* outcomes)
-      : Construct(2),
-        name_(name),
-        param_(param),
-        outcomes_(outcomes) { }
+  Experiment(): Construct(2) { }
+  Experiment(std::string name, Parametrization* param, FormulaList* outcomes);
 
   virtual Construct* child(uint nth) {
     switch (nth) {

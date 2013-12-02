@@ -51,6 +51,38 @@ Variable* Parser::get(identity<Variable>,
   }
 }
 
+Experiment::Experiment(std::string name,
+                       Parametrization* param,
+                       FormulaList* outcomes)
+    : Construct(2),
+      name_(name),
+      param_(param),
+      outcomes_(outcomes) {
+  for (auto& s: *param_) {
+    s->sort();
+  }
+}
+
+void Parametrization::addRestrictions(ParamRestrictions* r) {
+  restrictions_.resize(size());
+  for (auto& p: r->restrictions()) {
+    assert(p.first);
+    assert(p.first->ident() == "p");
+    assert(p.first->indices().size() == 1);
+    uint v1 = p.first->indices()[0] - 1;
+    assert(v1 < size());
+
+    assert(p.second);
+    assert(p.second->ident() == "p");
+    assert(p.second->indices().size() == 1);
+    uint v2 = p.second->indices()[0] - 1;
+    assert(v2 < size());
+
+    assert(v1 < v2); // TODO: ForAll shoud be generalized so that this can be modified.
+    restrictions_[v2].push_back(v1);
+  }
+}
+
 void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
                              std::map<int, int> equiv,
                              uint n) {
@@ -65,6 +97,13 @@ void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
       if (used.count(v) || equiv_classes.count(equiv_class)) {
         continue;
       }
+      bool ok = true;
+      for (auto& p: restrictions_[n]) {
+        if (comb[p]->id() > v->id()) {
+          ok = false;
+        }
+      }
+      if (!ok) continue;
       comb.push_back(v);
       used.insert(v);
       equiv_classes.insert(equiv_class);

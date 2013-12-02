@@ -85,11 +85,12 @@ typedef union YYSTYPE
   Variable* variable;
   VariableSet* variable_list;
   Parametrization* param_range;
+  ParamRestrictions* param_restrictions;
   char*    tstr;
   int      tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 93 "cobra.tab.hpp"
+#line 94 "cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -2,37 +2,37 @@
 Vars = { x1..x12, y }
 Init = Exactly-1(x1..x12)
 
-Exp("vazeni2", {x1..x12}^2 ) {
+Exp("vazeni2", {x1..x12}^2, {p1 < p2}) {
   (Or(p1) & !y) | (Or(p2) & y),
   (Or(p1) & y) | (Or(p2) & !y),
   !Or(p1..p2)
 }
 
-Exp("vazeni4", {x1..x12}^4 ) {
+Exp("vazeni4", {x1..x12}^4, {p1 < p2, p3 < p4, p1 < p3} ) {
   (Or(p1..p2) & !y) | (Or(p3..p4) & y),
   (Or(p1..p2) & y) | (Or(p3..p4) & !y),
   !Or(p1..p4)
 }
 
-Exp("vazeni6", {x1..x12}^6 ) {
+Exp("vazeni6", {x1..x12}^6, {p1 < p2, p2 < p3, p4 < p5, p5 < p6, p1 < p4} ) {
   (Or(p1..p3) & !y) | (Or(p4..p6) & y),
   (Or(p1..p3) & y) | (Or(p4..p6) & !y),
   !Or(p1..p4)
 }
 
-Exp("vazeni8", {x1..x12}^8 ) {
+Exp("vazeni8", {x1..x12}^8, {p1 < p2, p2 < p3, p3 < p4, p5 < p6, p6 < p7, p7 < p8, p1 < p4} ) {
   (Or(p1..p4) & !y) | (Or(p5..p8) & y),
   (Or(p1..p4) & y) | (Or(p5..p8) & !y),
   !Or(p1..p4)
 }
 
-Exp("vazeni10", {x1..x12}^10 ) {
+Exp("vazeni10", {x1..x12}^10, {p1 < p2, p2 < p3, p3 < p4, p4 < p5, p6 < p7, p7 < p8, p7 < p8, p8 < p9, p9 < p10, p1 < p5} ) {
   (Or(p1..p5) & !y) | (Or(p6..p10) & y),
   (Or(p1..p5) & y) | (Or(p6..p10) & !y),
   !Or(p1..p4)
 }
 
-Exp("vazeni12", {x1..x12}^12 ) {
+Exp("vazeni12", {x1..x12}^12, {p1 < p2, p2 < p3, p3 < p4, p4 < p5, p5 < p6, p7 < p8, p7 < p8, p8 < p9, p9 < p10, p10 < p11, p11<p12, p1 < p6} ) {
   (Or(p1..p6) & !y) | (Or(p7..p12) & y),
   (Or(p1..p6) & y) | (Or(p7..p12) & !y),
   !Or(p1..p12)

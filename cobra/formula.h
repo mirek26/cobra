@@ -560,6 +560,12 @@ class VariableSet: public VectorConstruct<Variable*> {
     return "VariableSet";
   }
 
+  void sort() {
+    std::sort(begin(), end(), [](Variable* a, Variable* b){
+      return b->id() > a->id();
+    });
+  }
+
   FormulaList* asFormulaList() {
     auto v = m.get<FormulaList>();
     v->insert(v->begin(), this->begin(), this->end());
