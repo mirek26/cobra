@@ -7,6 +7,9 @@ Init = Exactly-1(x1_1..x1_6) & # na prvni pozici je prave jedna z barev 1-6..
        Exactly-1(x3_1..x3_6) &
        Exactly-1(x4_1..x4_6)
 
+# zkusit jinak modelovat - intuitivne pres vsechny umisteni cernych a bilych
+
+
 # rekneme ze do parametrizace lezou by default ruzne promenne
 Exp("guess", {x1_1..x1_6}{x2_1..x2_6}{x3_1..x3_6}{x4_1..x4_6}) {
   # black pegs + white pegs

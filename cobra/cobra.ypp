@@ -130,13 +130,15 @@ param_range :
       { $$ = $1; $$->insert($$->begin(), $4, $2); }
 
 param_restrictions :
-    variable '<' variable
-      { $$ = m.get<ParamRestrictions>($1, $3) }
-  | param_restrictions ',' variable '<' variable
+    T_INT '<' T_INT
+      { $$ = m.get<ParamRestrictions>($1, $3); }
+  | param_restrictions ',' T_INT '<' T_INT
       { $$ = $1; $$->add($3, $5); }
 
 param_restrictions_set :
-    '{' param_restrictions '}'
+    '{' '}'
+      { $$ = m.get<ParamRestrictions>(); }
+  | '{' param_restrictions '}'
       { $$ = $2; }
 
 formula :

@@ -18,6 +18,7 @@ class Formula;
 class FormulaList;
 class Experiment;
 class Game;
+class CnfFormula;
 
 // Base class for AST node
 class Construct {
@@ -58,9 +59,10 @@ class VectorConstruct: public Construct, public std::vector<C> {
 };
 
 class ParamRestrictions: public Construct {
-  std::vector<std::pair<Variable*, Variable*>> restrictions_;
+  std::vector<std::pair<uint, uint>> restrictions_;
  public:
-  ParamRestrictions(Variable* v1, Variable* v2): Construct(0) {
+  ParamRestrictions(): Construct(0) { }
+  ParamRestrictions(uint v1, uint v2): Construct(0) {
     add(v1, v2);
   }
 
@@ -68,17 +70,17 @@ class ParamRestrictions: public Construct {
     return "ParamRestrictions";
   };
 
-  std::vector<std::pair<Variable*, Variable*>>& restrictions() {
+  std::vector<std::pair<uint, uint>>& restrictions() {
     return restrictions_;
   }
 
-  void add(Variable* v1, Variable* v2) {
+  void add(uint v1, uint v2) {
     restrictions_.push_back(std::make_pair(v1, v2));
   }
 };
 
 class Parametrization: public VectorConstruct<VariableSet*> {
-  std::vector<std::vector<int>> restrictions_;
+  std::vector<std::vector<uint>> restrictions_;
  public:
   Parametrization() { }
 
@@ -96,6 +98,7 @@ class Experiment: public Construct {
   std::string name_;
   Parametrization* param_;
   FormulaList* outcomes_;
+  std::vector<CnfFormula> outcomes_cnf_;
 
  public:
   Experiment(): Construct(2) { }
@@ -119,6 +122,10 @@ class Experiment: public Construct {
 
   Parametrization* param() {
     return param_;
+  }
+
+  std::vector<CnfFormula>& outcomes() {
+    return outcomes_cnf_;
   }
 };
 

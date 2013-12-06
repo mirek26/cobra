@@ -45,7 +45,11 @@ class CnfFormula {
   void AddConstraint(Formula* formula);
   void AddConstraint(CnfFormula& cnf);
 
+  CnfFormula SubstituteParams(std::vector<Variable*> params);
+
   int GetFixedVariables();
+  int GetFixedPairs();
+
   bool Satisfiable();
   void PrintAssignment();
 

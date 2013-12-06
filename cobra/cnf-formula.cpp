@@ -88,10 +88,12 @@ void CnfFormula::AddConstraint(CnfFormula& cnf) {
 // Pretty print
 
 std::string CnfFormula::pretty_literal(int id, bool unicode) {
+  assert(variables_.count(abs(id)) == 1);
   return (id > 0 ? variables_[id] : variables_[-id]->neg())->pretty(unicode);
 }
 
 std::string CnfFormula::pretty_clause(const TClause& clause, bool unicode) {
+  if (clause.empty()) return "()";
   std::string s = "(" + pretty_literal(*clause.begin(), unicode);
   for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
     s += unicode ? "|" : "|";
@@ -102,6 +104,7 @@ std::string CnfFormula::pretty_clause(const TClause& clause, bool unicode) {
 }
 
 std::string CnfFormula::pretty(bool unicode) {
+  if (clauses_.empty()) return "(empty)";
   std::string s = pretty_clause(*clauses_.begin(), unicode);
   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
     s += unicode ? " & " : " & ";
@@ -120,6 +123,27 @@ int CnfFormula::GetFixedVariables() {
     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
     picosat_assume(picosat_, -var);
     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  }
+  return r;
+}
+
+int CnfFormula::GetFixedPairs() {
+  int r = 0;
+  for (auto& var1: original_) {
+    for (auto& var2: original_) {
+      picosat_assume(picosat_, var1);
+      picosat_assume(picosat_, var2);
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+      picosat_assume(picosat_, -var1);
+      picosat_assume(picosat_, var2);
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+      picosat_assume(picosat_, var1);
+      picosat_assume(picosat_, -var2);
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+      picosat_assume(picosat_, -var1);
+      picosat_assume(picosat_, -var2);
+      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+    }
   }
   return r;
 }
@@ -179,4 +203,28 @@ std::map<int, int> CnfFormula::ComputeVariableEquivalence() {
     }
   }
   return components;
+}
+
+CnfFormula CnfFormula::SubstituteParams(std::vector<Variable*> params) {
+  CnfFormula result;
+  for (auto& clause: clauses_) {
+    TClause c;
+    for (auto f: clause) {
+      bool neg = f < 0;
+      f = abs(f);
+      assert(variables_.count(f) == 1);
+      auto var = variables_[f];
+      if (var->ident() == "p") {
+        uint id = var->indices()[0] - 1;
+        assert(id < params.size());
+        // TODO: this is horribly inefficient
+        result.addLiteral(c, neg ? params[id]->neg() : params[id]);
+      } else {
+        result.addLiteral(c, neg ? var->neg() : var);
+      }
+    }
+    result.clauses_.insert(c);
+    picosat_add(result.picosat_, 0);
+  }
+  return result;
 }

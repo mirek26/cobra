@@ -61,25 +61,18 @@ Experiment::Experiment(std::string name,
   for (auto& s: *param_) {
     s->sort();
   }
+  for (auto& outcome: *outcomes_) {
+    outcomes_cnf_.push_back(*outcome->ToCnf());
+  }
 }
 
 void Parametrization::addRestrictions(ParamRestrictions* r) {
   restrictions_.resize(size());
   for (auto& p: r->restrictions()) {
-    assert(p.first);
-    assert(p.first->ident() == "p");
-    assert(p.first->indices().size() == 1);
-    uint v1 = p.first->indices()[0] - 1;
-    assert(v1 < size());
-
-    assert(p.second);
-    assert(p.second->ident() == "p");
-    assert(p.second->indices().size() == 1);
-    uint v2 = p.second->indices()[0] - 1;
-    assert(v2 < size());
-
-    assert(v1 < v2); // TODO: ForAll shoud be generalized so that this can be modified.
-    restrictions_[v2].push_back(v1);
+    assert(p.first-1 < size());
+    assert(p.second-1 < size());
+    assert(p.first < p.second); // TODO: ForAll shoud be generalized so that this can be modified.
+    restrictions_[p.second - 1].push_back(p.first - 1);
   }
 }
 
