@@ -47,7 +47,6 @@ class Formula: public Construct {
    * used for Tseitin transformation
    */
   Variable* tseitin_var_ = nullptr;
-  static std::map<Variable*, Variable*>* variable_substitude_; // = nullptr
 
  public:
   /*
@@ -102,6 +101,9 @@ class Formula: public Construct {
  * List of Formulas.
  */
 class FormulaList: public VectorConstruct<Formula*> {
+ private:
+  void BuildRange(Formula* formula);
+
  public:
   FormulaList() { }
 
@@ -115,6 +117,13 @@ class FormulaList: public VectorConstruct<Formula*> {
       n->push_back(c->clone());
     }
     return n;
+  }
+
+  static FormulaList* Range(Formula* formula) {
+    auto result = m.get<FormulaList>();
+    result->BuildRange(formula);
+    m.formulaListRange().clear();
+    return result;
   }
 };
 
@@ -467,6 +476,10 @@ class Variable: public Formula {
   static int id_counter_; // initialy 1
 
  public:
+  static std::map<Variable*, Variable*>* variable_substitute_; // = nullptr
+  static std::map<int, int>* index_substitute_; // = nullptr
+
+ public:
   /* Parameterless constructor creates a generated variable with next
    * available id and named var_ID.
    */
@@ -530,8 +543,16 @@ class Variable: public Formula {
   }
 
   virtual Formula* clone() {
-    if (variable_substitude_ && variable_substitude_->count(this) > 0) {
-      return variable_substitude_->at(this);
+    if (variable_substitute_ && variable_substitute_->count(this) > 0) {
+      return variable_substitute_->at(this);
+    } else if (index_substitute_) {
+      std::vector<int> newIndices(indices_);
+      for (auto& i: newIndices) {
+        if (index_substitute_->count(i) > 0) {
+          i = index_substitute_->at(i);
+        }
+      }
+      return m.get<Variable>(ident_, newIndices);
     } else {
       return this;
     }

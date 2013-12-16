@@ -11,7 +11,8 @@
 #include "util.h"
 
 int Variable::id_counter_ = 1;
-std::map<Variable*, Variable*>* Formula::variable_substitude_ = nullptr;
+std::map<Variable*, Variable*>* Variable::variable_substitute_ = nullptr;
+std::map<int, int>* Variable::index_substitute_ = nullptr;
 
 extern void parse_string(std::string s);
 
@@ -22,9 +23,9 @@ Formula* Formula::Parse(std::string str) {
 }
 
 Formula* Formula::Substitude(std::map<Variable*, Variable*>& table) {
-  variable_substitude_ = &table;
+  Variable::variable_substitute_ = &table;
   auto n = this->clone();
-  variable_substitude_ = nullptr;
+  Variable::variable_substitute_ = nullptr;
   return n;
 }
 
@@ -43,6 +44,30 @@ void Formula::dump(int indent) {
 Formula* Formula::neg() {
   return m.get<NotOperator>(this);
 }
+
+void FormulaList::BuildRange(Formula* formula) {
+  static std::vector<int> combination;
+  auto spec = m.formulaListRange();
+  if (combination.size() == spec.size()) {
+    auto map = new std::map<int, int>();
+    for (uint i = 0; i < combination.size(); i++) {
+      map->insert(std::pair<int, int>(std::get<0>(spec[i]), combination[i]));
+    }
+    Variable::index_substitute_ = map;
+    this->push_back(formula->clone());
+    Variable::index_substitute_ = nullptr;
+    delete map;
+  } else {
+    auto& triple = spec[combination.size()];
+    combination.push_back(0);
+    for (auto i = std::get<1>(triple); i<= std::get<2>(triple); i++) {
+      combination.back() = i;
+      BuildRange(formula);
+    }
+    combination.pop_back();
+  }
+}
+
 
 Construct* AndOperator::Simplify() {
   Construct::Simplify();

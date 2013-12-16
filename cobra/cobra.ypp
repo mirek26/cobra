@@ -61,6 +61,7 @@
 %type <tint>     T_INT
 %type <formula>  formula
 %type <formula_list> formula_list
+%type <formula_list> formula_range
 %type <variable> variable
 %type <variable_list> variable_list
 %type <variable_list> variable_set
@@ -94,12 +95,22 @@ variable :
       { std::string x($1); $$ = m.get<Variable>(x); }
   | T_IDENT variable_indices
       { std::string x($1); $$ = m.get<Variable>(x, m.variableIndices()); }
+  | T_IDENT '_' variable_indices
+      { std::string x($1); $$ = m.get<Variable>(x, m.variableIndices()); }
 
 variable_indices :
     T_INT
-      { m.variableIndices().clear(); m.variableIndex($1); }
+      { m.variableIndices().clear();
+        m.addVariableIndex($1); }
+  | T_IDENT
+      { m.variableIndices().clear();
+        std::string x($1);
+        m.addVariableNamedIndex(x); }
   | variable_indices '_' T_INT
-      { m.variableIndex($3); }
+      { m.addVariableIndex($3); }
+  | variable_indices '_' T_IDENT
+      { std::string x($3);
+        m.addVariableNamedIndex(x); }
 
 variable_range :
     variable '.' '.' variable
@@ -178,13 +189,36 @@ formula :
   | variable '=' '=' variable
       { $$ = m.get<ParameterEq>($1, $4); }
 
+formula_range_spec :
+    '/' T_IDENT '=' T_INT '.' '.' T_INT
+      { std::string x($2);
+        m.addFormulaListRange(x, $4, $7); }
+  | formula_range_spec '/' T_IDENT '=' T_INT '.' '.' T_INT
+      { std::string x($3);
+        m.addFormulaListRange(x, $5, $8); }
+
+formula_range :
+    formula formula_range_spec
+  { $$ = FormulaList::Range($1); }
+
 formula_list :
     formula
-      { $$ = m.get<FormulaList>(); $$->push_back($1); }
-  | formula_list ',' formula
-      { $1->push_back($3); }
+      { $$ = m.get<FormulaList>();
+        $$->push_back($1); }
+  | formula_range
+      { $$ = $1; }
   | variable_range
       { $$ = $1->asFormulaList(); }
+  | formula_list ',' formula
+      { $$ = $1;
+        $$->push_back($3); }
+  | formula_list ',' formula_range
+      { $$ = $1;
+        $$->insert($$->end(), $3->begin(), $3->end()); }
+  | formula_list ',' variable_range
+      { $$ = $1;
+        auto list = $3->asFormulaList();
+        $$->insert($$->end(), list->begin(), list->end()); }
 
 %%
 

@@ -83,6 +83,33 @@ TEST(FormulaSubstitute, FormulaListSubstitute) {
                f2->pretty(false).c_str());
 }
 
+TEST(FormulaList, Range1) {
+  auto f = Formula::Parse("Or(x_I / I = 1..4)");
+  EXPECT_STREQ("(x1 | x2 | x3 | x4)", f->pretty(false).c_str());
+  f = Formula::Parse("Or(x_I / I = 1..3, x4)");
+  EXPECT_STREQ("(x1 | x2 | x3 | x4)", f->pretty(false).c_str());
+  f = Formula::Parse("Or(x_1, x_I / I = 2..4)");
+  EXPECT_STREQ("(x1 | x2 | x3 | x4)", f->pretty(false).c_str());
+  f = Formula::Parse("Or(x_I / I = 1..2, x_J / J = 3..4)");
+  EXPECT_STREQ("(x1 | x2 | x3 | x4)", f->pretty(false).c_str());
+}
+
+TEST(FormulaList, Range2) {
+  auto f = Formula::Parse("And(x_I | y_I / I = 1..4)");
+  EXPECT_STREQ("((x1 | y1) & (x2 | y2) & (x3 | y3) & (x4 | y4))",
+               f->pretty(false).c_str());
+  f = Formula::Parse("And(Or(x_I_J / I = 1..2) / J = 1..2)");
+  EXPECT_STREQ("((x1_1 | x2_1) & (x1_2 | x2_2))",
+               f->pretty(false).c_str());
+}
+
+TEST(FormulaList, MultiRange) {
+  auto f = Formula::Parse("And(Or(x_I, y_J, z_K) / I = 1..2 / J = 1..2 / K = 1..2)");
+  EXPECT_STREQ("((x1 | y1 | z1) & (x1 | y1 | z2) & (x1 | y2 | z1) &"
+    " (x1 | y2 | z2) & (x2 | y1 | z1) & (x2 | y1 | z2) & (x2 | y2 | z1)"
+    " & (x2 | y2 | z2))", f->pretty(false).c_str());
+}
+
 TEST(CnfSubstitude, ParamEq) {
   auto f1 = Formula::Parse("(p1==a -> p1 | x) && (p1==b -> p1 & x)");
   auto cnf = f1->ToCnf();

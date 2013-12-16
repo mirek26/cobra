@@ -157,8 +157,15 @@ class Parser {
   std::vector<Construct*> nodes_;
   std::map<std::string, Variable*> variables_;
   Construct* last_;
+
+  // auxiliary structures for parsing
   Formula* onlyFormula_;
   std::vector<int> variableIndices_;
+  std::vector<std::tuple<int, int, int>> formulaListRange_;
+
+  std::map<std::string, int> namedIndices_;
+  int namedIndexId_ = -1;
+
   Game game_;
 
  public:
@@ -185,12 +192,30 @@ class Parser {
     return game_;
   }
 
-  void variableIndex(int n) {
+  void addVariableIndex(int n) {
     variableIndices_.push_back(n);
+  }
+
+  void addVariableNamedIndex(std::string name) {
+    // if the identifier is not present in the map yet (this ident is used as
+    // an index seen for the first time), insert it with new (negative) id.
+    if (namedIndices_.count(name) == 0) {
+      namedIndices_[name] = namedIndexId_--;
+    }
+    addVariableIndex(namedIndices_[name]);
   }
 
   std::vector<int>& variableIndices(){
     return variableIndices_;
+  }
+
+  void addFormulaListRange(std::string name, int from, int to) {
+    assert(namedIndices_.count(name));
+    formulaListRange_.push_back(std::make_tuple(namedIndices_[name], from, to));
+  }
+
+  std::vector<std::tuple<int, int, int>>& formulaListRange() {
+    return formulaListRange_;
   }
 
   void setOnlyFormula(Formula* f) {
