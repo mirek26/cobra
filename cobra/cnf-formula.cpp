@@ -27,7 +27,7 @@ Variable* CnfFormula::getVariable(int id) {
 void CnfFormula::addVariable(Variable* var) {
   assert(var);
   variables_[var->id()] = var;
-  if (!var->generated()) {
+  if (var->orig()) {
     original_.insert(var->id());
   }
 }

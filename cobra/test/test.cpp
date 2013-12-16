@@ -114,6 +114,9 @@ TEST(FormulaList, ParamEq) {
   auto f = Formula::Parse("And(p_1 == x_I -> p_1 / I=1..2)");
   EXPECT_STREQ("(((p1 == x1) -> p1) & ((p1 == x2) -> p1))",
                f->pretty(false).c_str());
+  Formula::Parse("And(p_Il == x_I -> p_I / I=1..2)");
+  EXPECT_STREQ("(((p1 == x1) -> p1) & ((p2 == x2) -> p2))",
+               f->pretty(false).c_str());
 }
 
 TEST(FormulaList, RangeImpl) {

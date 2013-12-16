@@ -11,6 +11,13 @@
 Experiment* g_e;
 CnfFormula* g_init;
 
+void Game::setVariables(VariableSet* vars) {
+  variables_ = vars;
+  for (auto var: *variables_) {
+    var->orig(true);
+  }
+}
+
 void print(std::vector<Variable*>& params) {
   for (auto v: params) {
     printf("%i ", v->id());
@@ -20,7 +27,6 @@ void print(std::vector<Variable*>& params) {
     CnfFormula n;
     n.AddConstraint(*g_init);
     CnfFormula nnn = outcome.SubstituteParams(params);
-    printf("%s\n", nnn.pretty().c_str());
     n.AddConstraint(nnn);
     if (!n.Satisfiable()) {
       printf("UNSAT.\n");

@@ -20,9 +20,7 @@ class Game {
   std::vector<Experiment*> experiments_;
 
  public:
-  void setVariables(VariableSet* vars) {
-    variables_ = vars;
-  }
+  void setVariables(VariableSet* vars);
 
   void setInit(Formula* init) {
     init_ = init;

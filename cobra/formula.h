@@ -470,6 +470,7 @@ class NotOperator: public Formula {
 class Variable: public Formula {
   std::string ident_;
   std::vector<int> indices_;
+  bool orig_;
   bool generated_;
   int id_;
 
@@ -485,6 +486,7 @@ class Variable: public Formula {
    */
   Variable()
       : Formula(0),
+        orig_(false),
         generated_(true) {
     id_ = id_counter_++;
     ident_ = "var" + std::to_string(id_);
@@ -493,6 +495,7 @@ class Variable: public Formula {
   explicit Variable(std::string ident)
       : Formula(0),
         ident_(ident),
+        orig_(false),
         generated_(false) {
     id_ = id_counter_++;
   }
@@ -500,6 +503,7 @@ class Variable: public Formula {
   Variable(std::string ident, const std::vector<int>& indices)
       : Formula(0),
         ident_(ident),
+        orig_(false),
         generated_(false) {
     indices_.insert(indices_.begin(), indices.begin(), indices.end());
     id_ = id_counter_++;
@@ -515,6 +519,14 @@ class Variable: public Formula {
 
   bool generated() {
     return generated_;
+  }
+
+  bool orig() {
+    return orig_;
+  }
+
+  void orig(bool value) {
+    orig_= value;
   }
 
   virtual std::string ident() {
@@ -629,7 +641,9 @@ class ParameterEq: public Formula {
         var_(var) {
     assert(param->ident() == "p");
     assert(param->indices().size() == 1);
-    param_ = param->indices()[0]-1;
+    param_ = param->indices()[0];
+    // if absolute position, decrease by one (p1 is at parameter at position 0)
+    if (param_ > 0) param_--;
   }
 
   ParameterEq(int param, Variable* var)
@@ -668,7 +682,10 @@ class ParameterEq: public Formula {
   }
 
   virtual Formula* clone() {
-    return m.get<ParameterEq>(param_, static_cast<Variable*>(var_->clone()));
+    return m.get<ParameterEq>(
+      (Variable::index_substitute_ && Variable::index_substitute_->count(param_) ?
+        Variable::index_substitute_->at(param_)-1 : param_),
+      static_cast<Variable*>(var_->clone()));
   }
 };
 
