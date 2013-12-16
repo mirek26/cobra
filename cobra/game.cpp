@@ -20,11 +20,12 @@ void print(std::vector<Variable*>& params) {
     CnfFormula n;
     n.AddConstraint(*g_init);
     CnfFormula nnn = outcome.SubstituteParams(params);
+    printf("%s\n", nnn.pretty().c_str());
     n.AddConstraint(nnn);
     if (!n.Satisfiable()) {
       printf("UNSAT.\n");
     } else {
-      printf("SAT, FIXED %i / %i\n", n.GetFixedVariables(), n.GetFixedPairs());
+      printf("SAT, FIXED %i\n", n.GetFixedVariables());
     }
   }
   printf("\n");

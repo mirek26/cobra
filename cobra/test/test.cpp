@@ -110,6 +110,24 @@ TEST(FormulaList, MultiRange) {
     " & (x2 | y2 | z2))", f->pretty(false).c_str());
 }
 
+TEST(FormulaList, ParamEq) {
+  auto f = Formula::Parse("And(p_1 == x_I -> p_1 / I=1..2)");
+  EXPECT_STREQ("(((p1 == x1) -> p1) & ((p1 == x2) -> p1))",
+               f->pretty(false).c_str());
+}
+
+TEST(FormulaList, RangeImpl) {
+  auto f = Formula::Parse("And(p_1 == x_I -> (q <-> y_I) / I=1..4, q)");
+  auto s = f->ToCnf();
+  std::string x = "x";
+  std::vector<int> v = { 1 };
+  std::vector<Variable*> params = { m.get<Variable>(x, v) };
+  auto t = s->SubstituteParams(params);
+  EXPECT_TRUE(t.Satisfiable());
+  t.AddConstraint(Formula::Parse("!y_1"));
+  EXPECT_FALSE(t.Satisfiable());
+}
+
 TEST(CnfSubstitude, ParamEq) {
   auto f1 = Formula::Parse("(p1==a -> p1 | x) && (p1==b -> p1 & x)");
   auto cnf = f1->ToCnf();

@@ -668,7 +668,7 @@ class ParameterEq: public Formula {
   }
 
   virtual Formula* clone() {
-    return m.get<ParameterEq>(param_, var_);
+    return m.get<ParameterEq>(param_, static_cast<Variable*>(var_->clone()));
   }
 };
 
