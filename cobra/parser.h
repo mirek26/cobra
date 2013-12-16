@@ -92,6 +92,12 @@ class ParamRestrictions: public Construct {
 
 class Parametrization: public VectorConstruct<VariableSet*> {
   std::vector<std::vector<uint>> restrictions_;
+
+ private:
+  void GenerateAllHelper(std::map<int, int>& equiv,
+                        uint n,
+                        std::vector<std::vector<Variable*>>& result);
+
  public:
   Parametrization() { }
 
@@ -100,9 +106,7 @@ class Parametrization: public VectorConstruct<VariableSet*> {
   };
 
   void addRestrictions(ParamRestrictions* r);
-  void ForAll(std::function<void(std::vector<Variable*>&)> call,
-              std::map<int, int> equiv,
-              uint n = 0);
+  std::vector<std::vector<Variable*>> GenerateAll(std::map<int, int>& equiv);
 };
 
 class Experiment: public Construct {

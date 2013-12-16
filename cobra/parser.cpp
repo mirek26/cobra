@@ -76,13 +76,14 @@ void Parametrization::addRestrictions(ParamRestrictions* r) {
   }
 }
 
-void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
-                             std::map<int, int> equiv,
-                             uint n) {
+void Parametrization::GenerateAllHelper(
+    std::map<int, int>& equiv,
+    uint n,
+    std::vector<std::vector<Variable*>>& result) {
   static std::set<Variable*> used;
   static std::vector<Variable*> comb;
   if (n == size()) {
-    call(comb);
+    result.push_back(comb);
   } else {
     std::set<int> equiv_classes;
     for (auto& v: *this->at(n)) {
@@ -100,9 +101,16 @@ void Parametrization::ForAll(std::function<void(std::vector<Variable*>&)> call,
       comb.push_back(v);
       used.insert(v);
       equiv_classes.insert(equiv_class);
-      ForAll(call, equiv, n+1);
+      GenerateAllHelper(equiv, n+1, result);
       used.erase(v);
       comb.pop_back();
     }
   }
+}
+
+std::vector<std::vector<Variable*>> Parametrization::GenerateAll(
+    std::map<int, int>& equiv) {
+  std::vector<std::vector<Variable*>> result;
+  GenerateAllHelper(equiv, 0, result);
+  return result;
 }

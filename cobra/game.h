@@ -22,12 +22,20 @@ class Game {
  public:
   void setVariables(VariableSet* vars);
 
+  Formula* init() {
+    return init_;
+  }
+
   void setInit(Formula* init) {
     init_ = init;
   }
 
   void addExperiment(Experiment* e) {
     experiments_.push_back(e);
+  }
+
+  std::vector<Experiment*>& experiments() {
+    return experiments_;
   }
 
   bool complete() {
