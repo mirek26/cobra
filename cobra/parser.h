@@ -74,8 +74,19 @@ class ParamRestrictions: public Construct {
     return restrictions_;
   }
 
+  int last() {
+    assert(!restrictions_.empty());
+    return restrictions_.back().second;
+  }
+
   void add(uint v1, uint v2) {
     restrictions_.push_back(std::make_pair(v1, v2));
+  }
+
+  void add(ParamRestrictions* params) {
+    restrictions_.insert(restrictions_.end(),
+                         params->restrictions_.begin(),
+                         params->restrictions_.end());
   }
 };
 
