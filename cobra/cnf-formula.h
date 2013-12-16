@@ -16,6 +16,7 @@ extern "C" {
 class Variable;
 class Formula;
 class FormulaList;
+class ParameterEq;
 
 typedef std::set<int> TClause;
 
@@ -24,6 +25,7 @@ class CnfFormula {
   std::map<int, Variable*> variables_;
   std::set<int> original_;
   PicoSAT* picosat_;
+  std::vector<ParameterEq*> paramEq_;
 
  private:
   Variable* getVariable(int id);
@@ -40,6 +42,8 @@ class CnfFormula {
     picosat_ = picosat_init();
   }
 
+  void addParameterEq(ParameterEq* eq) { paramEq_.push_back(eq); };
+
   void addClause(FormulaList* list);
   void addClause(std::initializer_list<Formula*> list);
   void AddConstraint(Formula* formula);
@@ -52,6 +56,8 @@ class CnfFormula {
 
   bool Satisfiable();
   void PrintAssignment();
+
+  void ResetPicosat();
 
   std::map<int, int> ComputeVariableEquivalence();
 

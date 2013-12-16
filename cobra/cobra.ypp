@@ -175,6 +175,8 @@ formula :
       { $$ = m.get<NotOperator>($2); }
   | variable
       { $$ = $1; }
+  | variable '=' '=' variable
+      { $$ = m.get<ParameterEq>($1, $4); }
 
 formula_list :
     formula

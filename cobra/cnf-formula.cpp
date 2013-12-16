@@ -207,24 +207,56 @@ std::map<int, int> CnfFormula::ComputeVariableEquivalence() {
 
 CnfFormula CnfFormula::SubstituteParams(std::vector<Variable*> params) {
   CnfFormula result;
+  bool skipClause;
+  bool skipLiteral;
+  for (auto var: params) {
+    result.addVariable(var);
+  }
+  // copy all clauses:
   for (auto& clause: clauses_) {
     TClause c;
-    for (auto f: clause) {
-      bool neg = f < 0;
-      f = abs(f);
-      assert(variables_.count(f) == 1);
-      auto var = variables_[f];
-      if (var->ident() == "p") {
-        uint id = var->indices()[0] - 1;
-        assert(id < params.size());
-        // TODO: this is horribly inefficient
-        result.addLiteral(c, neg ? params[id]->neg() : params[id]);
-      } else {
-        result.addLiteral(c, neg ? var->neg() : var);
+    skipClause = false;
+    for (auto lit: clause) {
+      uint id = abs(lit);
+      skipLiteral = false;
+      for (auto p: paramEq_) {
+        if (p->tseitin_id() == id && p->param() < params.size()) {
+          if ((params[p->param()] == p->var()) == (lit > 0)) {
+            skipClause = true; // clause satisfied by lit
+          } else {
+            skipLiteral = true; // literal is false
+          }
+          break;
+        }
       }
+      if (skipLiteral) continue;
+      assert(variables_.count(id) == 1);
+      auto var = variables_[id];
+      result.addVariable(var);
+      auto param = var->getParam();
+      if (param != 0 && param <= params.size()) {
+        lit = (lit > 0 ? 1 : -1) * params[param-1]->id();
+      }
+      c.insert(lit);
     }
-    result.clauses_.insert(c);
-    picosat_add(result.picosat_, 0);
+
+    if (!skipClause) {
+      result.clauses_.insert(c);
+    }
   }
+  result.ResetPicosat();
   return result;
 }
+
+void CnfFormula::ResetPicosat() {
+  if (picosat_) picosat_reset(picosat_);
+  picosat_ = picosat_init();
+  for (auto& clause: clauses_) {
+    for (auto lit: clause) {
+      picosat_add(picosat_, lit);
+    }
+    picosat_add(picosat_, 0);
+  }
+}
+
+

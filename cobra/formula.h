@@ -521,6 +521,14 @@ class Variable: public Formula {
     assert(false);
   }
 
+  bool isParam() {
+    return ident_ == "p" && indices_.size() == 1;
+  }
+
+  uint getParam() {
+    return isParam() ? indices_[0] : 0;
+  }
+
   virtual Formula* clone() {
     if (variable_substitude_ && variable_substitude_->count(this) > 0) {
       return variable_substitude_->at(this);
@@ -586,6 +594,60 @@ class VariableSet: public VectorConstruct<Variable*> {
       vars->push_back(m.get<Variable>(from->ident(), v));
     }
     return vars;
+  }
+};
+
+
+class ParameterEq: public Formula {
+  int param_;
+  Variable* var_;
+
+ public:
+  ParameterEq(Variable* param, Variable* var)
+      : Formula(1),
+        var_(var) {
+    assert(param->ident() == "p");
+    assert(param->indices().size() == 1);
+    param_ = param->indices()[0]-1;
+  }
+
+  ParameterEq(int param, Variable* var)
+      : Formula(1),
+        param_(param),
+        var_(var) {}
+
+  uint tseitin_id() {
+    assert(tseitin_var_);
+    return tseitin_var_->id();
+  }
+
+  uint param() {
+    return param_;
+  }
+
+  Variable* var() {
+    return var_;
+  }
+
+  virtual std::string name() {
+    return "ParameterEq";
+  }
+
+  virtual std::string pretty(bool = true) {
+    return "(p" + std::to_string(param_ + 1) + " == " + var_->pretty() + ")";
+  }
+
+  virtual Construct* child(uint nth) {
+    assert(nth == 0);
+    return var_;
+  }
+
+  virtual void TseitinTransformation(CnfFormula* cnf, bool) {
+    cnf->addParameterEq(this);
+  }
+
+  virtual Formula* clone() {
+    return m.get<ParameterEq>(param_, var_);
   }
 };
 

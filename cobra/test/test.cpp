@@ -32,13 +32,18 @@ TEST(ParserGetTest, GetVariableWithNoParams) {
   EXPECT_EQ(v1, v2);
 }
 
+TEST(FormulaTest, ParamEqTest) {
+  auto f1 = Formula::Parse("p1==x1 -> (q1<->y1)");
+  EXPECT_STREQ("((p1 == x1) -> (q1 <-> y1))", f1->pretty(false).c_str());
+}
+
 TEST(FormulaTest, ExpandExactlyNone) {
   auto f1 = Formula::Parse("Exactly-0(a1, a2, a3)");
   auto f2 = dynamic_cast<ExactlyOperator*>(f1);
   EXPECT_TRUE(f1);
   auto f3 = f2->Expand();
   std::string s = f3->pretty(false);
-  EXPECT_STREQ(s.c_str(), "((!a1) & (!a2) & (!a3))");
+  EXPECT_STREQ("((!a1) & (!a2) & (!a3))", s.c_str());
 }
 
 TEST(FormulaTest, ExpandExactlyAll) {
@@ -47,10 +52,10 @@ TEST(FormulaTest, ExpandExactlyAll) {
   EXPECT_TRUE(f1);
   auto f3 = f2->Expand();
   std::string s = f3->pretty(false);
-  EXPECT_STREQ(s.c_str(), "((a1) & (a2) & (a3))");
+  EXPECT_STREQ("((a1) & (a2) & (a3))", s.c_str());
 }
 
-TEST(FormulaSubstitude, SimpleSubstitude) {
+TEST(FormulaSubstitute, SimpleSubstitute) {
   std::string a = "a", b = "b", c = "c", x = "x", y = "y", z = "z";
   auto f1 = Formula::Parse("a & b | c");
   std::map<Variable*, Variable*> table;
@@ -62,7 +67,7 @@ TEST(FormulaSubstitude, SimpleSubstitude) {
   EXPECT_STREQ("((x & y) | z)", f2->pretty(false).c_str());
 }
 
-TEST(FormulaSubstitude, FormulaListSubstitude) {
+TEST(FormulaSubstitute, FormulaListSubstitute) {
   std::string a = "a", b = "b", c = "c", x = "x", y = "y", z = "z";
   auto f1 = Formula::Parse("Exactly-1(AtLeast-2(a, b, c), AtMost-2(x, y, z))");
   std::map<Variable*, Variable*> table;
@@ -76,6 +81,19 @@ TEST(FormulaSubstitude, FormulaListSubstitude) {
   EXPECT_NE(f1, f2);
   EXPECT_STREQ("Exactly-1(AtLeast-2(x, y, z), AtMost-2(c, b, a))",
                f2->pretty(false).c_str());
+}
+
+TEST(CnfSubstitude, ParamEq) {
+  auto f1 = Formula::Parse("(p1==a -> p1 | x) && (p1==b -> p1 & x)");
+  auto cnf = f1->ToCnf();
+  std::vector<Variable*> v1, v2;
+  std::string a = "a", b = "b";
+  v1.push_back(m.get<Variable>(a));
+  v2.push_back(m.get<Variable>(b));
+  auto p1 = cnf->SubstituteParams(v1);
+  auto p2 = cnf->SubstituteParams(v2);
+  //EXPECT_STREQ("a | x", p1.pretty(false).c_str());
+  //EXPECT_STREQ("b & x", p2.pretty(false).c_str());
 }
 
 TEST(SolverTest, BasicSatisfiability) {
@@ -98,5 +116,6 @@ TEST(SolverTest, BasicFixed) {
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_EQ(s.GetFixedVariables(), 2); // x4 and x5 must be false.
 }
+
 
 
