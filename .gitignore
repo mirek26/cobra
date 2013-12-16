@@ -16,6 +16,7 @@ lingeling
 !lingeling/
  
 cobra
+cobra/test/test
 !cobra/
 
 # sys blabla
