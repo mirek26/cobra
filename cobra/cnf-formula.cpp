@@ -116,8 +116,8 @@ std::string CnfFormula::pretty(bool unicode) {
 //------------------------------------------------------------------------------
 // SAT solver stuff
 
-int CnfFormula::GetFixedVariables() {
-  int r = 0;
+uint CnfFormula::GetFixedVariables() {
+  uint r = 0;
   for (auto& var: original_) {
     picosat_assume(picosat_, var);
     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
@@ -127,8 +127,8 @@ int CnfFormula::GetFixedVariables() {
   return r;
 }
 
-int CnfFormula::GetFixedPairs() {
-  int r = 0;
+uint CnfFormula::GetFixedPairs() {
+  uint r = 0;
   for (auto& var1: original_) {
     for (auto& var2: original_) {
       picosat_assume(picosat_, var1);

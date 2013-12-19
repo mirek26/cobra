@@ -1592,7 +1592,7 @@ yyreduce:
 
   case 27:
 #line 148 "cobra.ypp"
-    { (yyval.param_restrictions) = (yyvsp[(1) - (3)].param_restrictions); (yyval.param_restrictions)->add((yyval.param_restrictions)->last(), (yyvsp[(3) - (3)].tint)) ;}
+    { (yyval.param_restrictions) = (yyvsp[(1) - (3)].param_restrictions); (yyval.param_restrictions)->add((yyval.param_restrictions)->last(), (yyvsp[(3) - (3)].tint)); ;}
     break;
 
   case 28:

@@ -2,6 +2,7 @@
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
 
+#include <cassert>
 #include <vector>
 #include <map>
 #include <set>
@@ -51,8 +52,12 @@ class CnfFormula {
 
   CnfFormula SubstituteParams(std::vector<Variable*> params);
 
-  int GetFixedVariables();
-  int GetFixedPairs();
+  uint GetFixedVariables();
+  uint GetFixedPairs();
+  bool HasOnlyOneModel() {
+    assert(Satisfiable());
+    return GetFixedVariables() == original_.size();
+  }
 
   bool Satisfiable();
   void PrintAssignment();

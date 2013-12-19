@@ -1,8 +1,11 @@
 /*
  * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
  */
+#include <cstdio>
+#include <cstring>
 #include <cerrno>
 #include <set>
+#include <iostream>
 
 #include "formula.h"
 #include "util.h"
@@ -68,18 +71,29 @@ int main(int argc, char* argv[]) {
     uint ch, outcome;
     do {
       printf("Your choice: ");
-      scanf("%i", &ch);
-    } while (ch >= experiments.size());
+      std::cin >> ch;
+      std::cin.clear();
+      std::cin.ignore(INT_MAX, '\n');
+      //scanf("%i", &ch);
+    } while (std::cin.fail() || ch >= experiments.size());
     do {
       printf("Select outcome[");
       for (uint i = 0; i < experiments[ch].f_outcomes.size(); i++)
         if (experiments[ch].f_outcomes[i] >= 0) printf("%i", i);
       printf("]: ");
-      scanf("%i", &outcome);
+      std::cin >> outcome;
+      std::cin.clear();
+      std::cin.ignore(INT_MAX, '\n');
     } while (outcome >= experiments[ch].f_outcomes.size() ||
              experiments[ch].f_outcomes[outcome] == -1);
     auto newConstraint = experiments[ch].type->outcomes()[outcome].SubstituteParams(experiments[ch].params);
     current.AddConstraint(newConstraint);
+    if (current.HasOnlyOneModel()) {
+      printf("\nSOLVED!\n");
+      current.Satisfiable();
+      current.PrintAssignment();
+      break;
+    }
   }
 
   return 0;
