@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
       printf("]: ");
       std::cin >> outcome;
       std::cin.clear();
-      std::cin.ignore(INT_MAX, '\n');
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (outcome >= experiments[ch].f_outcomes.size() ||
              experiments[ch].f_outcomes[outcome] == -1);
     auto newConstraint = experiments[ch].type->outcomes()[outcome].SubstituteParams(experiments[ch].params);
