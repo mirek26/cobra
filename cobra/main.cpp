@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
       printf("Your choice: ");
       std::cin >> ch;
       std::cin.clear();
-      std::cin.ignore(INT_MAX, '\n');
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       //scanf("%i", &ch);
     } while (std::cin.fail() || ch >= experiments.size());
     do {
