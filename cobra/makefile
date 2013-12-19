@@ -13,7 +13,9 @@ cobra: $(OBJECTS) main.o
 	$(CC) $(OBJECTS) main.o -L sat-solvers/picosat -l picosat -ll -o $(EXEC)
 
 # parser
-parser: cobra.tab.cpp cobra.yy.c
+clean-bison: 
+	rm cobra.tab.cpp cobra.tab.hpp cobra.yy.c
+bison: clean-bison cobra.tab.cpp cobra.yy.c
 cobra.tab.cpp: cobra.ypp
 	$(BISON) $<
 cobra.tab.o: cobra.tab.cpp cobra.ypp
@@ -60,7 +62,7 @@ test: $(GTEST_DIR)/test
 test-clean:
 	rm -rf $(GTEST_DIR)/*.o $(GTEST_DIR)/*.a $(GTEST_DIR)/test
 
-.PHONY: test
+.PHONY: test bison
 
 # clean
 clean:
