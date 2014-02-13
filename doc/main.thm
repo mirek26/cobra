@@ -1,9 +1,15 @@
-\contentsline {definition}{{Definition}{1}{}}{1}{common.1}
-\contentsline {example}{{Example}{2}{Fake-coin problem}}{2}{common.2}
-\contentsline {example}{{Example}{3}{Mastermind}}{2}{common.3}
+\contentsline {problem}{{Problem}{1}{The twelve coin problem}}{1}{common.1}
+\contentsline {problem}{{Problem}{2}{The thirteen coin problem}}{1}{common.2}
+\contentsline {problem}{{Problem}{3}{General fake coin problem}}{1}{common.3}
 \contentsline {definition}{{Definition}{4}{}}{3}{common.4}
-\contentsline {lemma}{{Lemma}{5}{}}{3}{common.5}
-\contentsline {proof}{{\proofname }{1}{}}{3}{proof.1}
-\contentsline {problem}{{Problem}{6}{}}{4}{common.6}
-\contentsline {definition}{{Definition}{7}{}}{4}{common.7}
-\contentsline {problem}{{Problem}{8}{}}{4}{common.8}
+\contentsline {definition}{{Definition}{5}{}}{3}{common.5}
+\contentsline {example}{{Example}{6}{Fake-coin problem}}{4}{common.6}
+\contentsline {example}{{Example}{7}{Fake-coin problem, alternative}}{4}{common.7}
+\contentsline {example}{{Example}{8}{Mastermind}}{5}{common.8}
+\contentsline {definition}{{Definition}{9}{}}{5}{common.9}
+\contentsline {lemma}{{Lemma}{10}{}}{6}{common.10}
+\contentsline {proof}{{\proofname }{1}{}}{6}{proof.1}
+\contentsline {definition}{{Definition}{11}{}}{6}{common.11}
+\contentsline {definition}{{Definition}{12}{}}{6}{common.12}
+\contentsline {problem}{{Problem}{13}{}}{7}{common.13}
+\contentsline {definition}{{Definition}{14}{}}{7}{common.14}
