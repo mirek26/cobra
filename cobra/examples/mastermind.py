@@ -1,4 +1,6 @@
+#
 # MASTERMIND model for COBRA
+#
 
 from itertools import permutations, combinations
 
@@ -14,6 +16,7 @@ for n in range(N):
   @mapping("F%i"%n, ["x%i_%s"%(n,c) for c in C])
 
 @experiment("guess")
+@params(N)
 for num_total in range(N + 1): # total number of pegs
   for num_blacks in range(num_total + 1): # number of black pegs
     num_whites = num_total - num_blacks

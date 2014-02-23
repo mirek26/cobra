@@ -18,7 +18,7 @@ params = lambda n0, n1: ",".join("X$" + str(i) for i in range(n0, n1+1))
 for m in range(1, N//2 + 1):
   # weighting m coins agains m coins
   @experiment("weighting" + str(m))
-  @params("{1..12}^2 $1<$2")
+  @params(2*m, "distinct(%s)"%",".join(range(2*m)))
 
   # left side is lighter
   @outcome("(Or(%s) & !y) | (Or(%s) & y)" % (params(1, m), params(m+1, 2*m)))

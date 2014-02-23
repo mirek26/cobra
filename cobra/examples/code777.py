@@ -22,7 +22,7 @@ for selected in product([0,1], repeat=2*len(A)):
   attrs1 = list(compress(A, selected[:len(A)]))
   attrs2 = list(compress(A, selected[len(A):]))
   @experiment("compare %s against %s"%(",".join(attrs1), ",".join(attrs2)))
-  @param(".^%i"%(len(attrs1) + len(attrs2)))
+  @param(len(attrs1) + len(attrs2))
 
   cards1 = [" & ".join(
                   "X%i_%s($%i)"%(n, attrs1[i], i) for i in range(len(attrs1)))

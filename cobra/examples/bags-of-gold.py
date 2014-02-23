@@ -34,7 +34,7 @@ for i in range(M):
   s += m[i]
 
 @experiment("weighting %s"%str(m))
-@params(".^%s"%s)
+@params(s)
 
 for i in range(M + 1):
   formula = []
