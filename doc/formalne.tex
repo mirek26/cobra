@@ -59,7 +59,7 @@ By $\pform(\param)$ we denote application of a parametrization $\param\in\Sigma^
 on a formula $\pform$, which is defined recursively on the stucture of $\pform$ in the following way:
 \begin{align}
 (x)(\param) &= x, \\
-(f(\$n))(\param) &= \param[n],\\
+(f(\$n))(\param) &= f(\param[n]),\\
 (\pform_1\circ\pform_2)(\param) &= \pform_1(\param) \circ \pform_2(\param),\\
 (\neg\pform)(\param) &= \neg(\pform(\param)).
 \end{align}
@@ -92,7 +92,7 @@ $\mathcal{F}_n = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n, y\}$, \\
-$\init = \exactly{1}(\{x_1, ..., x_n\})$. \\
+$\init = \exactly{1}\{x_1, ..., x_n\}$. \\
 Intuitively, variable $x_i$ tells weather the coin $i$ is fake.
 Variable $y$ tells weather it is lighter or heavier.
 Formule $\init$ says that exactly one coin is fake.
@@ -120,7 +120,7 @@ First, the right side is heavier. This happens if the fake coin is lighter and i
 Third, the weights are balanced if the fake coin do not participate in the experiment.
 \end{itemize}
 \end{example}
-
+\newpage
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM - alternative
 
@@ -131,7 +131,7 @@ $\mathcal{F'}_n = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n, y_1, y_2, ..., y_n\}$, \\
-$\init = \exactly{1}(\{x_1, ..., x_n, y_1, ..., y_n \})$. \\
+$\init = \exactly{1}\{x_1, ..., x_n, y_1, ..., y_n \}$. \\
 Variable $x_i$ tells that the coin $i$ is lighter, variable $y_i$ tells that the coin $i$ is heavier.
 Formule $\init$ says that exactly one coin is different.
 
@@ -151,51 +151,141 @@ $F = \{ f_x, f_y \}$, where $f_x(i) = x_i$ and $f_y(i) = y_i$ for $1 <= i <= n$,
 %-------------------------------------------------------------------------------
 % EXAMPLE: MASTERMIND
 
-\begin{example}[Mastermind]
-\TODO{UPDATOVAT!}
-Mastermind puzzle with $n$ pegs and color set $C$ can be formalized as
+\begin{example}[Mastermind] \label{form-mastermind}
+Mastermind puzzle with $n$ pegs and $m$ colors can be formalized as
 a code breaking game
-$\mathcal{M}_{n,C} = (\Var, \init, \Expt, \Exp, \outcome)$, where
+$\mathcal{M}_{n,m} = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 
 \begin{itemize}
 \item
-$\Var = \{x_{i,c} \| 1<=i<=n, c\in C\}$. \\
-Variable $x_{i,c}$ tells whether there is the color $c$ at position $i$.
-For simplicity, let us use the notation $\Var_c = \{ x_{i,c} \| 1<=i<=n \}$.
+$\Var = \{x_{i,j} \| 1<=i<=n, 1<=j<=m \}$, \\
+$\init = \bigwedge\left\{
+  \exactly{1} \{x_{i,j} \| 1<=j<=m\} \| 1<=i<=n\right\}$. \\
+Variable $x_{i,j}$ tells whether there is the color $j$ at position $i$.
+Formula $\init$ says that there is exactly one color at each position.
 
 \item
-$\init = \bigwedge\left\{
-  \exactly{1} \{x_{i,c} \| c\in C\} \| 1<=i<=n\right\}$. \\
-This guarantees that there is exactly one color at each position.
+$\Expt = \{ g_{k_1,...,k_m} \| k_i \in \{1,...,n\}, \sum_ik_i = n \}$,\\
+$\Sigma = C$, \\
+$\Exp = \{(g_{k_1,...,k_m}, \param) \| \param\in\Sigma^{n}, \#i.(\param[i]=j)=k_j\}$.\\
+The type $g_{k_1,...,k_m}$ covers all the guesses in which the number of $j$-colored pegs is $k_j$.
+Therefore, two guesses for which we use the same pegs (pegs are just shuffled) are of the same type,
+but if we change a peg for one with different color, it is other type of experiment.
 
-\item $\Expt = \{\expt\}$.\\
-There is only one type of experiment -- guessing a combination.
-
-\item $\Exp = \{(\expt, \param) \| \param = x_{1,c_1}x_{2,c_2}...x_{n,c_n}\}$.\\
-Parametrization of $\expt$ can be any string of length $n$,
-$i$-th symbol of which belongs to $\{ x_{i,c} \| c \in C\}$.
-
-\item Inference function is defined by
-\begin{align*}
-\outcome(\val, (\expt, \param)) =\;
- & \exactly{b}\{ \param[i] \| 1<=i<=n \} \;\wedge \\
+\item
+$F = \{ f_1, ..., f_n \}$, where $f_i(c) = x_{i,c}$ for $1<=i<=n$,
+\vspace{-2mm}
+\begin{flalign*}
+\outcome(& g_{k_1,...,k_n}) =  \Big\{ &\\
+ & \exactly{b}\{ f_i(\$i) \| 1<=i<=n \} \;\wedge &\\
  & \exactly{t}\bigcup
-      \big\{ \\
-          & \{
-                \atleast{k}\{ x_{i,c} \| 1<=i<=n \}
-                \| 1 <= k <= \#i.(\param[i]\in\Var_c)
-            \} \\
-            & \| c\in C
-      \big\}
-\end{align*}
-where $b = \# i . (\val(\param[i]) = 1)$ captures the number of black pegs
-  in the response for the experiment $(t, p)$ and
-  $t = \sum_{c\in C} \min( \#i.(v(x_{i,c}) = 1), \#i.(\param[i]\in\Var_c))$
-  is the total number of pegs (black + white).
-
-% TODO:
-\TODO{Fakt to nejde nějak jednodušej?}
+      \big\{
+           \{ \atleast{l}(x_{1,j},...,x_{n,j}) \| 1 <= l <= k_j \}
+           \| 1<=j<=m
+      \big\} &\\
+  &\hspace{2cm} \| 0<=b<=t, 0<=t<=n\Big\}.
+\end{flalign*}
+\TODO{Zdůvodnit proč to funguje.}
 \end{itemize}
+\end{example}
+
+%-------------------------------------------------------------------------------
+% EXAMPLE: MASTERMIND 2
+
+\begin{example}[Mastermind (alternative)] \label{form-mastermind2}
+$\mathcal{M'}_{n,m} = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
+
+\begin{itemize}
+\item
+$\Var$ and $\init$ is defined as in Example \ref{form-mastermind}. \\
+
+\item
+$\Expt = \{ g \}$,\\
+$\Sigma = C$, \\
+$\Exp = \{(g, \param) \| \param\in\Sigma^{n}\}$.\\
+
+\item
+$F = \{ f_1, ..., f_n \}$, where $f_i(c) = x_{i,c}$ for $1<=i<=n$,
+$\outcome(g) = \{ \textrm{Outcome}(b, w) \| 0<=b<=n, 0<=w<=n, b+w<=n \}$,
+where $\textrm{Outcome}$ function is computed by the algorithm described below.
+\end{itemize}
+
+\newcommand{\BlackSymb}{\bullet}
+\newcommand{\NoSymb}{\times}
+
+Consider a fixed color combination (code) and a guess.
+We assign a symbol $\BlackSymb$, $\NoSymb$ or a number to each position
+  in the following way.
+If the color at a position is same in the code and the guess, we assign
+  $\BlackSymb$ to this position and the player gets a black peg for it.
+If the color in the guess at position $i$ differs but it appears
+  appears at position $j$ in the code, we assign $j$ to position $i$ and
+  the player gets a white peg. Also, position $j$ must not be assigned
+  $\BlackSymb$ and the number $j$ must not be assigned to any other position.
+We assign $\NoSymb$ to all other positions.
+For example, if the code is $1234$ and the guess is $5251$, the assignment is
+ $\underline{\NoSymb\BlackSymb\NoSymb\:1}$.
+
+We start the computation of Outcome$(b, w)$ with generation of
+  all combinations of $\BlackSymb$, $\NoSymb$ and different numbers from $1$ to
+  $n$,
+  so that there is $b$-times $\BlackSymb$, $w$-times a number and
+  no number refers to a position with $\BlackSymb$.
+
+Next, for each combination, we generate a conjunction in the following way:
+\begin{itemize}
+\item For $\BlackSymb$ at position $i$, we add $f_i(\$i)$.
+\item For a number $j$ at position $i$, we add $\neg f_i(\$i) \wedge f_j(\$i)$.
+\item For $\NoSymb$ at position $i$, we add $\neg f_j(\$i)$ for any other position $j$ with $\NoSymb$.
+\end{itemize}
+The result is a disjunction of all these clauses, which effectively enumerates all the cases.
+
+To get a better idea about the results, this is $\textrm{Outcome}(1, 1)$ for n = 4:
+
+\medskip
+\begin{scriptsize}$(
+\neg f_0(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_0(\$2) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_0(\$2) \wedge \neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_2(\$0) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$0) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_1(\$1) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge f_3(\$3)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge \neg f_3(\$1) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$1) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_2(\$2) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_1(\$3) \wedge \neg f_2(\$1) \wedge \neg f_2(\$2) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_1(\$1) \wedge \neg f_1(\$2) \wedge \neg f_1(\$3) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_0(\$0)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_3(\$0) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_0(\$3) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_0(\$3) \wedge \neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$1) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_1(\$1) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_1(\$0) \wedge \neg f_1(\$1) \wedge \neg f_1(\$3) \wedge \neg f_3(\$1) \wedge \neg f_3(\$3) \wedge f_2(\$2)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge \neg f_3(\$0) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_0(\$3) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_0(\$3) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$2) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_2(\$2) \wedge \neg f_3(\$0) \wedge \neg f_3(\$3) \wedge f_1(\$1)) \vee
+(\neg f_0(\$0) \wedge \neg f_0(\$3) \wedge \neg f_2(\$0) \wedge \neg f_2(\$2) \wedge \neg f_2(\$3) \wedge \neg f_3(\$2) \wedge \neg f_3(\$3) \wedge f_1(\$1)
+).$
+\end{scriptsize} \medskip
+
+However complicated this may look, note that it is not much different from
+ the previous model where the complexity of the formulas was hidden in the
+ Exactly and AtLeast macro operators.
 \end{example}
 
 %-------------------------------------------------------------------------------
