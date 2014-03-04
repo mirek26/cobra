@@ -167,9 +167,9 @@ typedef union YYSTYPE
   VariableList* variable_list;
   FormulaList* formula_list;
   std::vector<std::string>* string_list;
-  std::vector<int>* int_list;
+  std::vector<uint>* int_list;
   char* tstr;
-  int tint;
+  uint tint;
 }
 /* Line 193 of yacc.c.  */
 #line 176 "cobra.tab.cpp"
@@ -1528,7 +1528,7 @@ yyreduce:
 
   case 22:
 #line 139 "cobra.ypp"
-    { (yyval.int_list) = new std::vector<int>();
+    { (yyval.int_list) = new std::vector<uint>();
         (yyval.int_list)->push_back((yyvsp[(1) - (1)].tint)); ;}
     break;
 
@@ -1600,7 +1600,7 @@ yyreduce:
 
   case 36:
 #line 171 "cobra.ypp"
-    { (yyval.formula) = m.get<Mapping>((yyvsp[(1) - (3)].tstr), (yyvsp[(3) - (3)].tint)); ;}
+    { (yyval.formula) = m.get<Mapping>((yyvsp[(1) - (3)].tstr), m.game().getMappingId((yyvsp[(1) - (3)].tstr)), (yyvsp[(3) - (3)].tint)); ;}
     break;
 
   case 37:

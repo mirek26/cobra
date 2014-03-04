@@ -35,12 +35,38 @@ Formula* Game::initialRestrictions() {
   return init_;
 }
 
-void Game::addMapping(std::string, VariableList*) {
-
+int Game::addMapping(std::string ident, VariableList* vars) {
+  assert(mappings_ids_.count(ident) == 0);
+  int new_id = mappings_.size();
+  mappings_ids_[ident] = new_id;
+  mappings_.push_back(std::vector<int>());
+  for (auto v: *vars) {
+    mappings_.back().push_back(v->id());
+  }
+  return new_id;
 }
 
-Experiment* Game::addExperiment(std::string name, int num_params) {
-  auto e = new Experiment(name, num_params);
+int Game::getMappingId(std::string ident) {
+  //printf("Ask for %s.\n", ident.c_str());
+  assert(mappings_ids_.count(ident) > 0);
+  return mappings_ids_[ident];
+}
+
+int Game::getMappingValue(uint mapping, uint a) {
+  assert(0 <= mapping && mapping < mappings_.size());
+  assert(0 <= a && a < alphabet_.size());
+  return mappings_[mapping][a];
+}
+
+Experiment* Game::addExperiment(std::string name, uint num_params) {
+  auto e = new Experiment(this, name, num_params);
   experiments_.push_back(e);
   return e;
+}
+
+
+void Game::Precompute() {
+  for (auto e: experiments_) {
+    e->Precompute();
+  }
 }

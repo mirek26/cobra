@@ -20,6 +20,9 @@ class Game {
   std::vector<Experiment*> experiments_;
   std::vector<std::string> alphabet_;
 
+  std::vector<std::vector<int>> mappings_;
+  std::map<std::string, int> mappings_ids_;
+
  public:
   void declareVariable(Variable*);
   void declareVariables(VariableList*);
@@ -34,31 +37,30 @@ class Game {
     delete alphabet;
   }
 
-  const std::vector<std::string>& alphabet() {
-    return alphabet_;
-  }
+  const std::vector<std::string>& alphabet() { return alphabet_; }
 
-  void addMapping(std::string, VariableList*);
+  int addMapping(std::string, VariableList*);
+  int getMappingId(std::string);
+  int getMappingValue(uint, uint);
 
-  Experiment* addExperiment(std::string name, int num_params);
+  Experiment* addExperiment(std::string name, uint num_params);
+  std::vector<Experiment*>& experiments() {  return experiments_;  }
 
-  std::vector<Experiment*>& experiments() {
-    return experiments_;
-  }
+  void Precompute();
 
   bool complete() {
-    if (!variables_) {
-      printf("Nothing assigned to 'Vars'.\n");
-      return false;
-    }
-    if (!init_) {
-      printf("Nothing assigned to 'Init'.\n");
-      return false;
-    }
-    if (experiments_.empty()) {
-      printf("No experiment defined.\n");
-      return false;
-    }
+    // if (!variables_) {
+    //   printf("Nothing assigned to 'Vars'.\n");
+    //   return false;
+    // }
+    // if (!init_) {
+    //   printf("Nothing assigned to 'Init'.\n");
+    //   return false;
+    // }
+    // if (experiments_.empty()) {
+    //   printf("No experiment defined.\n");
+    //   return false;
+    // }
     return true;
   }
 

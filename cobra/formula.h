@@ -455,16 +455,19 @@ class NotOperator: public Formula {
 
 class Mapping: public Formula {
   std::string ident_;
-  int param_id_;
+  uint mapping_id_;
+  uint param_id_;
 
  public:
-  Mapping(std::string ident, int param_id)
+  Mapping(std::string ident, uint mapping_id, uint param_id)
       : Formula(0),
         ident_(ident),
-        param_id_(param_id) { }
+        mapping_id_(mapping_id),
+        param_id_(param_id - 1) { // params are internally indexed from 0
+  }
 
-  std::string& ident() { return ident_; }
-  int param_id() { return param_id_; }
+  uint mapping_id() { return mapping_id_; }
+  uint param_id() { return param_id_; }
 
   virtual std::string pretty(bool = true) {
     return ident_ + "$" + std::to_string(param_id_);
@@ -475,7 +478,7 @@ class Mapping: public Formula {
   }
 
   virtual Formula* clone() {
-    return m.get<Mapping>(ident_, param_id_);
+    return m.get<Mapping>(ident_, mapping_id_, param_id_);
   }
 
   virtual void TseitinTransformation(CnfFormula*, bool) {

@@ -32,10 +32,14 @@ int main(int argc, char* argv[]) {
   yyparse();
   fclose (yyin);
 
-  // // INTERACTIVE MODE
-  // Game& g = m.game();
-  // if (!g.complete()) exit(1);
+  printf("LOADED.\n");
 
+  // // INTERACTIVE MODE
+  Game& g = m.game();
+  //if (!g.complete()) exit(1);
+  g.Precompute();
+
+  printf("DONE.\n");
   // CnfFormula current;
   // current.AddConstraint(g.init());
 

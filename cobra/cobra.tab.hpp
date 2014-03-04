@@ -97,9 +97,9 @@ typedef union YYSTYPE
   VariableList* variable_list;
   FormulaList* formula_list;
   std::vector<std::string>* string_list;
-  std::vector<int>* int_list;
+  std::vector<uint>* int_list;
   char* tstr;
-  int tint;
+  uint tint;
 }
 /* Line 1529 of yacc.c.  */
 #line 106 "cobra.tab.hpp"

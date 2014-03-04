@@ -6,6 +6,14 @@
 
 extern "C" int yyparse();
 #define YY_DECL extern "C" int yylex()
+
+char* str_dup_strip(char* str) {
+  char* result = (char*) malloc(strlen(yytext)-1);
+  strncpy(result, yytext + 1, strlen(yytext)-1);
+  result[strlen(yytext)-2] = '\0';
+  return result;
+}
+
 %}
 %%
 
@@ -53,8 +61,8 @@ extern "C" int yyparse();
 
  /* identifiers */
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
-\".*\" { yylval.tstr = strdup(yytext); return T_STRING; }
-\'.*\' { yylval.tstr = strdup(yytext); return T_STRING; }
+\".*\" { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
+\'.*\' { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
 
  /* default: return char on input */
  .              { return yytext[0]; }

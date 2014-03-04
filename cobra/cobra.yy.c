@@ -574,7 +574,15 @@ char *yytext;
 
 extern "C" int yyparse();
 #define YY_DECL extern "C" int yylex()
-#line 578 "cobra.yy.c"
+
+char* str_dup_strip(char* str) {
+  char* result = (char*) malloc(strlen(yytext)-1);
+  strncpy(result, yytext + 1, strlen(yytext)-1);
+  result[strlen(yytext)-2] = '\0';
+  return result;
+}
+
+#line 586 "cobra.yy.c"
 
 #define INITIAL 0
 
@@ -756,11 +764,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 10 "cobra.l"
+#line 18 "cobra.l"
 
 
  /* white space */
-#line 764 "cobra.yy.c"
+#line 772 "cobra.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -856,201 +864,201 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 13 "cobra.l"
+#line 21 "cobra.l"
 ;
 	YY_BREAK
 /* comments */
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 15 "cobra.l"
+#line 23 "cobra.l"
 ;  /**/
 	YY_BREAK
 /* number constants */
 case 3:
 YY_RULE_SETUP
-#line 18 "cobra.l"
+#line 26 "cobra.l"
 { yylval.tint = atoi(yytext); return T_INT; }
 	YY_BREAK
 /* operators */
 case 4:
 YY_RULE_SETUP
-#line 21 "cobra.l"
+#line 29 "cobra.l"
 { return T_IMPLIES; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "cobra.l"
+#line 30 "cobra.l"
 { return T_IMPLIES; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "cobra.l"
+#line 31 "cobra.l"
 { return T_IMPLIES; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 24 "cobra.l"
+#line 32 "cobra.l"
 { return T_IMPLIED; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 25 "cobra.l"
+#line 33 "cobra.l"
 { return T_IMPLIED; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 26 "cobra.l"
+#line 34 "cobra.l"
 { return T_EQUIV; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 27 "cobra.l"
+#line 35 "cobra.l"
 { return T_EQUIV; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 28 "cobra.l"
+#line 36 "cobra.l"
 { return T_EQUIV; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "cobra.l"
+#line 37 "cobra.l"
 { return T_AND; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "cobra.l"
+#line 38 "cobra.l"
 { return T_AND; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 31 "cobra.l"
+#line 39 "cobra.l"
 { return T_AND; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "cobra.l"
+#line 40 "cobra.l"
 { return T_AND; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 33 "cobra.l"
+#line 41 "cobra.l"
 { return T_OR; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 34 "cobra.l"
+#line 42 "cobra.l"
 { return T_OR; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 35 "cobra.l"
+#line 43 "cobra.l"
 { return T_OR; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 36 "cobra.l"
+#line 44 "cobra.l"
 { return T_OR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 37 "cobra.l"
+#line 45 "cobra.l"
 { return T_NOT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 38 "cobra.l"
+#line 46 "cobra.l"
 { return T_NOT; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 40 "cobra.l"
+#line 48 "cobra.l"
 { return T_ATLEAST; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 41 "cobra.l"
+#line 49 "cobra.l"
 { return T_ATMOST; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 42 "cobra.l"
+#line 50 "cobra.l"
 { return T_EXACTLY; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 44 "cobra.l"
+#line 52 "cobra.l"
 { return T_VARIABLE; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 45 "cobra.l"
+#line 53 "cobra.l"
 { return T_VARIABLES; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 46 "cobra.l"
+#line 54 "cobra.l"
 { return T_RESTRICTION; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 47 "cobra.l"
+#line 55 "cobra.l"
 { return T_ALPHABET; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 48 "cobra.l"
+#line 56 "cobra.l"
 { return T_MAPPING; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 49 "cobra.l"
+#line 57 "cobra.l"
 { return T_EXPERIMENT; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 50 "cobra.l"
+#line 58 "cobra.l"
 { return T_PARAMS_DISTINCT; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 51 "cobra.l"
+#line 59 "cobra.l"
 { return T_PARAMS_SORTED; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 52 "cobra.l"
+#line 60 "cobra.l"
 { return T_OUTCOME; }
 	YY_BREAK
 /* identifiers */
 case 34:
 YY_RULE_SETUP
-#line 55 "cobra.l"
+#line 63 "cobra.l"
 { yylval.tstr = strdup(yytext); return T_IDENT; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 56 "cobra.l"
-{ yylval.tstr = strdup(yytext); return T_STRING; }
+#line 64 "cobra.l"
+{ yylval.tstr = str_dup_strip(yytext); return T_STRING; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 57 "cobra.l"
-{ yylval.tstr = strdup(yytext); return T_STRING; }
+#line 65 "cobra.l"
+{ yylval.tstr = str_dup_strip(yytext); return T_STRING; }
 	YY_BREAK
 /* default: return char on input */
 case 37:
 YY_RULE_SETUP
-#line 60 "cobra.l"
+#line 68 "cobra.l"
 { return yytext[0]; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 61 "cobra.l"
+#line 69 "cobra.l"
 ECHO;
 	YY_BREAK
-#line 1054 "cobra.yy.c"
+#line 1062 "cobra.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2059,7 +2067,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 61 "cobra.l"
+#line 69 "cobra.l"
 
 
 
