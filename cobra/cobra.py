@@ -12,7 +12,7 @@ def VARIABLE(s):
 def VARIABLES(lst):
   assert type(lst) is list
   assert all(type(x) is str for x in lst)
-  F.write("VARIABLES {0}\n".format(str(lst)))
+  F.write("VARIABLES {0}\n".format(",".join(lst)))
 
 def RESTRICTION(s):
   assert type(s) is str
@@ -21,21 +21,29 @@ def RESTRICTION(s):
 def ALPHABET(lst):
   assert type(lst) is list
   assert all(type(x) is str for x in lst)
-  F.write("ALPHABET {0}\n".format(lst))
+  F.write("ALPHABET {0}\n".format(str(lst)[1:-1]))
+
+def PARAMS_SORTED(lst):
+  assert all(type(x) is int for x in lst)
+  F.write("  PARAMS_SORTED {0}\n".format(",".join(str(x) for x in lst)))
+
+def PARAMS_DISTINCT(lst):
+  assert all(type(x) is int for x in lst)
+  F.write("  PARAMS_DISTINCT {0}\n".format(",".join(str(x) for x in lst)))
 
 def MAPPING(name, lst):
   assert type(name) is str
   assert type(lst) is list
   assert all(type(x) is str for x in lst)
-  F.write("MAPPING '{0}' {1}\n".format(name, str(lst)))
+  F.write("MAPPING '{0}' {1}\n".format(name, ",".join(lst)))
 
-def EXPERIMENT(name, num, *rest):
-  F.write("\nEXPERIMENT '{0}' {1} {2}\n".format(name, num, rest))
+def EXPERIMENT(name, num):
+  F.write("\nEXPERIMENT '{0}' {1}\n".format(name, num))
 
 def OUTCOME(name, formula):
   assert type(name) is str
   assert type(formula) is str
-  F.write("  OUTCOME '{0}' {1}\n".format(repr(name), formula))
+  F.write("  OUTCOME '{0}' {1}\n".format(name, formula))
 
 if __name__ == '__main__':
   fout = tempfile.NamedTemporaryFile()

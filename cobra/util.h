@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 #include <cassert>
 #include <string>

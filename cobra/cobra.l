@@ -41,13 +41,20 @@ extern "C" int yyparse();
 "AtMost"        { return T_ATMOST; }
 "Exactly"       { return T_EXACTLY; }
 
-"Vars"          { return T_VARS; }
-"Init"          { return T_INIT; }
-"Exp"           { return T_EXP; }
+"VARIABLE"      { return T_VARIABLE; }
+"VARIABLES"     { return T_VARIABLES; }
+"RESTRICTION"   { return T_RESTRICTION; }
+"ALPHABET"      { return T_ALPHABET; }
+"MAPPING"       { return T_MAPPING; }
+"EXPERIMENT"    { return T_EXPERIMENT; }
+"PARAMS_DISTINCT" { return T_PARAMS_DISTINCT; }
+"PARAMS_SORTED" { return T_PARAMS_SORTED; }
+"OUTCOME"       { return T_OUTCOME; }
 
  /* identifiers */
-[a-zA-Z][a-zA-Z]* { yylval.tstr = strdup(yytext); return T_IDENT; }
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
 \".*\" { yylval.tstr = strdup(yytext); return T_STRING; }
+\'.*\' { yylval.tstr = strdup(yytext); return T_STRING; }
 
  /* default: return char on input */
  .              { return yytext[0]; }

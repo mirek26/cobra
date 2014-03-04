@@ -51,9 +51,15 @@
      T_ATLEAST = 267,
      T_ATMOST = 268,
      T_EXACTLY = 269,
-     T_VARS = 270,
-     T_INIT = 271,
-     T_EXP = 272
+     T_VARIABLE = 270,
+     T_VARIABLES = 271,
+     T_RESTRICTION = 272,
+     T_ALPHABET = 273,
+     T_MAPPING = 274,
+     T_EXPERIMENT = 275,
+     T_PARAMS_DISTINCT = 276,
+     T_PARAMS_SORTED = 277,
+     T_OUTCOME = 278
    };
 #endif
 /* Tokens.  */
@@ -69,28 +75,34 @@
 #define T_ATLEAST 267
 #define T_ATMOST 268
 #define T_EXACTLY 269
-#define T_VARS 270
-#define T_INIT 271
-#define T_EXP 272
+#define T_VARIABLE 270
+#define T_VARIABLES 271
+#define T_RESTRICTION 272
+#define T_ALPHABET 273
+#define T_MAPPING 274
+#define T_EXPERIMENT 275
+#define T_PARAMS_DISTINCT 276
+#define T_PARAMS_SORTED 277
+#define T_OUTCOME 278
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 47 "cobra.ypp"
+#line 55 "cobra.ypp"
 {
   Formula* formula;
-  FormulaList* formula_list;
   Variable* variable;
-  VariableSet* variable_list;
-  Parametrization* param_range;
-  ParamRestrictions* param_restrictions;
-  char*    tstr;
-  int      tint;
+  VariableList* variable_list;
+  FormulaList* formula_list;
+  std::vector<std::string>* string_list;
+  std::vector<int>* int_list;
+  char* tstr;
+  int tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 94 "cobra.tab.hpp"
+#line 106 "cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

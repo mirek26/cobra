@@ -8,27 +8,26 @@ V = [str(x) for x in range(7)]  # values
 
 from itertools import product, compress
 
-@alphabet(V)
+ALPHABET(V)
 
 for n in range(N):
   for a in A:
-    @variables(["c%i_%s_%s"%(n, a, v) for v in V])
-    @restriction("Exactly-1(%s)"%",".join("c%i_%s_%s"%(n,a,v) for v in V))
-    @mapping("X%i_%s"%(n, a), ["c%i_%s_%s"%(n, a, v) for v in V])
+    VARIABLES(["c%i%s%s"%(n, a, v) for v in V])
+    RESTRICTION("Exactly-1(%s)"%",".join("c%i%s%s"%(n,a,v) for v in V))
+    MAPPING("X%i%s"%(n, a), ["c%i%s%s"%(n, a, v) for v in V])
 
 for selected in product([0,1], repeat=2*len(A)):
   if not (any(selected[:len(A)]) and any(selected[len(A):])):
     continue
   attrs1 = list(compress(A, selected[:len(A)]))
   attrs2 = list(compress(A, selected[len(A):]))
-  @experiment("compare %s against %s"%(",".join(attrs1), ",".join(attrs2)))
-  @param(len(attrs1) + len(attrs2))
+  EXPERIMENT("compare %s against %s"%(",".join(attrs1), ",".join(attrs2)), len(attrs1) + len(attrs2))
 
   cards1 = [" & ".join(
-                  "X%i_%s($%i)"%(n, attrs1[i], i) for i in range(len(attrs1)))
+                  "X%i%s$%i"%(n, attrs1[i], i) for i in range(len(attrs1)))
             for n in range(N)]
   cards2 = [" & ".join(
-                  "X%i_%s($%i)"%(n, attrs2[i], len(attrs1)+i) for i in range(len(attrs2)))
+                  "X%i%s$%i"%(n, attrs2[i], len(attrs1)+i) for i in range(len(attrs2)))
             for n in range(N)]
   formula = []
   for i in range(1, N):
@@ -36,6 +35,6 @@ for selected in product([0,1], repeat=2*len(A)):
                    "AtMost-%i(%s)"%(i-1, ",".join(cards2)))
   outcome = " | ".join(formula)
 
-  @outcome(">", outcome)
-  @outcome("<=", "!(%s)"%outcome)
+  OUTCOME(">", outcome)
+  OUTCOME("<=", "!(%s)"%outcome)
 

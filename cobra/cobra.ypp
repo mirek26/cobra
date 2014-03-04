@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 %{
   #include <iostream>
@@ -9,6 +9,7 @@
   #include <string>
   #include <vector>
 
+  #include "experiment.h"
   #include "formula.h"
   #include "parser.h"
   #include "game.h"
@@ -32,7 +33,7 @@
  */
 %right T_EQUIV
 %right T_IMPLIES
-%left T_IMPLIED
+%left  T_IMPLIED
 %right T_OR
 %right T_AND
 %right T_NOT
@@ -40,124 +41,106 @@
 %token T_ATLEAST
 %token T_ATMOST
 %token T_EXACTLY
-%token T_VARS
-%token T_INIT
-%token T_EXP
+
+%token T_VARIABLE
+%token T_VARIABLES
+%token T_RESTRICTION
+%token T_ALPHABET
+%token T_MAPPING
+%token T_EXPERIMENT
+%token T_PARAMS_DISTINCT
+%token T_PARAMS_SORTED
+%token T_OUTCOME
 
 %union {
   Formula* formula;
-  FormulaList* formula_list;
   Variable* variable;
-  VariableSet* variable_list;
-  Parametrization* param_range;
-  ParamRestrictions* param_restrictions;
-  char*    tstr;
-  int      tint;
+  VariableList* variable_list;
+  FormulaList* formula_list;
+  std::vector<std::string>* string_list;
+  std::vector<int>* int_list;
+  char* tstr;
+  int tint;
 }
 
 /* Lets inform Bison about the type of each terminal and non-terminal */
 %type <tstr>     T_IDENT
 %type <tstr>     T_STRING
+%type <tstr>     ident
 %type <tint>     T_INT
+
 %type <formula>  formula
-%type <formula_list> formula_list
-%type <formula_list> formula_range
 %type <variable> variable
+
+%type <string_list> string_list
+%type <int_list> int_list
 %type <variable_list> variable_list
-%type <variable_list> variable_set
-%type <variable_list> variable_range
-%type <param_range> param_range
-%type <param_restrictions> param_restriction
-%type <param_restrictions> param_restriction_list
-%type <param_restrictions> param_restrictions_set
+%type <formula_list> formula_list
 %%
 
-start:
-    assignments
+start :
+    code
   | formula
-    {  m.setOnlyFormula($1);  }
+    {  m.set_only_formula($1);  }
 
-assignments :
-    assignment
-  | assignments assignment
+ident :
+     T_IDENT
+  |  T_STRING
 
-assignment :
-    T_VARS '=' '{' variable_list '}'
-    {  m.game().setVariables($4);  }
-  | T_INIT '=' formula
-    {  m.game().setInit($3);  }
-  | T_EXP '(' T_STRING ',' param_range ',' param_restrictions_set ')' '{' formula_list '}'
-    {  $5->addRestrictions($7);
-       m.game().addExperiment(m.get<Experiment>($3, $5, $10)); }
+code :
+    line
+  | code line
+
+line :
+    T_VARIABLE ident
+    {  m.game().declareVariable(m.get<Variable>($2)); }
+  | T_VARIABLES variable_list
+    {  m.game().declareVariables($2);  }
+  | T_RESTRICTION formula
+    {  m.game().addRestriction($2);  }
+  | T_ALPHABET string_list
+    {  m.game().setAlphabet($2); }
+  | T_MAPPING T_STRING variable_list
+    {  m.game().addMapping($2, $3) }
+  | T_EXPERIMENT T_STRING T_INT
+    {  Experiment* e = m.game().addExperiment($2, $3);
+       m.set_last_experiment(e); }
+  | T_PARAMS_DISTINCT int_list
+    { m.last_experiment()->paramsDistinct($2); }
+  | T_PARAMS_SORTED int_list
+    { m.last_experiment()->paramsSorted($2); }
+  | T_OUTCOME T_STRING formula
+    {  m.last_experiment()->addOutcome($2, $3); }
 
 variable :
-    T_IDENT
+    ident
       { std::string x($1); $$ = m.get<Variable>(x); }
-  | T_IDENT variable_indices
-      { std::string x($1); $$ = m.get<Variable>(x, m.variableIndices()); }
-  | T_IDENT '_' variable_indices
-      { std::string x($1); $$ = m.get<Variable>(x, m.variableIndices()); }
-
-variable_indices :
-    T_INT
-      { m.variableIndices().clear();
-        m.addVariableIndex($1); }
-  | T_IDENT
-      { m.variableIndices().clear();
-        std::string x($1);
-        m.addVariableNamedIndex(x); }
-  | variable_indices '_' T_INT
-      { m.addVariableIndex($3); }
-  | variable_indices '_' T_IDENT
-      { std::string x($3);
-        m.addVariableNamedIndex(x); }
-
-variable_range :
-    variable '.' '.' variable
-      { $$ = VariableSet::Range($1, $4); }
 
 variable_list :
     variable
-      { $$ = m.get<VariableSet>(); $$->push_back($1); }
-  | variable_range
-      { $$ = $1; }
+      { $$ = m.get<VariableList>();
+        $$->push_back($1); }
   | variable_list ',' variable
-      { $$ = $1; $$->push_back($3); }
-  | variable_list ',' variable_range
       { $$ = $1;
-        $$->insert($$->begin(), $3->begin(), $3->end()); }
+        $$->push_back($3); }
 
-variable_set:
-    '{' variable_list '}'
-      { $$ = $2; }
+string_list :
+    T_STRING
+      { std::string x($1);
+        $$ = new std::vector<std::string>();
+        $$->push_back(x); }
+  | string_list ',' T_STRING
+      { std::string x($3);
+        $$ = $1;
+        $$->push_back(x); }
 
-param_range :
-    variable_set
-      { $$ = m.get<Parametrization>(); $$->push_back($1); }
-  | variable_set '^' T_INT
-      { $$ = m.get<Parametrization>(); $$->insert($$->begin(), $3, $1); }
-  | param_range variable_set
-      { $$ = $1; $$->push_back($2); }
-  | param_range variable_set '^' T_INT
-      { $$ = $1; $$->insert($$->begin(), $4, $2); }
-
-param_restriction :
-    T_INT '<' T_INT
-      { $$ = m.get<ParamRestrictions>($1, $3); }
-  | param_restriction '<' T_INT
-      { $$ = $1; $$->add($$->last(), $3); }
-
-param_restriction_list :
-    param_restriction
-      { $$ = $1; }
-  | param_restriction_list ',' param_restriction
-      { $$ = $1; $$->add($3); }
-
-param_restrictions_set :
-    '{' '}'
-      { $$ = m.get<ParamRestrictions>(); }
-  | '{' param_restriction_list '}'
-      { $$ = $2; }
+int_list :
+    T_INT
+      { $$ = new std::vector<int>();
+        $$->push_back($1); }
+  | int_list ',' T_INT
+      { $$ = $1;
+        $$->push_back($3); }
 
 formula :
     '(' formula ')'
@@ -184,41 +167,18 @@ formula :
       { $$ = m.get<OrOperator>($3); }
   | T_NOT formula
       { $$ = m.get<NotOperator>($2); }
+  | T_IDENT '$' T_INT
+      { $$ = m.get<Mapping>($1, $3); }
   | variable
       { $$ = $1; }
-  | variable '=' '=' variable
-      { $$ = m.get<ParameterEq>($1, $4); }
 
-formula_range_spec :
-    '/' T_IDENT '=' T_INT '.' '.' T_INT
-      { std::string x($2);
-        m.addFormulaListRange(x, $4, $7); }
-  | formula_range_spec '/' T_IDENT '=' T_INT '.' '.' T_INT
-      { std::string x($3);
-        m.addFormulaListRange(x, $5, $8); }
-
-formula_range :
-    formula formula_range_spec
-  { $$ = FormulaList::Range($1); }
-
-formula_list :
+formula_list:
     formula
       { $$ = m.get<FormulaList>();
         $$->push_back($1); }
-  | formula_range
-      { $$ = $1; }
-  | variable_range
-      { $$ = $1->asFormulaList(); }
   | formula_list ',' formula
       { $$ = $1;
         $$->push_back($3); }
-  | formula_list ',' formula_range
-      { $$ = $1;
-        $$->insert($$->end(), $3->begin(), $3->end()); }
-  | formula_list ',' variable_range
-      { $$ = $1;
-        auto list = $3->asFormulaList();
-        $$->insert($$->end(), list->begin(), list->end()); }
 
 %%
 

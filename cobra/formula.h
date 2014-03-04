@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 #include <cstdio>
 #include <cassert>
@@ -89,10 +89,9 @@ class Formula: public Construct {
   /* Converts the formula to CNF using Tseitin transformation.
    */
   CnfFormula* ToCnf();
-
   virtual Formula* clone() = 0;
 
-  Formula* Substitude(std::map<Variable*, Variable*>& table);
+  //Formula* Substitude(std::map<Variable*, Variable*>& table);
 
   static Formula* Parse(std::string str);
 };
@@ -101,9 +100,6 @@ class Formula: public Construct {
  * List of Formulas.
  */
 class FormulaList: public VectorConstruct<Formula*> {
- private:
-  void BuildRange(Formula* formula);
-
  public:
   FormulaList() { }
 
@@ -117,13 +113,6 @@ class FormulaList: public VectorConstruct<Formula*> {
       n->push_back(c->clone());
     }
     return n;
-  }
-
-  static FormulaList* Range(Formula* formula) {
-    auto result = m.get<FormulaList>();
-    result->BuildRange(formula);
-    m.formulaListRange().clear();
-    return result;
   }
 };
 
@@ -464,12 +453,41 @@ class NotOperator: public Formula {
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
+class Mapping: public Formula {
+  std::string ident_;
+  int param_id_;
+
+ public:
+  Mapping(std::string ident, int param_id)
+      : Formula(0),
+        ident_(ident),
+        param_id_(param_id) { }
+
+  std::string& ident() { return ident_; }
+  int param_id() { return param_id_; }
+
+  virtual std::string pretty(bool = true) {
+    return ident_ + "$" + std::to_string(param_id_);
+  }
+
+  virtual std::string name() {
+    return "Mapping " + pretty();
+  }
+
+  virtual Formula* clone() {
+    return m.get<Mapping>(ident_, param_id_);
+  }
+
+  virtual void TseitinTransformation(CnfFormula*, bool) {
+    assert(false);
+  }
+};
+
 /******************************************************************************
  * Prepositional variable. The only possible leaf of the formula AST.
  */
 class Variable: public Formula {
   std::string ident_;
-  std::vector<int> indices_;
   bool orig_;
   bool generated_;
   int id_;
@@ -477,8 +495,8 @@ class Variable: public Formula {
   static int id_counter_; // initialy 1
 
  public:
-  static std::map<Variable*, Variable*>* variable_substitute_; // = nullptr
-  static std::map<int, int>* index_substitute_; // = nullptr
+//  static std::map<Variable*, Variable*>* variable_substitute_; // = nullptr
+//  static std::map<int, int>* index_substitute_; // = nullptr
 
  public:
   /* Parameterless constructor creates a generated variable with next
@@ -500,21 +518,8 @@ class Variable: public Formula {
     id_ = id_counter_++;
   }
 
-  Variable(std::string ident, const std::vector<int>& indices)
-      : Formula(0),
-        ident_(ident),
-        orig_(false),
-        generated_(false) {
-    indices_.insert(indices_.begin(), indices.begin(), indices.end());
-    id_ = id_counter_++;
-  }
-
   int id() {
     return id_;
-  }
-
-  const std::vector<int>& indices() {
-    return indices_;
   }
 
   bool generated() {
@@ -534,7 +539,7 @@ class Variable: public Formula {
   }
 
   virtual std::string pretty(bool = true) {
-    return ident_ + joinIndices(indices_);
+    return ident_;
   }
 
   virtual std::string name() {
@@ -546,28 +551,20 @@ class Variable: public Formula {
     assert(false);
   }
 
-  bool isParam() {
-    return ident_ == "p" && indices_.size() == 1;
-  }
-
-  uint getParam() {
-    return isParam() ? indices_[0] : 0;
-  }
-
   virtual Formula* clone() {
-    if (variable_substitute_ && variable_substitute_->count(this) > 0) {
-      return variable_substitute_->at(this);
-    } else if (index_substitute_) {
-      std::vector<int> newIndices(indices_);
-      for (auto& i: newIndices) {
-        if (index_substitute_->count(i) > 0) {
-          i = index_substitute_->at(i);
-        }
-      }
-      return m.get<Variable>(ident_, newIndices);
-    } else {
+    // if (variable_substitute_ && variable_substitute_->count(this) > 0) {
+    //   return variable_substitute_->at(this);
+    // } else if (index_substitute_) {
+    //   std::vector<int> newIndices(indices_);
+    //   for (auto& i: newIndices) {
+    //     if (index_substitute_->count(i) > 0) {
+    //       i = index_substitute_->at(i);
+    //     }
+    //   }
+    //   return m.get<Variable>(ident_, newIndices);
+    // } else {
       return this;
-    }
+    //}
   }
 
   virtual bool isLiteral() {
@@ -579,26 +576,17 @@ class Variable: public Formula {
       cnf->addClause({ (Formula*)this });
     }
   }
-
-  static std::string joinIndices(const std::vector<int> list) {
-    if (list.empty()) return "";
-    std::string s = std::to_string(list.front());
-    for (auto it = std::next(list.begin()); it != list.end(); ++it) {
-      s += "_" + std::to_string(*it);
-    }
-    return s;
-  }
 };
 
 /******************************************************************************
  * Set of Variables.
  */
-class VariableSet: public VectorConstruct<Variable*> {
+class VariableList: public VectorConstruct<Variable*> {
  public:
-  VariableSet() { }
+  VariableList() { }
 
   virtual std::string name() {
-    return "VariableSet";
+    return "VariableList";
   }
 
   void sort() {
@@ -611,81 +599,6 @@ class VariableSet: public VectorConstruct<Variable*> {
     auto v = m.get<FormulaList>();
     v->insert(v->begin(), this->begin(), this->end());
     return v;
-  }
-
-  static VariableSet* Range(Variable* from, Variable* to) {
-    auto vars = m.get<VariableSet>();
-    if (from->ident() != to->ident()) {
-      throw new ParserException("Invalid range.");
-    }
-    std::vector<int> v;
-    v.insert(v.begin(), from->indices().begin(), from->indices().end());
-    assert(from->indices().size() >= 1);
-    assert(to->indices().size() >= 1);
-    for (int i = from->indices()[0]; i <= to->indices()[0]; i++) {
-      v[0] = i;
-      vars->push_back(m.get<Variable>(from->ident(), v));
-    }
-    return vars;
-  }
-};
-
-
-class ParameterEq: public Formula {
-  int param_;
-  Variable* var_;
-
- public:
-  ParameterEq(Variable* param, Variable* var)
-      : Formula(1),
-        var_(var) {
-    assert(param->ident() == "p");
-    assert(param->indices().size() == 1);
-    param_ = param->indices()[0];
-    // if absolute position, decrease by one (p1 is at parameter at position 0)
-    if (param_ > 0) param_--;
-  }
-
-  ParameterEq(int param, Variable* var)
-      : Formula(1),
-        param_(param),
-        var_(var) {}
-
-  uint tseitin_id() {
-    assert(tseitin_var_);
-    return tseitin_var_->id();
-  }
-
-  uint param() {
-    return param_;
-  }
-
-  Variable* var() {
-    return var_;
-  }
-
-  virtual std::string name() {
-    return "ParameterEq";
-  }
-
-  virtual std::string pretty(bool = true) {
-    return "(p" + std::to_string(param_ + 1) + " == " + var_->pretty() + ")";
-  }
-
-  virtual Construct* child(uint nth) {
-    assert(nth == 0);
-    return var_;
-  }
-
-  virtual void TseitinTransformation(CnfFormula* cnf, bool) {
-    cnf->addParameterEq(this);
-  }
-
-  virtual Formula* clone() {
-    return m.get<ParameterEq>(
-      (Variable::index_substitute_ && Variable::index_substitute_->count(param_) ?
-        Variable::index_substitute_->at(param_)-1 : param_),
-      static_cast<Variable*>(var_->clone()));
   }
 };
 

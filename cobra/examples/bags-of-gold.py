@@ -22,22 +22,24 @@ def generate_helper(n, i):
     generate_helper(n - j*i, i + 1)
 
 # x1 tells whether the first bag contains fake coins
-@variables(["x%i"%i for i in range(N)])
-@alphabet([str(x) for x in range(N)] + ['-'])
-@mapping("X", ["x%i"%i for i in range(N)] + [ False ])
+VARIABLES(["x%i"%i for i in range(N)] + ["f"])
+RESTRICTION("!f")
+ALPHABET([str(x) for x in range(N)] + ['-'])
+MAPPING("X", ["x%i"%i for i in range(N)] + ["f"])
 
 m = [M//i for i in range(1, M + 1)]
+EXPERIMENT("weighting %s"%str(m), sum(m))
+
 s = 0
 param_groups = []
 for i in range(M):
   param_groups.append(",".join("X$" + str(i) for i in range(s, s + m[i])))
+  if m[i] > 1:
+    PARAMS_SORTED(range(s, s + m[i]))
   s += m[i]
-
-@experiment("weighting %s"%str(m))
-@params(s)
 
 for i in range(M + 1):
   formula = []
   for c in generate_combinations(i):
     formula.append(" & ".join("Exactly-%i(%s)"%(c[j], param_groups[j]) for j in range(M)))
-  @outcome("%i fakes"%i, " |\n ".join(formula))
+  OUTCOME("%i fakes"%i, " |\n ".join(formula))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 #include <cstdio>
 #include <cassert>
@@ -205,48 +205,48 @@ std::map<int, int> CnfFormula::ComputeVariableEquivalence() {
   return components;
 }
 
-CnfFormula CnfFormula::SubstituteParams(std::vector<Variable*> params) {
-  CnfFormula result;
-  bool skipClause;
-  bool skipLiteral;
-  for (auto var: params) {
-    result.addVariable(var);
-  }
-  // copy all clauses:
-  for (auto& clause: clauses_) {
-    TClause c;
-    skipClause = false;
-    for (auto lit: clause) {
-      uint id = abs(lit);
-      skipLiteral = false;
-      for (auto p: paramEq_) {
-        if (p->tseitin_id() == id && p->param() < params.size()) {
-          if ((params[p->param()] == p->var()) == (lit > 0)) {
-            skipClause = true; // clause satisfied by lit
-          } else {
-            skipLiteral = true; // literal is false
-          }
-          break;
-        }
-      }
-      if (skipLiteral) continue;
-      assert(variables_.count(id) == 1);
-      auto var = variables_[id];
-      result.addVariable(var);
-      auto param = var->getParam();
-      if (param != 0 && param <= params.size()) {
-        lit = (lit > 0 ? 1 : -1) * params[param-1]->id();
-      }
-      c.insert(lit);
-    }
+// CnfFormula CnfFormula::SubstituteParams(std::vector<Variable*> params) {
+//   CnfFormula result;
+//   bool skipClause;
+//   bool skipLiteral;
+//   for (auto var: params) {
+//     result.addVariable(var);
+//   }
+//   // copy all clauses:
+//   for (auto& clause: clauses_) {
+//     TClause c;
+//     skipClause = false;
+//     for (auto lit: clause) {
+//       uint id = abs(lit);
+//       skipLiteral = false;
+//       for (auto p: paramEq_) {
+//         if (p->tseitin_id() == id && p->param() < params.size()) {
+//           if ((params[p->param()] == p->var()) == (lit > 0)) {
+//             skipClause = true; // clause satisfied by lit
+//           } else {
+//             skipLiteral = true; // literal is false
+//           }
+//           break;
+//         }
+//       }
+//       if (skipLiteral) continue;
+//       assert(variables_.count(id) == 1);
+//       auto var = variables_[id];
+//       result.addVariable(var);
+//       auto param = var->getParam();
+//       if (param != 0 && param <= params.size()) {
+//         lit = (lit > 0 ? 1 : -1) * params[param-1]->id();
+//       }
+//       c.insert(lit);
+//     }
 
-    if (!skipClause) {
-      result.clauses_.insert(c);
-    }
-  }
-  result.ResetPicosat();
-  return result;
-}
+//     if (!skipClause) {
+//       result.clauses_.insert(c);
+//     }
+//   }
+//   result.ResetPicosat();
+//   return result;
+// }
 
 void CnfFormula::ResetPicosat() {
   if (picosat_) picosat_reset(picosat_);

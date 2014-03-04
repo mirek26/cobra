@@ -50,10 +50,10 @@ def test():
 
 def path_end(x, y):
   xx, yy = test()
-  r = "\n".join("".join(q.val for q in p) for p in state)
-  if xx != x or y != yy:
-    print "!"*80
-    print r, x, y, xx, yy
+  r = ["".join(q.val for q in p) for p in state]
+  #if xx != x or y != yy:
+    #print "!"*80
+    #print r, x, y, xx, yy
   if ends.has_key((x,y)):
     ends[(x,y)].append(r)
   else:
@@ -110,16 +110,29 @@ def start_from(s):
   # all other cases
   generate_paths(start)
 
-start_from((1,4,1,0))
+def get_formula(states):
+  disj = []
+  for state in states:
+    conj = []
+    for i in range(1, N+1):
+      for j in range(1, N+1):
+        if state[i][j] == NOTHING:
+          conj.append("!x%i%i"%(i,j))
+        elif state[i][j] == MARBLE:
+          conj.append("x%i%i"%(i,j))
+    disj.append(" & ".join(conj))
+  return " | ".join(disj)
 
 ############################ GAME description ##################################
-vars = ["x%i_%i"%(x, y) for x in range(N) for y in range(N)]
-@variables(vars)
-@restriction("Exactly-%i(%s)"%(M, ",".join(vars)))
+vars = ["x%i%i"%(x, y) for x in range(1, N+1) for y in range(1, N+1)]
+VARIABLES(vars)
+RESTRICTION("Exactly-%i(%s)"%(M, ",".join(vars)))
 
 for s in all_starts:
-  @experiment("ray from %i, %i"%(s[0], s[1]))
-  start_from(start)
-  @outcome("Hit", ends['hit'])
+  EXPERIMENT("ray from %i, %i"%(s[0], s[1]), 0)
+  start_from(s)
+  if len(ends['hit']) > 0:
+    OUTCOME("Hit", get_formula(ends['hit']))
   for e in all_ends:
-    @outcome("Reflection to %i %i"%e, ends[e])
+    if len(ends[e]) > 0:
+      OUTCOME("Reflection to %i %i"%e, get_formula(ends[e]))

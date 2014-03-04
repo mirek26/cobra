@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 
 #include <cassert>
@@ -11,28 +11,36 @@
 #define COBRA_GAME_H_
 
 class Formula;
-class VariableSet;
+class VariableList;
 class Experiment;
 
 class Game {
-  VariableSet* variables_;
+  VariableList* variables_;
   Formula* init_;
   std::vector<Experiment*> experiments_;
+  std::vector<std::string> alphabet_;
 
  public:
-  void setVariables(VariableSet* vars);
+  void declareVariable(Variable*);
+  void declareVariables(VariableList*);
+// getVariableById?
 
-  Formula* init() {
-    return init_;
+  void addRestriction(Formula*);
+  Formula* initialRestrictions();
+
+  void setAlphabet(std::vector<std::string>* alphabet) {
+    assert(alphabet_.empty());
+    alphabet_.insert(alphabet_.end(), alphabet->begin(), alphabet->end());
+    delete alphabet;
   }
 
-  void setInit(Formula* init) {
-    init_ = init;
+  const std::vector<std::string>& alphabet() {
+    return alphabet_;
   }
 
-  void addExperiment(Experiment* e) {
-    experiments_.push_back(e);
-  }
+  void addMapping(std::string, VariableList*);
+
+  Experiment* addExperiment(std::string name, int num_params);
 
   std::vector<Experiment*>& experiments() {
     return experiments_;

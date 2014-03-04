@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mirek Klimos <myreggg@gmail.com>
+ * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 
 #include <vector>
@@ -13,7 +13,7 @@
 #define COBRA_AST_MANAGER_H_
 
 class Variable;
-class VariableSet;
+class VariableList;
 class Formula;
 class FormulaList;
 class Experiment;
@@ -58,92 +58,6 @@ class VectorConstruct: public Construct, public std::vector<C> {
   }
 };
 
-class ParamRestrictions: public Construct {
-  std::vector<std::pair<uint, uint>> restrictions_;
- public:
-  ParamRestrictions(): Construct(0) { }
-  ParamRestrictions(uint v1, uint v2): Construct(0) {
-    add(v1, v2);
-  }
-
-  virtual std::string name() {
-    return "ParamRestrictions";
-  };
-
-  std::vector<std::pair<uint, uint>>& restrictions() {
-    return restrictions_;
-  }
-
-  int last() {
-    assert(!restrictions_.empty());
-    return restrictions_.back().second;
-  }
-
-  void add(uint v1, uint v2) {
-    restrictions_.push_back(std::make_pair(v1, v2));
-  }
-
-  void add(ParamRestrictions* params) {
-    restrictions_.insert(restrictions_.end(),
-                         params->restrictions_.begin(),
-                         params->restrictions_.end());
-  }
-};
-
-class Parametrization: public VectorConstruct<VariableSet*> {
-  std::vector<std::vector<uint>> restrictions_;
-
- private:
-  void GenerateAllHelper(std::map<int, int>& equiv,
-                        uint n,
-                        std::vector<std::vector<Variable*>>& result);
-
- public:
-  Parametrization() { }
-
-  virtual std::string name() {
-    return "Parametrization";
-  };
-
-  void addRestrictions(ParamRestrictions* r);
-  std::vector<std::vector<Variable*>> GenerateAll(std::map<int, int>& equiv);
-};
-
-class Experiment: public Construct {
-  std::string name_;
-  Parametrization* param_;
-  FormulaList* outcomes_;
-  std::vector<CnfFormula> outcomes_cnf_;
-
- public:
-  Experiment(): Construct(2) { }
-  Experiment(std::string name, Parametrization* param, FormulaList* outcomes);
-
-  virtual Construct* child(uint nth) {
-    switch (nth) {
-      case 0: return param_;
-      case 1: return (Construct*)outcomes_;
-      default: assert(false);
-    }
-  };
-
-  virtual std::string name() {
-    return "Experiment " + name_;
-  };
-
-  std::string experiment_name() {
-    return name_;
-  }
-
-  Parametrization* param() {
-    return param_;
-  }
-
-  std::vector<CnfFormula>& outcomes() {
-    return outcomes_cnf_;
-  }
-};
-
 class ParserException: public std::exception {
   std::string what_;
 
@@ -163,12 +77,11 @@ class Parser {
   Construct* last_;
 
   // auxiliary structures for parsing
-  Formula* onlyFormula_;
-  std::vector<int> variableIndices_;
-  std::vector<std::tuple<int, int, int>> formulaListRange_;
+  Formula* only_formula_;
+  Experiment* last_experiment_;
 
-  std::map<std::string, int> namedIndices_;
-  int namedIndexId_ = -1;
+//  std::map<std::string, int> namedIndices_;
+//  int namedIndexId_ = -1;
 
   Game game_;
 
@@ -192,43 +105,13 @@ class Parser {
     nodes_.clear();
   }
 
-  Game& game() {
-    return game_;
-  }
+  Game& game() { return game_; }
 
-  void addVariableIndex(int n) {
-    variableIndices_.push_back(n);
-  }
+  Formula* only_formula() { return only_formula_; }
+  void set_only_formula(Formula* f) { only_formula_ = f; }
 
-  void addVariableNamedIndex(std::string name) {
-    // if the identifier is not present in the map yet (this ident is used as
-    // an index seen for the first time), insert it with new (negative) id.
-    if (namedIndices_.count(name) == 0) {
-      namedIndices_[name] = namedIndexId_--;
-    }
-    addVariableIndex(namedIndices_[name]);
-  }
-
-  std::vector<int>& variableIndices(){
-    return variableIndices_;
-  }
-
-  void addFormulaListRange(std::string name, int from, int to) {
-    assert(namedIndices_.count(name));
-    formulaListRange_.push_back(std::make_tuple(namedIndices_[name], from, to));
-  }
-
-  std::vector<std::tuple<int, int, int>>& formulaListRange() {
-    return formulaListRange_;
-  }
-
-  void setOnlyFormula(Formula* f) {
-    onlyFormula_ = f;
-  }
-
-  Formula* onlyFormula() {
-    return onlyFormula_;
-  }
+  Experiment* last_experiment() { return last_experiment_; }
+  void set_last_experiment(Experiment* e) { last_experiment_ = e; }
 
  private:
   /* Generic template for a get method, which creates a new node.
