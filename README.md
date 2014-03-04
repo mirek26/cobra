@@ -1,2 +1,6 @@
-tony
+COde BReaking games Analyzer
 ====
+
+Diplomka.
+
+
