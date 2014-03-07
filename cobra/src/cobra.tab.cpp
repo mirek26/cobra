@@ -116,7 +116,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 4 "cobra.ypp"
+#line 4 "src/cobra.ypp"
 
   #include <iostream>
   #include <cstdlib>
@@ -160,7 +160,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 55 "cobra.ypp"
+#line 55 "src/cobra.ypp"
 {
   Formula* formula;
   Variable* variable;
@@ -172,7 +172,7 @@ typedef union YYSTYPE
   uint tint;
 }
 /* Line 193 of yacc.c.  */
-#line 176 "cobra.tab.cpp"
+#line 176 "src/cobra.tab.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -185,7 +185,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 189 "cobra.tab.cpp"
+#line 189 "src/cobra.tab.cpp"
 
 #ifdef short
 # undef short
@@ -1445,184 +1445,184 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 84 "cobra.ypp"
+#line 84 "src/cobra.ypp"
     {  m.set_only_formula((yyvsp[(1) - (1)].formula));  ;}
     break;
 
   case 8:
-#line 96 "cobra.ypp"
+#line 96 "src/cobra.ypp"
     {  m.game().declareVariable(m.get<Variable>((yyvsp[(2) - (2)].tstr))); ;}
     break;
 
   case 9:
-#line 98 "cobra.ypp"
+#line 98 "src/cobra.ypp"
     {  m.game().declareVariables((yyvsp[(2) - (2)].variable_list));  ;}
     break;
 
   case 10:
-#line 100 "cobra.ypp"
+#line 100 "src/cobra.ypp"
     {  m.game().addRestriction((yyvsp[(2) - (2)].formula));  ;}
     break;
 
   case 11:
-#line 102 "cobra.ypp"
+#line 102 "src/cobra.ypp"
     {  m.game().setAlphabet((yyvsp[(2) - (2)].string_list)); ;}
     break;
 
   case 12:
-#line 104 "cobra.ypp"
+#line 104 "src/cobra.ypp"
     {  m.game().addMapping((yyvsp[(2) - (3)].tstr), (yyvsp[(3) - (3)].variable_list)) ;}
     break;
 
   case 13:
-#line 106 "cobra.ypp"
+#line 106 "src/cobra.ypp"
     {  Experiment* e = m.game().addExperiment((yyvsp[(2) - (3)].tstr), (yyvsp[(3) - (3)].tint));
        m.set_last_experiment(e); ;}
     break;
 
   case 14:
-#line 109 "cobra.ypp"
+#line 109 "src/cobra.ypp"
     { m.last_experiment()->paramsDistinct((yyvsp[(2) - (2)].int_list)); ;}
     break;
 
   case 15:
-#line 111 "cobra.ypp"
+#line 111 "src/cobra.ypp"
     { m.last_experiment()->paramsSorted((yyvsp[(2) - (2)].int_list)); ;}
     break;
 
   case 16:
-#line 113 "cobra.ypp"
+#line 113 "src/cobra.ypp"
     {  m.last_experiment()->addOutcome((yyvsp[(2) - (3)].tstr), (yyvsp[(3) - (3)].formula)); ;}
     break;
 
   case 17:
-#line 117 "cobra.ypp"
+#line 117 "src/cobra.ypp"
     { std::string x((yyvsp[(1) - (1)].tstr)); (yyval.variable) = m.get<Variable>(x); ;}
     break;
 
   case 18:
-#line 121 "cobra.ypp"
+#line 121 "src/cobra.ypp"
     { (yyval.variable_list) = m.get<VariableList>();
         (yyval.variable_list)->push_back((yyvsp[(1) - (1)].variable)); ;}
     break;
 
   case 19:
-#line 124 "cobra.ypp"
+#line 124 "src/cobra.ypp"
     { (yyval.variable_list) = (yyvsp[(1) - (3)].variable_list);
         (yyval.variable_list)->push_back((yyvsp[(3) - (3)].variable)); ;}
     break;
 
   case 20:
-#line 129 "cobra.ypp"
+#line 129 "src/cobra.ypp"
     { std::string x((yyvsp[(1) - (1)].tstr));
         (yyval.string_list) = new std::vector<std::string>();
         (yyval.string_list)->push_back(x); ;}
     break;
 
   case 21:
-#line 133 "cobra.ypp"
+#line 133 "src/cobra.ypp"
     { std::string x((yyvsp[(3) - (3)].tstr));
         (yyval.string_list) = (yyvsp[(1) - (3)].string_list);
         (yyval.string_list)->push_back(x); ;}
     break;
 
   case 22:
-#line 139 "cobra.ypp"
+#line 139 "src/cobra.ypp"
     { (yyval.int_list) = new std::vector<uint>();
         (yyval.int_list)->push_back((yyvsp[(1) - (1)].tint)); ;}
     break;
 
   case 23:
-#line 142 "cobra.ypp"
+#line 142 "src/cobra.ypp"
     { (yyval.int_list) = (yyvsp[(1) - (3)].int_list);
         (yyval.int_list)->push_back((yyvsp[(3) - (3)].tint)); ;}
     break;
 
   case 24:
-#line 147 "cobra.ypp"
+#line 147 "src/cobra.ypp"
     { (yyval.formula) = (yyvsp[(2) - (3)].formula); ;}
     break;
 
   case 25:
-#line 149 "cobra.ypp"
+#line 149 "src/cobra.ypp"
     { (yyval.formula) = m.get<AndOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
     break;
 
   case 26:
-#line 151 "cobra.ypp"
+#line 151 "src/cobra.ypp"
     { (yyval.formula) = m.get<OrOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
     break;
 
   case 27:
-#line 153 "cobra.ypp"
+#line 153 "src/cobra.ypp"
     { (yyval.formula) = m.get<ImpliesOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
     break;
 
   case 28:
-#line 155 "cobra.ypp"
+#line 155 "src/cobra.ypp"
     { (yyval.formula) = m.get<ImpliesOperator>((yyvsp[(3) - (3)].formula), (yyvsp[(1) - (3)].formula)); ;}
     break;
 
   case 29:
-#line 157 "cobra.ypp"
+#line 157 "src/cobra.ypp"
     { (yyval.formula) = m.get<EquivalenceOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
     break;
 
   case 30:
-#line 159 "cobra.ypp"
+#line 159 "src/cobra.ypp"
     { (yyval.formula) = m.get<AtLeastOperator>((yyvsp[(3) - (6)].tint), (yyvsp[(5) - (6)].formula_list)); ;}
     break;
 
   case 31:
-#line 161 "cobra.ypp"
+#line 161 "src/cobra.ypp"
     { (yyval.formula) = m.get<AtMostOperator>((yyvsp[(3) - (6)].tint), (yyvsp[(5) - (6)].formula_list)); ;}
     break;
 
   case 32:
-#line 163 "cobra.ypp"
+#line 163 "src/cobra.ypp"
     { (yyval.formula) = m.get<ExactlyOperator>((yyvsp[(3) - (6)].tint), (yyvsp[(5) - (6)].formula_list)); ;}
     break;
 
   case 33:
-#line 165 "cobra.ypp"
+#line 165 "src/cobra.ypp"
     { (yyval.formula) = m.get<AndOperator>((yyvsp[(3) - (4)].formula_list)); ;}
     break;
 
   case 34:
-#line 167 "cobra.ypp"
+#line 167 "src/cobra.ypp"
     { (yyval.formula) = m.get<OrOperator>((yyvsp[(3) - (4)].formula_list)); ;}
     break;
 
   case 35:
-#line 169 "cobra.ypp"
+#line 169 "src/cobra.ypp"
     { (yyval.formula) = m.get<NotOperator>((yyvsp[(2) - (2)].formula)); ;}
     break;
 
   case 36:
-#line 171 "cobra.ypp"
+#line 171 "src/cobra.ypp"
     { (yyval.formula) = m.get<Mapping>((yyvsp[(1) - (3)].tstr), m.game().getMappingId((yyvsp[(1) - (3)].tstr)), (yyvsp[(3) - (3)].tint)); ;}
     break;
 
   case 37:
-#line 173 "cobra.ypp"
+#line 173 "src/cobra.ypp"
     { (yyval.formula) = (yyvsp[(1) - (1)].variable); ;}
     break;
 
   case 38:
-#line 177 "cobra.ypp"
+#line 177 "src/cobra.ypp"
     { (yyval.formula_list) = m.get<FormulaList>();
         (yyval.formula_list)->push_back((yyvsp[(1) - (1)].formula)); ;}
     break;
 
   case 39:
-#line 180 "cobra.ypp"
+#line 180 "src/cobra.ypp"
     { (yyval.formula_list) = (yyvsp[(1) - (3)].formula_list);
         (yyval.formula_list)->push_back((yyvsp[(3) - (3)].formula)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1626 "cobra.tab.cpp"
+#line 1626 "src/cobra.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1836,7 +1836,7 @@ yyreturn:
 }
 
 
-#line 183 "cobra.ypp"
+#line 183 "src/cobra.ypp"
 
 
 void yyerror(const char *error) {

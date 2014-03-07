@@ -15,7 +15,7 @@ picomcs
 lingeling
 !lingeling/
  
-cobra
+cobra-backend
 cobra/test/test
 !cobra/
 

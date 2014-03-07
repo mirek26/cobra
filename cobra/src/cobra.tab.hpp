@@ -90,7 +90,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 55 "cobra.ypp"
+#line 55 "src/cobra.ypp"
 {
   Formula* formula;
   Variable* variable;
@@ -102,7 +102,7 @@ typedef union YYSTYPE
   uint tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 106 "cobra.tab.hpp"
+#line 106 "src/cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

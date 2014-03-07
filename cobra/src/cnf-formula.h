@@ -8,7 +8,7 @@
 #include <set>
 
 extern "C" {
-  #include "sat-solvers/picosat/picosat.h"
+  #include "../sat-solvers/picosat/picosat.h"
 }
 
 #ifndef COBRA_CNF_FORMULA_H_

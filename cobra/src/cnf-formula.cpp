@@ -13,8 +13,10 @@
 #include "util.h"
 
 extern "C" {
-  #include "sat-solvers/picosat/picosat.h"
+  #include "../sat-solvers/picosat/picosat.h"
 }
+
+#include "cnf-formula.h"
 
 //------------------------------------------------------------------------------
 // Adding constraints

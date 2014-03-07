@@ -53,4 +53,4 @@ if __name__ == '__main__':
   print fout.name
   os.system("cat "+fout.name)
   print "="*80
-  subprocess.call(['./cobra', fout.name])
+  subprocess.call(['./cobra-backend', fout.name])

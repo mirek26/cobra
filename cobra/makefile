@@ -4,24 +4,24 @@ FLEX = flex
 BISON = bison -d
 
 # file names
-EXEC = cobra
-SOURCES = $(filter-out test.cpp main.cpp, $(wildcard *.cpp))
-OBJECTS = $(SOURCES:.cpp=.o) cobra.yy.o
+EXEC = cobra-backend
+SOURCES = $(filter-out src/main.cpp, $(wildcard src/*.cpp))
+OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
-cobra: $(OBJECTS) main.o
-	$(CC) $(OBJECTS) main.o -L sat-solvers/picosat -l picosat -ll -o $(EXEC)
+cobra: $(OBJECTS) src/main.o
+	$(CC) $(OBJECTS) src/main.o -L sat-solvers/picosat -l picosat -ll -o $(EXEC)
 
 # parser
-clean-bison: 
-	rm cobra.tab.cpp cobra.tab.hpp cobra.yy.c
-bison: clean-bison cobra.tab.cpp cobra.yy.c
-cobra.tab.cpp: cobra.ypp
-	$(BISON) $<
-cobra.tab.o: cobra.tab.cpp cobra.ypp
-cobra.yy.c: cobra.l
+clean-bison:
+	rm src/cobra.tab.cpp src/cobra.tab.hpp src/cobra.yy.c
+bison: src/cobra.tab.cpp src/cobra.yy.c
+src/cobra.tab.cpp: src/cobra.ypp
+	$(BISON) -o $@ $<
+src/cobra.tab.o: src/cobra.tab.cpp src/cobra.ypp
+src/cobra.yy.c: src/cobra.l
 	$(FLEX) -o $@ $<
-cobra.yy.o: cobra.yy.c cobra.l
+src/cobra.yy.o: src/cobra.yy.c src/cobra.l
 	@# suppress all warnings (compiling c as c++ etc.)
 	$(CC) -c -std=c++11 -w $< -o $@
 
@@ -66,5 +66,5 @@ test-clean:
 
 # clean
 clean:
-	rm -rf *.o cobra
+	rm -rf src/*.o $(EXEC)
 
