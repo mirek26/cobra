@@ -12,13 +12,6 @@
 // Experiment* g_e;
 // CnfFormula* g_init;
 
-// void Game::setVariables(VariableList* vars) {
-//   variables_ = vars;
-//   for (auto var: *variables_) {
-//     var->orig(true);
-//   }
-//}
-
 void Game::declareVariable(Variable*) {
 
 }
@@ -39,7 +32,7 @@ int Game::addMapping(std::string ident, VariableList* vars) {
   assert(mappings_ids_.count(ident) == 0);
   int new_id = mappings_.size();
   mappings_ids_[ident] = new_id;
-  mappings_.push_back(std::vector<int>());
+  mappings_.push_back(std::vector<VarId>());
   for (auto v: *vars) {
     mappings_.back().push_back(v->id());
   }
@@ -52,7 +45,7 @@ int Game::getMappingId(std::string ident) {
   return mappings_ids_[ident];
 }
 
-int Game::getMappingValue(uint mapping, uint a) {
+int Game::getMappingValue(MapId mapping, CharId a) {
   assert(0 <= mapping && mapping < mappings_.size());
   assert(0 <= a && a < alphabet_.size());
   return mappings_[mapping][a];

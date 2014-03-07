@@ -23,8 +23,8 @@ class Experiment {
   std::vector<Formula*> outcomes_;
   std::vector<CnfFormula> outcomes_cnf_;
 
-  std::vector<std::set<uint>> used_maps_;
-  std::set<uint> used_vars_;
+  std::vector<std::set<MapId>> used_maps_;
+  std::set<VarId> used_vars_;
   std::vector<std::vector<bool>> interchangable_;
 
   std::vector<std::set<uint>> params_different_;

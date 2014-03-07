@@ -455,18 +455,18 @@ class NotOperator: public Formula {
 
 class Mapping: public Formula {
   std::string ident_;
-  uint mapping_id_;
+  MapId mapping_id_;
   uint param_id_;
 
  public:
-  Mapping(std::string ident, uint mapping_id, uint param_id)
+  Mapping(std::string ident, MapId mapping_id, uint param_id)
       : Formula(0),
         ident_(ident),
         mapping_id_(mapping_id),
         param_id_(param_id - 1) { // params are internally indexed from 0
   }
 
-  uint mapping_id() { return mapping_id_; }
+  MapId mapping_id() { return mapping_id_; }
   uint param_id() { return param_id_; }
 
   virtual std::string pretty(bool = true) {
@@ -493,9 +493,9 @@ class Variable: public Formula {
   std::string ident_;
   bool orig_;
   bool generated_;
-  int id_;
+  VarId id_;
 
-  static int id_counter_; // initialy 1
+  static VarId id_counter_; // initialy 1
 
  public:
 //  static std::map<Variable*, Variable*>* variable_substitute_; // = nullptr
@@ -521,7 +521,7 @@ class Variable: public Formula {
     id_ = id_counter_++;
   }
 
-  int id() {
+  VarId id() {
     return id_;
   }
 

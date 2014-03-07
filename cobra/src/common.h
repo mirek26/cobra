@@ -7,10 +7,13 @@
 #include <algorithm>
 #include <functional>
 
-#ifndef COBRA_UTIL_H_
-#define COBRA_UTIL_H_
+#ifndef COBRA_COMMON_H_
+#define COBRA_COMMON_H_
 
 typedef unsigned int uint;
+typedef unsigned char CharId;
+typedef unsigned short int VarId;
+typedef unsigned char MapId;
 
 template<typename T>
 struct identity { typedef T type; };
@@ -39,4 +42,4 @@ void transform(std::vector<T>& from, std::vector<R>& to, std::function<R(T)>& fu
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
 
-#endif  // COBRA_UTIL_H_
+#endif  // COBRA_COMMON_H_

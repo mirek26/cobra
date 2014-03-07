@@ -10,7 +10,7 @@
 #include "formula.h"
 #include "common.h"
 
-int Variable::id_counter_ = 1;
+VarId Variable::id_counter_ = 1;
 // std::map<Variable*, Variable*>* Variable::variable_substitute_ = nullptr;
 // std::map<int, int>* Variable::index_substitute_ = nullptr;
 

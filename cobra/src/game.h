@@ -20,8 +20,9 @@ class Game {
   std::vector<Experiment*> experiments_;
   std::vector<std::string> alphabet_;
 
-  std::vector<std::vector<int>> mappings_;
-  std::map<std::string, int> mappings_ids_;
+  // list of mappings between alphabet and variables
+  std::vector<std::vector<VarId>> mappings_;
+  std::map<std::string, MapId> mappings_ids_;
 
  public:
   void declareVariable(Variable*);
@@ -41,7 +42,7 @@ class Game {
 
   int addMapping(std::string, VariableList*);
   int getMappingId(std::string);
-  int getMappingValue(uint, uint);
+  int getMappingValue(MapId, CharId);
 
   Experiment* addExperiment(std::string name, uint num_params);
   std::vector<Experiment*>& experiments() {  return experiments_;  }

@@ -70,7 +70,7 @@ void Experiment::Precompute() {
   interchangable_.resize(num_params_);
   for (uint d = 0; d < num_params_; d++) {
     interchangable_[d].resize(alph);
-    for (uint a = 0; a < alph; a++) {
+    for (CharId a = 0; a < alph; a++) {
       interchangable_[d][a] = true;
       std::set<int> vars;
       for (auto& f: used_maps_[d]) {
@@ -81,7 +81,7 @@ void Experiment::Precompute() {
       }
       for (uint e = 0; e < num_params_; e++) {
         if (e == d) continue;
-        for (uint b = 0; b < alph; b++) {
+        for (CharId b = 0; b < alph; b++) {
           // check that _b_ can be at _e_, given that _a_ is at _d_
           if (a == b && params_different_[e].count(d) > 0) continue;
           if (a >= b && params_smaller_than_[e].count(d) > 0) continue;
