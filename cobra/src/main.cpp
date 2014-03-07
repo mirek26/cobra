@@ -41,12 +41,15 @@ int main(int argc, char* argv[]) {
   g.Precompute();
   printf("PRECOMPUTED.\n");
 
-  std::vector<int> groups = { 1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  std::vector<int> groups = { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  //std::string s = "x1A";
+  //groups[m.get<Variable>(s)->id()] = 2;
   for (auto e: g.experiments()) {
     printf("\n\n%s\n\n", e->name().c_str());
     e->GenerateParametrizations(groups);
   }
 
+  printf("DONE.\n");
   // CnfFormula current;
   // current.AddConstraint(g.init());
 

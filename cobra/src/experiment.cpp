@@ -74,8 +74,7 @@ void Experiment::Precompute() {
       for (auto& f: used_maps_[d]) {
         auto var = game_->getMappingValue(f, a);
         vars.insert(var);
-        if (used_vars_.count(var) > 1)
-          interchangable_[d][a] = false;
+        if (used_vars_.count(var) > 0) interchangable_[d][a] = false;
       }
       for (uint e = 0; e < num_params_; e++) {
         if (e == d) continue;
@@ -89,7 +88,7 @@ void Experiment::Precompute() {
           }
         }
       }
-      printf("%s %i %i -> %s\n", name_.c_str(), d, a, interchangable_[d][a] ? "true" : "false");
+      //printf("%s %i %i -> %s\n", name_.c_str(), d, a, interchangable_[d][a] ? "true" : "false");
     }
   }
 }
@@ -146,8 +145,7 @@ void Experiment::FillParametrization(std::vector<int>& groups, uint n) {
     tmp_params_[n] = a;
     if (n + 1 == num_params_) {
       tmp_params_all_.insert(tmp_params_);
-      for (auto p: tmp_params_) printf("%i ", p);
-      printf(".\n");
+      //for (auto p: tmp_params_) printf("%i ", p); printf(".\n");
     } else {
       // for (int i = 0; i <= n; i++) printf("%i ", tmp_params_[i]);
       // printf("...\n");
@@ -159,5 +157,56 @@ void Experiment::FillParametrization(std::vector<int>& groups, uint n) {
 void Experiment::GenerateParametrizations(std::vector<int> groups) {
   tmp_params_.resize(num_params_);
   tmp_params_all_.clear();
+  std::set<std::vector<CharId>> remove_params;
   FillParametrization(groups, 0);
+  for (uint n = 0; n < num_params_; n++) {
+    for (auto params: tmp_params_all_) {
+      //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
+
+      CharId chr = params[n];
+      if (interchangable_[n][chr]) continue;
+      // Build other_vars - vars in outcome formulas due to other positions.
+      std::set<VarId> other_vars(used_vars_);
+      for (uint i = 0; i < num_params_; i++) {
+        if (i == n) continue;
+        for (auto f: used_maps_[i]) {
+          other_vars.insert(game_->getMappingValue(f, params[i]));
+        }
+      }
+      //
+      bool keep = false;
+      for (auto f: used_maps_[n]) {
+        VarId var = game_->getMappingValue(f, chr);
+        if (other_vars.count(var) > 0) keep = true;
+      }
+      if (keep) continue;
+      // Consider alternatives.
+      for (CharId a = 0; a < chr; a++) {
+        params[n] = a;
+        if (tmp_params_all_.count(params) == 0) continue;
+        if (!CharsEquivalent(n, a, chr, groups)) continue;
+        keep = false;
+        for (auto f: used_maps_[n]) {
+          VarId var = game_->getMappingValue(f, a);
+          if (other_vars.count(var) > 0) keep = true;
+        }
+        if (!keep) {
+          // Schedule for removal.
+          params[n] = chr;
+          remove_params.insert(params);
+          break;
+        }
+      }
+    }
+    for (auto& params: remove_params) {
+      tmp_params_all_.erase(params);
+    }
+    remove_params.clear();
+  }
+  printf("===\n");
+  for (auto& params: tmp_params_all_) {
+    for (auto p: params) printf("%i ", p);
+    printf("\n");
+  }
+
 }
