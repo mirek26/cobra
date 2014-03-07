@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "formula.h"
-#include "util.h"
+#include "common.h"
 #include "parser.h"
 
 extern "C" int yyparse();

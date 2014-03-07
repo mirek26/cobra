@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <vector>
-#include "util.h"
+#include "common.h"
 #include "cnf-formula.h"
 
 #ifndef COBRA_GAME_H_

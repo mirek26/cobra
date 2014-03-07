@@ -6,7 +6,7 @@
 #include <map>
 #include <exception>
 #include <cassert>
-#include "util.h"
+#include "common.h"
 #include "game.h"
 
 #ifndef COBRA_AST_MANAGER_H_

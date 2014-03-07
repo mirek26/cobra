@@ -8,7 +8,7 @@
 #include <map>
 
 #include "formula.h"
-#include "util.h"
+#include "common.h"
 
 int Variable::id_counter_ = 1;
 // std::map<Variable*, Variable*>* Variable::variable_substitute_ = nullptr;

@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #include <initializer_list>
-#include "util.h"
+#include "common.h"
 #include "parser.h"
 #include "cnf-formula.h"
 

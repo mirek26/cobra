@@ -7,7 +7,7 @@
 #include <exception>
 #include <cassert>
 
-#include "util.h"
+#include "common.h"
 #include "formula.h"
 #include "game.h"
 

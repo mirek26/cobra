@@ -10,7 +10,7 @@
 #include <set>
 
 #include "formula.h"
-#include "util.h"
+#include "common.h"
 
 extern "C" {
   #include "../sat-solvers/picosat/picosat.h"
