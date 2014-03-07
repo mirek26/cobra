@@ -61,8 +61,8 @@ char* str_dup_strip(char* str) {
 
  /* identifiers */
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
-\".*\" { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
-\'.*\' { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
+\"[^"]*\" { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
+\'[^']*\' { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
 
  /* default: return char on input */
  .              { return yytext[0]; }

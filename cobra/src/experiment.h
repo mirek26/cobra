@@ -15,6 +15,7 @@
 
 class Experiment {
   Game* game_;
+  uint alph_;
 
   std::string name_;
   uint num_params_;
@@ -30,30 +31,37 @@ class Experiment {
   std::vector<std::set<uint>> params_different_;
   std::vector<std::set<uint>> params_smaller_than_;
 
+  std::set<std::vector<CharId>> tmp_params_all_;
+  std::vector<CharId> tmp_params_;
+
  public:
   Experiment(Game* game, std::string name, uint num_params):
-    game_(game),
-    name_(name),
-    num_params_(num_params) {
+      game_(game),
+      name_(name),
+      num_params_(num_params) {
     params_different_.resize(num_params);
     params_smaller_than_.resize(num_params);
+    alph_ = game_->alphabet().size();
   }
 
-  std::string name() {
-    return name_;
-  }
+  std::string name() const { return name_; }
 
-  void GenerateParametrizations();
-
+  // Functions defining the experiment.
   void addOutcome(std::string name, Formula* outcome);
-
   void paramsDistinct(std::vector<uint>* list);
   void paramsSorted(std::vector<uint>* list);
 
+  void GenerateParametrizations(std::vector<int> symmetry);
   void Precompute();
 
  private:
+  // Computes used_maps_ and used_vars_.
   void PrecomputeUsed(Construct* f);
+
+  // Helper functions for parametrizations generation.
+  bool CharsEquivalent(uint n, CharId a, CharId b, std::vector<int>& groups) const;
+  void FillParametrization(std::vector<int>& groups, uint n);
+
 };
 
 #endif  // COBRA_EXPERIMENT_H_

@@ -8,6 +8,8 @@
 #include <iostream>
 
 #include "formula.h"
+#include "game.h"
+#include "experiment.h"
 #include "common.h"
 #include "parser.h"
 
@@ -31,15 +33,20 @@ int main(int argc, char* argv[]) {
   }
   yyparse();
   fclose (yyin);
-
   printf("LOADED.\n");
 
   // // INTERACTIVE MODE
   Game& g = m.game();
   //if (!g.complete()) exit(1);
   g.Precompute();
+  printf("PRECOMPUTED.\n");
 
-  printf("DONE.\n");
+  std::vector<int> groups = { 1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  for (auto e: g.experiments()) {
+    printf("\n\n%s\n\n", e->name().c_str());
+    e->GenerateParametrizations(groups);
+  }
+
   // CnfFormula current;
   // current.AddConstraint(g.init());
 
