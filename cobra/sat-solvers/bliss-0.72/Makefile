@@ -3,7 +3,7 @@ CFLAGS += -g
 #CFLAGS += -pg
 CFLAGS += -Wall
 CFLAGS += --pedantic
-CFLAGS += -O9
+#CFLAGS += -O9
 #CFLAGS += -DBLISS_DEBUG
 CFLAGS += -fPIC
 
@@ -17,7 +17,7 @@ GMPOBJS = $(addsuffix g,  $(OBJS))
 LIB =
 #LIB += /usr/lib/ccmalloc.o -ldl
 
-CC = g++
+CC = clang++
 RANLIB = ranlib
 AR = ar
 BLISSLIB = libbliss.a

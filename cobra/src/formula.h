@@ -26,6 +26,50 @@ class FormulaList;
  */
 extern Parser m;
 
+// Base class for AST node
+class Construct {
+  const int kChildCount;
+
+ public:
+  static const int kMaxNodeId = 13;
+
+  explicit Construct(int childCount)
+      : kChildCount(childCount) { }
+
+  virtual ~Construct() { }
+  virtual uint child_count() { return kChildCount; }
+  virtual Construct* child(uint) { assert(false); };
+  virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
+  virtual std::string name() = 0;
+  virtual uint node_id() = 0;
+  virtual void dump(int indent = 0);
+
+  /* Returns true for variables or a negations of a variable, false otherwise.
+   */
+  virtual bool isLiteral() { return false; }
+
+  virtual Construct* Simplify() {
+    for (uint i = 0; i < child_count(); ++i) {
+      set_child(i, child(i)->Simplify());
+    }
+    return this;
+  }
+};
+
+template<class C>
+class VectorConstruct: public Construct, public std::vector<C> {
+ public:
+  VectorConstruct(): Construct(0) { }
+
+  virtual uint child_count() { return this->size();  }
+  virtual uint node_id() { return 1; }
+
+  virtual Construct* child(uint nth) {
+    assert(nth < this->size());
+    return (Construct*)this->at(nth);
+  }
+};
+
 /* Prepositional formula, base class for
  * Derived classes:
  *  - NaryOperator - base class for associative n-ary operators
@@ -74,10 +118,6 @@ class Formula: public Construct {
    * for conjunction, disjunction, implication etc. will be used.
    */
   virtual std::string pretty(bool utf8 = true) = 0;
-
-  /* Returns true for variables or a negations of a variable, false otherwise.
-   */
-  virtual bool isLiteral() { return false; }
 
   /* Tseitin transformation - used for conversion to CNF.
    * Capures the relationsships between this node and its children as clauses
@@ -188,6 +228,7 @@ class AndOperator: public NaryOperator {
   explicit AndOperator(FormulaList* list)
       : NaryOperator(list) { }
 
+  virtual uint node_id() { return 2; }
   virtual std::string name() {
     return "AndOperator";
   }
@@ -216,6 +257,7 @@ class OrOperator: public NaryOperator {
   explicit OrOperator(FormulaList* list)
       : NaryOperator(list) {}
 
+  virtual uint node_id() { return 3; }
   virtual std::string name() {
     return "OrOperator";
   }
@@ -262,6 +304,7 @@ class AtLeastOperator: public MacroOperator {
     assert(value <= list->size());
   }
 
+  virtual uint node_id() { return 4; }
   virtual std::string name() {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
@@ -290,6 +333,7 @@ class AtMostOperator: public MacroOperator {
     assert(value <= list->size());
   }
 
+  virtual uint node_id() { return 5; }
   virtual std::string name() {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
@@ -318,6 +362,7 @@ class ExactlyOperator: public MacroOperator {
     assert(value <= list->size());
   }
 
+  virtual uint node_id() { return 6; }
   virtual std::string name() {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
@@ -346,6 +391,7 @@ class EquivalenceOperator: public Formula {
         left_(left),
         right_(right) { }
 
+  virtual uint node_id() { return 4; }
   virtual std::string name() {
     return "EquivalenceOperator";
   }
@@ -387,6 +433,7 @@ class ImpliesOperator: public Formula {
         left_(premise),
         right_(consequence) { }
 
+  virtual uint node_id() { return 5; }
   virtual std::string name() {
     return "ImpliesOperator";
   }
@@ -425,6 +472,7 @@ class NotOperator: public Formula {
       : Formula(1),
         child_(child) { }
 
+  virtual uint node_id() { return 2; }
   virtual std::string name() {
     return "NotOperator";
   }
@@ -469,6 +517,7 @@ class Mapping: public Formula {
   MapId mapping_id() { return mapping_id_; }
   uint param_id() { return param_id_; }
 
+  virtual uint node_id() { return 11; }
   virtual std::string pretty(bool = true) {
     return ident_ + "$" + std::to_string(param_id_);
   }
@@ -521,25 +570,13 @@ class Variable: public Formula {
     id_ = id_counter_++;
   }
 
-  VarId id() {
-    return id_;
-  }
+  virtual uint node_id() { return 1; }
+  VarId id() { return id_; }
+  bool generated() { return generated_; }
+  bool orig() { return orig_; }
+  void set_orig(bool value) { orig_= value; }
 
-  bool generated() {
-    return generated_;
-  }
-
-  bool orig() {
-    return orig_;
-  }
-
-  void orig(bool value) {
-    orig_= value;
-  }
-
-  virtual std::string ident() {
-    return ident_;
-  }
+  virtual std::string ident() { return ident_; }
 
   virtual std::string pretty(bool = true) {
     return ident_;
@@ -588,6 +625,7 @@ class VariableList: public VectorConstruct<Variable*> {
  public:
   VariableList() { }
 
+  virtual uint node_id() { return 10; }
   virtual std::string name() {
     return "VariableList";
   }

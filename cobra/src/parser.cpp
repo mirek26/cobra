@@ -11,14 +11,10 @@
 
 Parser m;
 
-void Construct::dump(int indent) {
-  for (int i = 0; i < indent; ++i) {
-    printf("   ");
-  }
-  printf("%p: %s\n", (void*)this, name().c_str());
-  for (uint i = 0; i < child_count(); ++i) {
-    child(i)->dump(indent + 1);
-  }
+void Parser::deleteAll(){
+  for (auto& n: nodes_) delete n;
+  nodes_.clear();
+
 }
 
 // Overloaded insance of get method for a Variable.

@@ -9,6 +9,7 @@
 #include "common.h"
 #include "formula.h"
 #include "game.h"
+#include <bliss-0.72/graph.hh>
 
 #ifndef COBRA_EXPERIMENT_H_
 #define COBRA_EXPERIMENT_H_
@@ -61,6 +62,10 @@ class Experiment {
   // Helper functions for parametrizations generation.
   bool CharsEquivalent(uint n, CharId a, CharId b, std::vector<int>& groups) const;
   void FillParametrization(std::vector<int>& groups, uint n);
+
+  bliss::Digraph* BlissGraphForParametrization(
+                          std::vector<int>& groups,
+                          std::vector<CharId>& params);
 
 };
 

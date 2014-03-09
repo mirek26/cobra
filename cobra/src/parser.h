@@ -12,6 +12,7 @@
 #ifndef COBRA_AST_MANAGER_H_
 #define COBRA_AST_MANAGER_H_
 
+class Construct;
 class Variable;
 class VariableList;
 class Formula;
@@ -19,44 +20,6 @@ class FormulaList;
 class Experiment;
 class Game;
 class CnfFormula;
-
-// Base class for AST node
-class Construct {
-  const int kChildCount;
-
- public:
-  explicit Construct(int childCount)
-      : kChildCount(childCount) { }
-
-  virtual ~Construct() { }
-  virtual uint child_count() { return kChildCount; }
-  virtual Construct* child(uint) { assert(false); };
-  virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
-  virtual std::string name() = 0;
-  virtual void dump(int indent = 0);
-
-  virtual Construct* Simplify() {
-    for (uint i = 0; i < child_count(); ++i) {
-      set_child(i, child(i)->Simplify());
-    }
-    return this;
-  }
-};
-
-template<class C>
-class VectorConstruct: public Construct, public std::vector<C> {
- public:
-  VectorConstruct(): Construct(0) { }
-
-  virtual uint child_count() {
-    return this->size();
-  }
-
-  virtual Construct* child(uint nth) {
-    assert(nth < this->size());
-    return (Construct*)this->at(nth);
-  }
-};
 
 class ParserException: public std::exception {
   std::string what_;
@@ -100,10 +63,7 @@ class Parser {
     return get(identity<T>(), l);
   }
 
-  void deleteAll() {
-    for (auto& n: nodes_) delete n;
-    nodes_.clear();
-  }
+  void deleteAll();
 
   Game& game() { return game_; }
 

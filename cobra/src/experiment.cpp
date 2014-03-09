@@ -6,6 +6,7 @@
 #include <map>
 #include <exception>
 #include <cassert>
+#include <bliss-0.72/graph.hh>
 
 #include "common.h"
 #include "formula.h"
@@ -208,5 +209,40 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
     for (auto p: params) printf("%i ", p);
     printf("\n");
   }
+}
 
+bliss::Digraph* Experiment::BlissGraphForParametrization(
+                          std::vector<int>& groups,
+                          std::vector<CharId>& params) {
+  std::map<Construct*, int> node_ids;
+  std::vector<Construct*> nodes;
+  int new_id = 0;
+  // Go through all formulas and indexize nodes.
+  std::function<void(Construct*)> CollectNodes = [&](Construct* c) {
+    if (node_ids.count(c) == 0) {
+      node_ids[c] = new_id++;
+      nodes.push_back(c);
+    }
+    for (uint i = 0; i < c->child_count(); i++) CollectNodes(c->child(i));
+  };
+  for (auto outcome: outcomes_) {
+    CollectNodes(outcome);
+  }
+  // Create the graph and copy the structure of formulas.
+  auto g = new bliss::Digraph(nodes.size() + 1);
+  for (auto c: nodes) {
+    g->add_vertex(c->node_id());
+  }
+  g->add_vertex(Construct::kMaxNodeId + 1); // 'root' node
+  std::function<void(Construct*)> AddEdges = [&](Construct* c) {
+    // TODO: kouknout jestli to neni mapping a kdyztak dosadit
+    for (uint i = 0; i < c->child_count(); i++) {
+      g->add_edge(node_ids[c], node_ids[c->child(i)]);
+      AddEdges(c->child(i));
+    }
+  };
+  for (auto outcome: outcomes_) {
+    AddEdges(outcome);
+    g->add_edge(nodes.size(), node_ids[outcome]);
+  }
 }

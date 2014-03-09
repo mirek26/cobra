@@ -16,6 +16,16 @@ VarId Variable::id_counter_ = 1;
 
 extern void parse_string(std::string s);
 
+void Construct::dump(int indent) {
+  for (int i = 0; i < indent; ++i) {
+    printf("   ");
+  }
+  printf("%p: %s\n", (void*)this, name().c_str());
+  for (uint i = 0; i < child_count(); ++i) {
+    child(i)->dump(indent + 1);
+  }
+}
+
 Formula* Formula::Parse(std::string str) {
   parse_string(str);
   assert(m.only_formula());

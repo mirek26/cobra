@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "common.h"
 
 extern "C" {
   #include "../sat-solvers/picosat/picosat.h"

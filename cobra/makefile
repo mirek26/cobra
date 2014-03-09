@@ -1,5 +1,6 @@
+#CC = g++
 CC = clang++
-CCFLAGS = -g -Wall -Wextra -pedantic -pthread -std=c++11
+CCFLAGS = -g -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
 FLEX = flex
 BISON = bison -d
 
@@ -10,7 +11,7 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	$(CC) $(OBJECTS) src/main.o -L sat-solvers/picosat -l picosat -ll -o $(EXEC)
+	$(CC) $(OBJECTS) src/main.o -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -lstdc++ -l picosat -l bliss -ll -o $(EXEC)
 
 # parser
 clean-bison:
