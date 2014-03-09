@@ -160,54 +160,77 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
   tmp_params_all_.clear();
   std::set<std::vector<CharId>> remove_params;
   FillParametrization(groups, 0);
-  for (uint n = 0; n < num_params_; n++) {
-    for (auto params: tmp_params_all_) {
-      //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
+  // for (uint n = 0; n < num_params_; n++) {
+  //   for (auto params: tmp_params_all_) {
+  //     //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
 
-      CharId chr = params[n];
-      if (interchangable_[n][chr]) continue;
-      // Build other_vars - vars in outcome formulas due to other positions.
-      std::set<VarId> other_vars(used_vars_);
-      for (uint i = 0; i < num_params_; i++) {
-        if (i == n) continue;
-        for (auto f: used_maps_[i]) {
-          other_vars.insert(game_->getMappingValue(f, params[i]));
-        }
-      }
-      //
-      bool keep = false;
-      for (auto f: used_maps_[n]) {
-        VarId var = game_->getMappingValue(f, chr);
-        if (other_vars.count(var) > 0) keep = true;
-      }
-      if (keep) continue;
-      // Consider alternatives.
-      for (CharId a = 0; a < chr; a++) {
-        params[n] = a;
-        if (tmp_params_all_.count(params) == 0) continue;
-        if (!CharsEquivalent(n, a, chr, groups)) continue;
-        keep = false;
-        for (auto f: used_maps_[n]) {
-          VarId var = game_->getMappingValue(f, a);
-          if (other_vars.count(var) > 0) keep = true;
-        }
-        if (!keep) {
-          // Schedule for removal.
-          params[n] = chr;
-          remove_params.insert(params);
-          break;
-        }
-      }
-    }
-    for (auto& params: remove_params) {
-      tmp_params_all_.erase(params);
-    }
-    remove_params.clear();
-  }
-  printf("===\n");
-  for (auto& params: tmp_params_all_) {
+  //     CharId chr = params[n];
+  //     if (interchangable_[n][chr]) continue;
+  //     // Build other_vars - vars in outcome formulas due to other positions.
+  //     std::set<VarId> other_vars(used_vars_);
+  //     for (uint i = 0; i < num_params_; i++) {
+  //       if (i == n) continue;
+  //       for (auto f: used_maps_[i]) {
+  //         other_vars.insert(game_->getMappingValue(f, params[i]));
+  //       }
+  //     }
+  //     //
+  //     bool keep = false;
+  //     for (auto f: used_maps_[n]) {
+  //       VarId var = game_->getMappingValue(f, chr);
+  //       if (other_vars.count(var) > 0) keep = true;
+  //     }
+  //     if (keep) continue;
+  //     // Consider alternatives.
+  //     for (CharId a = 0; a < chr; a++) {
+  //       params[n] = a;
+  //       if (tmp_params_all_.count(params) == 0) continue;
+  //       if (!CharsEquivalent(n, a, chr, groups)) continue;
+  //       keep = false;
+  //       for (auto f: used_maps_[n]) {
+  //         VarId var = game_->getMappingValue(f, a);
+  //         if (other_vars.count(var) > 0) keep = true;
+  //       }
+  //       if (!keep) {
+  //         // Schedule for removal.
+  //         params[n] = chr;
+  //         remove_params.insert(params);
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   for (auto& params: remove_params) {
+  //     tmp_params_all_.erase(params);
+  //   }
+  //   remove_params.clear();
+  // }
+  // printf("===\n");
+  // for (auto& params: tmp_params_all_) {
+  //   for (auto p: params) printf("%i ", p);
+  //   printf("\n");
+  // }
+
+  // ---
+  std::map<unsigned int, std::vector<CharId>> hash;
+  for (auto params: tmp_params_all_) {
+    bliss::Stats stats;
+    auto g = BlissGraphForParametrization(groups, params);
+    printf("Graph constructed. Running bliss.\n");
+    //g->write_dimacs(stdout);
+    auto a = g->canonical_form(stats, nullptr, nullptr);
+    printf("Canonical form found.\n");
+    auto ng = g->permute(a);
+    printf("Bliss finished?\n");
+    auto h = ng->get_hash();
     for (auto p: params) printf("%i ", p);
-    printf("\n");
+    if (hash.count(h) > 0) {
+      printf("..seems to be equiv to.. ");
+      for (auto p: hash[h]) printf("%i ", p);
+      printf("\n");
+    } else {
+      printf("is new!\n");
+      hash[h] = params;
+    }
   }
 }
 
@@ -267,5 +290,6 @@ bliss::Digraph* Experiment::BlissGraphForParametrization(
   for (auto outcome: outcomes_) {
     AddEdges(outcome);
   }
+  g->set_splitting_heuristic(bliss::Digraph::shs_fsm);
   return g;
 }

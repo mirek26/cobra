@@ -1,8 +1,9 @@
 CFLAGS = -I.
-CFLAGS += -g
+#CFLAGS += -g
 #CFLAGS += -pg
 CFLAGS += -Wall
 CFLAGS += --pedantic
+CFLAGS += -O3
 #CFLAGS += -O9
 #CFLAGS += -DBLISS_DEBUG
 CFLAGS += -fPIC
@@ -17,6 +18,7 @@ GMPOBJS = $(addsuffix g,  $(OBJS))
 LIB =
 #LIB += /usr/lib/ccmalloc.o -ldl
 
+#CC = g++-mp-4.9
 CC = clang++
 RANLIB = ranlib
 AR = ar

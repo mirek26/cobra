@@ -44,8 +44,8 @@ int Game::getMappingId(std::string ident) {
 }
 
 int Game::getMappingValue(MapId mapping, CharId a) {
-  assert(0 <= mapping && mapping < mappings_.size());
-  assert(0 <= a && a < alphabet_.size());
+  assert(mapping < mappings_.size());
+  assert(a >= 0 && a < alphabet_.size());
   return mappings_[mapping][a];
 }
 
