@@ -9,14 +9,12 @@
 #include "common.h"
 #include "game.h"
 
-#ifndef COBRA_AST_MANAGER_H_
-#define COBRA_AST_MANAGER_H_
+#ifndef COBRA_PARSER_H
+#define COBRA_PARSER_H
 
-class Construct;
-class Variable;
-class VariableList;
 class Formula;
-class FormulaList;
+class Variable;
+class Formula;
 class Experiment;
 class Game;
 class CnfFormula;
@@ -35,16 +33,13 @@ class ParserException: public std::exception {
 };
 
 class Parser {
-  std::vector<Construct*> nodes_;
+  std::vector<Formula*> nodes_;
   std::map<std::string, Variable*> variables_;
-  Construct* last_;
+  Formula* last_;
 
   // auxiliary structures for parsing
   Formula* only_formula_;
   Experiment* last_experiment_;
-
-//  std::map<std::string, int> namedIndices_;
-//  int namedIndexId_ = -1;
 
   Game game_;
 
@@ -100,4 +95,4 @@ class Parser {
 
 };
 
-#endif   // COBRA_AST_MANAGER_H_
+#endif   // COBRA_PARSER_H

@@ -57,7 +57,7 @@ class Experiment {
 
  private:
   // Computes used_maps_ and used_vars_.
-  void PrecomputeUsed(Construct* f);
+  void PrecomputeUsed(Formula* f);
 
   // Helper functions for parametrizations generation.
   bool CharsEquivalent(uint n, CharId a, CharId b, std::vector<int>& groups) const;

@@ -9,15 +9,13 @@
 #include "experiment.h"
 #include "game.h"
 
-// Experiment* g_e;
-// CnfFormula* g_init;
-
-void Game::declareVariable(Variable*) {
-
+void Game::declareVariable(Variable* var) {
+  variables_.push_back(var);
 }
 
-void Game::declareVariables(VariableList*) {
-
+void Game::declareVariables(std::vector<Variable*>* list) {
+  variables_.insert(variables_.begin(), list->begin(), list->end());
+  delete list;
 }
 
 void Game::addRestriction(Formula*) {
@@ -28,7 +26,7 @@ Formula* Game::initialRestrictions() {
   return init_;
 }
 
-int Game::addMapping(std::string ident, VariableList* vars) {
+int Game::addMapping(std::string ident, std::vector<Variable*>* vars) {
   assert(mappings_ids_.count(ident) == 0);
   int new_id = mappings_.size();
   mappings_ids_[ident] = new_id;

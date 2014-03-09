@@ -11,11 +11,10 @@
 #define COBRA_GAME_H_
 
 class Formula;
-class VariableList;
 class Experiment;
 
 class Game {
-  VariableList* variables_;
+  std::vector<Variable*> variables_;
   Formula* init_;
   std::vector<Experiment*> experiments_;
   std::vector<std::string> alphabet_;
@@ -26,7 +25,8 @@ class Game {
 
  public:
   void declareVariable(Variable*);
-  void declareVariables(VariableList*);
+  void declareVariables(std::vector<Variable*>*);
+  std::vector<Variable*>& variables() { return variables_; }
 // getVariableById?
 
   void addRestriction(Formula*);
@@ -40,7 +40,7 @@ class Game {
 
   const std::vector<std::string>& alphabet() { return alphabet_; }
 
-  int addMapping(std::string, VariableList*);
+  int addMapping(std::string, std::vector<Variable*>*);
   int getMappingId(std::string);
   int getMappingValue(MapId, CharId);
 

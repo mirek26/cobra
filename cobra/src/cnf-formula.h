@@ -17,7 +17,6 @@ extern "C" {
 
 class Variable;
 class Formula;
-class FormulaList;
 
 typedef std::set<int> TClause;
 
@@ -45,7 +44,7 @@ class CnfFormula {
 
 //  void addParameterEq(ParameterEq* eq) { paramEq_.push_back(eq); };
 
-  void addClause(FormulaList* list);
+  void addClause(std::vector<Formula*>* list);
   void addClause(std::initializer_list<Formula*> list);
   void AddConstraint(Formula* formula);
   void AddConstraint(CnfFormula& cnf);

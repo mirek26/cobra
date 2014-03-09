@@ -19,56 +19,11 @@ class Variable;
 class OrOperator;
 class AndOperator;
 class NotOperator;
-class FormulaList;
 
 /* Global Parser object. You should never create a ast node directly,
  * always use m.get<Type>(...).
  */
 extern Parser m;
-
-// Base class for AST node
-class Construct {
-  const int kChildCount;
-
- public:
-  static const int kMaxNodeId = 13;
-
-  explicit Construct(int childCount)
-      : kChildCount(childCount) { }
-
-  virtual ~Construct() { }
-  virtual uint child_count() { return kChildCount; }
-  virtual Construct* child(uint) { assert(false); };
-  virtual void set_child(uint nth, Construct* value) { assert(child(nth) == value); }
-  virtual std::string name() = 0;
-  virtual uint node_id() = 0;
-  virtual void dump(int indent = 0);
-
-  /* Returns true for variables or a negations of a variable, false otherwise.
-   */
-  virtual bool isLiteral() { return false; }
-
-  virtual Construct* Simplify() {
-    for (uint i = 0; i < child_count(); ++i) {
-      set_child(i, child(i)->Simplify());
-    }
-    return this;
-  }
-};
-
-template<class C>
-class VectorConstruct: public Construct, public std::vector<C> {
- public:
-  VectorConstruct(): Construct(0) { }
-
-  virtual uint child_count() { return this->size();  }
-  virtual uint node_id() { return 1; }
-
-  virtual Construct* child(uint nth) {
-    assert(nth < this->size());
-    return (Construct*)this->at(nth);
-  }
-};
 
 /* Prepositional formula, base class for
  * Derived classes:
@@ -85,18 +40,37 @@ class VectorConstruct: public Construct, public std::vector<C> {
  *  - Variable - the only possible leaf of the formula tree
  *  TODO: how about true/false leaves?
  */
-class Formula: public Construct {
+class Formula {
  protected:
   /* variable (possibly negated) that is equivalent to this subformula,
    * used for Tseitin transformation
    */
   Variable* tseitin_var_ = nullptr;
+  const int kChildCount;
 
  public:
-  /*
-   */
+  static const int kMaxNodeId;
+
   explicit Formula(int childCount)
-      : Construct(childCount) { }
+      : kChildCount(childCount) { }
+
+  virtual ~Formula() { }
+  virtual uint child_count() { return kChildCount; }
+  virtual Formula* child(uint) { assert(false); };
+  virtual void set_child(uint nth, Formula* value) { assert(child(nth) == value); }
+  virtual std::string name() = 0;
+  virtual uint node_id() = 0;
+
+  /* Returns true for variables or a negations of a variable, false otherwise.
+   */
+  virtual bool isLiteral() { return false; }
+
+  virtual Formula* Simplify() {
+    for (uint i = 0; i < child_count(); ++i) {
+      set_child(i, child(i)->Simplify());
+    }
+    return this;
+  }
 
   /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
    * a new variable will be created.
@@ -109,7 +83,7 @@ class Formula: public Construct {
    */
   virtual Formula* neg();
 
-  /* Dump this subtree in the same format as Construct::dump, but also
+  /* Dump this subtree in the same format as Formula::dump, but also
    * prints information about tseitin_var_.
    */
   virtual void dump(int indent = 0);
@@ -129,85 +103,69 @@ class Formula: public Construct {
   /* Converts the formula to CNF using Tseitin transformation.
    */
   CnfFormula* ToCnf();
-  virtual Formula* clone() = 0;
+  // virtual Formula* clone() = 0;
 
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
 
   static Formula* Parse(std::string str);
 };
 
-/******************************************************************************
- * List of Formulas.
- */
-class FormulaList: public VectorConstruct<Formula*> {
- public:
-  FormulaList() { }
-
-  virtual std::string name() {
-    return "FormulaList";
-  }
-
-  FormulaList* clone() {
-    auto n = m.get<FormulaList>();
-    for (auto c: *this) {
-      n->push_back(c->clone());
-    }
-    return n;
-  }
-};
 
 /******************************************************************************
  * Base class for associative n-ary operator. Abstract.
  */
 class NaryOperator: public Formula {
  protected:
-  FormulaList* children_;
+  std::vector<Formula*> children_;
 
  public:
   NaryOperator()
-      : Formula(1) {
-    children_ = m.get<FormulaList>();
-  }
+       : Formula(0) { }
 
   explicit NaryOperator(std::initializer_list<Formula*> list)
-      : Formula(1) {
-    children_ = m.get<FormulaList>();
-    children_->insert(children_->begin(), list.begin(), list.end());
+      : Formula(0) {
+    children_.insert(children_.begin(), list.begin(), list.end());
   }
 
-  explicit NaryOperator(FormulaList* list)
-      : Formula(1),
-        children_(list) {
+  explicit NaryOperator(std::vector<Formula*>* list)
+      : Formula(1) {
     assert(list);
+    children_.insert(children_.begin(), list->begin(), list->end());
+    delete list;
   }
 
   void addChild(Formula* child) {
-    children_->push_back(child);
+    children_.push_back(child);
   }
 
-  void addChildren(FormulaList* children) {
-    children_->insert(children_->end(), children->begin(), children->end());
+  void addChildren(std::vector<Formula*>* children) {
+    children_.insert(children_.end(), children->begin(), children->end());
+    delete children;
   }
 
   void removeChild(int nth) {
-    (*children_)[nth] = children_->back();
-    children_->pop_back();
+    children_[nth] = children_.back();
+    children_.pop_back();
   }
 
-  virtual Construct* child(uint nth) {
-    assert(nth == 0);
-    return children_;
+  virtual uint child_count() {
+    return children_.size();
   }
 
-  FormulaList* children() {
+  virtual Formula* child(uint nth) {
+    assert(nth < children_.size());
+    return children_[nth];
+  }
+
+  std::vector<Formula*>& children() {
     return children_;
   }
 
  protected:
   std::string pretty_join(std::string sep, bool utf8) {
-    if (children_->empty()) return "()";
-    std::string s = "(" + children_->front()->pretty(utf8);
-    for (auto it = std::next(children_->begin()); it != children_->end(); ++it) {
+    if (children_.empty()) return "()";
+    std::string s = "(" + children_.front()->pretty(utf8);
+    for (auto it = std::next(children_.begin()); it != children_.end(); ++it) {
       s += sep;
       s += (*it)->pretty(utf8);
     }
@@ -225,7 +183,7 @@ class AndOperator: public NaryOperator {
       : NaryOperator() { }
   explicit AndOperator(std::initializer_list<Formula*> list)
       : NaryOperator(list) { }
-  explicit AndOperator(FormulaList* list)
+  explicit AndOperator(std::vector<Formula*>* list)
       : NaryOperator(list) { }
 
   virtual uint node_id() { return 2; }
@@ -237,11 +195,11 @@ class AndOperator: public NaryOperator {
     return pretty_join(utf8 ? " ∧ " : " & ", utf8);
   }
 
-  virtual Formula* clone() {
-    return m.get<AndOperator>(children_->clone());
-  }
+  // virtual Formula* clone() {
+  //   // return m.get<AndOperator>(children_->clone());
+  // }
 
-  virtual Construct* Simplify();
+  virtual Formula* Simplify();
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
@@ -254,8 +212,8 @@ class OrOperator: public NaryOperator {
       : NaryOperator() {}
   explicit OrOperator(std::initializer_list<Formula*> list)
       : NaryOperator(list) {}
-  explicit OrOperator(FormulaList* list)
-      : NaryOperator(list) {}
+  explicit OrOperator(std::vector<Formula*>* list)
+     : NaryOperator(list) {}
 
   virtual uint node_id() { return 3; }
   virtual std::string name() {
@@ -266,11 +224,11 @@ class OrOperator: public NaryOperator {
     return pretty_join(utf8 ? " ∨ " : " | ", utf8);
   }
 
-  virtual Formula* clone() {
-    return m.get<OrOperator>(children_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<OrOperator>(children_->clone());
+  // }
 
-  virtual Construct* Simplify();
+  virtual Formula* Simplify();
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
@@ -282,7 +240,7 @@ class MacroOperator: public NaryOperator {
  protected:
   AndOperator* expanded_;
  public:
-  explicit MacroOperator(FormulaList* list);
+  explicit MacroOperator(std::vector<Formula*>* list);
 
   virtual Formula* tseitin_var();
 
@@ -298,10 +256,10 @@ class AtLeastOperator: public MacroOperator {
   uint value_;
 
  public:
-  AtLeastOperator(uint value, FormulaList* list)
+  AtLeastOperator(uint value, std::vector<Formula*>* list)
       : MacroOperator(list),
         value_(value) {
-    assert(value <= list->size());
+    assert(value <= children_.size());
   }
 
   virtual uint node_id() { return 4; }
@@ -313,9 +271,9 @@ class AtLeastOperator: public MacroOperator {
     return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
-  virtual Formula* clone() {
-    return m.get<AtLeastOperator>(value_, children_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<AtLeastOperator>(value_, children_->clone());
+  // }
 
   virtual AndOperator* Expand();
 };
@@ -327,10 +285,10 @@ class AtMostOperator: public MacroOperator {
   uint value_;
 
  public:
-  AtMostOperator(uint value, FormulaList* list)
+  AtMostOperator(uint value, std::vector<Formula*>* list)
       : MacroOperator(list),
         value_(value) {
-    assert(value <= list->size());
+    assert(value <= children_.size());
   }
 
   virtual uint node_id() { return 5; }
@@ -342,9 +300,9 @@ class AtMostOperator: public MacroOperator {
     return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
-  virtual Formula* clone() {
-    return m.get<AtMostOperator>(value_, children_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<AtMostOperator>(value_, children_->clone());
+  // }
 
   virtual AndOperator* Expand();
 };
@@ -356,10 +314,10 @@ class ExactlyOperator: public MacroOperator {
   uint value_;
 
  public:
-  ExactlyOperator(uint value, FormulaList* list)
+  ExactlyOperator(uint value, std::vector<Formula*>* list)
       : MacroOperator(list),
         value_(value) {
-    assert(value <= list->size());
+    assert(value <= children_.size());
   }
 
   virtual uint node_id() { return 6; }
@@ -371,9 +329,9 @@ class ExactlyOperator: public MacroOperator {
     return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8);
   }
 
-  virtual Formula* clone() {
-    return m.get<ExactlyOperator>(value_, children_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<ExactlyOperator>(value_, children_->clone());
+  // }
 
   virtual AndOperator* Expand();
 };
@@ -404,7 +362,7 @@ class EquivalenceOperator: public Formula {
       ")";
   }
 
-  virtual Construct* child(uint nth) {
+  virtual Formula* child(uint nth) {
     assert(nth < child_count());
     switch (nth) {
       case 0: return left_;
@@ -413,9 +371,9 @@ class EquivalenceOperator: public Formula {
     }
   }
 
-  virtual Formula* clone() {
-    return m.get<EquivalenceOperator>(left_->clone(), right_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<EquivalenceOperator>(left_->clone(), right_->clone());
+  // }
 
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
@@ -446,7 +404,7 @@ class ImpliesOperator: public Formula {
       ")";
   }
 
-  virtual Construct* child(uint nth) {
+  virtual Formula* child(uint nth) {
     assert(nth < child_count());
     switch (nth) {
       case 0: return left_;
@@ -455,9 +413,9 @@ class ImpliesOperator: public Formula {
     }
   }
 
-  virtual Formula* clone() {
-    return m.get<ImpliesOperator>(left_->clone(), right_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<ImpliesOperator>(left_->clone(), right_->clone());
+  // }
 
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
@@ -481,14 +439,14 @@ class NotOperator: public Formula {
     return (utf8 ? "¬" : "!") + child_->pretty(utf8);
   }
 
-  virtual Construct* child(uint nth) {
+  virtual Formula* child(uint nth) {
     assert(nth == 0);
     return child_;
   }
 
-  virtual Formula* clone() {
-    return m.get<NotOperator>(child_->clone());
-  }
+  // virtual Formula* clone() {
+  //   return m.get<NotOperator>(child_->clone());
+  // }
 
   virtual Formula* neg() {
     return child_;
@@ -522,13 +480,21 @@ class Mapping: public Formula {
     return ident_ + "$" + std::to_string(param_id_);
   }
 
+  virtual bool isLiteral() {
+    return true;
+  }
+
+  int getValue(std::vector<CharId>& params) {
+    return m.game().getMappingValue(mapping_id_, params[param_id_]);
+  }
+
   virtual std::string name() {
     return "Mapping " + pretty();
   }
 
-  virtual Formula* clone() {
-    return m.get<Mapping>(ident_, mapping_id_, param_id_);
-  }
+  // virtual Formula* clone() {
+  //   return m.get<Mapping>(ident_, mapping_id_, param_id_);
+  // }
 
   virtual void TseitinTransformation(CnfFormula*, bool) {
     assert(false);
@@ -545,10 +511,6 @@ class Variable: public Formula {
   VarId id_;
 
   static VarId id_counter_; // initialy 1
-
- public:
-//  static std::map<Variable*, Variable*>* variable_substitute_; // = nullptr
-//  static std::map<int, int>* index_substitute_; // = nullptr
 
  public:
   /* Parameterless constructor creates a generated variable with next
@@ -586,12 +548,12 @@ class Variable: public Formula {
     return "Variable " + pretty() + "(" + std::to_string(id_) +")";
   }
 
-  virtual Construct* child(uint) {
+  virtual Formula* child(uint) {
     // this have no children - child() should never be called
     assert(false);
   }
 
-  virtual Formula* clone() {
+  // virtual Formula* clone() {
     // if (variable_substitute_ && variable_substitute_->count(this) > 0) {
     //   return variable_substitute_->at(this);
     // } else if (index_substitute_) {
@@ -603,9 +565,9 @@ class Variable: public Formula {
     //   }
     //   return m.get<Variable>(ident_, newIndices);
     // } else {
-      return this;
+      // return this;
     //}
-  }
+  // }
 
   virtual bool isLiteral() {
     return true;
@@ -615,31 +577,6 @@ class Variable: public Formula {
     if (top) {
       cnf->addClause({ (Formula*)this });
     }
-  }
-};
-
-/******************************************************************************
- * Set of Variables.
- */
-class VariableList: public VectorConstruct<Variable*> {
- public:
-  VariableList() { }
-
-  virtual uint node_id() { return 10; }
-  virtual std::string name() {
-    return "VariableList";
-  }
-
-  void sort() {
-    std::sort(begin(), end(), [](Variable* a, Variable* b){
-      return b->id() > a->id();
-    });
-  }
-
-  FormulaList* asFormulaList() {
-    auto v = m.get<FormulaList>();
-    v->insert(v->begin(), this->begin(), this->end());
-    return v;
   }
 };
 

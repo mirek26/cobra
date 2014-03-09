@@ -94,8 +94,8 @@ typedef union YYSTYPE
 {
   Formula* formula;
   Variable* variable;
-  VariableList* variable_list;
-  FormulaList* formula_list;
+  std::vector<Variable*>* variable_list;
+  std::vector<Formula*>* formula_list;
   std::vector<std::string>* string_list;
   std::vector<uint>* int_list;
   char* tstr;

@@ -11,33 +11,14 @@
 #include "common.h"
 
 VarId Variable::id_counter_ = 1;
-// std::map<Variable*, Variable*>* Variable::variable_substitute_ = nullptr;
-// std::map<int, int>* Variable::index_substitute_ = nullptr;
 
 extern void parse_string(std::string s);
-
-void Construct::dump(int indent) {
-  for (int i = 0; i < indent; ++i) {
-    printf("   ");
-  }
-  printf("%p: %s\n", (void*)this, name().c_str());
-  for (uint i = 0; i < child_count(); ++i) {
-    child(i)->dump(indent + 1);
-  }
-}
 
 Formula* Formula::Parse(std::string str) {
   parse_string(str);
   assert(m.only_formula());
   return m.only_formula();
 }
-
-// Formula* Formula::Substitude(std::map<Variable*, Variable*>& table) {
-//   Variable::variable_substitute_ = &table;
-//   auto n = this->clone();
-//   Variable::variable_substitute_ = nullptr;
-//   return n;
-// }
 
 void Formula::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
@@ -55,30 +36,32 @@ Formula* Formula::neg() {
   return m.get<NotOperator>(this);
 }
 
-Construct* AndOperator::Simplify() {
-  Construct::Simplify();
+Formula* AndOperator::Simplify() {
+  Formula::Simplify();
   int merged = 0;
   int childCount = child_count();
   for (int i = 0; i < childCount; ++i) {
     auto andChild = dynamic_cast<AndOperator*>(child(i - merged));
     if (andChild) {
       removeChild(i - merged);
-      addChildren(andChild->children_);
+      children_.insert(children_.end(), andChild->children_.begin(),
+                                        andChild->children_.end());
       merged++;
     }
   }
   return this;
 }
 
-Construct* OrOperator::Simplify() {
-  Construct::Simplify();
+Formula* OrOperator::Simplify() {
+  Formula::Simplify();
   int merged = 0;
   int childCount = child_count();
   for (int i = 0; i < childCount; ++i) {
     auto orChild = dynamic_cast<OrOperator*>(child(i - merged));
     if (orChild) {
       removeChild(i - merged);
-      addChildren(orChild->children_);
+      children_.insert(children_.end(), orChild->children_.begin(),
+                                        orChild->children_.end());
       merged++;
     }
   }
@@ -110,15 +93,15 @@ Formula* MacroOperator::tseitin_var() {
   return expanded_->tseitin_var();
 }
 
-MacroOperator::MacroOperator(FormulaList* list)
+MacroOperator::MacroOperator(std::vector<Formula*>* list)
       : NaryOperator(list) {
   expanded_ = m.get<AndOperator>();
 }
 
 void MacroOperator::ExpandHelper(uint size, bool negate) {
-  assert(size <= children_->size());
+  assert(size <= children_.size());
   std::vector<Formula*> vars;
-  for (auto& f: *children_) {
+  for (auto& f: children_) {
     vars.push_back(f->tseitin_var());
   }
   //
@@ -134,13 +117,13 @@ void MacroOperator::ExpandHelper(uint size, bool negate) {
 
 AndOperator* AtLeastOperator::Expand() {
   if (value_ > 0) {
-    ExpandHelper(children_->size() - value_ + 1, false);
+    ExpandHelper(children_.size() - value_ + 1, false);
   }
   return expanded_;
 }
 
 AndOperator* AtMostOperator::Expand() {
-  if (value_ < children_->size()) {
+  if (value_ < children_.size()) {
     ExpandHelper(value_ + 1, true);
   }
   return expanded_;
@@ -151,12 +134,12 @@ AndOperator* ExactlyOperator::Expand() {
    * list all the possible combinations here.
    */
   // At most part
-  if (value_ < children_->size()) {
+  if (value_ < children_.size()) {
     ExpandHelper(value_ + 1, true);
   }
   // At least part
   if (value_ > 0) {
-    ExpandHelper(children_->size() - value_ + 1, false);
+    ExpandHelper(children_.size() - value_ + 1, false);
   }
   return expanded_;
 }
@@ -170,26 +153,26 @@ void AndOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   if (!top) {
     // X <-> AND(A1, A2, ..)
     // (X | !A1 | !A2 | ...) & (A1 | !X) & (A2 | !X) & ...
-    auto first = m.get<FormulaList>();
-    for (auto& f: *children_) {
+    auto first = new std::vector<Formula*>();
+    for (auto& f: children_) {
       first->push_back(f->tseitin_var()->neg());
     }
     first->push_back(tseitin_var());
     cnf->addClause(first);
     auto not_this = tseitin_var()->neg();
-    for (auto& f: *children_) {
+    for (auto& f: children_) {
       cnf->addClause({ not_this, f->tseitin_var() });
     }
   }
   // recurse down
-  for (auto& f: *children_) {
+  for (auto& f: children_) {
     f->TseitinTransformation(cnf, top);
   }
 }
 
 void OrOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
-  auto first = m.get<FormulaList>();
-  for (auto& f: *children_) {
+  auto first = new std::vector<Formula*>();
+  for (auto& f: children_) {
     first->push_back(f->tseitin_var());
   }
 
@@ -198,14 +181,14 @@ void OrOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
     // (!X | A1 | A2 | ...) & (!A1 | X) & (!A2 | X) & ...
     first->push_back(tseitin_var()->neg());
     cnf->addClause(first);
-    for (auto& f: *children_) {
+    for (auto& f: children_) {
       cnf->addClause({ tseitin_var(), f->tseitin_var()->neg() });
     }
   } else {
     cnf->addClause(first);
   }
   // recurse down
-  for (auto&f : *children_) {
+  for (auto&f : children_) {
     f->TseitinTransformation(cnf, false);
   }
 }

@@ -164,8 +164,8 @@ typedef union YYSTYPE
 {
   Formula* formula;
   Variable* variable;
-  VariableList* variable_list;
-  FormulaList* formula_list;
+  std::vector<Variable*>* variable_list;
+  std::vector<Formula*>* formula_list;
   std::vector<std::string>* string_list;
   std::vector<uint>* int_list;
   char* tstr;
@@ -1502,7 +1502,7 @@ yyreduce:
 
   case 18:
 #line 121 "src/cobra.ypp"
-    { (yyval.variable_list) = m.get<VariableList>();
+    { (yyval.variable_list) = new std::vector<Variable*>();
         (yyval.variable_list)->push_back((yyvsp[(1) - (1)].variable)); ;}
     break;
 
@@ -1610,7 +1610,7 @@ yyreduce:
 
   case 38:
 #line 177 "src/cobra.ypp"
-    { (yyval.formula_list) = m.get<FormulaList>();
+    { (yyval.formula_list) = new std::vector<Formula*>();
         (yyval.formula_list)->push_back((yyvsp[(1) - (1)].formula)); ;}
     break;
 

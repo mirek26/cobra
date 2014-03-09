@@ -1,6 +1,7 @@
 #CC = g++
 CC = clang++
 CCFLAGS = -g -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
+LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -l picosat -l bliss 
 FLEX = flex
 BISON = bison -d
 
@@ -11,7 +12,7 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	$(CC) $(OBJECTS) src/main.o -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -lstdc++ -l picosat -l bliss -ll -o $(EXEC)
+	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -ll -o $(EXEC)
 
 # parser
 clean-bison:
@@ -51,11 +52,11 @@ $(GTEST_DIR)/gtest.a: $(GTEST_DIR)/gtest-all.o
 $(GTEST_DIR)/gtest_main.a: $(GTEST_DIR)/gtest-all.o $(GTEST_DIR)/gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-$(GTEST_DIR)/test.o: $(GTEST_DIR)/test.cpp *.h $(GTEST_HEADERS)
+$(GTEST_DIR)/test.o: $(GTEST_DIR)/test.cpp src/*.h $(GTEST_HEADERS)
 	$(CC) $(IGNFLAGS) $(CCFLAGS) -c $(GTEST_DIR)/test.cpp -o $@
 
 $(GTEST_DIR)/test: $(GTEST_DIR)/test.o $(OBJECTS) $(GTEST_DIR)/gtest_main.a
-	$(CC) $(IGNFLAGS) $^ -L sat-solvers/picosat -lpthread -lpicosat -ll -o $@
+	$(CC) $(IGNFLAGS) $^ $(LINKWITHSAT) -lpthread -ll -o $@
 
 test: $(GTEST_DIR)/test
 	./test/test

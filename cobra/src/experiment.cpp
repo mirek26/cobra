@@ -42,7 +42,7 @@ void Experiment::paramsSorted(std::vector<uint>* list) {
   delete list;
 }
 
-void Experiment::PrecomputeUsed(Construct* f) {
+void Experiment::PrecomputeUsed(Formula* f) {
   assert(f);
   auto* mapping = dynamic_cast<Mapping*>(f);
   auto* variable = dynamic_cast<Variable*>(f);
@@ -214,11 +214,13 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
 bliss::Digraph* Experiment::BlissGraphForParametrization(
                           std::vector<int>& groups,
                           std::vector<CharId>& params) {
-  std::map<Construct*, int> node_ids;
-  std::vector<Construct*> nodes;
+  std::map<Formula*, uint> node_ids;
+  std::map<uint, uint> var_ids;
+  std::vector<Formula*> nodes;
   int new_id = 0;
   // Go through all formulas and indexize nodes.
-  std::function<void(Construct*)> CollectNodes = [&](Construct* c) {
+  std::function<void(Formula*)> CollectNodes = [&](Formula* c) {
+    if (c->isLiteral()) return;
     if (node_ids.count(c) == 0) {
       node_ids[c] = new_id++;
       nodes.push_back(c);
@@ -228,21 +230,42 @@ bliss::Digraph* Experiment::BlissGraphForParametrization(
   for (auto outcome: outcomes_) {
     CollectNodes(outcome);
   }
-  // Create the graph and copy the structure of formulas.
-  auto g = new bliss::Digraph(nodes.size() + 1);
+  // Create the graph and label vertices according to their type
+  auto g = new bliss::Digraph(new_id + 2*game_->variables().size());
   for (auto c: nodes) {
     g->add_vertex(c->node_id());
   }
-  g->add_vertex(Construct::kMaxNodeId + 1); // 'root' node
-  std::function<void(Construct*)> AddEdges = [&](Construct* c) {
-    // TODO: kouknout jestli to neni mapping a kdyztak dosadit
+  // Add vertices for variables, create edge between a variable and its negation
+  for (auto var: game_->variables()) {
+    g->add_vertex(groups[var->id()]);
+    g->add_vertex(groups[var->id()]);
+    var_ids[var->id()] = new_id;
+    g->add_edge(new_id, new_id + 1);
+    new_id += 2;
+  }
+  // Create all other edges according to the structure of the formula
+  std::function<void(Formula*)> AddEdges = [&](Formula* c) {
     for (uint i = 0; i < c->child_count(); i++) {
-      g->add_edge(node_ids[c], node_ids[c->child(i)]);
-      AddEdges(c->child(i));
+      auto ch = c->child(i);
+      bool neg = false;
+      if (c->isLiteral()) {
+        if (dynamic_cast<NotOperator*>(ch)) {
+          neg = true;
+          ch = ch->neg();
+        }
+        auto map = dynamic_cast<Mapping*>(ch);
+        auto var = dynamic_cast<Variable*>(ch);
+        assert(map || var);
+        g->add_edge(node_ids[c], neg + (map ? var_ids[map->getValue(params)]
+                                            : var_ids[var_ids[var->id()]]));
+      } else {
+        g->add_edge(node_ids[c], node_ids[ch]);
+        AddEdges(ch);
+      }
     }
   };
   for (auto outcome: outcomes_) {
     AddEdges(outcome);
-    g->add_edge(nodes.size(), node_ids[outcome]);
   }
+  return g;
 }

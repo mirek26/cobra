@@ -49,7 +49,7 @@ void CnfFormula::addLiteral(TClause& clause, Formula* literal) {
   picosat_add(picosat_, add);
 }
 
-void CnfFormula::addClause(FormulaList* list) {
+void CnfFormula::addClause(std::vector<Formula*>* list) {
   TClause c;
   for (auto f: *list) {
     addLiteral(c, f);

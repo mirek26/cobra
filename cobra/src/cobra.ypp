@@ -55,8 +55,8 @@
 %union {
   Formula* formula;
   Variable* variable;
-  VariableList* variable_list;
-  FormulaList* formula_list;
+  std::vector<Variable*>* variable_list;
+  std::vector<Formula*>* formula_list;
   std::vector<std::string>* string_list;
   std::vector<uint>* int_list;
   char* tstr;
@@ -118,7 +118,7 @@ variable :
 
 variable_list :
     variable
-      { $$ = m.get<VariableList>();
+      { $$ = new std::vector<Variable*>();
         $$->push_back($1); }
   | variable_list ',' variable
       { $$ = $1;
@@ -174,7 +174,7 @@ formula :
 
 formula_list:
     formula
-      { $$ = m.get<FormulaList>();
+      { $$ = new std::vector<Formula*>();
         $$->push_back($1); }
   | formula_list ',' formula
       { $$ = $1;
