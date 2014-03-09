@@ -24,10 +24,10 @@ for selected in product([0,1], repeat=2*len(A)):
   EXPERIMENT("compare %s against %s"%(",".join(attrs1), ",".join(attrs2)), len(attrs1) + len(attrs2))
 
   cards1 = [" & ".join(
-                  "X%i%s$%i"%(n, attrs1[i], i) for i in range(len(attrs1)))
+                  "X%i%s$%i"%(n, attrs1[i], i + 1) for i in range(len(attrs1)))
             for n in range(N)]
   cards2 = [" & ".join(
-                  "X%i%s$%i"%(n, attrs2[i], len(attrs1)+i) for i in range(len(attrs2)))
+                  "X%i%s$%i"%(n, attrs2[i], len(attrs1)+i+1) for i in range(len(attrs2)))
             for n in range(N)]
   formula = []
   for i in range(1, N):
