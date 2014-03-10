@@ -1,5 +1,6 @@
 #CC = g++-mp-4.9 -fdiagnostics-color=auto
-CC = clang++
+#CC = clang++
+#CC = g++
 CCFLAGS = -O3 -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
 LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -l picosat -l bliss 
 FLEX = flex
@@ -12,17 +13,17 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -ll -o $(EXEC)
+	$(MAKE) -C sat-solvers/bliss-0.72
+	$(MAKE) -C sat-solvers/picosat
+	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 
 # parser
 clean-bison:
 	rm src/cobra.tab.cpp src/cobra.tab.hpp src/cobra.yy.c
 bison: src/cobra.tab.cpp src/cobra.yy.c
-src/cobra.tab.cpp: src/cobra.ypp
-	$(BISON) -o $@ $<
+	$(BISON) -o src/cobra.tab.cpp src/cobra.ypp
+	$(FLEX) -o src/cobra.yy.c src/cobra.l
 src/cobra.tab.o: src/cobra.tab.cpp src/cobra.ypp
-src/cobra.yy.c: src/cobra.l
-	$(FLEX) -o $@ $<
 src/cobra.yy.o: src/cobra.yy.c src/cobra.l
 	@# suppress all warnings (compiling c as c++ etc.)
 	$(CC) -c -std=c++11 -w $< -o $@

@@ -101,7 +101,7 @@ line :
   | T_ALPHABET string_list
     {  m.game().setAlphabet($2); }
   | T_MAPPING T_STRING variable_list
-    {  m.game().addMapping($2, $3) }
+    {  m.game().addMapping($2, $3); }
   | T_EXPERIMENT T_STRING T_INT
     {  Experiment* e = m.game().addExperiment($2, $3);
        m.set_last_experiment(e); }
