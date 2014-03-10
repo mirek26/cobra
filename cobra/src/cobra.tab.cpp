@@ -570,7 +570,7 @@ static const yytype_int8 yypact[] =
       97,   -28,    78,    78,    10,    19,   -28,   -28,    10,    10,
       10,    10,    10,   -28,    30,   -17,   -16,    79,    80,    81,
       -1,    98,    75,   -28,   103,    30,   -28,    30,    83,    37,
-      37,    99,    10,   -28,   -28,    10,    10,    10,   -28,   -28,
+      99,   -28,    10,   -28,   -28,    10,    10,    10,   -28,   -28,
      -28,    30,   -12,     7,    17,   -28,   -28,   -28
 };
 
@@ -1545,12 +1545,12 @@ yyreduce:
 
   case 25:
 #line 149 "src/cobra.ypp"
-    { (yyval.formula) = m.get<AndOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
+    { (yyval.formula) = m.OnAssocOp<AndOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
     break;
 
   case 26:
 #line 151 "src/cobra.ypp"
-    { (yyval.formula) = m.get<OrOperator>({ (yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula) }); ;}
+    { (yyval.formula) = m.OnAssocOp<OrOperator>((yyvsp[(1) - (3)].formula), (yyvsp[(3) - (3)].formula)); ;}
     break;
 
   case 27:

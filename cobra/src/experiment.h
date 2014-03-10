@@ -46,6 +46,7 @@ class Experiment {
   }
 
   std::string name() const { return name_; }
+  const std::vector<Formula*>& outcomes() const { return outcomes_; }
 
   // Functions defining the experiment.
   void addOutcome(std::string name, Formula* outcome);

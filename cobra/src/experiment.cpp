@@ -214,13 +214,14 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
   std::map<unsigned int, std::vector<CharId>> hash;
   for (auto params: tmp_params_all_) {
     bliss::Stats stats;
+    //printf("Graph construction... \n");
     auto g = BlissGraphForParametrization(groups, params);
-    printf("Graph constructed. Running bliss.\n");
+    //printf("Graph constructed. Running bliss.\n");
     //g->write_dimacs(stdout);
     auto a = g->canonical_form(stats, nullptr, nullptr);
-    printf("Canonical form found.\n");
+    //printf("Canonical form found.\n");
     auto ng = g->permute(a);
-    printf("Bliss finished?\n");
+    //printf("Bliss finished?\n");
     auto h = ng->get_hash();
     for (auto p: params) printf("%i ", p);
     if (hash.count(h) > 0) {
@@ -231,6 +232,10 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
       printf("is new!\n");
       hash[h] = params;
     }
+  }
+  for (auto p: hash) {
+    for (auto x: p.second) printf("%i ", x);
+    printf(".\n");
   }
 }
 

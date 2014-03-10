@@ -60,6 +60,17 @@ class Parser {
 
   void deleteAll();
 
+  template <class T>
+  Formula* OnAssocOp(Formula* f1, Formula* f2) {
+    auto t = dynamic_cast<T*>(f1);
+    if (t) {
+      t->addChild(f2);
+      return t;
+    } else {
+      return get<T>({ f1, f2 });
+    }
+  }
+
   Game& game() { return game_; }
 
   Formula* only_formula() { return only_formula_; }

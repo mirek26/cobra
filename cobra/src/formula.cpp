@@ -36,38 +36,6 @@ Formula* Formula::neg() {
   return m.get<NotOperator>(this);
 }
 
-Formula* AndOperator::Simplify() {
-  Formula::Simplify();
-  int merged = 0;
-  int childCount = child_count();
-  for (int i = 0; i < childCount; ++i) {
-    auto andChild = dynamic_cast<AndOperator*>(child(i - merged));
-    if (andChild) {
-      removeChild(i - merged);
-      children_.insert(children_.end(), andChild->children_.begin(),
-                                        andChild->children_.end());
-      merged++;
-    }
-  }
-  return this;
-}
-
-Formula* OrOperator::Simplify() {
-  Formula::Simplify();
-  int merged = 0;
-  int childCount = child_count();
-  for (int i = 0; i < childCount; ++i) {
-    auto orChild = dynamic_cast<OrOperator*>(child(i - merged));
-    if (orChild) {
-      removeChild(i - merged);
-      children_.insert(children_.end(), orChild->children_.begin(),
-                                        orChild->children_.end());
-      merged++;
-    }
-  }
-  return this;
-}
-
 // Tseitin transformation of arbitrary formula to CNF
 CnfFormula* Formula::ToCnf() {
   CnfFormula* r = new CnfFormula();

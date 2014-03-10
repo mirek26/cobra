@@ -65,13 +65,6 @@ class Formula {
    */
   virtual bool isLiteral() { return false; }
 
-  virtual Formula* Simplify() {
-    for (uint i = 0; i < child_count(); ++i) {
-      set_child(i, child(i)->Simplify());
-    }
-    return this;
-  }
-
   /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
    * a new variable will be created.
    */
@@ -199,7 +192,6 @@ class AndOperator: public NaryOperator {
   //   // return m.get<AndOperator>(children_->clone());
   // }
 
-  virtual Formula* Simplify();
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
@@ -228,7 +220,6 @@ class OrOperator: public NaryOperator {
   //   return m.get<OrOperator>(children_->clone());
   // }
 
-  virtual Formula* Simplify();
   virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 

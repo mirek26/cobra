@@ -30,10 +30,10 @@ MAPPING("X", ["x%i"%i for i in range(N)] + ["f"])
 m = [M//i for i in range(1, M + 1)]
 EXPERIMENT("weighting %s"%str(m), sum(m))
 
-s = 0
+s = 1
 param_groups = []
 for i in range(M):
-  param_groups.append(",".join("X$" + str(i + 1) for i in range(s, s + m[i])))
+  param_groups.append(",".join("X$" + str(i) for i in range(s, s + m[i])))
   if m[i] > 1:
     PARAMS_SORTED(range(s, s + m[i]))
   s += m[i]

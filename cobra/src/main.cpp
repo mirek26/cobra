@@ -46,6 +46,9 @@ int main(int argc, char* argv[]) {
   //groups[m.get<Variable>(s)->id()] = 2;
   for (auto e: g.experiments()) {
     printf("\n\n%s\n\n", e->name().c_str());
+    // for (auto o: e->outcomes()) {
+    //   o->dump();
+    // }
     e->GenerateParametrizations(groups);
   }
 

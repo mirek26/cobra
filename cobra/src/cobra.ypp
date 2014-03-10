@@ -34,8 +34,8 @@
 %right T_EQUIV
 %right T_IMPLIES
 %left  T_IMPLIED
-%right T_OR
-%right T_AND
+%left T_OR
+%left T_AND
 %right T_NOT
 
 %token T_ATLEAST
@@ -146,9 +146,9 @@ formula :
     '(' formula ')'
       { $$ = $2; }
   | formula T_AND formula
-      { $$ = m.get<AndOperator>({ $1, $3 }); }
+      { $$ = m.OnAssocOp<AndOperator>($1, $3); }
   | formula T_OR formula
-      { $$ = m.get<OrOperator>({ $1, $3 }); }
+      { $$ = m.OnAssocOp<OrOperator>($1, $3); }
   | formula T_IMPLIES formula
       { $$ = m.get<ImpliesOperator>($1, $3); }
   | formula T_IMPLIED formula
