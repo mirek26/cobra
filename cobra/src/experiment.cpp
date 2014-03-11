@@ -7,12 +7,15 @@
 #include <exception>
 #include <cassert>
 #include <bliss-0.72/graph.hh>
+#include <bliss-0.72/utils.hh>
 
 #include "common.h"
 #include "formula.h"
 #include "game.h"
-
+#include "parser.h"
 #include "experiment.h"
+
+extern Parser m;
 
 void Experiment::addOutcome(std::string name, Formula* outcome) {
   outcomes_names_.push_back(name);
@@ -22,7 +25,10 @@ void Experiment::addOutcome(std::string name, Formula* outcome) {
 void Experiment::paramsDistinct(std::vector<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
-      assert(*i < *j && *j - 1 < num_params_);
+      m.input_assert(*i > 0 && *i <= num_params_,
+        "Invalid parameter id in PARAMS_DISTINCT.");
+      m.input_assert(*j > 0 && *j <= num_params_,
+        "Invalid parameter id in PARAMS_DISTINCT.");
       // params are internally indexed from 0, that's why *i - 1
       params_different_[*i - 1].insert(*j - 1);
       params_different_[*j - 1].insert(*i - 1);
@@ -34,7 +40,8 @@ void Experiment::paramsDistinct(std::vector<uint>* list) {
 void Experiment::paramsSorted(std::vector<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
-      assert(*i < *j && *j - 1 < num_params_);
+      m.input_assert(*i > 0 && *i < *j && *j <= num_params_,
+        "Invalid parameter id or invalid order in PARAMS_SORTED.");
       // params are internally indexed from 0, that's why *i - 1
       params_smaller_than_[*j - 1].insert(*i - 1);
     }
@@ -160,73 +167,74 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
   tmp_params_all_.clear();
   std::set<std::vector<CharId>> remove_params;
   FillParametrization(groups, 0);
-  // for (uint n = 0; n < num_params_; n++) {
-  //   for (auto params: tmp_params_all_) {
-  //     //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
+  for (uint n = 0; n < num_params_; n++) {
+    for (auto params: tmp_params_all_) {
+      //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
 
-  //     CharId chr = params[n];
-  //     if (interchangable_[n][chr]) continue;
-  //     // Build other_vars - vars in outcome formulas due to other positions.
-  //     std::set<VarId> other_vars(used_vars_);
-  //     for (uint i = 0; i < num_params_; i++) {
-  //       if (i == n) continue;
-  //       for (auto f: used_maps_[i]) {
-  //         other_vars.insert(game_->getMappingValue(f, params[i]));
-  //       }
-  //     }
-  //     //
-  //     bool keep = false;
-  //     for (auto f: used_maps_[n]) {
-  //       VarId var = game_->getMappingValue(f, chr);
-  //       if (other_vars.count(var) > 0) keep = true;
-  //     }
-  //     if (keep) continue;
-  //     // Consider alternatives.
-  //     for (CharId a = 0; a < chr; a++) {
-  //       params[n] = a;
-  //       if (tmp_params_all_.count(params) == 0) continue;
-  //       if (!CharsEquivalent(n, a, chr, groups)) continue;
-  //       keep = false;
-  //       for (auto f: used_maps_[n]) {
-  //         VarId var = game_->getMappingValue(f, a);
-  //         if (other_vars.count(var) > 0) keep = true;
-  //       }
-  //       if (!keep) {
-  //         // Schedule for removal.
-  //         params[n] = chr;
-  //         remove_params.insert(params);
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   for (auto& params: remove_params) {
-  //     tmp_params_all_.erase(params);
-  //   }
-  //   remove_params.clear();
-  // }
-  // printf("===\n");
-  // for (auto& params: tmp_params_all_) {
-  //   for (auto p: params) printf("%i ", p);
-  //   printf("\n");
-  // }
+      CharId chr = params[n];
+      if (interchangable_[n][chr]) continue;
+      // Build other_vars - vars in outcome formulas due to other positions.
+      std::set<VarId> other_vars(used_vars_);
+      for (uint i = 0; i < num_params_; i++) {
+        if (i == n) continue;
+        for (auto f: used_maps_[i]) {
+          other_vars.insert(game_->getMappingValue(f, params[i]));
+        }
+      }
+      //
+      bool keep = false;
+      for (auto f: used_maps_[n]) {
+        VarId var = game_->getMappingValue(f, chr);
+        if (other_vars.count(var) > 0) keep = true;
+      }
+      if (keep) continue;
+      // Consider alternatives.
+      for (CharId a = 0; a < chr; a++) {
+        params[n] = a;
+        if (tmp_params_all_.count(params) == 0) continue;
+        if (!CharsEquivalent(n, a, chr, groups)) continue;
+        keep = false;
+        for (auto f: used_maps_[n]) {
+          VarId var = game_->getMappingValue(f, a);
+          if (other_vars.count(var) > 0) keep = true;
+        }
+        if (!keep) {
+          // Schedule for removal.
+          params[n] = chr;
+          remove_params.insert(params);
+          break;
+        }
+      }
+    }
+    for (auto& params: remove_params) {
+      tmp_params_all_.erase(params);
+    }
+    remove_params.clear();
+  }
+  printf("===\n");
+  for (auto& params: tmp_params_all_) {
+    for (auto p: params) printf("%i ", p);
+    printf("\n");
+  }
 
   // ---
   std::map<unsigned int, std::vector<CharId>> hash;
   for (auto params: tmp_params_all_) {
+  //decltype(tmp_params_all_) test = { {0,0,1} };
+  //for (auto params: test) {
     bliss::Stats stats;
-    //printf("Graph construction... \n");
     auto g = BlissGraphForParametrization(groups, params);
-    //printf("Graph constructed. Running bliss.\n");
-    //g->write_dimacs(stdout);
+    // g->write_dimacs(stdout);
     auto a = g->canonical_form(stats, nullptr, nullptr);
-    //printf("Canonical form found.\n");
     auto ng = g->permute(a);
-    //printf("Bliss finished?\n");
+    // ng->write_dimacs(stdout);
+    //printf("\n\n");
     auto h = ng->get_hash();
     for (auto p: params) printf("%i ", p);
     if (hash.count(h) > 0) {
       printf("..seems to be equiv to.. ");
       for (auto p: hash[h]) printf("%i ", p);
+      //bliss::print_permutation(stdout, g->get_nof_vertices(), a, 1);
       printf("\n");
     } else {
       printf("is new!\n");
@@ -244,39 +252,41 @@ bliss::Digraph* Experiment::BlissGraphForParametrization(
                           std::vector<CharId>& params) {
   std::map<Formula*, uint> node_ids;
   std::map<uint, uint> var_ids;
-  std::vector<Formula*> nodes;
   int new_id = 0;
-  // Go through all formulas and indexize nodes.
-  std::function<void(Formula*)> CollectNodes = [&](Formula* c) {
-    if (c->isLiteral()) return;
-    if (node_ids.count(c) == 0) {
-      node_ids[c] = new_id++;
-      nodes.push_back(c);
-    }
-    for (uint i = 0; i < c->child_count(); i++) CollectNodes(c->child(i));
-  };
-  for (auto outcome: outcomes_) {
-    CollectNodes(outcome);
-  }
-  // Create the graph and label vertices according to their type
-  auto g = new bliss::Digraph(new_id + 2*game_->variables().size());
-  for (auto c: nodes) {
-    g->add_vertex(c->node_id());
-  }
+  // Create the graph
+  auto g = new bliss::Digraph(0);
   // Add vertices for variables, create edge between a variable and its negation
+  int max_group_id = 0;
   for (auto var: game_->variables()) {
+    // printf("Adding vertices for variable %s - color %i\n", var->pretty().c_str(), groups[var->id()]);
+    if (groups[var->id()] > max_group_id) max_group_id = groups[var->id()];
     g->add_vertex(groups[var->id()]);
     g->add_vertex(groups[var->id()]);
     var_ids[var->id()] = new_id;
+    // printf("Adding edge %i - %i\n", new_id, new_id+1 );
     g->add_edge(new_id, new_id + 1);
+    g->add_edge(new_id + 1, new_id);
     new_id += 2;
+  }
+  // Go through all outcome formulas and create nodes.
+  std::function<void(Formula*)> CreateNodes = [&](Formula* c) {
+    if (c->isLiteral()) return;
+    if (node_ids.count(c) == 0) {
+      node_ids[c] = new_id++;
+      // printf("add VERTEX %i for %s\n", new_id-1, c->pretty().c_str());
+      g->add_vertex(max_group_id + c->node_id());
+    }
+    for (uint i = 0; i < c->child_count(); i++) CreateNodes(c->child(i));
+  };
+  for (auto outcome: outcomes_) {
+    CreateNodes(outcome);
   }
   // Create all other edges according to the structure of the formula
   std::function<void(Formula*)> AddEdges = [&](Formula* c) {
     for (uint i = 0; i < c->child_count(); i++) {
       auto ch = c->child(i);
       bool neg = false;
-      if (c->isLiteral()) {
+      if (ch->isLiteral()) {
         if (dynamic_cast<NotOperator*>(ch)) {
           neg = true;
           ch = ch->neg();
@@ -284,9 +294,12 @@ bliss::Digraph* Experiment::BlissGraphForParametrization(
         auto map = dynamic_cast<Mapping*>(ch);
         auto var = dynamic_cast<Variable*>(ch);
         assert(map || var);
+        // printf("ADD edge %i %i for %s\n", node_ids[c], neg + (map ? var_ids[map->getValue(params)]
+        //                                      : var_ids[var_ids[var->id()]]), c->pretty().c_str());
         g->add_edge(node_ids[c], neg + (map ? var_ids[map->getValue(params)]
                                             : var_ids[var_ids[var->id()]]));
       } else {
+        // printf("add edge %i %i for %s to %s.\n", node_ids[c], node_ids[ch], c->pretty().c_str(), ch->pretty().c_str());
         g->add_edge(node_ids[c], node_ids[ch]);
         AddEdges(ch);
       }

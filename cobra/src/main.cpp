@@ -31,28 +31,38 @@ int main(int argc, char* argv[]) {
     printf("Cannot open %s: %s.", file, strerror(errno));
     exit(EXIT_FAILURE);
   }
-  yyparse();
+  try {
+    yyparse();
+  } catch (ParserException* p) {
+    printf("Invalid input: %s\n", p->what());
+    exit(1);
+  }
   fclose (yyin);
   printf("LOADED.\n");
 
   // // INTERACTIVE MODE
-  Game& g = m.game();
-  //if (!g.complete()) exit(1);
-  g.Precompute();
-  printf("PRECOMPUTED.\n");
+  // Game& g = m.game();
+  // //if (!g.complete()) exit(1);
+  // g.Precompute();
+  // printf("PRECOMPUTED.\n");
 
-  std::vector<int> groups = { 1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-  //std::string s = "x1A";
-  //groups[m.get<Variable>(s)->id()] = 2;
-  for (auto e: g.experiments()) {
-    printf("\n\n%s\n\n", e->name().c_str());
-    // for (auto o: e->outcomes()) {
-    //   o->dump();
-    // }
-    e->GenerateParametrizations(groups);
-  }
+  // std::vector<int> groups; // = { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  // groups.insert(groups.end(), 300, 1);
+  // std::string s = "x1A";
+  // groups[m.get<Variable>(s)->id()] = 2;
+  // // s = "x2B";
+  // // groups[m.get<Variable>(s)->id()] = 3;
+  // // s = "x3C";
+  // // groups[m.get<Variable>(s)->id()] = 4;
+  // for (auto e: g.experiments()) {
+  //   printf("\n\n%s\n\n", e->name().c_str());
+  //   // for (auto o: e->outcomes()) {
+  //   //   o->dump();
+  //   // }
+  //   e->GenerateParametrizations(groups);
+  // }
 
-  printf("DONE.\n");
+  // printf("DONE.\n");
   // CnfFormula current;
   // current.AddConstraint(g.init());
 

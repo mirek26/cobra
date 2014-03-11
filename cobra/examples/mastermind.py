@@ -8,7 +8,7 @@ N = 4   # number of pegs
 C = ['A', 'B', 'C', 'D', 'E', 'F'] # peg colors
 
 # x1_A tells whether the color of the first peg is A
-VARIABLES(["x%i%s"%(n,c) for n in range(N) for c in C])
+VARIABLES(["x%i%s"%(n,c) for n in range(1, N + 1) for c in C])
 ALPHABET(C)
 
 for n in range(1, N+1):

@@ -48,6 +48,8 @@ class Experiment {
   std::string name() const { return name_; }
   const std::vector<Formula*>& outcomes() const { return outcomes_; }
 
+  uint num_params() { return num_params_; }
+
   // Functions defining the experiment.
   void addOutcome(std::string name, Formula* outcome);
   void paramsDistinct(std::vector<uint>* list);

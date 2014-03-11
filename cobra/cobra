@@ -5,52 +5,60 @@ import tempfile
 import subprocess
 F = None
 
+def input_assert(ok, message):
+  if not ok:
+    f = sys._getframe(2);
+    print "File %s, line %i:\n  Invalid input: %s"%(f.f_code.co_filename, f.f_lineno, message);
+    exit(1)
+
 def VARIABLE(s):
-  assert type(s) is list
+  input_assert(type(s) is str, "VARIABLE argument must be a string.")
   F.write("VARIABLE '{0}'\n".formate(s))
 
 def VARIABLES(lst):
-  assert type(lst) is list
-  assert all(type(x) is str for x in lst)
+  input_assert(type(lst) is list, "VARIABLES argument must be a list of strings.")
+  input_assert(all(type(x) is str for x in lst), "VARIABLES argument must be a list of strings.")
   F.write("VARIABLES {0}\n".format(",".join(lst)))
 
 def RESTRICTION(s):
-  assert type(s) is str
+  input_assert(type(s) is str, "RESTRICTION argument must be a string (formula).")
   F.write("RESTRICTION {0}\n".format(s))
 
 def ALPHABET(lst):
-  assert type(lst) is list
-  assert all(type(x) is str for x in lst)
+  input_assert(type(lst) is list, "ALPHABET argument must be a list of strings.")
+  input_assert(all(type(x) is str for x in lst), "ALPHABET argument must be a list of strings.")
   F.write("ALPHABET {0}\n".format(str(lst)[1:-1]))
 
 def PARAMS_SORTED(lst):
-  assert all(type(x) is int for x in lst)
+  input_assert(all(type(x) is int for x in lst), "PARAMS_SORTED argument must be a list of ints.")
   F.write("  PARAMS_SORTED {0}\n".format(",".join(str(x) for x in lst)))
 
 def PARAMS_DISTINCT(lst):
-  assert all(type(x) is int for x in lst)
+  input_assert(all(type(x) is int for x in lst), "PARAMS_DISTINCT argument must be a list of ints.")
   F.write("  PARAMS_DISTINCT {0}\n".format(",".join(str(x) for x in lst)))
 
 def MAPPING(name, lst):
-  assert type(name) is str
-  assert type(lst) is list
-  assert all(type(x) is str for x in lst)
+  input_assert(type(name) is str, "MAPPING first argument must be a string")
+  input_assert(type(lst) is list, "MAPPING second argument must be a list of strings.")
+  input_assert(all(type(x) is str for x in lst),  "MAPPING second argument must be a list of strings.")
   F.write("MAPPING '{0}' {1}\n".format(name, ",".join(lst)))
 
 def EXPERIMENT(name, num):
   F.write("\nEXPERIMENT '{0}' {1}\n".format(name, num))
 
 def OUTCOME(name, formula):
-  assert type(name) is str
-  assert type(formula) is str
+  input_assert(type(name) is str, "OUTCOME first argument must be a string.")
+  input_assert(type(formula) is str, "OUTCOME second argument must be a string.")
   F.write("  OUTCOME '{0}' {1}\n".format(name, formula))
 
 if __name__ == '__main__':
-  fout = tempfile.NamedTemporaryFile()
-  F = fout.file
+  #fout = tempfile.NamedTemporaryFile()
+  #F = fout.file
+  F = open("./.cobra.in", "w")
   execfile(sys.argv[1])
-  F.close()
-  print fout.name
-  os.system("cat "+fout.name)
-  print "="*80
-  subprocess.call(['./cobra-backend', fout.name])
+  #F.close()
+  #print fout.name
+  #os.system("cat "+fout.name)
+  #print "="*80
+  #subprocess.call(['./cobra-backend', fout.name])
+  subprocess.call(['./cobra-backend', '.cobra.in'])

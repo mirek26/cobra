@@ -15,6 +15,7 @@ class Experiment;
 
 class Game {
   std::vector<Variable*> variables_;
+  std::map<std::string, VarId> variables_ids_;
   Formula* init_;
   std::vector<Experiment*> experiments_;
   std::vector<std::string> alphabet_;
@@ -27,7 +28,8 @@ class Game {
   void declareVariable(Variable*);
   void declareVariables(std::vector<Variable*>*);
   std::vector<Variable*>& variables() { return variables_; }
-// getVariableById?
+
+  Variable* getVariableByName(std::string);
 
   void addRestriction(Formula*);
   Formula* initialRestrictions();

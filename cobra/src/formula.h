@@ -25,19 +25,20 @@ class NotOperator;
  */
 extern Parser m;
 
-/* Prepositional formula, base class for
- * Derived classes:
- *  - NaryOperator - base class for associative n-ary operators
- *    - AndOperator - logical conjunction
- *    - OrOperator - logical disjunction
- *    - MacroOperator - syntax sugar - expansion can lead to exponential blowup
- *      - AtLeastOperator - at least k of n formulas must be true
- *      - AtMostOperator - at most k of n formulas must be true
- *      - ExactlyOperator - exactly k of n formulas must be true
- *  - EquivalenceOperator - logical equivalence (binary, symmetric)
- *  - ImpliesOperator - logical implication (binary)
- *  - NotOperator - negation of any other formula
- *  - Variable - the only possible leaf of the formula tree
+/* Prepositional formula.
+ * Derived classes (node type id)
+ *  - Variable (1) - the only possible leaf of the formula tree
+ *  - NotOperator (2) - negation of any other formula
+ *  - ImpliesOperator (3) - logical implication (binary)
+ *  - EquivalenceOperator (4) - logical equivalence (binary, symmetric)
+ *  - Mapping (7) - special construct in parametrized formulas : f($1)
+ *  - NaryOperator - base class for n-ary operators
+ *    - AndOperator (5) - logical conjunction
+ *    - OrOperator (6) - logical disjunction
+ *    - MacroOperator - syntax sugar
+ *      - AtLeastOperator (8+3k)- at least k of n formulas must be true
+ *      - AtMostOperator (9+3k) - at most k of n formulas must be true
+ *      - ExactlyOperator (10+3k)- exactly k of n formulas must be true
  *  TODO: how about true/false leaves?
  */
 class Formula {
@@ -46,10 +47,19 @@ class Formula {
    * used for Tseitin transformation
    */
   Variable* tseitin_var_ = nullptr;
-  const int kChildCount;
 
  public:
-  static const int kMaxNodeId;
+  const int kChildCount;
+  const int kVariableId = 1,
+            kNotId = 2,
+            kImpliesId = 3,
+            kEquivalenceId = 4,
+            kAndId = 5,
+            kOrId = 6,
+            kMappingId = 7,
+            kAtLeastId = 8,
+            kAtMostId = 9,
+            kExactlyId = 10;
 
   explicit Formula(int childCount)
       : kChildCount(childCount) { }
@@ -102,6 +112,8 @@ class Formula {
 
   static Formula* Parse(std::string str);
 };
+
+
 
 
 /******************************************************************************
@@ -179,7 +191,7 @@ class AndOperator: public NaryOperator {
   explicit AndOperator(std::vector<Formula*>* list)
       : NaryOperator(list) { }
 
-  virtual uint node_id() { return 2; }
+  virtual uint node_id() { return kAndId; }
   virtual std::string name() {
     return "AndOperator";
   }
@@ -207,7 +219,7 @@ class OrOperator: public NaryOperator {
   explicit OrOperator(std::vector<Formula*>* list)
      : NaryOperator(list) {}
 
-  virtual uint node_id() { return 3; }
+  virtual uint node_id() { return kOrId; }
   virtual std::string name() {
     return "OrOperator";
   }
@@ -253,7 +265,7 @@ class AtLeastOperator: public MacroOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return 4; }
+  virtual uint node_id() { return kAtLeastId + 3*value_; }
   virtual std::string name() {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
@@ -282,7 +294,7 @@ class AtMostOperator: public MacroOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return 5; }
+  virtual uint node_id() { return kAtMostId + 3*value_; }
   virtual std::string name() {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
@@ -311,7 +323,7 @@ class ExactlyOperator: public MacroOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return 6; }
+  virtual uint node_id() { return kExactlyId + 3*value_; }
   virtual std::string name() {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
@@ -340,7 +352,7 @@ class EquivalenceOperator: public Formula {
         left_(left),
         right_(right) { }
 
-  virtual uint node_id() { return 4; }
+  virtual uint node_id() { return kEquivalenceId; }
   virtual std::string name() {
     return "EquivalenceOperator";
   }
@@ -382,7 +394,7 @@ class ImpliesOperator: public Formula {
         left_(premise),
         right_(consequence) { }
 
-  virtual uint node_id() { return 5; }
+  virtual uint node_id() { return kImpliesId; }
   virtual std::string name() {
     return "ImpliesOperator";
   }
@@ -421,7 +433,7 @@ class NotOperator: public Formula {
       : Formula(1),
         child_(child) { }
 
-  virtual uint node_id() { return 2; }
+  virtual uint node_id() { return kNotId; }
   virtual std::string name() {
     return "NotOperator";
   }
@@ -466,7 +478,7 @@ class Mapping: public Formula {
   MapId mapping_id() { return mapping_id_; }
   uint param_id() { return param_id_; }
 
-  virtual uint node_id() { return 11; }
+  virtual uint node_id() { return kMappingId; }
   virtual std::string pretty(bool = true) {
     return ident_ + "$" + std::to_string(param_id_);
   }
@@ -520,11 +532,16 @@ class Variable: public Formula {
         ident_(ident),
         orig_(false),
         generated_(false) {
-    id_ = id_counter_++;
   }
 
-  virtual uint node_id() { return 1; }
+  virtual uint node_id() { return kVariableId; }
+
   VarId id() { return id_; }
+  void set_id(VarId value) {
+    id_ = value;
+    if (value > id_counter_) id_counter_ = value + 1;
+  }
+
   bool generated() { return generated_; }
   bool orig() { return orig_; }
   void set_orig(bool value) { orig_= value; }

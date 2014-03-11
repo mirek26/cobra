@@ -13,8 +13,8 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	$(MAKE) -C sat-solvers/bliss-0.72
-	$(MAKE) -C sat-solvers/picosat
+	@$(MAKE) -C sat-solvers/bliss-0.72
+	@$(MAKE) -C sat-solvers/picosat
 	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 
 # parser

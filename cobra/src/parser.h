@@ -58,6 +58,12 @@ class Parser {
     return get(identity<T>(), l);
   }
 
+  void input_assert(bool value, std::string error_message) {
+    if (!value) {
+      throw new ParserException(error_message);
+    }
+  }
+
   void deleteAll();
 
   template <class T>
@@ -98,11 +104,8 @@ class Parser {
    * it isn't there yet. This ensures that we don't create more than one node
    * for the same variable.
    */
-  Variable* get(identity<Variable>,
-                const std::string& ident);
-  Variable* get(identity<Variable>,
-                const std::string& ident,
-                const std::vector<int>& incides);
+  // Variable* get(identity<Variable>,
+  //               const std::string& ident);
 
 };
 

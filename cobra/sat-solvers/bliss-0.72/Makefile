@@ -28,17 +28,17 @@ BLISSLIB = libbliss.a
 gmp:	LIB += -lgmp
 gmp:	CFLAGS += -DBLISS_USE_GMP
 
-normal:	bliss
+normal:	bliss libbliss.a
 gmp:	bliss_gmp
 
 
-all:: lib bliss
+all:: bliss libbliss.a
 
 %.o %.og:	%.cc
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-lib: $(OBJS)
-	rm -f $(BLISSLIB)
+#rm -f $(BLISSLIB)
+libbliss.a: $(OBJS)
 	$(AR) cr $(BLISSLIB) $(OBJS)
 	$(RANLIB) $(BLISSLIB)
 
@@ -47,7 +47,7 @@ lib_gmp: $(GMPOBJS)
 	$(AR) cr $(BLISSLIB) $(GMPOBJS)
 	$(RANLIB) $(BLISSLIB)
 
-bliss: bliss.o lib $(OBJS)
+bliss: bliss.o $(OBJS)
 	$(CC) $(CFLAGS) -o bliss bliss.o $(OBJS) $(LIB)
 
 bliss_gmp: bliss.og lib_gmp $(GMPOBJS)

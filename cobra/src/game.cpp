@@ -10,12 +10,24 @@
 #include "game.h"
 
 void Game::declareVariable(Variable* var) {
+  var->set_id(variables_.size());
   variables_.push_back(var);
+  variables_ids_[var->ident()] = var->id();
 }
 
 void Game::declareVariables(std::vector<Variable*>* list) {
-  variables_.insert(variables_.begin(), list->begin(), list->end());
+  for (auto var: *list) {
+    var->set_id(variables_.size());
+    variables_.push_back(var);
+    variables_ids_[var->ident()] = var->id();
+  }
   delete list;
+}
+
+Variable* Game::getVariableByName(std::string name) {
+  m.input_assert(variables_ids_.count(name) > 0,
+    "Undefined prepositional variable '" + name + "'.");
+  return variables_[variables_ids_[name]];
 }
 
 void Game::addRestriction(Formula*) {
@@ -27,19 +39,20 @@ Formula* Game::initialRestrictions() {
 }
 
 int Game::addMapping(std::string ident, std::vector<Variable*>* vars) {
-  assert(mappings_ids_.count(ident) == 0);
+  m.input_assert(mappings_ids_.count(ident) == 0,
+    "Mapping " + ident + " defined twice.");
   int new_id = mappings_.size();
   mappings_ids_[ident] = new_id;
   mappings_.push_back(std::vector<VarId>());
   for (auto v: *vars) {
-    mappings_.back().push_back(v->id());
+    mappings_.back().push_back(getVariableByName(v->ident())->id());
   }
   return new_id;
 }
 
 int Game::getMappingId(std::string ident) {
-  //printf("Ask for %s.\n", ident.c_str());
-  assert(mappings_ids_.count(ident) > 0);
+  m.input_assert(mappings_ids_.count(ident) > 0,
+    "Undefined mapping '" + ident + "'.");
   return mappings_ids_[ident];
 }
 
