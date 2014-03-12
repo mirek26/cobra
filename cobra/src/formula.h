@@ -46,7 +46,7 @@ class Formula {
   /* variable (possibly negated) that is equivalent to this subformula,
    * used for Tseitin transformation
    */
-  Variable* tseitin_var_ = nullptr;
+  VarId tseitin_var_ = 0;
 
  public:
   const int kChildCount;
@@ -76,9 +76,9 @@ class Formula {
   virtual bool isLiteral() { return false; }
 
   /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
-   * a new variable will be created.
+   * a new variable id will be created.
    */
-  virtual Formula* tseitin_var();
+  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr);
 
   /* Negate the formula. Equivalent to m.get<NotOperator>(this), except for
    * NotOperator nodes, for which it just returns the child (and thus avoids
@@ -94,7 +94,7 @@ class Formula {
   /* Returns formula as a string. If utf8 is set to true, special math symbols
    * for conjunction, disjunction, implication etc. will be used.
    */
-  virtual std::string pretty(bool utf8 = true) = 0;
+  virtual std::string pretty(bool = true, std::vector<CharId>* param = nullptr) = 0;
 
   /* Tseitin transformation - used for conversion to CNF.
    * Capures the relationsships between this node and its children as clauses
@@ -106,6 +106,8 @@ class Formula {
   /* Converts the formula to CNF using Tseitin transformation.
    */
   CnfFormula* ToCnf();
+  CnfFormula* ToCnf(std::vector<CharId>& param);
+
   // virtual Formula* clone() = 0;
 
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
@@ -167,12 +169,12 @@ class NaryOperator: public Formula {
   }
 
  protected:
-  std::string pretty_join(std::string sep, bool utf8) {
+  std::string pretty_join(std::string sep, bool utf8, std::vector<CharId>* params) {
     if (children_.empty()) return "()";
-    std::string s = "(" + children_.front()->pretty(utf8);
+    std::string s = "(" + children_.front()->pretty(utf8, params);
     for (auto it = std::next(children_.begin()); it != children_.end(); ++it) {
       s += sep;
-      s += (*it)->pretty(utf8);
+      s += (*it)->pretty(utf8, params);
     }
     s += ")";
     return s;
@@ -196,8 +198,8 @@ class AndOperator: public NaryOperator {
     return "AndOperator";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return pretty_join(utf8 ? " ∧ " : " & ", utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return pretty_join(utf8 ? " ∧ " : " & ", utf8, params);
   }
 
   // virtual Formula* clone() {
@@ -224,8 +226,8 @@ class OrOperator: public NaryOperator {
     return "OrOperator";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return pretty_join(utf8 ? " ∨ " : " | ", utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return pretty_join(utf8 ? " ∨ " : " | ", utf8, params);
   }
 
   // virtual Formula* clone() {
@@ -245,7 +247,7 @@ class MacroOperator: public NaryOperator {
  public:
   explicit MacroOperator(std::vector<Formula*>* list);
 
-  virtual Formula* tseitin_var();
+  //virtual VarId tseitin_var();
 
   void ExpandHelper(uint size, bool negate);
   virtual AndOperator* Expand() = 0;
@@ -270,8 +272,8 @@ class AtLeastOperator: public MacroOperator {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
   // virtual Formula* clone() {
@@ -299,8 +301,8 @@ class AtMostOperator: public MacroOperator {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
   // virtual Formula* clone() {
@@ -328,8 +330,8 @@ class ExactlyOperator: public MacroOperator {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
   // virtual Formula* clone() {
@@ -357,11 +359,11 @@ class EquivalenceOperator: public Formula {
     return "EquivalenceOperator";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
     return "(" +
-      left_->pretty(utf8) +
+      left_->pretty(utf8, params) +
       (utf8 ? " ⇔ " : " <-> ") +
-      right_->pretty(utf8) +
+      right_->pretty(utf8, params) +
       ")";
   }
 
@@ -399,11 +401,11 @@ class ImpliesOperator: public Formula {
     return "ImpliesOperator";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
     return "(" +
-      left_->pretty(utf8) +
+      left_->pretty(utf8, params) +
       (utf8 ? " ⇒ " : " -> ") +
-      right_->pretty(utf8) +
+      right_->pretty(utf8, params) +
       ")";
   }
 
@@ -438,13 +440,18 @@ class NotOperator: public Formula {
     return "NotOperator";
   }
 
-  virtual std::string pretty(bool utf8 = true) {
-    return (utf8 ? "¬" : "!") + child_->pretty(utf8);
+  virtual std::string pretty(bool utf8 = true, std::vector<CharId>* params = nullptr) {
+    return (utf8 ? "¬" : "!") + child_->pretty(utf8, params);
   }
 
   virtual Formula* child(uint nth) {
     assert(nth == 0);
     return child_;
+  }
+
+  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr) {
+    if (isLiteral()) return -child_->tseitin_var(params);
+    else return Formula::tseitin_var(params);
   }
 
   // virtual Formula* clone() {
@@ -479,16 +486,21 @@ class Mapping: public Formula {
   uint param_id() { return param_id_; }
 
   virtual uint node_id() { return kMappingId; }
-  virtual std::string pretty(bool = true) {
-    return ident_ + "$" + std::to_string(param_id_);
-  }
+
+  virtual std::string pretty(bool = true, std::vector<CharId>* params = nullptr);
 
   virtual bool isLiteral() {
     return true;
   }
 
-  int getValue(std::vector<CharId>& params) {
+  VarId getValue(std::vector<CharId>& params) {
+    assert(param_id_ < params.size());
     return m.game().getMappingValue(mapping_id_, params[param_id_]);
+  }
+
+  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr) {
+    assert(params);
+    return getValue(*params);
   }
 
   virtual std::string name() {
@@ -499,8 +511,9 @@ class Mapping: public Formula {
   //   return m.get<Mapping>(ident_, mapping_id_, param_id_);
   // }
 
-  virtual void TseitinTransformation(CnfFormula*, bool) {
-    assert(false);
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top) {
+    if (top)
+      cnf->addClause({ getValue(*cnf->build_for_params()) });
   }
 };
 
@@ -509,8 +522,8 @@ class Mapping: public Formula {
  */
 class Variable: public Formula {
   std::string ident_;
-  bool orig_;
-  bool generated_;
+  // bool orig_;
+  // bool generated_;
   VarId id_;
 
   static VarId id_counter_; // initialy 1
@@ -519,20 +532,22 @@ class Variable: public Formula {
   /* Parameterless constructor creates a generated variable with next
    * available id and named var_ID.
    */
-  Variable()
-      : Formula(0),
-        orig_(false),
-        generated_(true) {
-    id_ = id_counter_++;
-    ident_ = "var" + std::to_string(id_);
-  }
+  // Variable()
+  //     : Formula(0),
+  //       orig_(false),
+  //       generated_(true) {
+  //   id_ = id_counter_++;
+  //   ident_ = "var" + std::to_string(id_);
+  // }
 
   explicit Variable(std::string ident)
       : Formula(0),
-        ident_(ident),
-        orig_(false),
-        generated_(false) {
-  }
+        ident_(ident)
+//        orig_(false),
+//        generated_(false) {
+  { }
+
+  static VarId NewVarId() { return id_counter_++; }
 
   virtual uint node_id() { return kVariableId; }
 
@@ -542,13 +557,13 @@ class Variable: public Formula {
     if (value > id_counter_) id_counter_ = value + 1;
   }
 
-  bool generated() { return generated_; }
-  bool orig() { return orig_; }
-  void set_orig(bool value) { orig_= value; }
+  // bool generated() { return generated_; }
+  // bool orig() { return orig_; }
+  // void set_orig(bool value) { orig_= value; }
 
   virtual std::string ident() { return ident_; }
 
-  virtual std::string pretty(bool = true) {
+  virtual std::string pretty(bool = true, std::vector<CharId>* = nullptr) {
     return ident_;
   }
 
@@ -559,6 +574,10 @@ class Variable: public Formula {
   virtual Formula* child(uint) {
     // this have no children - child() should never be called
     assert(false);
+  }
+
+  virtual VarId tseitin_var(std::vector<CharId>* = nullptr) {
+    return id_;
   }
 
   // virtual Formula* clone() {
@@ -582,9 +601,8 @@ class Variable: public Formula {
   }
 
   virtual void TseitinTransformation(CnfFormula* cnf, bool top) {
-    if (top) {
-      cnf->addClause({ (Formula*)this });
-    }
+    if (top)
+      cnf->addClause({ id_ });
   }
 };
 

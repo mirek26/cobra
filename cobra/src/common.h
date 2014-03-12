@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <iostream>
 
 #ifndef COBRA_COMMON_H_
 #define COBRA_COMMON_H_
@@ -41,5 +42,8 @@ void transform(std::vector<T>& from, std::vector<R>& to, std::function<R(T)>& fu
   to.resize(from.size());
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
+
+std::vector<std::string> split(std::string s);
+bool readIntOrString(int& i, std::string& str);
 
 #endif  // COBRA_COMMON_H_

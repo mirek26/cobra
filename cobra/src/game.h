@@ -12,11 +12,12 @@
 
 class Formula;
 class Experiment;
+class AndOperator;
 
 class Game {
   std::vector<Variable*> variables_;
   std::map<std::string, VarId> variables_ids_;
-  Formula* init_;
+  AndOperator* restriction_;
   std::vector<Experiment*> experiments_;
   std::vector<std::string> alphabet_;
 
@@ -25,6 +26,8 @@ class Game {
   std::map<std::string, MapId> mappings_ids_;
 
  public:
+  Game();
+
   void declareVariable(Variable*);
   void declareVariables(std::vector<Variable*>*);
   std::vector<Variable*>& variables() { return variables_; }
@@ -32,7 +35,7 @@ class Game {
   Variable* getVariableByName(std::string);
 
   void addRestriction(Formula*);
-  Formula* initialRestrictions();
+  Formula* restriction();
 
   void setAlphabet(std::vector<std::string>* alphabet) {
     assert(alphabet_.empty());

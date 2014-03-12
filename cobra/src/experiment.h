@@ -47,6 +47,7 @@ class Experiment {
 
   std::string name() const { return name_; }
   const std::vector<Formula*>& outcomes() const { return outcomes_; }
+  const std::vector<std::string>& outcomes_names() const { return outcomes_names_; }
 
   uint num_params() { return num_params_; }
 
@@ -55,7 +56,7 @@ class Experiment {
   void paramsDistinct(std::vector<uint>* list);
   void paramsSorted(std::vector<uint>* list);
 
-  void GenerateParametrizations(std::vector<int> symmetry);
+  std::set<std::vector<CharId>>* GenerateParametrizations(std::vector<int>);
   void Precompute();
 
  private:

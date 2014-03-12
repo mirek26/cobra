@@ -162,7 +162,8 @@ void Experiment::FillParametrization(std::vector<int>& groups, uint n) {
   }
 }
 
-void Experiment::GenerateParametrizations(std::vector<int> groups) {
+std::set<std::vector<CharId>>*
+Experiment::GenerateParametrizations(std::vector<int> groups) {
   tmp_params_.resize(num_params_);
   tmp_params_all_.clear();
   std::set<std::vector<CharId>> remove_params;
@@ -211,11 +212,11 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
     }
     remove_params.clear();
   }
-  printf("===\n");
-  for (auto& params: tmp_params_all_) {
-    for (auto p: params) printf("%i ", p);
-    printf("\n");
-  }
+  // printf("===\n");
+  // for (auto& params: tmp_params_all_) {
+  //   for (auto p: params) printf("%i ", p);
+  //   printf("\n");
+  // }
 
   // ---
   std::map<unsigned int, std::vector<CharId>> hash;
@@ -230,21 +231,28 @@ void Experiment::GenerateParametrizations(std::vector<int> groups) {
     // ng->write_dimacs(stdout);
     //printf("\n\n");
     auto h = ng->get_hash();
-    for (auto p: params) printf("%i ", p);
+    //for (auto p: params) printf("%i ", p);
     if (hash.count(h) > 0) {
-      printf("..seems to be equiv to.. ");
-      for (auto p: hash[h]) printf("%i ", p);
+      remove_params.insert(params);
+      //printf("..seems to be equiv to.. ");
+      //for (auto p: hash[h]) printf("%i ", p);
       //bliss::print_permutation(stdout, g->get_nof_vertices(), a, 1);
-      printf("\n");
+      //printf("\n");
     } else {
-      printf("is new!\n");
+      //printf("is new!\n");
       hash[h] = params;
     }
   }
-  for (auto p: hash) {
-    for (auto x: p.second) printf("%i ", x);
-    printf(".\n");
+  for (auto& params: remove_params) {
+    tmp_params_all_.erase(params);
   }
+  remove_params.clear();
+
+  // for (auto p: hash) {
+  //   for (auto x: p.second) printf("%i ", x);
+  //   printf(".\n");
+  // }
+  return &tmp_params_all_;
 }
 
 bliss::Digraph* Experiment::BlissGraphForParametrization(

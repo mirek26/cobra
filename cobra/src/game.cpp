@@ -9,6 +9,12 @@
 #include "experiment.h"
 #include "game.h"
 
+extern Parser m;
+
+Game::Game() {
+  restriction_ = m.get<AndOperator>();
+}
+
 void Game::declareVariable(Variable* var) {
   var->set_id(variables_.size());
   variables_.push_back(var);
@@ -30,12 +36,12 @@ Variable* Game::getVariableByName(std::string name) {
   return variables_[variables_ids_[name]];
 }
 
-void Game::addRestriction(Formula*) {
-
+void Game::addRestriction(Formula* f) {
+  restriction_->addChild(f);
 }
 
-Formula* Game::initialRestrictions() {
-  return init_;
+Formula* Game::restriction() {
+  return restriction_;
 }
 
 int Game::addMapping(std::string ident, std::vector<Variable*>* vars) {
