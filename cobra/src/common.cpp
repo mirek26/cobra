@@ -21,7 +21,7 @@ std::vector<std::string> split(std::string s) {
   return result;
 }
 
-bool readIntOrString(int& i, std::string& str) {
+bool readIntOrString(uint& i, std::string& str) {
   std::cin >> str;
   try {
     i = std::stoi(str);

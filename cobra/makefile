@@ -1,7 +1,10 @@
 #CC = g++-mp-4.9 -fdiagnostics-color=auto
 #CC = clang++
 #CC = g++
-CCFLAGS = -O3 -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
+ifndef $(CC)
+  CC = clang++
+endif
+CCFLAGS = -g -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
 LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -l picosat -l bliss 
 FLEX = flex
 BISON = bison -d

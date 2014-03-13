@@ -79,13 +79,17 @@ void CnfFormula::addClause(std::initializer_list<VarId> list) {
 }
 
 void CnfFormula::AddConstraint(Formula* formula) {
+  assert(formula);
   CnfFormula* cnf = formula->ToCnf();
+  assert(cnf);
   AddConstraint(*cnf);
   delete cnf;
 }
 
 void CnfFormula::AddConstraint(Formula* formula, std::vector<CharId> params) {
+  assert(formula);
   CnfFormula* cnf = formula->ToCnf(params);
+  assert(cnf);
   AddConstraint(*cnf);
   delete cnf;
 }
@@ -102,26 +106,24 @@ void CnfFormula::AddConstraint(CnfFormula& cnf) {
 //   return (id > 0 ? variables_[id] : variables_[-id]->neg())->pretty(unicode);
 // }
 
-// std::string CnfFormula::pretty_clause(const TClause& clause, bool unicode) {
-//   if (clause.empty()) return "()";
-//   std::string s = "(" + pretty_literal(*clause.begin(), unicode);
-//   for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
-//     s += unicode ? "|" : "|";
-//     s += pretty_literal(*it, unicode);
-//   }
-//   s += ")";
-//   return s;
-// }
+std::string CnfFormula::pretty_clause(const Clause& clause) {
+  if (clause.empty()) return "()";
+  std::string s = "(" + std::to_string(*clause.begin());
+  for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
+    s += " | " + std::to_string(*it);
+  }
+  s += ")";
+  return s;
+}
 
-// std::string CnfFormula::pretty(bool unicode) {
-//   if (clauses_.empty()) return "(empty)";
-//   std::string s = pretty_clause(*clauses_.begin(), unicode);
-//   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
-//     s += unicode ? " & " : " & ";
-//     s += pretty_clause(*it, unicode);
-//   }
-//   return s;
-// }
+std::string CnfFormula::pretty() {
+  if (clauses_.empty()) return "(empty)";
+  std::string s = pretty_clause(*clauses_.begin());
+  for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
+    s += "&" + pretty_clause(*it);
+  }
+  return s;
+}
 
 //------------------------------------------------------------------------------
 // SAT solver stuff
@@ -161,7 +163,9 @@ uint CnfFormula::GetFixedPairs() {
 void CnfFormula::InitSolver() {
   picosat_ = picosat_init();
   for (auto& c: clauses_) {
-    for (auto n: c) picosat_add(picosat_, n);
+    for (auto n: c) {
+      picosat_add(picosat_, n);
+    }
     picosat_add(picosat_, 0);
   }
 }
@@ -171,7 +175,7 @@ bool CnfFormula::Satisfiable() {
   return (result == PICOSAT_SATISFIABLE);
 }
 
-void CnfFormula::PrintAssignment(int limit) {
+void CnfFormula::PrintAssignment(VarId limit) {
   std::vector<int> trueVar;
   std::vector<int> falseVar;
   for (int id = 0; id < limit; id++) {
@@ -188,7 +192,7 @@ void CnfFormula::PrintAssignment(int limit) {
 //------------------------------------------------------------------------------
 // Symmetry-breaking stuff
 
-bool CnfFormula::ProbeEquivalence(const Clause& clause, int var1, int var2) {
+bool CnfFormula::ProbeEquivalence(const Clause& clause, VarId var1, VarId var2) {
   Clause test(clause);
   bool p1 = test.erase(var1);
   bool p2 = test.erase(var2);
@@ -201,15 +205,14 @@ bool CnfFormula::ProbeEquivalence(const Clause& clause, int var1, int var2) {
   return clauses_.count(test);
 }
 
-// Compute 'syntactical' equivalence on variables with ids 0 - limit; how about semantical?
-std::vector<int> CnfFormula::ComputeVariableEquivalence(int limit) {
-  std::vector<int> components(limit, 0);
+// Compute 'syntactical' equivalence on variables with ids 1 - limit; how about semantical?
+std::vector<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
+  std::vector<int> components(limit + 1, 0);
   int cid = 1;
-  std::set<int> rest(original_);
-  for (int i = 0; i < limit; i++) {
+  for (VarId i = 1; i <= limit; i++) {
     if (components[i] > 0) continue;
     components[i] = cid++;
-    for (int j = i + 1; j < limit; j++) {
+    for (VarId j = i + 1; j <= limit; j++) {
       if (components[j] > 0) continue;
       bool equiv = true;
       for (auto& clause: clauses_) {

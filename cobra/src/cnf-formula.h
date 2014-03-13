@@ -34,10 +34,9 @@ class CnfFormula {
   void addVariable(Variable* var);
   void addLiteral(Clause& clause, Formula* literal);
 
-  std::string pretty_literal(int id, bool unicode = true);
-  std::string pretty_clause(const Clause& clause, bool unicode = true);
+  std::string pretty_clause(const Clause& clause);
 
-  bool ProbeEquivalence(const Clause& clause, int var1, int var2);
+  bool ProbeEquivalence(const Clause& clause, VarId var1, VarId var2);
 
  public:
 
@@ -68,11 +67,11 @@ class CnfFormula {
 //  void ResetPicosat();
 
   void InitSolver();
-  void PrintAssignment(int limit);
+  void PrintAssignment(VarId limit);
 
-  std::vector<int> ComputeVariableEquivalence(int);
+  std::vector<int> ComputeVariableEquivalence(VarId limit);
 
-  std::string pretty(bool unicode = true);
+  std::string pretty();
 };
 
 #endif   // COBRA_CNF_FORMULA_H_

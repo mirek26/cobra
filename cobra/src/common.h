@@ -13,7 +13,7 @@
 
 typedef unsigned int uint;
 typedef unsigned char CharId;
-typedef unsigned short int VarId;
+typedef short int VarId; // must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
 
 template<typename T>
@@ -44,6 +44,6 @@ void transform(std::vector<T>& from, std::vector<R>& to, std::function<R(T)>& fu
 }
 
 std::vector<std::string> split(std::string s);
-bool readIntOrString(int& i, std::string& str);
+bool readIntOrString(uint& i, std::string& str);
 
 #endif  // COBRA_COMMON_H_

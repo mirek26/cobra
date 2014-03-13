@@ -30,6 +30,7 @@ class Game {
 
   void declareVariable(Variable*);
   void declareVariables(std::vector<Variable*>*);
+  void declareVariables(std::initializer_list<std::string>);
   std::vector<Variable*>& variables() { return variables_; }
 
   Variable* getVariableByName(std::string);

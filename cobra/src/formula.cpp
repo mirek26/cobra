@@ -36,7 +36,7 @@ Formula* Formula::neg() {
 
 std::string Mapping::pretty(bool, std::vector<CharId>* params) {
   if (params) {
-    return m.game().variables()[getValue(*params)]->pretty();
+    return m.game().variables()[getValue(*params) - 1]->pretty();
   } else {
     return ident_ + "$" + std::to_string(param_id_);
   }

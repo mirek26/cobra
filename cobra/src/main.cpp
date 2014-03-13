@@ -19,13 +19,13 @@ extern Parser m;
 
 struct ExperimentSpec {
   Experiment* type;
-  std::vector<Variable*> params;
-  std::vector<int> f_outcomes;
+  std::vector<CharId> params;
+  std::vector<bool> sat_outcomes;
 };
 
 int main(int argc, char* argv[]) {
   // PARSE INPUT
-  assert(argc == 2); // TODO: find some library to parse cmd line args
+  assert(argc == 2);
   auto file = argv[1];
   if (!(yyin = fopen(file, "r"))) {
     printf("Cannot open %s: %s.", file, strerror(errno));
@@ -52,36 +52,32 @@ int main(int argc, char* argv[]) {
   while (true) {
     auto varEquiv = current.ComputeVariableEquivalence(g.variables().size());
     int o = 0;
-    std::vector<std::pair<Experiment*, std::vector<CharId>>> experiments;
+    std::vector<ExperimentSpec> experiments;
     printf("Select experiment #%i: \n", exp_num++);
     for (auto e: g.experiments()) {
       auto params_all = e->GenerateParametrizations(varEquiv);
       for (auto& params: *params_all) {
-        experiments.push_back(std::make_pair(e, params));
+        experiments.push_back({ e, params, std::vector<bool>(e->outcomes().size(), false)});
         // print option
         printf("%i) %s [ ", o++, e->name().c_str());
         for (auto k: params) printf("%s ", g.alphabet()[k].c_str());
         printf("]\n");
-        // analysis
-        // printf("[fixed:");
-        // for (auto& outcome: e->outcomes()) {
-        //   CnfFormula n;
-        //   n.AddConstraint(current);
-        //   CnfFormula nn = outcome.SubstituteParams(p);
-        //   n.AddConstraint(nn);
-        //   if (n.Satisfiable()) {
-        //     auto fixed = n.GetFixedVariables();
-        //     experiments.back().f_outcomes.push_back(fixed);
-        //     printf(" %i", fixed);
-        //   } else {
-        //     experiments.back().f_outcomes.push_back(-1);
-        //   }
-        // }
-        //printf("]\n");
+        // basic analysis
+        for (uint i = 0; i < e->outcomes().size(); i++) {
+          CnfFormula n;
+          n.AddConstraint(current);
+          n.AddConstraint(e->outcomes()[i], params);
+          n.InitSolver();
+          if (n.Satisfiable()) {
+            //auto fixed = n.GetFixedVariables();
+            experiments.back().sat_outcomes[i] = true;
+            //printf(" %i", fixed);
+          }
+        }
       }
     }
 
-    int eid, oid;
+    uint eid, oid;
     bool ok;
     std::string str;
     do {
@@ -91,19 +87,24 @@ int main(int argc, char* argv[]) {
 
     printf("Select outcome: \n");
     o = 0;
-    auto experiment = experiments[eid].first;
-    auto param = experiments[eid].second;
+    auto experiment = experiments[eid].type;
+    auto params = experiments[eid].params;
     for (uint i = 0; i < experiment->outcomes().size(); i++) {
-      printf("%i) %s - %s\n", i, experiment->outcomes_names()[i].c_str(),
-                  experiment->outcomes()[i]->pretty(true, &param).c_str());
+      if (experiments[eid].sat_outcomes[i]) printf("%i) ", i);
+      else printf("-) ");
+      printf("%s - %s %s\n",
+        experiment->outcomes_names()[i].c_str(),
+        experiment->outcomes()[i]->pretty(true, &params).c_str(),
+        experiments[eid].sat_outcomes[i] ? "" : "(unsatisfiable)");
     }
     do {
       printf("> ");
       ok = readIntOrString(oid, str);
-    } while (!ok || oid >= experiment->outcomes().size());
+    } while (!ok || oid >= experiment->outcomes().size() ||
+             !experiments[eid].sat_outcomes[oid]);
 
-    printf("Gained knowledge: %s\n", experiment->outcomes()[oid]->pretty(true, &param).c_str());
-    auto newConstraint = experiment->outcomes()[oid]->ToCnf(param);
+    printf("Gained knowledge: %s\n", experiment->outcomes()[oid]->pretty(true, &params).c_str());
+    auto newConstraint = experiment->outcomes()[oid]->ToCnf(params);
     current.AddConstraint(*newConstraint);
     delete newConstraint;
     if (current.HasOnlyOneModel()) {

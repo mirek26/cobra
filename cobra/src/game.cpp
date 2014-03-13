@@ -16,24 +16,26 @@ Game::Game() {
 }
 
 void Game::declareVariable(Variable* var) {
-  var->set_id(variables_.size());
+  var->set_id(variables_.size() + 1);
   variables_.push_back(var);
   variables_ids_[var->ident()] = var->id();
 }
 
 void Game::declareVariables(std::vector<Variable*>* list) {
-  for (auto var: *list) {
-    var->set_id(variables_.size());
-    variables_.push_back(var);
-    variables_ids_[var->ident()] = var->id();
-  }
+  for (auto var: *list)
+    declareVariable(var);
   delete list;
+}
+
+void Game::declareVariables(std::initializer_list<std::string> list) {
+  for (auto x: list)
+    declareVariable(m.get<Variable>(x));
 }
 
 Variable* Game::getVariableByName(std::string name) {
   m.input_assert(variables_ids_.count(name) > 0,
     "Undefined prepositional variable '" + name + "'.");
-  return variables_[variables_ids_[name]];
+  return variables_[variables_ids_[name] - 1];
 }
 
 void Game::addRestriction(Formula* f) {

@@ -52,13 +52,14 @@ def OUTCOME(name, formula):
   F.write("  OUTCOME '{0}' {1}\n".format(name, formula))
 
 if __name__ == '__main__':
-  #fout = tempfile.NamedTemporaryFile()
-  #F = fout.file
-  F = open("./.cobra.in", "w")
+  filename = ".cobra.in"
+  try:
+    F = open(filename, "w")
+  except IOError as e:
+    fout = tempfile.NamedTemporaryFile()
+    filename = fout.name
+    F = fout.file
   execfile(sys.argv[1])
-  #F.close()
-  #print fout.name
-  #os.system("cat "+fout.name)
-  #print "="*80
-  #subprocess.call(['./cobra-backend', fout.name])
-  subprocess.call(['./cobra-backend', '.cobra.in'])
+  F.close()
+  print "Preprocessing finished, output written to %s." % filename;
+  subprocess.call([os.path.dirname(sys.argv[0])+'/cobra-backend', filename])
