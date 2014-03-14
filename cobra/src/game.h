@@ -56,23 +56,7 @@ class Game {
 
   void Precompute();
 
-  bool complete() {
-    // if (!variables_) {
-    //   printf("Nothing assigned to 'Vars'.\n");
-    //   return false;
-    // }
-    // if (!init_) {
-    //   printf("Nothing assigned to 'Init'.\n");
-    //   return false;
-    // }
-    // if (experiments_.empty()) {
-    //   printf("No experiment defined.\n");
-    //   return false;
-    // }
-    return true;
-  }
-
-  void doAll();
+  bliss::Digraph* CreateBlissGraph();
 };
 
 #endif   // COBRA_GAME_H_

@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <initializer_list>
+#include <bliss/graph.hh>
 #include "common.h"
 #include "parser.h"
 #include "cnf-formula.h"
@@ -111,6 +112,8 @@ class Formula {
   // virtual Formula* clone() = 0;
 
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
+
+  void BuildBlissGraph(bliss::Digraph& g, std::vector<CharId>* params, int parent = -1);
 
   static Formula* Parse(std::string str);
 };

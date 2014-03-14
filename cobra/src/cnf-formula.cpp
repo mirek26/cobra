@@ -280,3 +280,52 @@ std::vector<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
 // }
 
 
+// void CnfFormula::BuildBlissGraph(bliss::Digraph& g) {
+//   auto vars = g.get_nof_vertices() / 2;
+
+//   std::map<uint, uint> var_ids;
+//   // Go through all outcome formulas and create nodes.
+//   std::function<void(Formula*)> CreateNodes = [&](Formula* c) {
+//     if (c->isLiteral()) return;
+//     if (node_ids.count(c) == 0) {
+//       node_ids[c] = new_id++;
+//       // printf("add VERTEX %i for %s\n", new_id-1, c->pretty().c_str());
+//       g->add_vertex(max_group_id + c->node_id());
+//     }
+//     for (uint i = 0; i < c->child_count(); i++) CreateNodes(c->child(i));
+//   };
+//   for (auto outcome: outcomes_) {
+//     CreateNodes(outcome);
+//   }
+//   // Create all other edges according to the structure of the formula
+//   std::function<void(Formula*)> AddEdges = [&](Formula* c) {
+//     for (uint i = 0; i < c->child_count(); i++) {
+//       auto ch = c->child(i);
+//       bool neg = false;
+//       if (ch->isLiteral()) {
+//         if (dynamic_cast<NotOperator*>(ch)) {
+//           neg = true;
+//           ch = ch->neg();
+//         }
+//         auto map = dynamic_cast<Mapping*>(ch);
+//         auto var = dynamic_cast<Variable*>(ch);
+//         assert(map || var);
+//         // printf("ADD edge %i %i for %s\n", node_ids[c], neg + (map ? var_ids[map->getValue(params)]
+//         //                                      : var_ids[var_ids[var->id()]]), c->pretty().c_str());
+//         g->add_edge(node_ids[c], neg + (map ? var_ids[map->getValue(params)]
+//                                             : var_ids[var_ids[var->id()]]));
+//       } else {
+//         // printf("add edge %i %i for %s to %s.\n", node_ids[c], node_ids[ch], c->pretty().c_str(), ch->pretty().c_str());
+//         g->add_edge(node_ids[c], node_ids[ch]);
+//         AddEdges(ch);
+//       }
+//     }
+//   };
+//   for (auto outcome: outcomes_) {
+//     AddEdges(outcome);
+//   }
+//   g->set_splitting_heuristic(bliss::Digraph::shs_fsm);
+//   return g;
+// }
+
+

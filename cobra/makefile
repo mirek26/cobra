@@ -29,7 +29,7 @@ bison: src/cobra.tab.cpp src/cobra.yy.c
 src/cobra.tab.o: src/cobra.tab.cpp src/cobra.ypp
 src/cobra.yy.o: src/cobra.yy.c src/cobra.l
 	@# suppress all warnings (compiling c as c++ etc.)
-	$(CC) -c -std=c++11 -w $< -o $@
+	$(CC) -c -isystem sat-solvers/ -std=c++11 -w $< -o $@
 
 # general
 %.o: %.cpp %.h

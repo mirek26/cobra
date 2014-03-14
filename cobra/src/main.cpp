@@ -6,6 +6,8 @@
 #include <cerrno>
 #include <set>
 #include <iostream>
+#include <bliss/graph.hh>
+#include <bliss/utils.hh>
 
 #include "formula.h"
 #include "game.h"
@@ -22,6 +24,23 @@ struct ExperimentSpec {
   std::vector<CharId> params;
   std::vector<bool> sat_outcomes;
 };
+
+
+void new_gen_hook(void* equiv, uint len, const uint* aut) {
+  std::vector<int>& var_equiv = *((std::vector<int>*) equiv);
+  uint d = -1;
+  for (int i = 0; i < var_equiv.size()*2 - 2; i+=2) {
+    if (aut[i] <= i) continue;
+    if (aut[i+1] != aut[i]+1) return;
+    if (d > -1) return;
+    d = i;
+  }
+  int v1 = aut[d]/2 + 1, v2 = d/2 + 1;
+  if (v1 < var_equiv.size()) {
+    auto min = var_equiv[v1] > var_equiv[v2] ? var_equiv[v2] : var_equiv[v1];
+    var_equiv[v1] = var_equiv[v2] = min;
+  }
+}
 
 int main(int argc, char* argv[]) {
   // PARSE INPUT
@@ -42,20 +61,36 @@ int main(int argc, char* argv[]) {
 
   // INTERACTIVE MODE
   Game& g = m.game();
+  int var_count = g.variables().size();
   g.Precompute();
 
   printf("Starting interactive mode [both].\n");
-  CnfFormula current;
-  current.AddConstraint(g.restriction());
+  AndOperator current;
+  CnfFormula current_cnf;
+  current.addChild(g.restriction());
+  current_cnf.AddConstraint(g.restriction());
 
   int exp_num = 1;
   while (true) {
-    auto varEquiv = current.ComputeVariableEquivalence(g.variables().size());
+    // compute var equivalence
+    auto gr = g.CreateBlissGraph();
+    current.BuildBlissGraph(*gr, nullptr);
+    bliss::Stats stats;
+    std::vector<int> var_equiv(var_count + 1, 0);
+    for (int i = 1; i <= var_count; i++) var_equiv[i] = i;
+    gr->find_automorphisms(stats, new_gen_hook, (void*)&var_equiv);
+    printf("VAREQUIV:\n");
+    for (int i = 1; i <= var_count; i++) {
+      var_equiv[i] = var_equiv[var_equiv[i]];
+      printf("%i : %i \n", i, var_equiv[i]);
+    }
+    printf("\n");
+    //
     int o = 0;
     std::vector<ExperimentSpec> experiments;
     printf("Select experiment #%i: \n", exp_num++);
     for (auto e: g.experiments()) {
-      auto params_all = e->GenerateParametrizations(varEquiv);
+      auto params_all = e->GenerateParametrizations(var_equiv);
       for (auto& params: *params_all) {
         experiments.push_back({ e, params, std::vector<bool>(e->outcomes().size(), false)});
         // print option
@@ -65,7 +100,7 @@ int main(int argc, char* argv[]) {
         // basic analysis
         for (uint i = 0; i < e->outcomes().size(); i++) {
           CnfFormula n;
-          n.AddConstraint(current);
+          n.AddConstraint(current_cnf);
           n.AddConstraint(e->outcomes()[i], params);
           n.InitSolver();
           if (n.Satisfiable()) {
@@ -105,12 +140,12 @@ int main(int argc, char* argv[]) {
 
     printf("Gained knowledge: %s\n", experiment->outcomes()[oid]->pretty(true, &params).c_str());
     auto newConstraint = experiment->outcomes()[oid]->ToCnf(params);
-    current.AddConstraint(*newConstraint);
+    current_cnf.AddConstraint(*newConstraint);
     delete newConstraint;
-    if (current.HasOnlyOneModel()) {
+    if (current_cnf.HasOnlyOneModel()) {
       printf("\nSOLVED!\n");
-      current.Satisfiable();
-      current.PrintAssignment(g.variables().size());
+      current_cnf.Satisfiable();
+      current_cnf.PrintAssignment(g.variables().size());
       break;
     }
   }

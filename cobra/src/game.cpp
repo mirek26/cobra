@@ -82,3 +82,19 @@ void Game::Precompute() {
     e->Precompute();
   }
 }
+
+bliss::Digraph* Game::CreateBlissGraph() {
+  int new_id = 0;
+  // Create the graph
+  auto g = new bliss::Digraph(0);
+  // Add vertices for variables, create edge between a variable and its negation
+  for (auto var: variables()) {
+    g->add_vertex(var->node_id());
+    g->add_vertex(var->node_id());
+    g->add_edge(new_id, new_id + 1);
+    g->add_edge(new_id + 1, new_id);
+    new_id += 2;
+  }
+  g->set_splitting_heuristic(bliss::Digraph::shs_fsm);
+  return g;
+}

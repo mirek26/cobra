@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <bliss/graph.hh>
 
 #include "formula.h"
 #include "common.h"
@@ -230,4 +231,35 @@ void EquivalenceOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
 void MacroOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   //auto expanded = Expand();
   //expanded->TseitinTransformation(cnf, top);
+}
+
+void Formula::BuildBlissGraph(bliss::Digraph& g, std::vector<CharId>* params, int parent) {
+  if (isLiteral()) {
+    // just create an edge from parent to the variable
+    assert(parent > 0);
+    auto neg = false;
+    auto c = this;
+    // natáhni hranu z parenta sem
+    if (dynamic_cast<NotOperator*>(c)) {
+      neg = true;
+      c = c->neg();
+    }
+    auto map = dynamic_cast<Mapping*>(c);
+    auto var = dynamic_cast<Variable*>(c);
+    if (map) {
+      assert(params);
+      g.add_edge(parent, 2*map->getValue(*params) - 2 + neg);
+    } else {
+      assert(var);
+      g.add_edge(parent, 2*var->id() - 2 + neg);
+    }
+  } else {
+    // create a new node for the operator and call recursively for children
+    auto id = g.get_nof_vertices();
+    g.add_vertex(node_id());
+    if (parent > 0)
+      g.add_edge(parent, id);
+    for (uint i = 0; i < child_count(); i++)
+      child(i)->BuildBlissGraph(g, params, id);
+  }
 }
