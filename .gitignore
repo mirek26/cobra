@@ -21,8 +21,12 @@ cobra-backend
 cobra/test/test
 !cobra/
 
+# tmp files
+.cobra.in
+
 # sys blabla
 *.DS_Store
+local/
 
 # latex
 *.out

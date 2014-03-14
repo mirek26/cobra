@@ -1,0 +1,39 @@
+\chapter{Symmetry Breaking}
+\TOOD{Motivace:} u některých úloh je fakt mrtě experimentů, když uvážíme možné
+parametrizace. Třeba u standardních 12 koulí u vážení 4 vs 4
+ $\frac{1}{2}\cdot {12 \choose 4}\cdot{8 \choose 4}$ kombinací. Ne všechny jsou zajímavé.
+V téhle kapitole zformalizujem, co znamená zajímavé a jak takové vyberem.
+
+\begin{definition}
+An experiment $\exp_1$ is in relation $\sim_\form$ with an experiment $\exp_2$ if
+ and only if there exists a permutation $\perm\in\Perm_\Var$ such that
+ $ \{ \form\wedge\formu \| \formu\in\outcome(\exp_1) \} \equiv
+   \{ (\form\wedge\formu)^\perm \| \formu\in\outcome(\exp_2) \} $.
+\end{definition}
+
+This is clearly an equivalence relation.
+
+\begin{lemma}
+Let $\stg_1, \stg_2$ be two strageties, such that
+$\stg_1(\form) \sim_\form \stg_2(\form)$ for any $\form \in\Form_\Var$.
+Then for any valuation $v$ $|\procstg{\stg_1}{\val}| = |\procstg{\stg_1}{\val}|$
+and thus also $\lenmax{\stg_1} = \lenmax{\stg_2}$.
+\end{lemma}
+
+\begin{proof}
+\TODO{Indukcí k délce $\procstg{\stg}{\val}$.}
+\end{proof}
+
+For any accrued knowledge $\form$, this lemma gives us the right
+to consider only one of the experiments
+$\exp_1, \exp_2$ if $\exp_1 \sim\form \exp_2$.
+
+Now, we would love an algorithm that would, for a given formula $\form$,
+generate a set of experiment, such that there is exaclty one expriment
+from every equivalence class in $E/\sim_\form$.
+\TODO{...}
+
+For the following sections, let us fix an experiment type $t$.
+\section{Phase 1}
+
+\section{Phase 2}
