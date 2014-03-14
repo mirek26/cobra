@@ -22,18 +22,11 @@ typedef std::set<VarId> Clause;
 
 class CnfFormula {
   std::set<Clause> clauses_;
-  std::map<int, Variable*> variables_;
-  std::set<int> original_;
   PicoSAT* picosat_;
 
   std::vector<CharId>* build_for_params_ = nullptr;
-//  std::vector<ParameterEq*> paramEq_;
 
  private:
-  Variable* getVariable(int id);
-  void addVariable(Variable* var);
-  void addLiteral(Clause& clause, Formula* literal);
-
   std::string pretty_clause(const Clause& clause);
 
   bool ProbeEquivalence(const Clause& clause, VarId var1, VarId var2);
@@ -50,9 +43,6 @@ class CnfFormula {
   void AddConstraint(Formula* formula);
   void AddConstraint(Formula* formula, std::vector<CharId> params);
   void AddConstraint(CnfFormula& cnf);
-
-
-  //CnfFormula SubstituteParams(std::vector<Variable*> params);
 
   uint GetFixedVariables();
   uint GetFixedPairs();

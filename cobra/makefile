@@ -5,7 +5,7 @@ ifndef $(CC)
   CC = clang++
 endif
 CCFLAGS = -g -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
-LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss-0.72 -l picosat -l bliss 
+LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss -l picosat -l bliss 
 FLEX = flex
 BISON = bison -d
 
@@ -16,7 +16,7 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	@$(MAKE) -C sat-solvers/bliss-0.72
+	@$(MAKE) -C sat-solvers/bliss
 	@$(MAKE) -C sat-solvers/picosat
 	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 

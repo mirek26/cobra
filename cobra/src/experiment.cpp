@@ -6,8 +6,8 @@
 #include <map>
 #include <exception>
 #include <cassert>
-#include <bliss-0.72/graph.hh>
-#include <bliss-0.72/utils.hh>
+#include <bliss/graph.hh>
+#include <bliss/utils.hh>
 
 #include "common.h"
 #include "formula.h"

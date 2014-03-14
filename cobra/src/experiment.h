@@ -9,7 +9,7 @@
 #include "common.h"
 #include "formula.h"
 #include "game.h"
-#include <bliss-0.72/graph.hh>
+#include <bliss/graph.hh>
 
 #ifndef COBRA_EXPERIMENT_H_
 #define COBRA_EXPERIMENT_H_

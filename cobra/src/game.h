@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <vector>
+#include <bliss/graph.hh>
 #include "common.h"
 #include "cnf-formula.h"
 

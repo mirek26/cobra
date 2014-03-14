@@ -130,33 +130,33 @@ std::string CnfFormula::pretty() {
 
 uint CnfFormula::GetFixedVariables() {
   uint r = 0;
-  for (auto& var: original_) {
-    picosat_assume(picosat_, var);
-    if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-    picosat_assume(picosat_, -var);
-    if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-  }
+  // for (auto& var: original_) {
+  //   picosat_assume(picosat_, var);
+  //   if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  //   picosat_assume(picosat_, -var);
+  //   if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  // }
   return r;
 }
 
 uint CnfFormula::GetFixedPairs() {
   uint r = 0;
-  for (auto& var1: original_) {
-    for (auto& var2: original_) {
-      picosat_assume(picosat_, var1);
-      picosat_assume(picosat_, var2);
-      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-      picosat_assume(picosat_, -var1);
-      picosat_assume(picosat_, var2);
-      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-      picosat_assume(picosat_, var1);
-      picosat_assume(picosat_, -var2);
-      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-      picosat_assume(picosat_, -var1);
-      picosat_assume(picosat_, -var2);
-      if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
-    }
-  }
+  // for (auto& var1: original_) {
+  //   for (auto& var2: original_) {
+  //     picosat_assume(picosat_, var1);
+  //     picosat_assume(picosat_, var2);
+  //     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  //     picosat_assume(picosat_, -var1);
+  //     picosat_assume(picosat_, var2);
+  //     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  //     picosat_assume(picosat_, var1);
+  //     picosat_assume(picosat_, -var2);
+  //     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  //     picosat_assume(picosat_, -var1);
+  //     picosat_assume(picosat_, -var2);
+  //     if (picosat_sat(picosat_, -1) == PICOSAT_UNSATISFIABLE) r++;
+  //   }
+  // }
   return r;
 }
 
