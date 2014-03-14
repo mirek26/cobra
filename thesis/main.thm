@@ -1,15 +1,19 @@
-\contentsline {problem}{{Problem}{1}{The twelve coin problem}}{1}{common.1}
-\contentsline {problem}{{Problem}{2}{The thirteen coin problem}}{1}{common.2}
-\contentsline {problem}{{Problem}{3}{General fake coin problem}}{1}{common.3}
-\contentsline {definition}{{Definition}{4}{}}{3}{common.4}
-\contentsline {definition}{{Definition}{5}{}}{3}{common.5}
-\contentsline {example}{{Example}{6}{Fake-coin problem}}{4}{common.6}
-\contentsline {example}{{Example}{7}{Fake-coin problem, alternative}}{4}{common.7}
-\contentsline {example}{{Example}{8}{Mastermind}}{5}{common.8}
-\contentsline {definition}{{Definition}{9}{}}{5}{common.9}
-\contentsline {lemma}{{Lemma}{10}{}}{6}{common.10}
-\contentsline {proof}{{\proofname }{1}{}}{6}{proof.1}
-\contentsline {definition}{{Definition}{11}{}}{6}{common.11}
-\contentsline {definition}{{Definition}{12}{}}{6}{common.12}
-\contentsline {problem}{{Problem}{13}{}}{7}{common.13}
-\contentsline {definition}{{Definition}{14}{}}{7}{common.14}
+\contentsline {problem}{{Problem}{1}{The twelve coin problem}}{5}{common.1}
+\contentsline {problem}{{Problem}{2}{The thirteen coin problem}}{5}{common.2}
+\contentsline {problem}{{Problem}{3}{General fake coin problem}}{5}{common.3}
+\contentsline {definition}{{Definition}{4}{}}{7}{common.4}
+\contentsline {definition}{{Definition}{5}{}}{8}{common.5}
+\contentsline {example}{{Example}{6}{Fake-coin problem}}{8}{common.6}
+\contentsline {example}{{Example}{7}{Fake-coin problem, alternative}}{10}{common.7}
+\contentsline {example}{{Example}{8}{Mastermind}}{10}{common.8}
+\contentsline {example}{{Example}{9}{Mastermind (alternative)}}{10}{common.9}
+\contentsline {definition}{{Definition}{10}{}}{12}{common.10}
+\contentsline {lemma}{{Lemma}{11}{}}{12}{common.11}
+\contentsline {proof}{{\proofname }{1}{}}{13}{proof.1}
+\contentsline {definition}{{Definition}{12}{}}{13}{common.12}
+\contentsline {definition}{{Definition}{13}{}}{13}{common.13}
+\contentsline {problem}{{Problem}{14}{}}{13}{common.14}
+\contentsline {definition}{{Definition}{15}{}}{13}{common.15}
+\contentsline {definition}{{Definition}{16}{}}{14}{common.16}
+\contentsline {lemma}{{Lemma}{17}{}}{14}{common.17}
+\contentsline {proof}{{\proofname }{2}{}}{14}{proof.2}

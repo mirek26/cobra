@@ -1,19 +1,19 @@
 \input{header}
 
 \thesislang{en}
-\thesistitle{Synthesis of Minimal Schedulers \\ for Markov Decision Processes}
-\thesissubtitle{Bachelor Thesis}
+\thesistitle{Algorithmic Analysis \\of Code Breaking Games}
+\thesissubtitle{Master's Thesis}
 \thesisstudent{Miroslav Klimoš}
 \thesiswoman{false}
 \thesisfaculty{fi}
-\thesisyear{2012}
-\thesisadvisor{RNDr. Tomáš Brázdil, Ph.D.}
+\thesisyear{2014}
+\thesisadvisor{prof. RNDr. Antonín Kučera, Ph.D.}
 
 \hypersetup{
     unicode=true,
-    pdftitle={Synthesis of Minimal Schedulers for Markov Decision Processes},
+    pdftitle={Algorithmic Analysis of Code Breaking Games},
     pdfauthor={Miroslav Klimoš},
-    pdfkeywords={Markov decision process}{optimal scheduler}{minimal scheduler},
+    %pdfkeywords={Markov decision process}{optimal scheduler}{minimal scheduler},
     colorlinks=true,        % false: boxed links; true: colored links
     linkcolor=BrickRed, 	% color of internal links
     citecolor=OliveGreen,   % color of links to bibliography
@@ -69,20 +69,20 @@
 \newcommand{\atleast}[1]{\textrm{AtLeast-#1}\:}
 \newcommand{\atmost}[1]{\textrm{AtMost-#1}\:}
 
-% \FrontMatter
-% \setlength{\parindent}{0pt}
-% \ThesisTitlePage
+\FrontMatter
+\setlength{\parindent}{0pt}
+\ThesisTitlePage
 
 
-% \begin{ThesisDeclaration}
-% I declare that this thesis is my own work and has not been submitted
-% in any form for another degree or diploma at any university or
-% other institution of tertiary education. Information derived from the published
-% or unpublished work of others has been acknowledged in the text
-% and a list of references is given.
+\begin{ThesisDeclaration}
+I declare that this thesis is my own work and has not been submitted
+in any form for another degree or diploma at any university or
+other institution of tertiary education. Information derived from the published
+or unpublished work of others has been acknowledged in the text
+and a list of references is given.
 
-% \AdvisorName
-% \end{ThesisDeclaration}
+\AdvisorName
+\end{ThesisDeclaration}
 
 
 % \begin{ThesisThanks}
@@ -97,14 +97,13 @@
 % \end{ThesisThanks}
 
 
-% \begin{ThesisKeyWords}
-% stochastic processes,
-% Markov decision processes,
-% continuous-time Markov decision processes,
-% time-bounded reachability,
-% optimal scheduler,
-% minimal scheduler
-% \end{ThesisKeyWords}
+\begin{ThesisKeyWords}
+code braking games,
+mastermind,
+counterfeit coin,
+sat solving,
+greedy strategy
+\end{ThesisKeyWords}
 
 
 % \begin{ThesisAbstract}
@@ -132,24 +131,22 @@
 % \end{ThesisAbstract}
 
 
-% \MainMatter
-% \setlength{\parindent}{0pt}
+\MainMatter
+\setlength{\parindent}{0pt}
 
-% \setcounter{secnumdepth}{1}
-% \setcounter{tocdepth}{2}
-% \begin{spacing}{1.2} \normalsize
-% \tableofcontents
-% \end{spacing}
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{2}
+\begin{spacing}{1.2} \normalsize
+\tableofcontents
+\end{spacing}
 
-% \input{intro}
-% \input{preliminaries}
-% \input{reachability}
-% \input{discret}
-% \input{minimal-ctmdp}
-% \input{conclusions}
 
 \input{intro}
+\input{problems}
 \input{formalne}
+\input{cobra}
+\input{implementation}
+\input{conclusions}
 
 \pagestyle{plain}
 \bibliographystyle{plain}

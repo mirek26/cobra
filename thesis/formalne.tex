@@ -1,8 +1,26 @@
-\chapter{Code-breaking Games}
+\chapter{General model}
+
+\section{Notation}
+Let $\Form_\Var$ be the set of all prepositional formulas over
+  the set of variables $\Var$;
+  $\Val_\Var$ be the set of all valuations of variables $\Var$.
+Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
+  written $\form_0 \equiv \form_1$, if
+  $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
+For a formula $\form\in\Form_\Var$, let
+  $\numval_\Var(\form) = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
+  be the number of valuations by which $\form$ is satisfied.
+We often omit the index $\Var$ if it is clear from the context.
+
+For any unary predicate $P$, $\#i\in A.P(i) = |\{ i\in A \| P(i)\}|$.
+  We often omit the ``$\in A$'' part and write only $\#i.P(i)$
+  if the range of $i$ is clear from the context.
+
+Let $\Perm_\Var$ be the set of all permutations of $\Var$.
 
 %-------------------------------------------------------------------------------
 % DEF: CODE BREAKING GAME
-%\section{Formal definition}
+\section{Formal definition}
 
 \TODO{Motivace: Ve hře chci najít přiřazení proměnných. Hru tedy reprezentuju jako
 mnozinu promennych, a jakousi mnozinu experimentu. Po provedeni experimentu
@@ -394,4 +412,4 @@ An experiment $\exp_1$ is in relation $\sim_\form$ with an experiment $\exp_2$ i
    \{ (\form\wedge\formu)^\perm \| \formu\in\outcome(\exp_2) \} $.
 \end{definition}
 
-Meaning?
+\input{symmetry-breaking.tex}
