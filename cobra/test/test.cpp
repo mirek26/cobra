@@ -52,6 +52,20 @@ TEST(SolverTest, BasicSatisfiability) {
   EXPECT_FALSE(s.Satisfiable());
 }
 
+TEST(SolverTest, OtherSatisfiability) {
+  CnfFormula s;
+  m.game().declareVariables({"x", "a", "b", "c", "d"});
+  s.AddConstraint(Formula::Parse("a&!b&!c&!d | !a&b&!c&!d | !a&!b&c&!d | !a&!b&!c&d"));
+  s.InitSolver();
+  EXPECT_TRUE(s.Satisfiable());
+  s.AddConstraint(Formula::Parse("(x & a) | (!x & b)"));
+  s.InitSolver();
+  EXPECT_TRUE(s.Satisfiable());
+  s.AddConstraint(Formula::Parse("(!x & b) | (x & c)"));
+  s.InitSolver();
+  EXPECT_TRUE(s.Satisfiable());
+}
+
 TEST(SolverTest, BasicFixed) {
   CnfFormula s;
   m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});

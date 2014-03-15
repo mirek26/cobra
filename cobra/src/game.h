@@ -56,7 +56,8 @@ class Game {
 
   void Precompute();
 
-  bliss::Digraph* CreateBlissGraph();
+  bliss::Digraph* CreateGraph();
+  std::vector<int> ComputeVarEquiv(bliss::Digraph&);
 };
 
 #endif   // COBRA_GAME_H_

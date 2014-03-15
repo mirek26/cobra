@@ -79,7 +79,7 @@ class Formula {
   /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
    * a new variable id will be created.
    */
-  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr);
+  virtual VarId tseitin_var(std::vector<CharId>* params);
 
   /* Negate the formula. Equivalent to m.get<NotOperator>(this), except for
    * NotOperator nodes, for which it just returns the child (and thus avoids
@@ -113,7 +113,9 @@ class Formula {
 
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
 
-  void BuildBlissGraph(bliss::Digraph& g, std::vector<CharId>* params, int parent = -1);
+  void AddToGraph(bliss::Digraph& g,
+                  std::vector<CharId>* params,
+                  int parent = -1);
 
   static Formula* Parse(std::string str);
 };
@@ -452,7 +454,7 @@ class NotOperator: public Formula {
     return child_;
   }
 
-  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr) {
+  virtual VarId tseitin_var(std::vector<CharId>* params) {
     if (isLiteral()) return -child_->tseitin_var(params);
     else return Formula::tseitin_var(params);
   }
@@ -501,7 +503,7 @@ class Mapping: public Formula {
     return m.game().getMappingValue(mapping_id_, params[param_id_]);
   }
 
-  virtual VarId tseitin_var(std::vector<CharId>* params = nullptr) {
+  virtual VarId tseitin_var(std::vector<CharId>* params) {
     assert(params);
     return getValue(*params);
   }
@@ -515,8 +517,10 @@ class Mapping: public Formula {
   // }
 
   virtual void TseitinTransformation(CnfFormula* cnf, bool top) {
-    if (top)
+    if (top) {
+      assert(cnf->build_for_params());
       cnf->addClause({ getValue(*cnf->build_for_params()) });
+    }
   }
 };
 
@@ -557,7 +561,7 @@ class Variable: public Formula {
   VarId id() { return id_; }
   void set_id(VarId value) {
     id_ = value;
-    if (value > id_counter_) id_counter_ = value + 1;
+    if (value >= id_counter_) id_counter_ = value + 1;
   }
 
   // bool generated() { return generated_; }
@@ -604,8 +608,9 @@ class Variable: public Formula {
   }
 
   virtual void TseitinTransformation(CnfFormula* cnf, bool top) {
-    if (top)
+    if (top) {
       cnf->addClause({ id_ });
+    }
   }
 };
 

@@ -60,7 +60,9 @@ CnfFormula* Formula::ToCnf(std::vector<CharId>& param) {
 
 // return the variable corresponding to the node during Tseitin transformation
 VarId Formula::tseitin_var(std::vector<CharId>*) {
-  if (tseitin_var_ == 0) tseitin_var_ = Variable::NewVarId();
+  if (tseitin_var_ == 0) {
+    tseitin_var_ = Variable::NewVarId();
+  }
   return tseitin_var_;
 }
 
@@ -143,7 +145,7 @@ void AndOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
     for (auto& f: children_) {
       first.push_back(-f->tseitin_var(cnf->build_for_params()));
     }
-    first.push_back(tseitin_var());
+    first.push_back(thisVar);
     cnf->addClause(first);
     for (auto& f: children_) {
       cnf->addClause({ -thisVar, f->tseitin_var(cnf->build_for_params()) });
@@ -233,7 +235,9 @@ void MacroOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   //expanded->TseitinTransformation(cnf, top);
 }
 
-void Formula::BuildBlissGraph(bliss::Digraph& g, std::vector<CharId>* params, int parent) {
+void Formula::AddToGraph(bliss::Digraph& g,
+                         std::vector<CharId>* params,
+                         int parent) {
   if (isLiteral()) {
     // just create an edge from parent to the variable
     assert(parent > 0);
@@ -260,6 +264,6 @@ void Formula::BuildBlissGraph(bliss::Digraph& g, std::vector<CharId>* params, in
     if (parent > 0)
       g.add_edge(parent, id);
     for (uint i = 0; i < child_count(); i++)
-      child(i)->BuildBlissGraph(g, params, id);
+      child(i)->AddToGraph(g, params, id);
   }
 }
