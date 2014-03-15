@@ -13,26 +13,45 @@ TEST(FormulaTest, BasicParse) {
   EXPECT_STREQ("((p1 & p2) -> (a <-> b))", f1->pretty(false).c_str());
 }
 
-TEST(FormulaTest, ExpandExactlyNone) {
+TEST(Tseitin, Exactly0) {
+  CnfFormula s;
   m.game().declareVariables({"a1", "a2", "a3"});
-  auto f1 = Formula::Parse("Exactly-0(a1, a2, a3)");
-  auto f2 = dynamic_cast<ExactlyOperator*>(f1);
-  ASSERT_TRUE(f2);
-  auto f3 = f2->Expand();
-  ASSERT_TRUE(f3);
-  std::string s = f3->pretty(false);
-  EXPECT_STREQ("((!a1) & (!a2) & (!a3))", s.c_str());
+  s.AddConstraint(Formula::Parse("!((!a1 & !a2 & !a3) <-> Exactly-0(a1, a2, a3))"));
+  s.InitSolver();
+  EXPECT_FALSE(s.Satisfiable());
 }
 
-TEST(FormulaTest, ExpandExactlyAll) {
+TEST(Tseitin, Exactly1) {
+  CnfFormula s;
   m.game().declareVariables({"a1", "a2", "a3"});
-  auto f1 = Formula::Parse("Exactly-3(a1, a2, a3)");
-  auto f2 = dynamic_cast<ExactlyOperator*>(f1);
-  ASSERT_TRUE(f2);
-  auto f3 = f2->Expand();
-  ASSERT_TRUE(f3);
-  std::string s = f3->pretty(false);
-  EXPECT_STREQ("((a1) & (a2) & (a3))", s.c_str());
+  s.AddConstraint(Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
+  s.InitSolver();
+  EXPECT_FALSE(s.Satisfiable());
+}
+
+TEST(Tseitin, ExactlyN) {
+  CnfFormula s;
+  m.game().declareVariables({"a1", "a2", "a3"});
+  s.AddConstraint(Formula::Parse("!((a1 & a2 & a3) <-> Exactly-3(a1, a2, a3))"));
+  s.InitSolver();
+  EXPECT_FALSE(s.Satisfiable());
+}
+
+TEST(SolverTest, Exactly1) {
+  CnfFormula s;
+  m.game().declareVariables({"a1", "a2", "a3"});
+  s.AddConstraint(Formula::Parse("Exactly-1(a1, a2, a3)"));
+  s.InitSolver();
+  EXPECT_TRUE(s.Satisfiable());
+  s.AddConstraint(Formula::Parse("a2 <-> a3"));
+  s.InitSolver();
+  EXPECT_TRUE(s.Satisfiable());
+  s.AddConstraint(Formula::Parse("!a1"));
+  s.InitSolver();
+  EXPECT_FALSE(s.Satisfiable());
+  if (s.Satisfiable()) {
+    s.PrintAssignment(m.game().variables());
+  }
 }
 
 TEST(SolverTest, BasicSatisfiability) {

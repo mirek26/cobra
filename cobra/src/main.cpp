@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 
   int exp_num = 1;
   while (true) {
-    // compute var equivalence
+    // Compute var equivalence.
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
     //
     int o = 0;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
           { e,
             params,
             std::vector<bool>(e->outcomes().size(), false)});
-        // basic analysis
+        // Perform basic analysis.
         int sat_outcomes = 0;
         for (uint i = 0; i < e->outcomes().size(); i++) {
           CnfFormula n;
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
           experiments.pop_back();
           continue;
         }
-        // print option
+        // Print option.
         if (experiments.size() == 1) {
           printf("Select experiment #%i: \n", exp_num++);
         }

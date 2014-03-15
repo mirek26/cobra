@@ -26,8 +26,8 @@ class NotOperator;
  */
 extern Parser m;
 
-/* Prepositional formula.
- * Derived classes (node type id)
+/* Propositional formula.
+ * Derived classes (node type id).
  *  - Variable (1) - the only possible leaf of the formula tree
  *  - NotOperator (2) - negation of any other formula
  *  - ImpliesOperator (3) - logical implication (binary)
@@ -36,12 +36,11 @@ extern Parser m;
  *  - NaryOperator - base class for n-ary operators
  *    - AndOperator (5) - logical conjunction
  *    - OrOperator (6) - logical disjunction
- *    - MacroOperator - syntax sugar
- *      - AtLeastOperator (8+3k)- at least k of n formulas must be true
- *      - AtMostOperator (9+3k) - at most k of n formulas must be true
- *      - ExactlyOperator (10+3k)- exactly k of n formulas must be true
- *  TODO: how about true/false leaves?
+ *    - AtLeastOperator (8+3k)- at least k of n formulas must be true
+ *    - AtMostOperator (9+3k) - at most k of n formulas must be true
+ *    - ExactlyOperator (10+3k)- exactly k of n formulas must be true
  */
+
 class Formula {
  protected:
   /* variable (possibly negated) that is equivalent to this subformula,
@@ -174,6 +173,14 @@ class NaryOperator: public Formula {
   }
 
  protected:
+  std::vector<VarId> tseitin_children(std::vector<CharId>* params) {
+    std::vector<VarId> vars(children_.size(), 0);
+    std::transform(children_.begin(), children_.end(), vars.begin(), [&](Formula* f){
+      return f->tseitin_var(params);
+    });
+    return vars;
+  }
+
   std::string pretty_join(std::string sep, bool utf8, std::vector<CharId>* params) {
     if (children_.empty()) return "()";
     std::string s = "(" + children_.front()->pretty(utf8, params);
@@ -243,31 +250,14 @@ class OrOperator: public NaryOperator {
 };
 
 /******************************************************************************
- * Base class syntax sugar like AtLeast/AtMost/ExactlyOperator.
- * Expansion of these operator causes exponential blowup.
- */
-class MacroOperator: public NaryOperator {
- protected:
-  AndOperator* expanded_;
- public:
-  explicit MacroOperator(std::vector<Formula*>* list);
-
-  //virtual VarId tseitin_var();
-
-  void ExpandHelper(uint size, bool negate);
-  virtual AndOperator* Expand() = 0;
-  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
-};
-
-/******************************************************************************
  *
  */
-class AtLeastOperator: public MacroOperator {
+class AtLeastOperator: public NaryOperator {
   uint value_;
 
  public:
   AtLeastOperator(uint value, std::vector<Formula*>* list)
-      : MacroOperator(list),
+      : NaryOperator(list),
         value_(value) {
     assert(value <= children_.size());
   }
@@ -285,18 +275,18 @@ class AtLeastOperator: public MacroOperator {
   //   return m.get<AtLeastOperator>(value_, children_->clone());
   // }
 
-  virtual AndOperator* Expand();
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
  *
  */
-class AtMostOperator: public MacroOperator {
+class AtMostOperator: public NaryOperator {
   uint value_;
 
  public:
   AtMostOperator(uint value, std::vector<Formula*>* list)
-      : MacroOperator(list),
+      : NaryOperator(list),
         value_(value) {
     assert(value <= children_.size());
   }
@@ -314,18 +304,18 @@ class AtMostOperator: public MacroOperator {
   //   return m.get<AtMostOperator>(value_, children_->clone());
   // }
 
-  virtual AndOperator* Expand();
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************
  *
  */
-class ExactlyOperator: public MacroOperator {
+class ExactlyOperator: public NaryOperator {
   uint value_;
 
  public:
   ExactlyOperator(uint value, std::vector<Formula*>* list)
-      : MacroOperator(list),
+      : NaryOperator(list),
         value_(value) {
     assert(value <= children_.size());
   }
@@ -343,7 +333,7 @@ class ExactlyOperator: public MacroOperator {
   //   return m.get<ExactlyOperator>(value_, children_->clone());
   // }
 
-  virtual AndOperator* Expand();
+  virtual void TseitinTransformation(CnfFormula* cnf, bool top);
 };
 
 /******************************************************************************

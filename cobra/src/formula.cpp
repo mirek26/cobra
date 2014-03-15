@@ -67,89 +67,32 @@ VarId Formula::tseitin_var(std::vector<CharId>*) {
 }
 
 /******************************************************************************
- * Expansion of macros.
- */
-
-// VarId MacroOperator::tseitin_var() {
-//    Macros must be expanded before tseitin tranformation. Never create a
-//    * tseitin_var_, return a tseitin_var_ of the root of the expanded subtree.
-
-//   return expanded_->tseitin_var();
-// }
-
-MacroOperator::MacroOperator(std::vector<Formula*>* list)
-      : NaryOperator(list) {
-  //expanded_ = m.get<AndOperator>();
-}
-
-void MacroOperator::ExpandHelper(uint size, bool negate) {
-  // assert(size <= children_.size());
-  // std::vector<Formula*> vars;
-  // for (auto& f: children_) {
-  //   vars.push_back(f->tseitin_var());
-  // }
-  // //
-  // AndOperator* root = expanded_;
-  // std::function<void(std::vector<Formula*>)> add = [&](std::vector<VarId> list) {
-  //   auto clause = m.get<OrOperator>();
-  //   for (auto& f: list) clause->addChild(negate ? -f : f);
-  //   root->addChild(clause);
-  // };
-  // //
-  // for_all_combinations(size, vars, add);
-}
-
-AndOperator* AtLeastOperator::Expand() {
-  // if (value_ > 0) {
-  //   ExpandHelper(children_.size() - value_ + 1, false);
-  // }
-  // return expanded_;
-  return nullptr;
-}
-
-AndOperator* AtMostOperator::Expand() {
-  // if (value_ < children_.size()) {
-  //   ExpandHelper(value_ + 1, true);
-  // }
-  // return expanded_;
-  return nullptr;
-}
-
-AndOperator* ExactlyOperator::Expand() {
-  /* TODO: it might be better to have expanded_ as an OrOperator and just
-   * list all the possible combinations here.
-   */
-  // // At most part
-  // if (value_ < children_.size()) {
-  //   ExpandHelper(value_ + 1, true);
-  // }
-  // // At least part
-  // if (value_ > 0) {
-  //   ExpandHelper(children_.size() - value_ + 1, false);
-  // }
-  // return expanded_;
-  return nullptr;
-}
-
-/******************************************************************************
  * Tseitin transformation.
  */
 
+void TseitinAnd(VarId thisVar, CnfFormula* cnf,
+                const std::vector<VarId>& list, uint offset,
+                bool negate = false) {
+  int neg = negate ? -1 : 1;
+  // X <-> AND(A1, A2, ..)
+  // 1. (X | !A1 | !A2 | ...)
+  std::vector<VarId> first;
+  for (auto v = list.begin() + offset; v < list.end(); ++v) {
+    first.push_back(neg * -(*v));
+  }
+  first.push_back(thisVar);
+  cnf->addClause(first);
+  // 2. (A1 | !X) & (A2 | !X) & ...
+  for (auto v = list.begin() + offset; v < list.end(); ++v) {
+    cnf->addClause({ -thisVar, neg * (*v) });
+  }
+}
+
 void AndOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
-  // if tseitin_var_ was not passigned yet, just recurse down
+  // if on top level, all childs must be true - just recurse down
   if (!top) {
-    // X <-> AND(A1, A2, ..)
-    // (X | !A1 | !A2 | ...) & (A1 | !X) & (A2 | !X) & ...
-    auto thisVar = tseitin_var(cnf->build_for_params());
-    std::vector<VarId> first;
-    for (auto& f: children_) {
-      first.push_back(-f->tseitin_var(cnf->build_for_params()));
-    }
-    first.push_back(thisVar);
-    cnf->addClause(first);
-    for (auto& f: children_) {
-      cnf->addClause({ -thisVar, f->tseitin_var(cnf->build_for_params()) });
-    }
+    TseitinAnd(tseitin_var(cnf->build_for_params()), cnf,
+               tseitin_children(cnf->build_for_params()), 0);
   }
   // recurse down
   for (auto& f: children_) {
@@ -230,10 +173,53 @@ void EquivalenceOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   right_->TseitinTransformation(cnf, false);
 }
 
-void MacroOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
-  //auto expanded = Expand();
-  //expanded->TseitinTransformation(cnf, top);
+// 'to' exclusively
+void TseitinNumerical(VarId thisVar, CnfFormula* cnf,
+                      bool at_least, bool at_most, uint value,
+                      const std::vector<VarId>& children, uint offset) {
+  // X <-> ( A1 & T1 ) | ( !A1 & T2 )
+  // (X | !T1 | !A1) & (T1 | !X | !A1) & (A1 | X | !T2) & (A1 | T2 | !X)
+  if (value == children.size() - offset) {
+    if (at_least) TseitinAnd(thisVar, cnf, children, offset);
+  } else if (value == 0) {
+    if (at_most) TseitinAnd(thisVar, cnf, children, offset, true);
+  } else {
+    auto t1 = Variable::NewVarId(); // OP-(value-1) in the rest
+    auto t2 = Variable::NewVarId(); // OP-value in the rest
+    cnf->addClause({ thisVar, -t1, -children[offset] });
+    cnf->addClause({ -thisVar, t1, -children[offset] });
+    cnf->addClause({ thisVar, -t2, children[offset] });
+    cnf->addClause({ -thisVar, t2, children[offset] });
+    TseitinNumerical(t1, cnf, at_least, at_most, value - 1, children, offset + 1);
+    TseitinNumerical(t2, cnf, at_least, at_most, value, children, offset + 1);
+  }
 }
+
+void ExactlyOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
+  auto thisVar = tseitin_var(cnf->build_for_params());
+  if (top) cnf->addClause({ thisVar });
+  TseitinNumerical(thisVar, cnf,
+                   true, true, value_,
+                   tseitin_children(cnf->build_for_params()), 0);
+}
+
+void AtLeastOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
+  auto thisVar = tseitin_var(cnf->build_for_params());
+  if (top) cnf->addClause({ thisVar });
+  TseitinNumerical(thisVar, cnf,
+                   true, false, value_,
+                   tseitin_children(cnf->build_for_params()), 0);
+}
+
+void AtMostOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
+  auto thisVar = tseitin_var(cnf->build_for_params());
+  if (top) cnf->addClause({ thisVar });
+  TseitinNumerical(thisVar, cnf,
+                   false, true, value_,
+                   tseitin_children(cnf->build_for_params()), 0);
+}
+
+
 
 void Formula::AddToGraph(bliss::Digraph& g,
                          std::vector<CharId>* params,
@@ -243,7 +229,7 @@ void Formula::AddToGraph(bliss::Digraph& g,
     assert(parent > 0);
     auto neg = false;
     auto c = this;
-    // natáhni hranu z parenta sem
+    // natahni hranu z parenta sem
     if (dynamic_cast<NotOperator*>(c)) {
       neg = true;
       c = c->neg();
