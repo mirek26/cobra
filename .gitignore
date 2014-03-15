@@ -8,6 +8,9 @@ dimacs2boole
 
 picosat
 !picosat/
+minisat
+minisat_release
+!minisat/
 picomus
 picogcnf
 picomcs
@@ -42,6 +45,8 @@ local/
 *.so
 *.o
 *.a
+*.or
+*.od
 
 # Packages
 *.egg

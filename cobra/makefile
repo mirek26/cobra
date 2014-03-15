@@ -4,8 +4,8 @@
 ifndef $(CC)
   CC = clang++
 endif
-CCFLAGS = -g -isystem sat-solvers/ -Wall -Wextra -pedantic -pthread -std=c++11  
-LINKWITHSAT = -L sat-solvers/picosat -L sat-solvers/bliss -l picosat -l bliss 
+CCFLAGS = -g -isystem tools/ -Wall -Wextra -pedantic -pthread -std=c++11  
+LINKWITHSAT = -L tools/picosat -L tools/bliss -l picosat -l bliss 
 FLEX = flex
 BISON = bison -d
 
@@ -16,8 +16,8 @@ OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
 default: cobra
 cobra: $(OBJECTS) src/main.o
-	@$(MAKE) -C sat-solvers/bliss
-	@$(MAKE) -C sat-solvers/picosat
+	@$(MAKE) -C tools/bliss
+	@$(MAKE) -C tools/picosat
 	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 
 # parser
@@ -29,7 +29,7 @@ bison: src/cobra.tab.cpp src/cobra.yy.c
 src/cobra.tab.o: src/cobra.tab.cpp src/cobra.ypp
 src/cobra.yy.o: src/cobra.yy.c src/cobra.l
 	@# suppress all warnings (compiling c as c++ etc.)
-	$(CC) -c -isystem sat-solvers/ -std=c++11 -w $< -o $@
+	$(CC) -c -isystem tools/ -std=c++11 -w $< -o $@
 
 # general
 %.o: %.cpp %.h

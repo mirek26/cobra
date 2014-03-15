@@ -71,7 +71,6 @@ int main(int argc, char* argv[]) {
     //
     int o = 0;
     std::vector<ExperimentSpec> experiments;
-    printf("Select experiment #%i: \n", exp_num++);
     for (auto e: game.experiments()) {
       auto params_all = e->GenerateParametrizations(var_equiv);
       for (auto& params: *params_all) {
@@ -99,11 +98,22 @@ int main(int argc, char* argv[]) {
           continue;
         }
         // print option
+        if (experiments.size() == 1) {
+          printf("Select experiment #%i: \n", exp_num++);
+        }
         printf("%i) %s [ ", o++, e->name().c_str());
         for (auto k: params)
           printf("%s ", game.alphabet()[k].c_str());
         printf("] (%i sat outcomes)\n", sat_outcomes);
       }
+    }
+
+    if (experiments.size() == 0) {
+      printf("SOLVED! (You cannot get any new information from the experiments.)\n");
+      knowledge.InitSolver();
+      knowledge.Satisfiable();
+      knowledge.PrintAssignment(game.variables());
+      break;
     }
 
     uint eid, oid;
@@ -135,13 +145,9 @@ int main(int argc, char* argv[]) {
     auto outcome = experiment->outcomes()[oid];
     printf("Gained knowledge: %s\n", outcome->pretty(true, &params).c_str());
     knowledge.AddConstraint(outcome, params);
+    knowledge.InitSolver();
+    knowledge.WriteDimacs(stdout);
     outcome->AddToGraph(*knowledge_graph, &params);
-    // if (knowledge.HasOnlyOneModel()) {
-    //   printf("\nSOLVED!\n");
-    //   knowledge.Satisfiable();
-    //   knowledge.PrintAssignment(game.variables().size());
-    //   break;
-    // }
   }
 
   return 0;

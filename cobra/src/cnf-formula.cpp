@@ -13,7 +13,7 @@
 #include "common.h"
 
 extern "C" {
-  #include "../sat-solvers/picosat/picosat.h"
+  #include <picosat/picosat.h>
 }
 
 #include "cnf-formula.h"
@@ -175,17 +175,17 @@ bool CnfFormula::Satisfiable() {
   return (result == PICOSAT_SATISFIABLE);
 }
 
-void CnfFormula::PrintAssignment(VarId limit) {
+void CnfFormula::PrintAssignment(std::vector<Variable*>& vars) {
   std::vector<int> trueVar;
   std::vector<int> falseVar;
-  for (int id = 0; id < limit; id++) {
+  for (uint id = 1; id <= vars.size(); id++) {
     if (picosat_deref(picosat_, id) == 1) trueVar.push_back(id);
     else falseVar.push_back(id);
   }
   printf("TRUE: ");
-  for (auto s: trueVar) printf("%i ", s);
+  for (auto s: trueVar) printf("%s ", vars[s-1]->ident().c_str());
   printf("\nFALSE: ");
-  for (auto s: falseVar) printf("%i ", s);
+  for (auto s: falseVar) printf("%s ", vars[s-1]->ident().c_str());
   printf("\n");
 }
 

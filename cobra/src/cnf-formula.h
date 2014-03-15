@@ -9,7 +9,7 @@
 #include "common.h"
 
 extern "C" {
-  #include "../sat-solvers/picosat/picosat.h"
+  #include <picosat/picosat.h>
 }
 
 #ifndef COBRA_CNF_FORMULA_H_
@@ -54,10 +54,14 @@ class CnfFormula {
 
   bool Satisfiable();
 
+  void WriteDimacs(FILE* f) {
+    picosat_print(picosat_, f);
+  }
+
 //  void ResetPicosat();
 
   void InitSolver();
-  void PrintAssignment(VarId limit);
+  void PrintAssignment(std::vector<Variable*>& vars);
 
   std::vector<int> ComputeVariableEquivalence(VarId limit);
 
