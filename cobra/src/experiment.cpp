@@ -101,9 +101,9 @@ void Experiment::Precompute() {
   }
 }
 
-bool Experiment::CharsEquiv(uint n, CharId a, CharId b) const {
+bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
   bool equiv = true;
-  for (auto f: used_maps_[n]) {
+  for (auto f: maps) {
     if (gen_var_groups_[game_->getMappingValue(f, a)] !=
         gen_var_groups_[game_->getMappingValue(f, b)]) {
       equiv = false;
@@ -117,11 +117,13 @@ Experiment::GenParams(vec<int>& groups) {
   gen_stats_ = GenParamsStats();
   gen_var_groups_ = groups;
   gen_params_.resize(num_params_);
-  gen_params_all_.clear();
+  gen_params_basic_.clear();
+  gen_params_final_.clear();
   GenParamsFill(0);
-  //printf("Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
-  assert(gen_stats_.ph3 == gen_params_all_.size());
-  return &gen_params_all_;
+  printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+  assert(gen_stats_.ph2 == gen_params_basic_.size());
+  assert(gen_stats_.ph3 == gen_params_final_.size());
+  return &gen_params_final_;
 }
 
 // Recursive function that substitudes char at position n for all posibilities.
@@ -145,7 +147,7 @@ void Experiment::GenParamsFill(uint n) {
     if (interchangable_[n][a]) {
       for (auto b: done) {
         if (a == b) continue;
-        if (CharsEquiv(n, a, b)) {
+        if (CharsEquiv(used_maps_[n], a, b)) {
           valid = false;
           done.erase(a);  // there is an equivalent in done -> not needed
           break;
@@ -165,45 +167,66 @@ void Experiment::GenParamsFill(uint n) {
 }
 
 void Experiment::GenParamsBasicFilter() {
-  auto& params = gen_params_;
-  bool keep = true;
+  auto params = gen_params_;
+  // Compute position partitioning according to the vars.
+  vec<uint> dfu(num_params_, 0);
+  for (uint i = 0; i < num_params_; i++) dfu[i] = i;
+  for (uint i = 0; i < num_params_; i++)
+    for (uint j = i + 1; j < num_params_; j++)
+      for (auto fi: used_maps_[i])
+        for (auto fj: used_maps_[j])
+          if (game_->getMappingValue(fi, params[i]) ==
+              game_->getMappingValue(fj, params[j])) {
+            if (dfu[i] > dfu[j])
+              dfu[i] = dfu[j];
+            else
+              dfu[j] = dfu[i];
+          }
+  // Compute canonical form of the parametrization.
   for (uint n = 0; n < num_params_; n++) {
+    if (dfu[n] != n) continue; // only for roots of components
     CharId chr = params[n];
     if (interchangable_[n][chr]) continue;
-    // Build other_vars - vars in outcome formulas due to other positions.
-    set<VarId> other_vars(used_vars_);
-    for (uint i = 0; i < num_params_; i++) {
-      if (i == n) continue;
-      for (auto f: used_maps_[i]) {
-        other_vars.insert(game_->getMappingValue(f, params[i]));
+    // Precompute minimal set of positions such that...
+    bool keep = false;
+    set<MapId> maps;
+    set<VarId> other_vars;
+    for (uint p = 0; p < num_params_; p++) {
+      if (dfu[p] == n) {
+        if (params[p] != chr) keep = true;
+        for (auto f: used_maps_[p]) {
+          if (used_vars_.count(game_->getMappingValue(f, chr))) keep = true;
+          maps.insert(f);
+        }
+      } else {
+        for (auto f: used_maps_[p]) {
+          other_vars.insert(game_->getMappingValue(f, params[p]));
+        }
       }
-    }
-    //
-    keep = false;
-    for (auto f: used_maps_[n]) {
-      VarId var = game_->getMappingValue(f, chr);
-      if (other_vars.count(var) > 0) keep = true;
     }
     if (keep) continue;
-    // Consider alternatives.
+    keep = true;
+    // Try substituing the whole group with other char (from 0).
     for (CharId a = 0; a < chr; a++) {
-      params[n] = a;
-      if (gen_params_all_.count(params) == 0) continue;
-      if (!CharsEquiv(n, a, chr)) continue;
+      // Is it equivalent?
+      if (!CharsEquiv(maps, a, chr)) continue;
+      // Doesn't it indroduce conflicting vars?
       keep = false;
-      for (auto f: used_maps_[n]) {
+      for (auto f: maps) {
         VarId var = game_->getMappingValue(f, a);
-        if (other_vars.count(var) > 0) keep = true;
+        if (other_vars.count(var)) keep = true;
       }
       if (!keep) {
-        params[n] = chr;
+        // Substitude the whole group.
+        for (uint p = 0; p < num_params_; p++)
+          if (dfu[p] == n) params[p] = a;
         break;
       }
     }
-    if (!keep) break;
   }
-
-  if (keep) {
+  // If the canonical form is not yet present, add it.
+  if (gen_params_basic_.count(params) == 0) {
+    gen_params_basic_.insert(params);
     gen_stats_.ph2++;
     GenParamsGraphFilter();
   }
@@ -219,7 +242,7 @@ void Experiment::GenParamsGraphFilter() {
     return;
   gen_graphs_[h] = params;
   gen_stats_.ph3++;
-  gen_params_all_.insert(params);
+  gen_params_final_.insert(params);
 }
 
 bliss::Digraph* Experiment::BlissGraphForParametrization(

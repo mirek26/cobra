@@ -13,6 +13,13 @@
 #ifndef COBRA_COMMON_H_
 #define COBRA_COMMON_H_
 
+/*
+var(s) - variable(s)
+param(s) - parametrization(s)
+gen - generate
+equiv - equivalence
+*/
+
 // common types
 typedef unsigned int uint;
 typedef unsigned char CharId;

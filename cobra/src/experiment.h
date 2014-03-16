@@ -39,7 +39,8 @@ class Experiment {
   // Helper fields for parametrization generation.
   GenParamsStats gen_stats_;
   vec<int> gen_var_groups_;
-  set<vec<CharId>> gen_params_all_;
+  set<vec<CharId>> gen_params_basic_;
+  set<vec<CharId>> gen_params_final_;
   vec<CharId> gen_params_;
   std::map<unsigned int, vec<CharId>> gen_graphs_;
 
@@ -72,7 +73,7 @@ class Experiment {
   void PrecomputeUsed(Formula* f);
 
   // Helper functions for parametrizations generation.
-  bool CharsEquiv(uint n, CharId a, CharId b) const;
+  bool CharsEquiv(set<MapId>& maps, CharId a, CharId b) const;
   void GenParamsFill(uint n);
   void GenParamsBasicFilter();
   void GenParamsGraphFilter();
