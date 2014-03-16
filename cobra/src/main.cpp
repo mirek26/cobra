@@ -21,8 +21,8 @@ extern Parser m;
 
 struct ExperimentSpec {
   Experiment* type;
-  std::vector<CharId> params;
-  std::vector<bool> sat_outcomes;
+  vec<CharId> params;
+  vec<bool> sat_outcomes;
 };
 
 void print_usage() {
@@ -70,14 +70,14 @@ int main(int argc, char* argv[]) {
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
     //
     int o = 0;
-    std::vector<ExperimentSpec> experiments;
+    vec<ExperimentSpec> experiments;
     for (auto e: game.experiments()) {
       auto params_all = e->GenParams(var_equiv);
       for (auto& params: *params_all) {
         experiments.push_back(
           { e,
             params,
-            std::vector<bool>(e->outcomes().size(), false)});
+            vec<bool>(e->outcomes().size(), false)});
         // Perform basic analysis.
         int sat_outcomes = 0;
         for (uint i = 0; i < e->outcomes().size(); i++) {
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 
     uint eid, oid;
     bool ok;
-    std::string str;
+    string str;
     do {
       printf("> ");
       ok = readIntOrString(eid, str);

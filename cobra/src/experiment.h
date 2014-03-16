@@ -22,29 +22,29 @@ class Experiment {
   Game* game_;
   uint alph_;
 
-  std::string name_;
+  string name_;
   uint num_params_;
 
-  std::vector<std::string> outcomes_names_;
-  std::vector<Formula*> outcomes_;
-  std::vector<CnfFormula> outcomes_cnf_;
+  vec<string> outcomes_names_;
+  vec<Formula*> outcomes_;
+  vec<CnfFormula> outcomes_cnf_;
 
-  std::vector<std::set<MapId>> used_maps_;
-  std::set<VarId> used_vars_;
-  std::vector<std::vector<bool>> interchangable_;
+  vec<set<MapId>> used_maps_;
+  set<VarId> used_vars_;
+  vec<vec<bool>> interchangable_;
 
-  std::vector<std::set<uint>> params_different_;
-  std::vector<std::set<uint>> params_smaller_than_;
+  vec<set<uint>> params_different_;
+  vec<set<uint>> params_smaller_than_;
 
   // Helper fields for parametrization generation.
   GenParamsStats gen_stats_;
-  std::vector<int> gen_var_groups_;
-  std::set<std::vector<CharId>> gen_params_all_;
-  std::vector<CharId> gen_params_;
-  std::map<unsigned int, std::vector<CharId>> gen_graphs_;
+  vec<int> gen_var_groups_;
+  set<vec<CharId>> gen_params_all_;
+  vec<CharId> gen_params_;
+  std::map<unsigned int, vec<CharId>> gen_graphs_;
 
  public:
-  Experiment(Game* game, std::string name, uint num_params):
+  Experiment(Game* game, string name, uint num_params):
       game_(game),
       name_(name),
       num_params_(num_params) {
@@ -53,18 +53,18 @@ class Experiment {
     alph_ = game_->alphabet().size();
   }
 
-  std::string name() const { return name_; }
-  const std::vector<Formula*>& outcomes() const { return outcomes_; }
-  const std::vector<std::string>& outcomes_names() const { return outcomes_names_; }
+  string name() const { return name_; }
+  const vec<Formula*>& outcomes() const { return outcomes_; }
+  const vec<string>& outcomes_names() const { return outcomes_names_; }
 
   uint num_params() { return num_params_; }
 
   // Functions defining the experiment.
-  void addOutcome(std::string name, Formula* outcome);
-  void paramsDistinct(std::vector<uint>* list);
-  void paramsSorted(std::vector<uint>* list);
+  void addOutcome(string name, Formula* outcome);
+  void paramsDistinct(vec<uint>* list);
+  void paramsSorted(vec<uint>* list);
 
-  std::set<std::vector<CharId>>* GenParams(std::vector<int>&);
+  set<vec<CharId>>* GenParams(vec<int>&);
   void Precompute();
 
  private:
@@ -78,8 +78,8 @@ class Experiment {
   void GenParamsGraphFilter();
 
   bliss::Digraph* BlissGraphForParametrization(
-                          std::vector<int>& groups,
-                          std::vector<CharId>& params);
+                          vec<int>& groups,
+                          vec<CharId>& params);
 
 };
 

@@ -93,10 +93,10 @@ typedef union YYSTYPE
 #line 55 "src/cobra.ypp"
 {
   Formula* formula;
-  std::vector<Variable*>* variable_list;
-  std::vector<Formula*>* formula_list;
-  std::vector<std::string>* string_list;
-  std::vector<uint>* int_list;
+  vec<Variable*>* variable_list;
+  vec<Formula*>* formula_list;
+  vec<string>* string_list;
+  vec<uint>* int_list;
   char* tstr;
   uint tint;
 }

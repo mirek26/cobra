@@ -49,7 +49,7 @@ extern "C" {
 //   picosat_add(picosat_, add);
 // }
 
-// void CnfFormula::addClause(std::vector<Formula*>* list) {
+// void CnfFormula::addClause(vec<Formula*>* list) {
 //   TClause c;
 //   for (auto f: *list) {
 //     addLiteral(c, f);
@@ -68,7 +68,7 @@ extern "C" {
 // }
 
 
-void CnfFormula::addClause(std::vector<VarId>& list) {
+void CnfFormula::addClause(vec<VarId>& list) {
   Clause c(list.begin(), list.end());
   clauses_.insert(c);
 }
@@ -86,7 +86,7 @@ void CnfFormula::AddConstraint(Formula* formula) {
   delete cnf;
 }
 
-void CnfFormula::AddConstraint(Formula* formula, std::vector<CharId> params) {
+void CnfFormula::AddConstraint(Formula* formula, vec<CharId> params) {
   assert(formula);
   CnfFormula* cnf = formula->ToCnf(params);
   assert(cnf);
@@ -101,14 +101,14 @@ void CnfFormula::AddConstraint(CnfFormula& cnf) {
 //------------------------------------------------------------------------------
 // Pretty print
 
-// std::string CnfFormula::pretty_literal(int id, bool unicode) {
+// string CnfFormula::pretty_literal(int id, bool unicode) {
 //   assert(variables_.count(abs(id)) == 1);
 //   return (id > 0 ? variables_[id] : variables_[-id]->neg())->pretty(unicode);
 // }
 
-std::string CnfFormula::pretty_clause(const Clause& clause) {
+string CnfFormula::pretty_clause(const Clause& clause) {
   if (clause.empty()) return "()";
-  std::string s = "(" + std::to_string(*clause.begin());
+  string s = "(" + std::to_string(*clause.begin());
   for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
     s += " | " + std::to_string(*it);
   }
@@ -116,9 +116,9 @@ std::string CnfFormula::pretty_clause(const Clause& clause) {
   return s;
 }
 
-std::string CnfFormula::pretty() {
+string CnfFormula::pretty() {
   if (clauses_.empty()) return "(empty)";
-  std::string s = pretty_clause(*clauses_.begin());
+  string s = pretty_clause(*clauses_.begin());
   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
     s += "&" + pretty_clause(*it);
   }
@@ -175,9 +175,9 @@ bool CnfFormula::Satisfiable() {
   return (result == PICOSAT_SATISFIABLE);
 }
 
-void CnfFormula::PrintAssignment(std::vector<Variable*>& vars) {
-  std::vector<int> trueVar;
-  std::vector<int> falseVar;
+void CnfFormula::PrintAssignment(vec<Variable*>& vars) {
+  vec<int> trueVar;
+  vec<int> falseVar;
   for (uint id = 1; id <= vars.size(); id++) {
     if (picosat_deref(picosat_, id) == 1) trueVar.push_back(id);
     else falseVar.push_back(id);
@@ -206,8 +206,8 @@ bool CnfFormula::ProbeEquivalence(const Clause& clause, VarId var1, VarId var2) 
 }
 
 // Compute 'syntactical' equivalence on variables with ids 1 - limit; how about semantical?
-std::vector<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
-  std::vector<int> components(limit + 1, 0);
+vec<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
+  vec<int> components(limit + 1, 0);
   int cid = 1;
   for (VarId i = 1; i <= limit; i++) {
     if (components[i] > 0) continue;
@@ -225,7 +225,7 @@ std::vector<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
   return components;
 }
 
-// CnfFormula CnfFormula::SubstituteParams(std::vector<Variable*> params) {
+// CnfFormula CnfFormula::SubstituteParams(vec<Variable*> params) {
 //   CnfFormula result;
 //   bool skipClause;
 //   bool skipLiteral;

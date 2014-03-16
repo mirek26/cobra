@@ -69,7 +69,7 @@ char* str_dup_strip(char* str) {
  .              { return yytext[0]; }
 %%
 
-void parse_string(std::string str) {
+void parse_string(string str) {
   yy_switch_to_buffer(yy_scan_string(str.c_str()));
   yyparse();
 }

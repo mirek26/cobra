@@ -18,30 +18,30 @@ extern "C" {
 class Variable;
 class Formula;
 
-typedef std::set<VarId> Clause;
+typedef set<VarId> Clause;
 
 class CnfFormula {
-  std::set<Clause> clauses_;
+  set<Clause> clauses_;
   PicoSAT* picosat_;
 
-  std::vector<CharId>* build_for_params_ = nullptr;
+  vec<CharId>* build_for_params_ = nullptr;
 
  private:
-  std::string pretty_clause(const Clause& clause);
+  string pretty_clause(const Clause& clause);
 
   bool ProbeEquivalence(const Clause& clause, VarId var1, VarId var2);
 
  public:
 
-  std::vector<CharId>* build_for_params() { return build_for_params_; }
-  void set_build_for_params(std::vector<CharId>* value) {
+  vec<CharId>* build_for_params() { return build_for_params_; }
+  void set_build_for_params(vec<CharId>* value) {
     build_for_params_ = value;
   }
 
-  void addClause(std::vector<VarId>& list);
+  void addClause(vec<VarId>& list);
   void addClause(std::initializer_list<VarId> list);
   void AddConstraint(Formula* formula);
-  void AddConstraint(Formula* formula, std::vector<CharId> params);
+  void AddConstraint(Formula* formula, vec<CharId> params);
   void AddConstraint(CnfFormula& cnf);
 
   uint GetFixedVariables();
@@ -61,11 +61,11 @@ class CnfFormula {
 //  void ResetPicosat();
 
   void InitSolver();
-  void PrintAssignment(std::vector<Variable*>& vars);
+  void PrintAssignment(vec<Variable*>& vars);
 
-  std::vector<int> ComputeVariableEquivalence(VarId limit);
+  vec<int> ComputeVariableEquivalence(VarId limit);
 
-  std::string pretty();
+  string pretty();
 };
 
 #endif   // COBRA_CNF_FORMULA_H_

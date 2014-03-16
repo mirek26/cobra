@@ -17,12 +17,12 @@
 
 extern Parser m;
 
-void Experiment::addOutcome(std::string name, Formula* outcome) {
+void Experiment::addOutcome(string name, Formula* outcome) {
   outcomes_names_.push_back(name);
   outcomes_.push_back(outcome);
 }
 
-void Experiment::paramsDistinct(std::vector<uint>* list) {
+void Experiment::paramsDistinct(vec<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i <= num_params_,
@@ -37,7 +37,7 @@ void Experiment::paramsDistinct(std::vector<uint>* list) {
   delete list;
 }
 
-void Experiment::paramsSorted(std::vector<uint>* list) {
+void Experiment::paramsSorted(vec<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i < *j && *j <= num_params_,
@@ -78,7 +78,7 @@ void Experiment::Precompute() {
     interchangable_[d].resize(alph_);
     for (CharId a = 0; a < alph_; a++) {
       interchangable_[d][a] = true;
-      std::set<int> vars;
+      set<int> vars;
       for (auto& f: used_maps_[d]) {
         auto var = game_->getMappingValue(f, a);
         vars.insert(var);
@@ -112,8 +112,8 @@ bool Experiment::CharsEquiv(uint n, CharId a, CharId b) const {
   return equiv;
 }
 
-std::set<std::vector<CharId>>*
-Experiment::GenParams(std::vector<int>& groups) {
+set<vec<CharId>>*
+Experiment::GenParams(vec<int>& groups) {
   gen_stats_ = GenParamsStats();
   gen_var_groups_ = groups;
   gen_params_.resize(num_params_);
@@ -126,7 +126,7 @@ Experiment::GenParams(std::vector<int>& groups) {
 
 // Recursive function that substitudes char at position n for all posibilities.
 void Experiment::GenParamsFill(uint n) {
-  std::set<CharId> done;
+  set<CharId> done;
   for (CharId a = 0; a < alph_; a++) {
     bool valid = true;
     // Test compliance with PARAMS_DIFFERENT.
@@ -171,7 +171,7 @@ void Experiment::GenParamsBasicFilter() {
     CharId chr = params[n];
     if (interchangable_[n][chr]) continue;
     // Build other_vars - vars in outcome formulas due to other positions.
-    std::set<VarId> other_vars(used_vars_);
+    set<VarId> other_vars(used_vars_);
     for (uint i = 0; i < num_params_; i++) {
       if (i == n) continue;
       for (auto f: used_maps_[i]) {
@@ -223,8 +223,8 @@ void Experiment::GenParamsGraphFilter() {
 }
 
 bliss::Digraph* Experiment::BlissGraphForParametrization(
-                          std::vector<int>& groups,
-                          std::vector<CharId>& params) {
+                          vec<int>& groups,
+                          vec<CharId>& params) {
   std::map<Formula*, uint> node_ids;
   std::map<uint, uint> var_ids;
   int new_id = 0;

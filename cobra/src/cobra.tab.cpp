@@ -163,10 +163,10 @@ typedef union YYSTYPE
 #line 55 "src/cobra.ypp"
 {
   Formula* formula;
-  std::vector<Variable*>* variable_list;
-  std::vector<Formula*>* formula_list;
-  std::vector<std::string>* string_list;
-  std::vector<uint>* int_list;
+  vec<Variable*>* variable_list;
+  vec<Formula*>* formula_list;
+  vec<string>* string_list;
+  vec<uint>* int_list;
   char* tstr;
   uint tint;
 }
@@ -1494,7 +1494,7 @@ yyreduce:
 
   case 17:
 #line 115 "src/cobra.ypp"
-    { (yyval.variable_list) = new std::vector<Variable*>();
+    { (yyval.variable_list) = new vec<Variable*>();
         (yyval.variable_list)->push_back(m.get<Variable>((yyvsp[(1) - (1)].tstr))); ;}
     break;
 
@@ -1506,7 +1506,7 @@ yyreduce:
 
   case 19:
 #line 123 "src/cobra.ypp"
-    { (yyval.string_list) = new std::vector<std::string>();
+    { (yyval.string_list) = new vec<string>();
         (yyval.string_list)->push_back((yyvsp[(1) - (1)].tstr)); ;}
     break;
 
@@ -1518,7 +1518,7 @@ yyreduce:
 
   case 21:
 #line 131 "src/cobra.ypp"
-    { (yyval.int_list) = new std::vector<uint>();
+    { (yyval.int_list) = new vec<uint>();
         (yyval.int_list)->push_back((yyvsp[(1) - (1)].tint)); ;}
     break;
 
@@ -1602,7 +1602,7 @@ yyreduce:
 
   case 37:
 #line 171 "src/cobra.ypp"
-    { (yyval.formula_list) = new std::vector<Formula*>();
+    { (yyval.formula_list) = new vec<Formula*>();
         (yyval.formula_list)->push_back((yyvsp[(1) - (1)].formula)); ;}
     break;
 

@@ -16,48 +16,48 @@ class Experiment;
 class AndOperator;
 
 class Game {
-  std::vector<Variable*> variables_;
-  std::map<std::string, VarId> variables_ids_;
+  vec<Variable*> variables_;
+  std::map<string, VarId> variables_ids_;
   AndOperator* restriction_;
-  std::vector<Experiment*> experiments_;
-  std::vector<std::string> alphabet_;
+  vec<Experiment*> experiments_;
+  vec<string> alphabet_;
 
   // list of mappings between alphabet and variables
-  std::vector<std::vector<VarId>> mappings_;
-  std::map<std::string, MapId> mappings_ids_;
+  vec<vec<VarId>> mappings_;
+  std::map<string, MapId> mappings_ids_;
 
  public:
   Game();
 
   void declareVariable(Variable*);
-  void declareVariables(std::vector<Variable*>*);
-  void declareVariables(std::initializer_list<std::string>);
-  std::vector<Variable*>& variables() { return variables_; }
+  void declareVariables(vec<Variable*>*);
+  void declareVariables(std::initializer_list<string>);
+  vec<Variable*>& variables() { return variables_; }
 
-  Variable* getVariableByName(std::string);
+  Variable* getVariableByName(string);
 
   void addRestriction(Formula*);
   Formula* restriction();
 
-  void setAlphabet(std::vector<std::string>* alphabet) {
+  void setAlphabet(vec<string>* alphabet) {
     assert(alphabet_.empty());
     alphabet_.insert(alphabet_.end(), alphabet->begin(), alphabet->end());
     delete alphabet;
   }
 
-  const std::vector<std::string>& alphabet() { return alphabet_; }
+  const vec<string>& alphabet() { return alphabet_; }
 
-  int addMapping(std::string, std::vector<Variable*>*);
-  int getMappingId(std::string);
+  int addMapping(string, vec<Variable*>*);
+  int getMappingId(string);
   int getMappingValue(MapId, CharId);
 
-  Experiment* addExperiment(std::string name, uint num_params);
-  std::vector<Experiment*>& experiments() {  return experiments_;  }
+  Experiment* addExperiment(string name, uint num_params);
+  vec<Experiment*>& experiments() {  return experiments_;  }
 
   void Precompute();
 
   bliss::Digraph* CreateGraph();
-  std::vector<int> ComputeVarEquiv(bliss::Digraph&);
+  vec<int> ComputeVarEquiv(bliss::Digraph&);
 };
 
 #endif   // COBRA_GAME_H_

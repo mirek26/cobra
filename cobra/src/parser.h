@@ -20,10 +20,10 @@ class Game;
 class CnfFormula;
 
 class ParserException: public std::exception {
-  std::string what_;
+  string what_;
 
  public:
-  explicit ParserException(std::string what) {
+  explicit ParserException(string what) {
     what_ = what;
   }
 
@@ -33,8 +33,8 @@ class ParserException: public std::exception {
 };
 
 class Parser {
-  std::vector<Formula*> nodes_;
-  std::map<std::string, Variable*> variables_;
+  vec<Formula*> nodes_;
+  std::map<string, Variable*> variables_;
   Formula* last_;
 
   // auxiliary structures for parsing
@@ -58,7 +58,7 @@ class Parser {
     return get(identity<T>(), l);
   }
 
-  void input_assert(bool value, std::string error_message) {
+  void input_assert(bool value, string error_message) {
     if (!value) {
       throw ParserException(error_message);
     }
@@ -105,7 +105,7 @@ class Parser {
    * for the same variable.
    */
   // Variable* get(identity<Variable>,
-  //               const std::string& ident);
+  //               const string& ident);
 
 };
 

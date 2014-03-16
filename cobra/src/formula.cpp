@@ -13,9 +13,9 @@
 
 VarId Variable::id_counter_ = 1;
 
-extern void parse_string(std::string s);
+extern void parse_string(string s);
 
-Formula* Formula::Parse(std::string str) {
+Formula* Formula::Parse(string str) {
   parse_string(str);
   assert(m.only_formula());
   return m.only_formula();
@@ -35,7 +35,7 @@ Formula* Formula::neg() {
   return m.get<NotOperator>(this);
 }
 
-std::string Mapping::pretty(bool, std::vector<CharId>* params) {
+string Mapping::pretty(bool, vec<CharId>* params) {
   if (params) {
     return m.game().variables()[getValue(*params) - 1]->pretty();
   } else {
@@ -50,7 +50,7 @@ CnfFormula* Formula::ToCnf() {
   return r;
 }
 
-CnfFormula* Formula::ToCnf(std::vector<CharId>& param) {
+CnfFormula* Formula::ToCnf(vec<CharId>& param) {
   CnfFormula* r = new CnfFormula();
   r->set_build_for_params(&param);
   TseitinTransformation(r, true);
@@ -59,7 +59,7 @@ CnfFormula* Formula::ToCnf(std::vector<CharId>& param) {
 }
 
 // return the variable corresponding to the node during Tseitin transformation
-VarId Formula::tseitin_var(std::vector<CharId>*) {
+VarId Formula::tseitin_var(vec<CharId>*) {
   if (tseitin_var_ == 0) {
     tseitin_var_ = Variable::NewVarId();
   }
@@ -71,12 +71,12 @@ VarId Formula::tseitin_var(std::vector<CharId>*) {
  */
 
 void TseitinAnd(VarId thisVar, CnfFormula* cnf,
-                const std::vector<VarId>& list, uint offset,
+                const vec<VarId>& list, uint offset,
                 bool negate = false) {
   int neg = negate ? -1 : 1;
   // X <-> AND(A1, A2, ..)
   // 1. (X | !A1 | !A2 | ...)
-  std::vector<VarId> first;
+  vec<VarId> first;
   for (auto v = list.begin() + offset; v < list.end(); ++v) {
     first.push_back(neg * -(*v));
   }
@@ -101,7 +101,7 @@ void AndOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
 }
 
 void OrOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
-  std::vector<VarId> first;
+  vec<VarId> first;
   for (auto& f: children_) {
     first.push_back(f->tseitin_var(cnf->build_for_params()));
   }
@@ -176,7 +176,7 @@ void EquivalenceOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
 // 'to' exclusively
 void TseitinNumerical(VarId thisVar, CnfFormula* cnf,
                       bool at_least, bool at_most, uint value,
-                      const std::vector<VarId>& children, uint offset) {
+                      const vec<VarId>& children, uint offset) {
   // X <-> ( A1 & T1 ) | ( !A1 & T2 )
   // (X | !T1 | !A1) & (T1 | !X | !A1) & (A1 | X | !T2) & (A1 | T2 | !X)
   if (value == children.size() - offset) {
@@ -232,7 +232,7 @@ void AtMostOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
 }
 
 void Formula::AddToGraph(bliss::Digraph& g,
-                         std::vector<CharId>* params,
+                         vec<CharId>* params,
                          int parent) {
   if (isLiteral()) {
     // just create an edge from parent to the variable

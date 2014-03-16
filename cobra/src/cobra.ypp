@@ -54,10 +54,10 @@
 
 %union {
   Formula* formula;
-  std::vector<Variable*>* variable_list;
-  std::vector<Formula*>* formula_list;
-  std::vector<std::string>* string_list;
-  std::vector<uint>* int_list;
+  vec<Variable*>* variable_list;
+  vec<Formula*>* formula_list;
+  vec<string>* string_list;
+  vec<uint>* int_list;
   char* tstr;
   uint tint;
 }
@@ -112,7 +112,7 @@ line :
 
 variable_list :
     ident
-      { $$ = new std::vector<Variable*>();
+      { $$ = new vec<Variable*>();
         $$->push_back(m.get<Variable>($1)); }
   | variable_list ',' ident
       { $$ = $1;
@@ -120,7 +120,7 @@ variable_list :
 
 string_list :
     T_STRING
-      { $$ = new std::vector<std::string>();
+      { $$ = new vec<string>();
         $$->push_back($1); }
   | string_list ',' T_STRING
       { $$ = $1;
@@ -128,7 +128,7 @@ string_list :
 
 int_list :
     T_INT
-      { $$ = new std::vector<uint>();
+      { $$ = new vec<uint>();
         $$->push_back($1); }
   | int_list ',' T_INT
       { $$ = $1;
@@ -168,7 +168,7 @@ formula :
 
 formula_list:
     formula
-      { $$ = new std::vector<Formula*>();
+      { $$ = new vec<Formula*>();
         $$->push_back($1); }
   | formula_list ',' formula
       { $$ = $1;

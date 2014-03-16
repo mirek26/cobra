@@ -21,18 +21,18 @@ void Game::declareVariable(Variable* var) {
   variables_ids_[var->ident()] = var->id();
 }
 
-void Game::declareVariables(std::vector<Variable*>* list) {
+void Game::declareVariables(vec<Variable*>* list) {
   for (auto var: *list)
     declareVariable(var);
   delete list;
 }
 
-void Game::declareVariables(std::initializer_list<std::string> list) {
+void Game::declareVariables(std::initializer_list<string> list) {
   for (auto x: list)
     declareVariable(m.get<Variable>(x));
 }
 
-Variable* Game::getVariableByName(std::string name) {
+Variable* Game::getVariableByName(string name) {
   m.input_assert(variables_ids_.count(name) > 0,
     "Undefined prepositional variable '" + name + "'.");
   return variables_[variables_ids_[name] - 1];
@@ -46,19 +46,19 @@ Formula* Game::restriction() {
   return restriction_;
 }
 
-int Game::addMapping(std::string ident, std::vector<Variable*>* vars) {
+int Game::addMapping(string ident, vec<Variable*>* vars) {
   m.input_assert(mappings_ids_.count(ident) == 0,
     "Mapping " + ident + " defined twice.");
   int new_id = mappings_.size();
   mappings_ids_[ident] = new_id;
-  mappings_.push_back(std::vector<VarId>());
+  mappings_.push_back(vec<VarId>());
   for (auto v: *vars) {
     mappings_.back().push_back(getVariableByName(v->ident())->id());
   }
   return new_id;
 }
 
-int Game::getMappingId(std::string ident) {
+int Game::getMappingId(string ident) {
   m.input_assert(mappings_ids_.count(ident) > 0,
     "Undefined mapping '" + ident + "'.");
   return mappings_ids_[ident];
@@ -70,7 +70,7 @@ int Game::getMappingValue(MapId mapping, CharId a) {
   return mappings_[mapping][a];
 }
 
-Experiment* Game::addExperiment(std::string name, uint num_params) {
+Experiment* Game::addExperiment(string name, uint num_params) {
   auto e = new Experiment(this, name, num_params);
   experiments_.push_back(e);
   return e;
@@ -100,7 +100,7 @@ bliss::Digraph* Game::CreateGraph() {
 }
 
 void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
-  std::vector<int>& var_equiv = *((std::vector<int>*) equiv);
+  vec<int>& var_equiv = *((vec<int>*) equiv);
   int d = -1;
   for (uint i = 0; i < var_equiv.size()*2 - 2; i+=2) {
     if (aut[i] <= i) continue;
@@ -115,10 +115,10 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-std::vector<int> Game::ComputeVarEquiv(bliss::Digraph& graph) {
+vec<int> Game::ComputeVarEquiv(bliss::Digraph& graph) {
   bliss::Stats stats;
   auto var_count = variables_.size();
-  std::vector<int> var_equiv(var_count + 1, 0);
+  vec<int> var_equiv(var_count + 1, 0);
   for (uint i = 1; i <= var_count; i++) {
     var_equiv[i] = i;
   }

@@ -4,6 +4,8 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <unordered_set>
+#include <set>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -11,21 +13,28 @@
 #ifndef COBRA_COMMON_H_
 #define COBRA_COMMON_H_
 
+// common types
 typedef unsigned int uint;
 typedef unsigned char CharId;
 typedef short int VarId; // must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
 
+// type aliases for
+typedef std::string string;
+template<typename T> using vec = std::vector<T>;
+//template<typename T> using set = std::unordered_set<T>;
+template<typename T> using set = std::set<T>;
+
 template<typename T>
 struct identity { typedef T type; };
 
 template<class T>
-void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::vector<T>)> action, int offset = 0);
+void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> action, int offset = 0);
 
 template<class T>
-void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::vector<T>)> action, int offset) {
+void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> action, int offset) {
   assert(k >= 0);
-  static std::vector<T> combination;
+  static vec<T> combination;
   if (k == 0) {
     action(combination);
     return;
@@ -38,12 +47,12 @@ void for_all_combinations(int k, std::vector<T>& list, std::function<void(std::v
 }
 
 template<class T, class R>
-void transform(std::vector<T>& from, std::vector<R>& to, std::function<R(T)>& fun) {
+void transform(vec<T>& from, vec<R>& to, std::function<R(T)>& fun) {
   to.resize(from.size());
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
 
-std::vector<std::string> split(std::string s);
-bool readIntOrString(uint& i, std::string& str);
+vec<string> split(string s);
+bool readIntOrString(uint& i, string& str);
 
 #endif  // COBRA_COMMON_H_
