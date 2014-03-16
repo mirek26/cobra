@@ -201,6 +201,10 @@ void ExactlyOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   TseitinNumerical(thisVar, cnf,
                    true, true, value_,
                    tseitin_children(cnf->build_for_params()), 0);
+  // recurse down
+  for (auto& f: children_) {
+    f->TseitinTransformation(cnf, false);
+  }
 }
 
 void AtLeastOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
@@ -209,6 +213,10 @@ void AtLeastOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   TseitinNumerical(thisVar, cnf,
                    true, false, value_,
                    tseitin_children(cnf->build_for_params()), 0);
+  // recurse down
+  for (auto& f: children_) {
+    f->TseitinTransformation(cnf, false);
+  }
 }
 
 void AtMostOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
@@ -217,9 +225,11 @@ void AtMostOperator::TseitinTransformation(CnfFormula* cnf, bool top) {
   TseitinNumerical(thisVar, cnf,
                    false, true, value_,
                    tseitin_children(cnf->build_for_params()), 0);
+  // recurse down
+  for (auto& f: children_) {
+    f->TseitinTransformation(cnf, false);
+  }
 }
-
-
 
 void Formula::AddToGraph(bliss::Digraph& g,
                          std::vector<CharId>* params,

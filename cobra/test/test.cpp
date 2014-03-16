@@ -7,11 +7,22 @@
 
 extern Parser m;
 
-TEST(FormulaTest, BasicParse) {
+// Parser tests.
+
+TEST(Parser, UndefinedVariable) {
+  m.game().declareVariables({"a", "b", "c"});
+  EXPECT_NO_THROW(Formula::Parse("a & b & c"));
+  EXPECT_THROW(Formula::Parse("a & b & c & d"), ParserException);
+  EXPECT_THROW(Formula::Parse("Exactly-1(a1, a2, a3)"), ParserException);
+}
+
+TEST(Parser, BasicParse) {
   m.game().declareVariables({"p1", "p2", "a", "b"});
   auto f1 = Formula::Parse("p1 & p2 -> (a <-> b)");
   EXPECT_STREQ("((p1 & p2) -> (a <-> b))", f1->pretty(false).c_str());
 }
+
+// Tsetitin transformation tests.
 
 TEST(Tseitin, Exactly0) {
   CnfFormula s;
@@ -25,6 +36,14 @@ TEST(Tseitin, Exactly1) {
   CnfFormula s;
   m.game().declareVariables({"a1", "a2", "a3"});
   s.AddConstraint(Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
+  s.InitSolver();
+  EXPECT_FALSE(s.Satisfiable());
+}
+
+TEST(Tseitin, Exactly1b) {
+  CnfFormula s;
+  m.game().declareVariables({"a1", "a2", "a3"});
+  s.AddConstraint(Formula::Parse("Exactly-1(a, a|b, b)"));
   s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -49,10 +68,9 @@ TEST(SolverTest, Exactly1) {
   s.AddConstraint(Formula::Parse("!a1"));
   s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
-  if (s.Satisfiable()) {
-    s.PrintAssignment(m.game().variables());
-  }
 }
+
+// Sat solver tests.
 
 TEST(SolverTest, BasicSatisfiability) {
   CnfFormula s;

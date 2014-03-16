@@ -60,7 +60,7 @@ class Parser {
 
   void input_assert(bool value, std::string error_message) {
     if (!value) {
-      throw new ParserException(error_message);
+      throw ParserException(error_message);
     }
   }
 
