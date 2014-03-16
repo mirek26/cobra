@@ -101,158 +101,125 @@ void Experiment::Precompute() {
   }
 }
 
-bool Experiment::CharsEquivalent(uint n, CharId a, CharId b, std::vector<int>& groups) const {
+bool Experiment::CharsEquiv(uint n, CharId a, CharId b) const {
   bool equiv = true;
   for (auto f: used_maps_[n]) {
-    if (groups[game_->getMappingValue(f, a)] !=
-        groups[game_->getMappingValue(f, b)]) {
+    if (gen_var_groups_[game_->getMappingValue(f, a)] !=
+        gen_var_groups_[game_->getMappingValue(f, b)]) {
       equiv = false;
     }
   }
   return equiv;
 }
 
+std::set<std::vector<CharId>>*
+Experiment::GenParams(std::vector<int>& groups) {
+  gen_stats_ = GenParamsStats();
+  gen_var_groups_ = groups;
+  gen_params_.resize(num_params_);
+  gen_params_all_.clear();
+  GenParamsFill(0);
+  //printf("Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+  assert(gen_stats_.ph3 == gen_params_all_.size());
+  return &gen_params_all_;
+}
+
 // Recursive function that substitudes char at position n for all posibilities.
-void Experiment::FillParametrization(std::vector<int>& groups, uint n) {
+void Experiment::GenParamsFill(uint n) {
   std::set<CharId> done;
   for (CharId a = 0; a < alph_; a++) {
-    bool recurse = true;
-    // Test whether this agrees with PARAMS_DIFFERENT.
+    bool valid = true;
+    // Test compliance with PARAMS_DIFFERENT.
     for (auto p: params_different_[n]) {
-      if (p < n && tmp_params_[p] == a) recurse = false;
+      if (p < n && gen_params_[p] == a) valid = false;
     }
-    if (!recurse) {
-      // for (int i = 0; i < n; i++) printf("%i ", tmp_params_[i]); printf("%i not different. \n", a);
-      continue;
-    }
+    if (!valid) continue;
     done.insert(a);
-    // Test whether this agrees with PARAMS_SORTED.
+    // Test compliance with PARAMS_SORTED.
     for (auto p: params_smaller_than_[n]) {
       assert(p < n);
-      if (tmp_params_[p] > a) recurse = false;
+      if (gen_params_[p] > a) valid = false;
     }
-    if (!recurse) {
-      // for (int i = 0; i < n; i++) printf("%i ", tmp_params_[i]); printf("%i not bigger. \n", a);
-      continue;
-    }
+    if (!valid) continue;
     // Test equivalence.
     if (interchangable_[n][a]) {
       for (auto b: done) {
         if (a == b) continue;
-        if (CharsEquivalent(n, a, b, groups)) {
-          recurse = false;
-          // for (int i = 0; i < n; i++) printf("%i ", tmp_params_[i]);
-          // printf("%i ~ %i.\n", a, b);
+        if (CharsEquiv(n, a, b)) {
+          valid = false;
           done.erase(a);  // there is an equivalent in done -> not needed
           break;
         }
       }
     }
-    if (!recurse) continue;
+    if (!valid) continue;
     // Recurse down.
-    tmp_params_[n] = a;
+    gen_params_[n] = a;
     if (n + 1 == num_params_) {
-      tmp_params_all_.insert(tmp_params_);
-      //for (auto p: tmp_params_) printf("%i ", p); printf(".\n");
+      gen_stats_.ph1++;
+      GenParamsBasicFilter();
     } else {
-      // for (int i = 0; i <= n; i++) printf("%i ", tmp_params_[i]);
-      // printf("...\n");
-      FillParametrization(groups, n + 1);
+      GenParamsFill(n + 1);
     }
   }
 }
 
-std::set<std::vector<CharId>>*
-Experiment::GenerateParametrizations(std::vector<int> groups) {
-  tmp_params_.resize(num_params_);
-  tmp_params_all_.clear();
-  std::set<std::vector<CharId>> remove_params;
-  FillParametrization(groups, 0);
+void Experiment::GenParamsBasicFilter() {
+  auto& params = gen_params_;
+  bool keep = true;
   for (uint n = 0; n < num_params_; n++) {
-    for (auto params: tmp_params_all_) {
-      //for (auto p: params) printf("%i ", p); printf("change pos %i - ", n);
-
-      CharId chr = params[n];
-      if (interchangable_[n][chr]) continue;
-      // Build other_vars - vars in outcome formulas due to other positions.
-      std::set<VarId> other_vars(used_vars_);
-      for (uint i = 0; i < num_params_; i++) {
-        if (i == n) continue;
-        for (auto f: used_maps_[i]) {
-          other_vars.insert(game_->getMappingValue(f, params[i]));
-        }
+    CharId chr = params[n];
+    if (interchangable_[n][chr]) continue;
+    // Build other_vars - vars in outcome formulas due to other positions.
+    std::set<VarId> other_vars(used_vars_);
+    for (uint i = 0; i < num_params_; i++) {
+      if (i == n) continue;
+      for (auto f: used_maps_[i]) {
+        other_vars.insert(game_->getMappingValue(f, params[i]));
       }
-      //
-      bool keep = false;
+    }
+    //
+    keep = false;
+    for (auto f: used_maps_[n]) {
+      VarId var = game_->getMappingValue(f, chr);
+      if (other_vars.count(var) > 0) keep = true;
+    }
+    if (keep) continue;
+    // Consider alternatives.
+    for (CharId a = 0; a < chr; a++) {
+      params[n] = a;
+      if (gen_params_all_.count(params) == 0) continue;
+      if (!CharsEquiv(n, a, chr)) continue;
+      keep = false;
       for (auto f: used_maps_[n]) {
-        VarId var = game_->getMappingValue(f, chr);
+        VarId var = game_->getMappingValue(f, a);
         if (other_vars.count(var) > 0) keep = true;
       }
-      if (keep) continue;
-      // Consider alternatives.
-      for (CharId a = 0; a < chr; a++) {
-        params[n] = a;
-        if (tmp_params_all_.count(params) == 0) continue;
-        if (!CharsEquivalent(n, a, chr, groups)) continue;
-        keep = false;
-        for (auto f: used_maps_[n]) {
-          VarId var = game_->getMappingValue(f, a);
-          if (other_vars.count(var) > 0) keep = true;
-        }
-        if (!keep) {
-          // Schedule for removal.
-          params[n] = chr;
-          remove_params.insert(params);
-          break;
-        }
+      if (!keep) {
+        params[n] = chr;
+        break;
       }
     }
-    for (auto& params: remove_params) {
-      tmp_params_all_.erase(params);
-    }
-    remove_params.clear();
+    if (!keep) break;
   }
-  // printf("===\n");
-  // for (auto& params: tmp_params_all_) {
-  //   for (auto p: params) printf("%i ", p);
-  //   printf("\n");
-  // }
 
-  // ---
-  std::map<unsigned int, std::vector<CharId>> hash;
-  for (auto params: tmp_params_all_) {
-  //decltype(tmp_params_all_) test = { {0,0,1} };
-  //for (auto params: test) {
-    bliss::Stats stats;
-    auto g = BlissGraphForParametrization(groups, params);
-    // g->write_dimacs(stdout);
-    auto a = g->canonical_form(stats, nullptr, nullptr);
-    auto ng = g->permute(a);
-    // ng->write_dimacs(stdout);
-    //printf("\n\n");
-    auto h = ng->get_hash();
-    //for (auto p: params) printf("%i ", p);
-    if (hash.count(h) > 0) {
-      remove_params.insert(params);
-      //printf("..seems to be equiv to.. ");
-      //for (auto p: hash[h]) printf("%i ", p);
-      //bliss::print_permutation(stdout, g->get_nof_vertices(), a, 1);
-      //printf("\n");
-    } else {
-      //printf("is new!\n");
-      hash[h] = params;
-    }
+  if (keep) {
+    gen_stats_.ph2++;
+    GenParamsGraphFilter();
   }
-  for (auto& params: remove_params) {
-    tmp_params_all_.erase(params);
-  }
-  remove_params.clear();
+}
 
-  // for (auto p: hash) {
-  //   for (auto x: p.second) printf("%i ", x);
-  //   printf(".\n");
-  // }
-  return &tmp_params_all_;
+void Experiment::GenParamsGraphFilter() {
+  auto& params = gen_params_;
+  bliss::Stats stats;
+  auto graph = BlissGraphForParametrization(gen_var_groups_, params);
+  auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
+  auto h = canonical->get_hash();
+  if (gen_graphs_.count(h) > 0)
+    return;
+  gen_graphs_[h] = params;
+  gen_stats_.ph3++;
+  gen_params_all_.insert(params);
 }
 
 bliss::Digraph* Experiment::BlissGraphForParametrization(

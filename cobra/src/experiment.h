@@ -14,6 +14,10 @@
 #ifndef COBRA_EXPERIMENT_H_
 #define COBRA_EXPERIMENT_H_
 
+struct GenParamsStats {
+  uint ph1 = 0, ph2 = 0, ph3 = 0;
+};
+
 class Experiment {
   Game* game_;
   uint alph_;
@@ -32,8 +36,12 @@ class Experiment {
   std::vector<std::set<uint>> params_different_;
   std::vector<std::set<uint>> params_smaller_than_;
 
-  std::set<std::vector<CharId>> tmp_params_all_;
-  std::vector<CharId> tmp_params_;
+  // Helper fields for parametrization generation.
+  GenParamsStats gen_stats_;
+  std::vector<int> gen_var_groups_;
+  std::set<std::vector<CharId>> gen_params_all_;
+  std::vector<CharId> gen_params_;
+  std::map<unsigned int, std::vector<CharId>> gen_graphs_;
 
  public:
   Experiment(Game* game, std::string name, uint num_params):
@@ -56,7 +64,7 @@ class Experiment {
   void paramsDistinct(std::vector<uint>* list);
   void paramsSorted(std::vector<uint>* list);
 
-  std::set<std::vector<CharId>>* GenerateParametrizations(std::vector<int>);
+  std::set<std::vector<CharId>>* GenParams(std::vector<int>&);
   void Precompute();
 
  private:
@@ -64,8 +72,10 @@ class Experiment {
   void PrecomputeUsed(Formula* f);
 
   // Helper functions for parametrizations generation.
-  bool CharsEquivalent(uint n, CharId a, CharId b, std::vector<int>& groups) const;
-  void FillParametrization(std::vector<int>& groups, uint n);
+  bool CharsEquiv(uint n, CharId a, CharId b) const;
+  void GenParamsFill(uint n);
+  void GenParamsBasicFilter();
+  void GenParamsGraphFilter();
 
   bliss::Digraph* BlissGraphForParametrization(
                           std::vector<int>& groups,

@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     int o = 0;
     std::vector<ExperimentSpec> experiments;
     for (auto e: game.experiments()) {
-      auto params_all = e->GenerateParametrizations(var_equiv);
+      auto params_all = e->GenParams(var_equiv);
       for (auto& params: *params_all) {
         experiments.push_back(
           { e,
