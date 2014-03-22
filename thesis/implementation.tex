@@ -1,1 +1,51 @@
 \chapter{Implementation details}
+
+\section{Programming Language and Style}
+
+Since the problem we are trying to solve is very computationally demanding,
+  we had to choose a high-performing programming language.
+The tools we want to use, especially SAT solvers, are typically written in C/C++,
+  so C++ was a natural choice for our tool.
+Cobra is written in the latest standard of ISO C++, namely C++11, which
+  contains significant changes both in the language and in the standard libraries
+  and, in our opinion, improves readability compared to previous versions.
+
+We wanted the style of our code to be consistent and to usage of the language in the best
+ manner possible according to industrial practice.
+From the wide range of style guides available online
+ we chose \emph{Google C++ Style Guide}\ref{google-style} and made
+ the code compliant with all its rules except for a few exception.
+The only significant one of those are lambda functions, which are forbidden
+ by the style guide due to various reasons\ref{google-style},
+ but we think they are more beneficial than harmful in this project.
+
+\subsection{Compiler Requirements}
+The usage of a modern standard requires a modern compiler,
+  which supports all the C++11 feautres we use.
+We recommend using starndard \texttt{gcc}; you need version $4.8$ or higher.
+For \texttt{clang}, you need version $3.2$ or higher.
+
+The tool is platform independent.
+  We tested compilation and functionality on
+  all three major operating systems, on Linux (Ubuntu 12.04),
+  Mac OS X (10.9) and Windows (8.1).
+
+\subsection{Unit testing.}
+Unit testing has became a common part of software development process
+  in the recent years.
+Correctness was a top priority during the development and
+  unit tests are a perfect way to capture potential programmer's error
+  as soon as possible and avoid regression.
+
+There is a lot of unit tests framework for C++.
+We focused on simplicity, minimal amount of work needed to add new tests
+  and good assertion support, and opted for
+  \emph{Google Test}\ref{google-test}.
+
+All available tests are compiled and excecuted if you run \texttt{make test}
+  in the root folder.
+This should serve as a basic sanity test and we highly recommend
+  doing this in case anyone needs to change something in the code.
+
+\section{Sat solving}
+

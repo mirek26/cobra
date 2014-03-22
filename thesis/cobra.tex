@@ -2,4 +2,28 @@
 
 \section{Input language}
 
+\newcommand{\symb}[1]{\;\textcolor{DarkBlue}{\textrm{$<$#1$>$}}\;}
+\newcommand{\txt}[1]{\;\textcolor{DarkRed}{\textsc{#1}}\;}
+\newcommand{\term}[1]{\;\textrm{#1}\;}
+\begin{align*}
+\symb{code} ::=\;& \symb{line} \| \symb{code} \symb{line}\\
+\symb{line} ::=\;& \txt{Variable} \term{ident} \| \txt{Variables} \symb{ident-list} \| \\
+  & \txt{Restriction} \symb{formula} \| \txt{Alphabet} \symb{string-list} \| \\
+  & \txt{Mapping} \term{ident} \symb{ident-list} \| \txt{Experiment} \term{string} \term{int} \| \\
+  & \txt{Params-distinct} \symb{int-list} \| \txt{Params-sorted} \symb{int-list} \| \\
+  & \txt{Outcome} \term{string} \symb{formula} \\
+\symb{formula} ::=\;&  \term{ident} \| \txt{(} \symb{formula} \txt{)} \| \txt{!} \symb{formula} \| \\
+ & \symb{formula} \txt{and} \symb{formula} \| \symb{formula} \txt{or} \symb{formula} \| \\
+ & \txt{And(} \symb{formula-list} \txt{)} \| \txt{Or(} \symb{formula-list} \txt{)} \| \\
+ & \symb{formula} \txt{$\rightarrow$} \symb{formula} \| \symb{formula} \txt{$\leftarrow$} \symb{formula} \| \\
+ & \symb{formula} \txt{$\leftrightarrow$} \symb{formula} \| \term{ident} \txt{(\$} \term{int} \txt{)} \| \\
+ & \txt{AtLeast-} \term{int} \txt{(} \symb{formula-list} \txt{)} \| \\
+ & \txt{AtMost-} \term{int} \txt{(} \symb{formula-list} \txt{)} \| \\
+ & \txt{Exactly-} \term{int} \txt{(} \symb{formula-list} \txt{)} \\
+\symb{ident-list} ::=\;& \term{ident} \| \symb{ident-list} \txt{,} \term{ident} \\
+\symb{int-list} ::=\;& \term{int} \| \symb{int-list} \txt{,} \term{int} \\
+\symb{formula-list} ::=\;& \symb{formula} \| \symb{formula-list} \txt{,} \symb{formula} \\
+\symb{string-list} ::=\;& \term{string} \| \symb{string-list} \txt{,} \term{string}
+\end{align*}
+
 \section{Modes}

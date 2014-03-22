@@ -1,40 +1,113 @@
 \section{Symmetry Breaking}
 
-\TODO{Motivace:} u některých úloh je fakt mrtě experimentů, když uvážíme možné
-parametrizace. Třeba u standardních 12 koulí u vážení 4 vs 4
- $\frac{1}{2}\cdot {12 \choose 4}\cdot{8 \choose 4}$ kombinací. Ne všechny jsou zajímavé.
-V téhle kapitole zformalizujem, co znamená zajímavé a jak takové vyberem.
+% The number of possible parametrizations of a type of experiment is typically very large,
+%   which makes the analysis a game much harder.
+% For example, consider the conterfeit-coin problem (\ref{prob-coins})
+%   and the experiment of weighting 4 coins against 4 coins.
+% There is $\frac{1}{2}\cdot {12 \choose 4}\cdot{8 \choose 4} = 17325$
+%  possible combinations for parametrization, but
+%  in the initial state (i.e. with no knowledge except for the initial restriction),
+%  all of them are equivelent -- they will give us the same information regardless of symmetries.
+
+% In this section, we formally define equivalence of two experiments
+%  and show that we can neglect all but one experiment in each equivelence class.
+% Further, we present several lemmas that will form the basis of
+%  our symmetry breaking algorithms in the Chapter \ref{chapter-cobra}.
+
+%Since composition of permutations is a permutation, this is clearly an equivalence relation.
+\TODO{Tohle hrozně nefunguje. Musí být symetrické i experimenty.}
+Plán:
+\begin{itemize}
+\item zadefinovat symetrii množiny experimentů jako gropu permutací proměnných tak, aby $\forall e\in E \exists e^\pi$ (kde
+).
+\item zadefinovat nějakou vlastnost hry (symetrická) - pokud pro nějaké $e$ existuje $e^\pi$, pak pro všechny
+\item říct, že pokud jsou parametrizace nějak normálně omezené (typicky libovolný řetězec, nebo řetězec bez opakování), tak je ta hra symetrická
+\item omezit se s analýzou jen na symetrické hry
+\item zadefinovat konzistentní strategii, jako strategii, která na zpermutovanou formuli zahraje zpermutovaný experiment
+\item zadefinovat ekvivalenci experimentů podle definice výše
+\item dokázat, že pokud mám strategie $\stg_1. \stg_2$ tak že $\stg_1(\form) \sim_\form \stg_2(\form)$,
+tak existuje permutace proměnných taková, že $|\procstg{\stg_1}{\val}| = |\procstg{\stg_2}{\val^\pi}|$
+\end{itemize}
 
 \begin{definition}
-An experiment $\exp_1$ is in relation $\sim_\form$ with an experiment $\exp_2$ if
- and only if there exists a permutation $\perm\in\Perm_\Var$ such that
+For an experiment $\exp$ and a permutation $\perm\in\Perm_\Var$,
+  a $\perm$-symmetric experiment $\exp^\perm\in\Exp$ is an experiment such that
+  $\{\form^\perm \in\outcome(\exp)\} = \{\form\in\outcome(\exp^\perm)\}$.
+Clearly, no experiment satisfying this may exists.
+\end{definition}
+
+\begin{definition}
+A game $\game$ is \emph{symmetric} if it satifies the following implication:
+If for an experiment $\exp$ exists a $\perm$-symmetric experiment $\exp^\perm\in\Exp$,
+  then a $\perm$-symmetric experiment exists for every experiment.
+\end{definition}
+
+For the rest of this chapter, the game we analyze is \emph{symmetric}.
+
+\begin{definition}
+A memory-less strategy $\stg$ is \emph{consistent} if and only if
+  $\stg(\form^\perm) = \stg(\form)^\perm$ for any $\form\in\Form_\Var$ and
+  $\perm\in$ symmetry group of the set of experiments.
+\end{definition}
+
+\begin{definition}
+An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $\form$,
+  written $\exp_1\sim_\form\exp_2$,
+  if and only if there exists a permutation $\perm\in\Perm_\Var$ such that
  $ \{ \form\wedge\formu \| \formu\in\outcome(\exp_1) \} \equiv
    \{ (\form\wedge\formu)^\perm \| \formu\in\outcome(\exp_2) \} $.
 \end{definition}
 
-This is clearly an equivalence relation.
-
-\begin{lemma}
-Let $\stg_1, \stg_2$ be two strageties, such that
-$\stg_1(\form) \sim_\form \stg_2(\form)$ for any $\form \in\Form_\Var$.
-Then for any valuation $v$ $|\procstg{\stg_1}{\val}| = |\procstg{\stg_1}{\val}|$
-and thus also $\lenmax{\stg_1} = \lenmax{\stg_2}$.
-\end{lemma}
+\begin{theorem}
+Let $\stg_1, \stg_2$ be two consistent strategies, such that
+$\stg_1(\form) \sim_\form \stg_2(\form)$ for any $\form\in\Form_\Var$.
+Then ... ?!? %$\lenmax{\stg_1} = \lenmax{\stg_2}$ ?!?
+\end{theorem}
 
 \begin{proof}
-\TODO{Indukcí k délce $\procstg{\stg}{\val}$.}
+\newcommand{\knA}{\varphi}
+\newcommand{\knB}{\chi}
+Značme $\knA_k, \knB_{k,\perm}$ accumulated knowledge of $\stg, \tau$ after $k$ steps on valuation $v, v^\perm$ respectively.
+
+Indukcí ukážu, že pro $k\in\Nseto$ existuje $\perm\in Sym(E)$, $\knA_k^\perm = \knB_{k,\perm}$.
+Pro $k=0$ zřejmě platí. \TODO{Sym(E) vs symetrie $\init$..}
+
+Předpokl. $\knA_k^\perm = \knB_{k, \perm}$.
+Oznečme $e_1 = \stg(\knA_k)$, $e_2 = \tau(\knB_{k, \perm})$.
+
+\[
+e_2 = \tau(\knB_{k, \perm})
+    \sim_{\knB_{k, \perm}}   \stg(\knB_{k, \perm})
+    = \stg(\knA_k^\perm)
+    = \stg(\knA_k)^\perm
+    = e_1^\perm
+\]
+
+Díky tomu existuje $\rho\in Sym(E)$ such that
+\begin{align}
+ \{ \knB_{k, \perm} \wedge \formu \| \formu\in\outcome(\exp_2) \} &=
+ \{ (\knB_{k, \perm} \wedge \formu)^\rho \| \formu\in\outcome(\exp_1^\perm) \} = \\
+&= \{ (\knA_k^\perm \wedge \formu^\perm)^\rho \| \formu\in\outcome(\exp_1) \} =
+ \{ (\knA_k \wedge \formu)^{\pi\rho} \| \formu\in\outcome(\exp_1) \} \\
+\end{align}
+
+$\rho\in Sym(E)$takže i $\perm\rho\in Sym(E)$. Ukážeme, že
+$\knA_{k+1}^{\pi\rho} = \knB_{k+1, \pi\rho}$.
+
+
+
 \end{proof}
 
-For any accrued knowledge $\form$, this lemma gives us the right
-to consider only one of the experiments
-$\exp_1, \exp_2$ if $\exp_1 \sim\form \exp_2$.
+% For any accrued knowledge $\form$, this lemma gives us the right
+% to consider only one of the experiments
+% $\exp_1, \exp_2$ if $\exp_1 \sim_\form \exp_2$.
 
-Now, we would love an algorithm that would, for a given formula $\form$,
-generate a set of experiment, such that there is exaclty one expriment
-from every equivalence class in $E/\sim_\form$.
-\TODO{...}
+% Now, we would love an algorithm that would, for a given formula $\form$,
+% generate a set of experiment, such that there is exaclty one expriment
+% from every equivalence class in $E/\sim_\form$.
+% \TODO{...}
 
-For the following sections, let us fix an experiment type $t$.
-\subsection{Phase 1}
+% For the following sections, let us fix an experiment type $t$.
+% \subsection{Phase 1}
 
-\subsection{Phase 2}
+% \subsection{Phase 2}

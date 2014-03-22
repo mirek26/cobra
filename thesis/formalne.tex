@@ -1,20 +1,26 @@
 \chapter{General model}
 
 \section{Notation}
-Let $\Form_\Var$ be the set of all prepositional formulas over
+Let $\Form^*_\Var$ be the set of all prepositional formulas over
   the set of variables $\Var$;
-  $\Val_\Var$ be the set of all valuations of variables $\Var$.
-Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
+  $\Val_\Var$ be the set of all valuations (boolean interpretation)
+  of variables $\Var$.
+Formulas $\form_0, \form_1 \in \Form^*_\Var$ are (semantically) equivalent,
   written $\form_0 \equiv \form_1$, if
   $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
+In the whole text, we want to identify equivalent formulas.
+Therefore, let $\Form_\Var = \Form^*_\Var/\!\!\equiv$ and in the sequel,
+  let us identify a formula with its corresponding equivalence class.
+
 For a formula $\form\in\Form_\Var$, let
-  $\numval_\Var(\form) = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
-  be the number of valuations by which $\form$ is satisfied.
+  $\numval_\Var{\form} = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
+  be the number of models of $\form$ (valuations satisfying $\form$).
+This definition is correct as equivalent formulas has same number of models.
 We often omit the index $\Var$ if it is clear from the context.
 
-For any unary predicate $P$, $\#i\in A.P(i) = |\{ i\in A \| P(i)\}|$.
-  We often omit the ``$\in A$'' part and write only $\#i.P(i)$
-  if the range of $i$ is clear from the context.
+% For any unary predicate $P$, $\#i\in A.P(i) = |\{ i\in A \| P(i)\}|$.
+%   We often omit the ``$\in A$'' part and write only $\#i.P(i)$
+%   if the range of $i$ is clear from the context.
 
 Let $\Perm_\Var$ be the set of all permutations of $\Var$.
 
@@ -22,33 +28,31 @@ Let $\Perm_\Var$ be the set of all permutations of $\Var$.
 % DEF: CODE BREAKING GAME
 \section{Formal definition}
 
-\TODO{Motivace: Ve hře chci najít přiřazení proměnných. Hru tedy reprezentuju jako
-mnozinu promennych, a jakousi mnozinu experimentu. Po provedeni experimentu
-dostanu formuli v danych promennych, o ktere vim, ze je splnena v hledane valuaci.
-Tato formule reprezentuje castecnou informaci, kterou jsem experimentem ziskal.
-Kazdy experiment muze dopadnout vice zpusoby, pro kazdy mam tedy mnozinu
-moznych formuli, ktere mi da.}
+Code breaking games are game between two players -- a \emph{codemaker}
+  and a \emph{codebreaker}.
+The codemaker selects a secret code and then evaluates the experiments
+  performed by the codebreaker.
+The codebreaker chooses and performs experiments and collects partial
+  information about the code according to some rules.
+The codebreaker strives to reveal the code in minimal number of experiments.
+... (introduction)
 
-% Intuitively, the objective of the game is to find a valuation of
-%   variables $\Var$ by a series of experiments.
-% Let us call it \emph{the wanted valuation}.
-% The search space is reduced by formula $\init$,
-%   which is always known to be satisfied by the wanted valuation.
+Within the framework of propositional logic,
+  we represent the secret code as a valuation
+  of propositional variables.
+The game can be represented as a \emph{set of variables},
+  \emph{initial restriction} (a formula that is guaranteed to be satisfied),
+  and a set of \emph{possible experiments}.
+A finite set of possible \emph{outcomes} is associated with each experiment.
+Outcome is a propositional formula that represents the partial information,
+  which the codebreaker can gain from the experiment.
 
-% Experiments consist of a type, which is from the set $\Expt$ and a
-%   parametrization, which is a string of variables from $\Var$.
-% The experiment relation $\Exp$ specifies all permitted parameterizations
-%   for each type of experiment and, therefore, $\Exp$ is the set of
-%   all possible experiments as pairs.
-
-% The outcome function gives us the possible outcomes of an experiment.
-%   We require that exactly one of them must be satisfied by every valuation
-%   by which $\init$ is satisfied.
-
-\TODO{
-Pro kompaktni zapis reprezentuju experiment jako dvojici (typ experimentu, parametrizace),
-kde parametrizace je retezec nad danou abecedou.
-Pro kazdy typ experimentu pak mam mnozinu parametrizovanych formuli.}
+The number of experiments is typically very large
+  (such as 36894 for the Counterfeit-coin Problem \ref{prob-coins})
+  but most of them have same structure and yield similar outcomes.
+Therefore we opt for a compact representation of an experiment as a pair
+  (type of experiment, parametrization), where parametrization is a string
+  over a defined alphabet.
 This whole idea is formalized below.
 
 \begin{definition} \label{def-game}
@@ -74,7 +78,7 @@ A set of \emph{parametrized formulas} $\PForm_{\Var,F,\Sigma}$ is a set of
 $$ \pform ::= x \| f(\$n) \| \pform \circ \pform \| \neg \pform,$$
 where $x\in\Var$, $f\in F$, $n \in\Nset$, and $\circ\in\{\wedge, \vee, =>\}$.
 By $\pform(\param)$ we denote application of a parametrization $\param\in\Sigma^\star$
-on a formula $\pform$, which is defined recursively on the stucture of $\pform$ in the following way:
+on a formula $\pform$, which is defined recursively on the structure of $\pform$ in the following way:
 \begin{align}
 (x)(\param) &= x, \\
 (f(\$n))(\param) &= f(\param[n]),\\
@@ -83,21 +87,42 @@ on a formula $\pform$, which is defined recursively on the stucture of $\pform$ 
 \end{align}
 \end{definition}
 
-\TODO{Znak $\$$ v $f(\$n)$ je od toho, aby to nematlo, ze $n$ je argumentem funkce.}
+We use the special symbol $\$$ in $f(\$n)$ so that $n$ cannot be mistaken for
+  the argument of $f$, which is $n$-th symbol of the parametrization.
+For the sake of simplicity, let us denote the set of possible outcomes for
+  an experiment $\exp = (\expt, \param) \in \Exp$ by
+  $\outcome(\exp) = \{ \pform(\param) \| \pform\in\outcome(\expt)\}$.
 
-\TODO{Poznamka o tom, ze tohle me neomezuje oproti popsane intuici. V nejhorsim muzu pro kazdy experiment udelat zvlastni typ.}
+Note that this compact representation with parametrized formulas does not restrict
+  the class of games that can fit this definition.
+If no two experiments
+  can be united under the same type, every experiment can have its own type and
+  allow only one possible parametrization.
 
-For the sake of simplicity, let us write $\outcome(\exp) = \{ \pform(\param) \| \pform\in\outcome(\expt)\}$ for any experiment
-$\exp = (\expt, \param) \in \Exp$.
+Let us now describe the course of the game in the defined terms.
+First, the codemaker choose a valuation $\val$ of $\Var$
+  which satisfies $\init$.
+Then, the codebreaker successively chooses a type $\expt\in\Expt$ and
+  a parametrization $\param\in\Sigma^*$ such that $(\expt, \param)\in\Exp$.
+The codemaker gives the codebreaker a formula $\form\in\outcome((\expt, \param))$
+  which is satisfied by the valuation $\val$.
 
-A code-breaking game is \emph{well-formed} if for all $(\expt, \param) \in \Exp$,
+Here we hit a problem -- so that the codemaker can always fulfill the last step,
+  there must be a formula $\form\in\outcome(\exp)$ satisfied by any valuation.
+Since it might make sense to allow multiple satisfied formulas, we restrict
+  ourselves to game where the outcome is uniquely defined for given valuation.
+
+\begin{definition}
+A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
 \begin{equation} \label{prop-outcome}
-\forall\val\in\Val_\Var:  \val(\init) = 1 ==> \exists \textrm{ exactly one }\psi\in\outcome(\expt)\;.\; \val(\psi(\param)) = 1
+\forall\val\in\Val_\Var:
+  \val(\init) = 1 ==> \exists \textrm{ exactly one }
+     \form\in\outcome(\exp)\;.\; \val(\form) = 1
 \end{equation}
+\end{definition}
 
-This guarantees that the result of every experiment is uniquely defined for any valuation.
+In sequel, we suppose a game to be well-formed, if not stated otherwise.
 Note that this property is not easy to check.
-In sequel, we suppose a game to be well-fordmed, if not stated otherwise.
 
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM
@@ -113,7 +138,7 @@ $\Var = \{x_1, x_2, ..., x_n, y\}$, \\
 $\init = \exactly{1}\{x_1, ..., x_n\}$. \\
 Intuitively, variable $x_i$ tells weather the coin $i$ is fake.
 Variable $y$ tells weather it is lighter or heavier.
-Formule $\init$ says that exactly one coin is fake.
+Formula $\init$ says that exactly one coin is fake.
 
 \item
 $\Expt = \{ w_2, w_4, ..., w_n \}$, \\
@@ -126,7 +151,7 @@ possible parametrizations for $w_{2m}$ are strings of length $2m$ with no repeti
 
 \item
 $F = \{ f_x \}$, where $f_x(i) = x_i$ for $1 <= i <= n$, \\
-$\outcome(w_m) = $ \vspace{-4mm}
+$\outcome(w_m) = $ \vspace{-3mm}
 \begin{align*}
   \big\{
 & ((f_x(\$1) \vee ... \vee f_x(\$m)) \wedge \neg y) \vee ((f_x(\$m+1) \vee ... \vee f_x(\$2m)) \wedge y), \\
@@ -306,17 +331,23 @@ However complicated this may look, note that it is not much different from
  Exactly and AtLeast macro operators.
 \end{example}
 
+We do not provide the formal definition of other Code breaking Games presented in
+  Chapter \ref{ch-games}.
+However, a computer language for game specification
+  that is based on this formalism is introduced in Chapter \ref{ch-cobra}, and
+  definition of all the games in this language can be found in Appendix \ref{app-games}.
+
 %-------------------------------------------------------------------------------
 % DEF: STRATEGY
 \section{Strategies}
 
+\TODO{Nadefinovat strategii obecněji - v závislosti na historii atd. Potom
+  definovat třídy strategií - memory-less pokud se rozhodují jen podle formule;
+  non-adaptive pokud se rozhodují jen podle čísla experimentu a na formule nekoukaj}
 \begin{definition}
 A \emph{strategy} is a function $\stg: \Form_\Var -> \Exp$,
-determining the next experiment for given accumulated knowledge,
-such that
-\[
-\form_0 \equiv \form_1 ==> \stg(\form_0) = \stg(\form_1).
-\]
+  determining the next experiment for given accumulated knowledge.
+(Note that this requires )
 \end{definition}
 
 A strategy $\stg$ together with a valuation $\val$ (satisfying $\form_0$) induce
@@ -327,7 +358,7 @@ A strategy $\stg$ together with a valuation $\val$ (satisfying $\form_0$) induce
 \]
 where $\exp_i = \stg(\form_0 \wedge \form_1 \wedge ... \wedge \form_{i-1})$ and
 $\form_i \in \outcome(\exp_i)$ and $\val(\form_i) = 1$,
-for all $i\in\Nset$. Notice that due to the condition \ref{prop-outcome},
+for all $i\in\Nset$. Notice that due to the condition in Definition \ref{prop-outcome},
 there is always exactly one such $\pform_i$.
 
 For the sake of simplicity, let us write $\aform{k}$
@@ -337,11 +368,10 @@ We define \emph{length} of the solving process,
   denoted $|\procstg{\stg}{\val}|$
   (despite the infinite length of the sequence),
   as the smallest $k\in\Nseto$ such that
-  $\numval_\Var(\aform{k}) = 1$.
+  $\aform{k}$ has only one model ($\numval_\Var{\aform{k}} = 1$).
 This corresponds to the point where we can uniquely
-  determine the valuation used in the process
-  (i.e. we can determine the secret code).
-Note that it always holds $\numval(\aform{k}) > 0$ because
+  determine the code.
+Note that it always holds $\numval{\aform{k}} > 0$ because
   $\val(\form_i) = 1$ for all $i\in\Nseto$.
 
 The following lemma is a straightforward consequence
@@ -350,31 +380,33 @@ The following lemma is a straightforward consequence
   any new information (using the strategy).
 
 \begin{lemma}
-If $\numval(\aform{k}) = \numval(\aform{k+1})$ for some $k\in\Nset$,
-then $\numval(\aform{k}) = \numval(\aform{k+l})$ for any $l\in\Nset$.
+If $\numval{\aform{k}} = \numval{\aform{k+1}}$ for some $k\in\Nset$,
+then $\numval{\aform{k}} = \numval{\aform{k+l}}$ for any $l\in\Nset$.
 \end{lemma}
 
 \begin{proof}
 If $\aform{k+1} = \aform{k} \wedge \form_{k+1}$
-is satisfied by valuation $\val$, so must be $\aform{k}$.
-Since $\numval(\aform{k}) = \numval(\aform{k+1})$, the sets of
-valuations satisfying $\aform{k}$ and $\aform{k+1}$ must be exactly the same
-and the formulas are thus equivalent. This implies
-$\stg(\aform{k}) = \stg(\aform{k+1})$ and thus also $\form_{k+2} = \form_{k+1}$.
+  is satisfied by valuation $\val$, so must be $\aform{k}$.
+Since $\numval{\aform{k}} = \numval{\aform{k+1}}$, the sets of
+  valuations satisfying $\aform{k}$ and $\aform{k+1}$ must be exactly the same
+  and the formulas are thus equivalent.
+This implies $\stg(\aform{k}) = \stg(\aform{k+1})$ and thus also
+  $\form_{k+2} = \form_{k+1}$.
 By induction, $\form_{k+l} = \form_{k+1}$ and $\aform{k+l} \equiv \aform{k}$
- for any $l\in\Nset$.\qed
+  for any $l\in\Nset$.\qed
 \end{proof}
+
+\TODO{Co nějaká average délka?}
 
 The \emph{worst-case number of experiments} $\lenmax{\stg}$
   of a strategy $\stg$ is the maximal length of the solving process
-  $\procstg{\stg}{\val}$ over all valuations $\val$ by which $\form_0$ is satisfied,
-  i.e.
+  $\procstg{\stg}{\val}$ over all models $\val$ of $\form_0$, i.e.
   $\lenmax{\stg} = \max_{\val\in\Val_\Var, \val(\form_0) = 1} |\procstg{\stg}{\val}|$.
 We say that a strategy $\stg$ \emph{solves the game} if $\lenmax{\stg}$ is finite.
 The game is \emph{solvable} if there exists a strategy that solves the game.
 
-\TODO{Není to jednoduchý, ale je to zajímavý?
-Given a code-breaking game $\game$, decide whether $\game$ is solvable.}
+% \TODO{Není to jednoduchý, ale je to zajímavý?
+% Given a code-breaking game $\game$, decide whether $\game$ is solvable.}
 
 \begin{definition}
 A strategy $\stg$ is \emph{optimal} if
@@ -386,30 +418,20 @@ Let $f: \Form_\Var -> \Zset$.
 A strategy $\stg$ is \emph{$f$-greedy} if
   for every $\form\in\Form_X$ and $\exp'\in\Exp$,
 \[
-\max_{\formu \in \outcome(\stg(\form)), \SAT{\form\wedge\formu}} f(\form\wedge\formu) <=
-\max_{\formu \in \outcome(e), \SAT{\form\wedge\formu}} f(\form\wedge\formu).
+\max_{\formu \in \outcome(\stg(\form)) \atop \SAT{\form\wedge\formu}} f(\form\wedge\formu) <=
+\max_{\formu \in \outcome(e) \atop \SAT{\form\wedge\formu}} f(\form\wedge\formu).
 \]
 In words, a greedy strategy minimizes
   the value of $f$ on the formula in the next step.
-
-We say $\stg$ is \emph{greedy} if it is $\numval_\Var$-greedy.
+We say $\stg$ is \emph{greedy} if it is $\numval_\Var{}$-greedy.
 \end{definition}
 
 
-\begin{problem}
-Given a code-breaking game $\game$,
-  decide whether all greedy strategies are optimal.
-Hypothesis: It is the case for Fake-coin problem (?).
-  It is not the case for Mastermind[ref].
-\end{problem}
-
-%-------------------------------------------------------------------------------
-
-\begin{definition}
-An experiment $\exp_1$ is in relation $\sim_\form$ with an experiment $\exp_2$ if
- and only if there exists a permutation $\perm\in\Perm_\Var$ such that
- $ \{ \form\wedge\formu \| \formu\in\outcome(\exp_1) \} \equiv
-   \{ (\form\wedge\formu)^\perm \| \formu\in\outcome(\exp_2) \} $.
-\end{definition}
+% \begin{problem}
+% Given a code-breaking game $\game$,
+%   decide whether all greedy strategies are optimal.
+% Hypothesis: It is the case for Fake-coin problem (?).
+%   It is not the case for Mastermind[ref].
+% \end{problem}
 
 \input{symmetry-breaking.tex}

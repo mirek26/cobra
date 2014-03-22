@@ -26,7 +26,7 @@
 % znaceni
 \newcommand{\Val}{V} % mnoz vsech valuaci
 \newcommand{\val}{v} % jedna valuace
-\newcommand{\numval}{\tau} % number of sat valutaions
+\newcommand{\numval}[1]{\##1} % number of sat valutaions
 \renewcommand{\Form}{\textrm{Form}} % mnoz vsech formuli
 \newcommand{\PForm}{\textrm{PForm}} % mnoz vsech param formuli
 \newcommand{\form}{\varphi} % jedna formule
@@ -57,10 +57,10 @@
 % nep
 \newcommand{\stg}{\sigma}
 
-\newcommand{\proc}{\pi}
-\newcommand{\procstg}[2]{\proc_{#1,#2}}
+\newcommand{\proc}{\lambda}
+\newcommand{\procstg}[2]{\lambda_{#1,#2}}
 
-\newcommand{\len}{\lambda}
+\newcommand{\len}{\Lambda}
 \newcommand{\lenstg}[2]{\len^{#1,#2}}
 \newcommand{\lenmax}[1]{\len^{#1}}
 \newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
