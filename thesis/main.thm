@@ -9,13 +9,19 @@
 \contentsline {example}{{Example}{9}{Mastermind}}{10}{common.9}
 \contentsline {example}{{Example}{10}{Mastermind (alternative)}}{10}{common.10}
 \contentsline {definition}{{Definition}{11}{}}{12}{common.11}
-\contentsline {lemma}{{Lemma}{12}{}}{13}{common.12}
-\contentsline {proof}{{\proofname }{1}{}}{13}{proof.1}
+\contentsline {definition}{{Definition}{12}{}}{13}{common.12}
 \contentsline {definition}{{Definition}{13}{}}{13}{common.13}
 \contentsline {definition}{{Definition}{14}{}}{13}{common.14}
-\contentsline {definition}{{Definition}{15}{}}{14}{common.15}
+\contentsline {lemma}{{Lemma}{15}{}}{13}{common.15}
+\contentsline {proof}{{\proofname }{1}{}}{13}{proof.1}
 \contentsline {definition}{{Definition}{16}{}}{14}{common.16}
-\contentsline {definition}{{Definition}{17}{}}{14}{common.17}
+\contentsline {example}{{Example}{17}{}}{14}{common.17}
 \contentsline {definition}{{Definition}{18}{}}{14}{common.18}
-\contentsline {theorem}{{Theorem}{19}{}}{15}{common.19}
+\contentsline {definition}{{Definition}{19}{}}{14}{common.19}
+\contentsline {definition}{{Definition}{20}{}}{14}{common.20}
+\contentsline {definition}{{Definition}{21}{}}{15}{common.21}
+\contentsline {lemma}{{Lemma}{22}{}}{15}{common.22}
 \contentsline {proof}{{\proofname }{2}{}}{15}{proof.2}
+\contentsline {theorem}{{Theorem}{23}{}}{15}{common.23}
+\contentsline {proof}{{\proofname }{3}{}}{15}{proof.3}
+\contentsline {corollary}{{Corollary}{24}{}}{15}{common.24}

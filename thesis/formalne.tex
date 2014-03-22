@@ -112,9 +112,9 @@ Here we hit a problem -- so that the codemaker can always fulfill the last step,
 Since it might make sense to allow multiple satisfied formulas, we restrict
   ourselves to game where the outcome is uniquely defined for given valuation.
 
-\begin{definition}
+\begin{definition} \label{def-wellformed}
 A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
-\begin{equation} \label{prop-outcome}
+\begin{equation}
 \forall\val\in\Val_\Var:
   \val(\init) = 1 ==> \exists \textrm{ exactly one }
      \form\in\outcome(\exp)\;.\; \val(\form) = 1
@@ -341,60 +341,48 @@ However, a computer language for game specification
 % DEF: STRATEGY
 \section{Strategies}
 
-\TODO{Nadefinovat strategii obecněji - v závislosti na historii atd. Potom
-  definovat třídy strategií - memory-less pokud se rozhodují jen podle formule;
-  non-adaptive pokud se rozhodují jen podle čísla experimentu a na formule nekoukaj}
 \begin{definition}
-A \emph{strategy} is a function $\stg: \Form_\Var -> \Exp$,
-  determining the next experiment for given accumulated knowledge.
-(Note that this requires )
+An \emph{evaluated experiment} is a pair $(e, \form)$ such that $\form\in\outcome(e)$.
+Let us denote the set of evaluated experiments by $\Omega$.
+
+A \emph{solving process} is a finite or infinite sequence of evaluated experiments.
+
+A \emph{strategy} is a function $\stg: \Omega^* -> \Exp$,
+  determining the next experiment for a given finite solving process.
 \end{definition}
 
+% \TODO{Nadefinovat strategii obecněji - v závislosti na historii atd. Potom
+%   definovat třídy strategií - memory-less pokud se rozhodují jen podle formule;
+%   non-adaptive pokud se rozhodují jen podle čísla experimentu a na formule nekoukaj}
+% \begin{definition}
+% A \emph{strategy} is a function $\stg: \Form_\Var -> \Exp$,
+%   determining the next experiment for given accumulated knowledge.
+% (Note that this requires )
+% \end{definition}
+
 A strategy $\stg$ together with a valuation $\val$ (satisfying $\form_0$) induce
-  a \emph{solving process}, which is an infinite sequence
+  an infinite solving process
 \[
-\procstg{\stg}{\val} = \form_0 \arrow{\exp_1} \form_1 \arrow{\exp_2}
-  \form_2 \arrow{\exp_3} ...,
+\procstg{\stg}{\val} = \exp_1, \form_1, \exp_2, \form_2, ...,
 \]
-where $\exp_i = \stg(\form_0 \wedge \form_1 \wedge ... \wedge \form_{i-1})$ and
-$\form_i \in \outcome(\exp_i)$ and $\val(\form_i) = 1$,
-for all $i\in\Nset$. Notice that due to the condition in Definition \ref{prop-outcome},
-there is always exactly one such $\pform_i$.
+where $\exp_{i+1} = \stg(\exp_1, \form_1, ..., \exp_i, \form_i)$ and
+$\form_{i+1} \in \outcome(\exp_{i+1})$ and $\val(\form_{i+1}) = 1$,
+for all $i\in\Nset$. Notice that due to the condition in Definition \ref{def-wellformed},
+there is always exactly one such $\form_{i+1}$.
 
-For the sake of simplicity, let us write $\aform{k}$
-instead of $\form_0 \wedge \form_1 \wedge ... \wedge \form_k$.
+Let us denote by
+  $\stgknow{\stg}{\val}{k} = \form_0 \wedge \form_1 \wedge ... \wedge \form_k$
+  the accrued knowledge after $k$ experiments.
 
-We define \emph{length} of the solving process,
-  denoted $|\procstg{\stg}{\val}|$
-  (despite the infinite length of the sequence),
+We define \emph{length} of the induced solving process,
+  denoted $\stglen{\stg}{\val}$
   as the smallest $k\in\Nseto$ such that
-  $\aform{k}$ has only one model ($\numval_\Var{\aform{k}} = 1$).
+  $\stgknow{\stg}{\val}{k}$ has only one model
+  ($\numval_\Var{\stgknow{\stg}{\val}{k}} = 1$).
 This corresponds to the point where we can uniquely
   determine the code.
-Note that it always holds $\numval{\aform{k}} > 0$ because
+Note that it always holds $\numval{\stgknow{\stg}{\val}{k}} > 0$ because
   $\val(\form_i) = 1$ for all $i\in\Nseto$.
-
-The following lemma is a straightforward consequence
-  of the memory-less nature of the games. It says that once a strategy
-  gives us an experiment that yields no new information, we will never get
-  any new information (using the strategy).
-
-\begin{lemma}
-If $\numval{\aform{k}} = \numval{\aform{k+1}}$ for some $k\in\Nset$,
-then $\numval{\aform{k}} = \numval{\aform{k+l}}$ for any $l\in\Nset$.
-\end{lemma}
-
-\begin{proof}
-If $\aform{k+1} = \aform{k} \wedge \form_{k+1}$
-  is satisfied by valuation $\val$, so must be $\aform{k}$.
-Since $\numval{\aform{k}} = \numval{\aform{k+1}}$, the sets of
-  valuations satisfying $\aform{k}$ and $\aform{k+1}$ must be exactly the same
-  and the formulas are thus equivalent.
-This implies $\stg(\aform{k}) = \stg(\aform{k+1})$ and thus also
-  $\form_{k+2} = \form_{k+1}$.
-By induction, $\form_{k+l} = \form_{k+1}$ and $\aform{k+l} \equiv \aform{k}$
-  for any $l\in\Nset$.\qed
-\end{proof}
 
 \TODO{Co nějaká average délka?}
 
@@ -414,18 +402,78 @@ A strategy $\stg$ is \emph{optimal} if
 \end{definition}
 
 \begin{definition}
+A strategy $\stg$ is \emph{non-adaptive} if it decides the next experiment
+  based on the length of the solving process only, i.e.
+  whenever
+  $\proc_1 = e_1, \form_1, ..., e_k, \form_k$ and
+  $\proc_2 = e'_1, \form'_1, ..., e'_k, \form'_k$,
+  then $\stg(\proc_1) = \stg(\proc_2)$.
+
+Non-adaptive strategies can be seen as functions $\Nseto -> \Exp$.
+\end{definition}
+
+Non-adaptive strategies corresponds to the well studied problems of
+  static mastermind and
+  non-adaptive strategies for the coutnerfeit coin problem.
+We mention them here only to show the possibility of formulating these problems
+  in our formalism but we do not study them any further.
+
+\begin{definition}
+A strategy $\stg$ is \emph{memory-less} if it decides the next experiment
+  based on the accumulated knowledge only, i.e.
+  whenever
+  $\proc_1 = e_1, \form_1, ..., e_k, \form_k$ and
+  $\proc_2 = e'_1, \form'_1, ..., e'_l, \form'_l$
+  are two solving processes such that
+  $ \form_1 \wedge ... \wedge \form_k \equiv \form'_1 \wedge ... \wedge \form'_l$,
+  then
+  $\stg(\proc_1) = \stg(\proc_2)$.
+
+Memory-less strategies can be considered as functions $\Form_\Var -> \Exp$.
+\end{definition}
+
+\begin{lemma}
+Let $\stg$ be a memory-less strategy and $\val$ a model of $\init$.
+If there exists $k\in\Nset$ such that
+  $\numval{\stgknow{\stg}{\val}{k}} = \numval{\stgknow{\stg}{\val}{k+1}}$,
+ then
+  $\numval{\stgknow{\stg}{\val}{k}} = \numval{\stgknow{\stg}{\val}{k+l}}$
+ for any $l\in\Nset$.
+\end{lemma}
+
+\begin{proof}
+For the sake of simplicity, let $\know^k = \stgknow{\stg}{\val}{k}$.
+There is a formula $\form\in\outcome(\know^k)$,
+  such that $\know^{k+1} \equiv \know^{k} \wedge \form$.
+Therefore, if $\know^{k+1}$ is satisfied by valuation $\val$, so must be $\know^{k}$.
+Since $\numval{\know^{k}} = \numval{\know^{k+1}}$, the sets of
+  valuations satisfying $\know^{k}$ and $\know^{k+1}$ are exactly the same
+  and the formulas are thus equivalent.
+This implies $\stg(\know^{k}) = \stg(\know^{k+1})$ and $\know^{k+2} \equiv \know^{k+1}\wedge \form \equiv \know^{k+1}$.
+
+By induction,
+  $\stg(\know^{k+l}) = \stg(\know^{k})$ and
+  $\know^{k+l} \equiv \know^{k}$
+  for any $l\in\Nset$.\qed
+\end{proof}
+
+\begin{definition}
 Let $f: \Form_\Var -> \Zset$.
-A strategy $\stg$ is \emph{$f$-greedy} if
+A memory-less strategy $\stg$ is \emph{$f$-greedy} if
   for every $\form\in\Form_X$ and $\exp'\in\Exp$,
 \[
-\max_{\formu \in \outcome(\stg(\form)) \atop \SAT{\form\wedge\formu}} f(\form\wedge\formu) <=
-\max_{\formu \in \outcome(e) \atop \SAT{\form\wedge\formu}} f(\form\wedge\formu).
+\max_{\formx \in \outcome(\stg(\form)) \atop \SAT{\form\wedge\formx}} f(\form\wedge\formx) <=
+\max_{\formx \in \outcome(e) \atop \SAT{\form\wedge\formx}} f(\form\wedge\formx).
 \]
 In words, a greedy strategy minimizes
   the value of $f$ on the formula in the next step.
 We say $\stg$ is \emph{greedy} if it is $\numval_\Var{}$-greedy.
 \end{definition}
 
+\begin{example}
+Greedy strategies are optimal in the fake-coin game $\mathcal{F}_n$.
+\TODO{...}
+\end{example}
 
 % \begin{problem}
 % Given a code-breaking game $\game$,

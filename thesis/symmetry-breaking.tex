@@ -15,19 +15,19 @@
 %  our symmetry breaking algorithms in the Chapter \ref{chapter-cobra}.
 
 %Since composition of permutations is a permutation, this is clearly an equivalence relation.
-\TODO{Tohle hrozně nefunguje. Musí být symetrické i experimenty.}
-Plán:
-\begin{itemize}
-\item zadefinovat symetrii množiny experimentů jako gropu permutací proměnných tak, aby $\forall e\in E \exists e^\pi$ (kde
-).
-\item zadefinovat nějakou vlastnost hry (symetrická) - pokud pro nějaké $e$ existuje $e^\pi$, pak pro všechny
-\item říct, že pokud jsou parametrizace nějak normálně omezené (typicky libovolný řetězec, nebo řetězec bez opakování), tak je ta hra symetrická
-\item omezit se s analýzou jen na symetrické hry
-\item zadefinovat konzistentní strategii, jako strategii, která na zpermutovanou formuli zahraje zpermutovaný experiment
-\item zadefinovat ekvivalenci experimentů podle definice výše
-\item dokázat, že pokud mám strategie $\stg_1. \stg_2$ tak že $\stg_1(\form) \sim_\form \stg_2(\form)$,
-tak existuje permutace proměnných taková, že $|\procstg{\stg_1}{\val}| = |\procstg{\stg_2}{\val^\pi}|$
-\end{itemize}
+% \TODO{Tohle hrozně nefunguje. Musí být symetrické i experimenty.}
+% Plán:
+% \begin{itemize}
+% \item zadefinovat symetrii množiny experimentů jako gropu permutací proměnných tak, aby $\forall e\in E \exists e^\pi$ (kde
+% ).
+% \item zadefinovat nějakou vlastnost hry (symetrická) - pokud pro nějaké $e$ existuje $e^\pi$, pak pro všechny
+% \item říct, že pokud jsou parametrizace nějak normálně omezené (typicky libovolný řetězec, nebo řetězec bez opakování), tak je ta hra symetrická
+% \item omezit se s analýzou jen na symetrické hry
+% \item zadefinovat konzistentní strategii, jako strategii, která na zpermutovanou formuli zahraje zpermutovaný experiment
+% \item zadefinovat ekvivalenci experimentů podle definice výše
+% \item dokázat, že pokud mám strategie $\stg_1. \stg_2$ tak že $\stg_1(\form) \sim_\form \stg_2(\form)$,
+% tak existuje permutace proměnných taková, že $|\procstg{\stg_1}{\val}| = |\procstg{\stg_2}{\val^\pi}|$
+% \end{itemize}
 
 \begin{definition}
 For an experiment $\exp$ and a permutation $\perm\in\Perm_\Var$,
@@ -50,53 +50,79 @@ A memory-less strategy $\stg$ is \emph{consistent} if and only if
   $\perm\in$ symmetry group of the set of experiments.
 \end{definition}
 
+\TODO{Aby mohla být strategie konzistentní, musí být hra symetrická.}
+
+\newcommand{\expeq}[1]{\cong_{#1}}
 \begin{definition}
 An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $\form$,
-  written $\exp_1\sim_\form\exp_2$,
+  written $\exp_1\expeq{\form}\exp_2$,
   if and only if there exists a permutation $\perm\in\Perm_\Var$ such that
- $ \{ \form\wedge\formu \| \formu\in\outcome(\exp_1) \} \equiv
-   \{ (\form\wedge\formu)^\perm \| \formu\in\outcome(\exp_2) \} $.
+ $ \{ \form\wedge\formx \| \formx\in\outcome(\exp_1) \} \equiv
+   \{ (\form\wedge\formx)^\perm \| \formx\in\outcome(\exp_2) \} $.
 \end{definition}
 
+\begin{lemma} \label{lma-accruedknowledge}
+Let $\stg$ be a consistent memory-less strategy and let $\val_1$, $\val_2$ be two models of $\init$.
+If $v_1$ is a model of $\stgknow{\stg}{\val_2}{k}$, then $\stgknow{\stg}{\val_1}{k} = \stgknow{\stg}{\val_2}{k}$.
+\end{lemma}
+\begin{proof}
+Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
+and let $c <= k$ be the first place where $\proc_1$ and $\proc_2$ differs.
+...
+\end{proof}
+
 \begin{theorem}
-Let $\stg_1, \stg_2$ be two consistent strategies, such that
-$\stg_1(\form) \sim_\form \stg_2(\form)$ for any $\form\in\Form_\Var$.
-Then ... ?!? %$\lenmax{\stg_1} = \lenmax{\stg_2}$ ?!?
+Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
+$\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
+Then for any $k\in\Nseto$, there is a permutation $\perm\in Sym$ such that
+$\perm\in Sym$ and $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$.
 \end{theorem}
 
 \begin{proof}
-\newcommand{\knA}{\varphi}
-\newcommand{\knB}{\chi}
-Značme $\knA_k, \knB_{k,\perm}$ accumulated knowledge of $\stg, \tau$ after $k$ steps on valuation $v, v^\perm$ respectively.
+By Induction.
 
-Indukcí ukážu, že pro $k\in\Nseto$ existuje $\perm\in Sym(E)$, $\knA_k^\perm = \knB_{k,\perm}$.
-Pro $k=0$ zřejmě platí. \TODO{Sym(E) vs symetrie $\init$..}
+For simplicity, let
+  $\know_k = \stgknow{\stg}{\val}{k}$ and
+  $\knowx_{k, \perm} = \stgknow{\stgx}{\val^\perm}{k}$
+For $k=0$ it clearly holds, as any \TODO{$\perm\in$ Sym(E) $\init = \init^\perm$.}
 
-Předpokl. $\knA_k^\perm = \knB_{k, \perm}$.
-Oznečme $e_1 = \stg(\knA_k)$, $e_2 = \tau(\knB_{k, \perm})$.
-
+For the induction step, suppose $\know_k^\perm = \knowx_{k, \perm}$ and $\perm\in Sym$.
+Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$. It holds
 \[
-e_2 = \tau(\knB_{k, \perm})
-    \sim_{\knB_{k, \perm}}   \stg(\knB_{k, \perm})
-    = \stg(\knA_k^\perm)
-    = \stg(\knA_k)^\perm
+e_2 = \stgx(\knowx_{k, \perm})
+    \expeq{\knowx_{k, \perm}}   \stg(\knowx_{k, \perm})
+    = \stg(\know_k^\perm)
+    = \stg(\know_k)^\perm
     = e_1^\perm
 \]
 
-Díky tomu existuje $\rho\in Sym(E)$ such that
+and, therefore, there exists $\permx\in Sym$ such that
 \begin{align}
- \{ \knB_{k, \perm} \wedge \formu \| \formu\in\outcome(\exp_2) \} &=
- \{ (\knB_{k, \perm} \wedge \formu)^\rho \| \formu\in\outcome(\exp_1^\perm) \} = \\
-&= \{ (\knA_k^\perm \wedge \formu^\perm)^\rho \| \formu\in\outcome(\exp_1) \} =
- \{ (\knA_k \wedge \formu)^{\pi\rho} \| \formu\in\outcome(\exp_1) \} \\
+ \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \} &=
+ \{ (\knowx_{k, \perm} \wedge \formx)^\permx \| \formx\in\outcome(\exp_1^\perm) \} = \label{eq:sets}\tag{*}\\
+&= \{ (\know_k^\perm \wedge \formx^\perm)^\permx \| \formx\in\outcome(\exp_1) \} =
+ \{ (\know_k \wedge \formx)^{\perm\permx} \| \formx\in\outcome(\exp_1) \}
 \end{align}
+As $\permx\in Sym(E)$ and $Sym$ is a permutation group, $\perm\permx\in Sym(E)$.
 
-$\rho\in Sym(E)$takže i $\perm\rho\in Sym(E)$. Ukážeme, že
-$\knA_{k+1}^{\pi\rho} = \knB_{k+1, \pi\rho}$.
-
-
-
+Since we suppose the game is well-formed (Definition \ref{def-wellformed}),
+  $v$ satisfies exactly one formula in
+  $\{ \know_k \wedge \formx \| \formx\in\outcome(\exp_1) \}$.
+Therefore $v^{\perm\permx}$ satisfies exactly one formula
+  in
+  $\{ (\know_k \wedge \formx)^{\perm\permx} \| \formx\in\outcome(\exp_1) \}  =
+   \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \}$,
+  which means that $v^{\perm\permx}$ satisfies $\knowx_{k, \perm}$.
+From Lemma \ref{lma-accruedknowledge}, $\knowx_{k, \perm} = \knowx_{k, \perm\permx}$.
+Both $\know_{k+1}^{\perm\permx}$ and $\knowx_{k+1, \perm\permx}$ is thus the only
+  formula from (\refeq{eq:sets}) satisfied by $v^{\perm\permx}$. \qed
 \end{proof}
+
+\begin{corollary}
+Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
+$\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
+Then $\lenmax{\stg_1} = \lenmax{\stg_2}$.
+\end{corollary}
 
 % For any accrued knowledge $\form$, this lemma gives us the right
 % to consider only one of the experiments
