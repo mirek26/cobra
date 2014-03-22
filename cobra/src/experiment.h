@@ -38,7 +38,7 @@ class Experiment {
 
   // Helper fields for parametrization generation.
   GenParamsStats gen_stats_;
-  vec<int> gen_var_groups_;
+  vec<uint> gen_var_groups_;
   set<vec<CharId>> gen_params_basic_;
   set<vec<CharId>> gen_params_final_;
   vec<CharId> gen_params_;
@@ -65,7 +65,7 @@ class Experiment {
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
 
-  set<vec<CharId>>* GenParams(vec<int>&);
+  set<vec<CharId>>* GenParams(vec<uint>&);
   void Precompute();
 
  private:
@@ -78,9 +78,8 @@ class Experiment {
   void GenParamsBasicFilter();
   void GenParamsGraphFilter();
 
-  bliss::Digraph* BlissGraphForParametrization(
-                          vec<int>& groups,
-                          vec<CharId>& params);
+  bliss::Digraph* CreateGraphForParams(vec<uint>& groups,
+                                       vec<CharId>& params);
 
 };
 

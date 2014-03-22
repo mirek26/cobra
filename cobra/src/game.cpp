@@ -46,7 +46,7 @@ Formula* Game::restriction() {
   return restriction_;
 }
 
-int Game::addMapping(string ident, vec<Variable*>* vars) {
+MapId Game::addMapping(string ident, vec<Variable*>* vars) {
   m.input_assert(mappings_ids_.count(ident) == 0,
     "Mapping " + ident + " defined twice.");
   int new_id = mappings_.size();
@@ -58,13 +58,13 @@ int Game::addMapping(string ident, vec<Variable*>* vars) {
   return new_id;
 }
 
-int Game::getMappingId(string ident) {
+MapId Game::getMappingId(string ident) {
   m.input_assert(mappings_ids_.count(ident) > 0,
     "Undefined mapping '" + ident + "'.");
   return mappings_ids_[ident];
 }
 
-int Game::getMappingValue(MapId mapping, CharId a) {
+VarId Game::getMappingValue(MapId mapping, CharId a) {
   assert(mapping < mappings_.size());
   assert(a >= 0 && a < alphabet_.size());
   return mappings_[mapping][a];
@@ -115,10 +115,10 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<int> Game::ComputeVarEquiv(bliss::Digraph& graph) {
+vec<uint> Game::ComputeVarEquiv(bliss::Digraph& graph) {
   bliss::Stats stats;
   auto var_count = variables_.size();
-  vec<int> var_equiv(var_count + 1, 0);
+  vec<uint> var_equiv(var_count + 1, 0);
   for (uint i = 1; i <= var_count; i++) {
     var_equiv[i] = i;
   }

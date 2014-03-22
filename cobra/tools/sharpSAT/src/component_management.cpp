@@ -8,7 +8,7 @@
 #include "component_management.h"
 
 #include <algorithm>
-#include <sys/sysinfo.h>
+//#include <sys/sysinfo.h>
 #include <cstdint>
 
 ComponentCache::ComponentCache(SolverConfiguration &conf,
@@ -25,11 +25,12 @@ void ComponentCache::init() {
 	free_entry_base_slots_.clear();
 	free_entry_base_slots_.reserve(10000);
 
-	struct sysinfo info;
-	sysinfo(&info);
+	// struct sysinfo info;
+	// sysinfo(&info);
 
-	uint64_t free_ram =
-		info.freeram *(uint64_t) info.mem_unit;
+	// uint64_t free_ram =
+	// 	info.freeram *(uint64_t) info.mem_unit;
+	uint64_t free_ram = 100000000;
 	uint64_t max_cache_bound = 95 * (free_ram / 100);
 
 	if (config_.maximum_cache_size_bytes == 0) {

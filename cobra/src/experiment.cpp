@@ -113,7 +113,7 @@ bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
 }
 
 set<vec<CharId>>*
-Experiment::GenParams(vec<int>& groups) {
+Experiment::GenParams(vec<uint>& groups) {
   gen_stats_ = GenParamsStats();
   gen_var_groups_ = groups;
   gen_params_.resize(num_params_);
@@ -235,7 +235,7 @@ void Experiment::GenParamsBasicFilter() {
 void Experiment::GenParamsGraphFilter() {
   auto& params = gen_params_;
   bliss::Stats stats;
-  auto graph = BlissGraphForParametrization(gen_var_groups_, params);
+  auto graph = CreateGraphForParams(gen_var_groups_, params);
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
   auto h = canonical->get_hash();
   if (gen_graphs_.count(h) > 0)
@@ -245,67 +245,18 @@ void Experiment::GenParamsGraphFilter() {
   gen_params_final_.insert(params);
 }
 
-bliss::Digraph* Experiment::BlissGraphForParametrization(
-                          vec<int>& groups,
-                          vec<CharId>& params) {
-  std::map<Formula*, uint> node_ids;
-  std::map<uint, uint> var_ids;
-  int new_id = 0;
-  // Create the graph
-  auto g = new bliss::Digraph(0);
-  // Add vertices for variables, create edge between a variable and its negation
-  int max_group_id = 0;
+bliss::Digraph* Experiment::CreateGraphForParams(vec<uint>& groups,
+                                                 vec<CharId>& params) {
+  auto g = game_->CreateGraph();
+  // Change color of var vertices according to 'groups'.
   for (auto var: game_->variables()) {
-    // printf("Adding vertices for variable %s - color %i\n", var->pretty().c_str(), groups[var->id()]);
-    if (groups[var->id()] > max_group_id) max_group_id = groups[var->id()];
-    g->add_vertex(groups[var->id()]);
-    g->add_vertex(groups[var->id()]);
-    var_ids[var->id()] = new_id;
-    // printf("Adding edge %i - %i\n", new_id, new_id+1 );
-    g->add_edge(new_id, new_id + 1);
-    g->add_edge(new_id + 1, new_id);
-    new_id += 2;
+    uint group = std::numeric_limits<uint>::max() - groups[var->id()];
+    g->change_color(2*var->id() - 2, group);
+    g->change_color(2*var->id() - 1, group);
   }
-  // Go through all outcome formulas and create nodes.
-  std::function<void(Formula*)> CreateNodes = [&](Formula* c) {
-    if (c->isLiteral()) return;
-    if (node_ids.count(c) == 0) {
-      node_ids[c] = new_id++;
-      // printf("add VERTEX %i for %s\n", new_id-1, c->pretty().c_str());
-      g->add_vertex(max_group_id + c->node_id());
-    }
-    for (uint i = 0; i < c->child_count(); i++) CreateNodes(c->child(i));
-  };
+  // Construct graphs for outcome formulas.
   for (auto outcome: outcomes_) {
-    CreateNodes(outcome);
+    outcome->AddToGraph(*g, &params);
   }
-  // Create all other edges according to the structure of the formula
-  std::function<void(Formula*)> AddEdges = [&](Formula* c) {
-    for (uint i = 0; i < c->child_count(); i++) {
-      auto ch = c->child(i);
-      bool neg = false;
-      if (ch->isLiteral()) {
-        if (dynamic_cast<NotOperator*>(ch)) {
-          neg = true;
-          ch = ch->neg();
-        }
-        auto map = dynamic_cast<Mapping*>(ch);
-        auto var = dynamic_cast<Variable*>(ch);
-        assert(map || var);
-        // printf("ADD edge %i %i for %s\n", node_ids[c], neg + (map ? var_ids[map->getValue(params)]
-        //                                      : var_ids[var_ids[var->id()]]), c->pretty().c_str());
-        g->add_edge(node_ids[c], neg + (map ? var_ids[map->getValue(params)]
-                                            : var_ids[var_ids[var->id()]]));
-      } else {
-        // printf("add edge %i %i for %s to %s.\n", node_ids[c], node_ids[ch], c->pretty().c_str(), ch->pretty().c_str());
-        g->add_edge(node_ids[c], node_ids[ch]);
-        AddEdges(ch);
-      }
-    }
-  };
-  for (auto outcome: outcomes_) {
-    AddEdges(outcome);
-  }
-  g->set_splitting_heuristic(bliss::Digraph::shs_fsm);
   return g;
 }

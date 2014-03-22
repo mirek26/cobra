@@ -47,9 +47,9 @@ class Game {
 
   const vec<string>& alphabet() { return alphabet_; }
 
-  int addMapping(string, vec<Variable*>*);
-  int getMappingId(string);
-  int getMappingValue(MapId, CharId);
+  MapId addMapping(string, vec<Variable*>*);
+  MapId getMappingId(string);
+  VarId getMappingValue(MapId, CharId);
 
   Experiment* addExperiment(string name, uint num_params);
   vec<Experiment*>& experiments() {  return experiments_;  }
@@ -57,7 +57,7 @@ class Game {
   void Precompute();
 
   bliss::Digraph* CreateGraph();
-  vec<int> ComputeVarEquiv(bliss::Digraph&);
+  vec<uint> ComputeVarEquiv(bliss::Digraph&);
 };
 
 #endif   // COBRA_GAME_H_

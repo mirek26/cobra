@@ -63,6 +63,8 @@ int main(int argc, char* argv[]) {
 
   CnfFormula knowledge;
   knowledge.AddConstraint(game.restriction());
+  knowledge.InitSolver();
+  knowledge.WriteDimacs(stdout);
 
   int exp_num = 1;
   while (true) {

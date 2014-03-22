@@ -24,6 +24,8 @@ lingeling
 cobra-backend
 cobra/test/test
 !cobra/
+sharpSAT
+!sharpSAT/
 
 # tmp files
 .cobra.in
@@ -45,6 +47,7 @@ local/
 *.so
 *.o
 *.a
+*.d
 *.or
 *.od
 depend.mk
