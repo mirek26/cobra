@@ -53,15 +53,19 @@
 
 % \usepackage{amsthm}
 \usepackage{tikz}
-\tikzstyle{thmbox} = [rectangle, rounded corners, draw=gray!80, fill=gray!10, inner sep=10pt, inner ysep=5pt]
-\newcommand\thmbox[1]{%
-  \noindent\begin{tikzpicture}%
-  \node [thmbox] (box){%
-    \begin{minipage}{.94\textwidth}%
-      #1%
-    \end{minipage}%
-  };%
-  \end{tikzpicture}}
+\tikzstyle{thmbox} = [rectangle, rounded corners=10, draw=gray!20, fill=gray!10, inner sep=8pt, inner ysep=1pt]
+\newcommand\thmbox[1]{
+  % \hspace{-8pt}
+  \begin{tikzpicture}
+  \node [inner sep=-10pt, inner ysep=-5pt] (box) {
+    \begin{tikzpicture}
+    \node [thmbox] (box){
+      #1
+    };
+    \end{tikzpicture}
+  };
+  \end{tikzpicture}
+}
 \let\theoremframecommand\thmbox
 
 \newcounter{common}

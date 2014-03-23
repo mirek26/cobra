@@ -29,6 +29,8 @@
 % tak existuje permutace proměnných taková, že $|\procstg{\stg_1}{\val}| = |\procstg{\stg_2}{\val^\pi}|$
 % \end{itemize}
 
+\newcommand{\symg}{\Pi}
+
 \begin{definition}
 For an experiment $\exp$ and a permutation $\perm\in\Perm_\Var$,
   a $\perm$-symmetric experiment $\exp^\perm\in\Exp$ is an experiment such that
@@ -37,9 +39,16 @@ Clearly, no experiment satisfying this may exists.
 \end{definition}
 
 \begin{definition}
+For a fixed game $\game$, we define a \emph{symmetry group} $\symg$ as
+  the maximal subset of $\Perm_\Var$ such that for
+  every $\perm\in\symg$, $\perm$ is a symmetry of $\init$, i.e. $\init \equiv \init^\perm$
+  and for every experiment $\exp\in\Exp$, there exists a $\perm$-symmetric experiment $\exp^\perm$.
+\end{definition}
+
+\begin{definition}
 A game $\game$ is \emph{symmetric} if it satifies the following implication:
 If for an experiment $\exp$ exists a $\perm$-symmetric experiment $\exp^\perm\in\Exp$,
-  then a $\perm$-symmetric experiment exists for every experiment.
+  then $\perm\in\symg$.
 \end{definition}
 
 For the rest of this chapter, the game we analyze is \emph{symmetric}.
@@ -51,6 +60,7 @@ A memory-less strategy $\stg$ is \emph{consistent} if and only if
 \end{definition}
 
 \TODO{Aby mohla být strategie konzistentní, musí být hra symetrická.}
+\TODO{If $v$ satisfies $\stgknow{\stg}{\val}{k}$, it satisfies $\stgknow{\stg}{\val}{l}$ for all $l < k$.}
 
 \newcommand{\expeq}[1]{\cong_{#1}}
 \begin{definition}
@@ -63,30 +73,43 @@ An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $
 
 \begin{lemma} \label{lma-accruedknowledge}
 Let $\stg$ be a consistent memory-less strategy and let $\val_1$, $\val_2$ be two models of $\init$.
-If $v_1$ is a model of $\stgknow{\stg}{\val_2}{k}$, then $\stgknow{\stg}{\val_1}{k} = \stgknow{\stg}{\val_2}{k}$.
+If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$, then $\stgknow{\stg}{\val_1}{k} = \stgknow{\stg}{\val_2}{k}$.
 \end{lemma}
 \begin{proof}
 Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
-and let $c <= k$ be the first place where $\proc_1$ and $\proc_2$ differs.
-...
+and consider the first place where $\proc_1$ and $\proc_2$ differs.
+It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
+  values of the same strategy on the same accrued knowledge:
+$\proc_1(i) = \stg(\stgknow{\stg}{\val_1}{i-1}) =
+              \stg(\stgknow{\stg}{\val_2}{i-1}) = \proc_2(i)$.
+
+Suppose it is a result of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
+  and $i <= k$.
+Since $\val_1$ satisfies $\stgknow{\stg}{\val_2}{k}$ and $i <= k$,
+  it satisfies $\proc_2[i]$ as well.
+However $\val_1$ always satisfies $\proc_1[i]$ and
+  both $\proc_1[i]$ and $\proc_2[i]$ are from the set
+  $\outcome(\proc_1(i)) = \outcome(\proc_2(i))$.
+Since there is exactly one satisfied experiment for each valuation in the set,
+  $\proc_1[i]$ and $\proc_2[i]$ must be the same.
+Contradiction. \qed
 \end{proof}
 
 \begin{theorem}
 Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
 $\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
-Then for any $k\in\Nseto$, there is a permutation $\perm\in Sym$ such that
-$\perm\in Sym$ and $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$.
+Then for any $k\in\Nseto$, there is a permutation $\perm\in \symg$ such that
+ $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$.
 \end{theorem}
 
 \begin{proof}
-By Induction.
-
-For simplicity, let
+By Induction. For better readability, let
   $\know_k = \stgknow{\stg}{\val}{k}$ and
   $\knowx_{k, \perm} = \stgknow{\stgx}{\val^\perm}{k}$
-For $k=0$ it clearly holds, as any \TODO{$\perm\in$ Sym(E) $\init = \init^\perm$.}
 
-For the induction step, suppose $\know_k^\perm = \knowx_{k, \perm}$ and $\perm\in Sym$.
+For $k=0$ it clearly holds, as any \TODO{$\perm\in\symg \init = \init^\perm$. Potřebuju to nebo ne?}
+
+For the induction step, suppose $\know_k^\perm = \knowx_{k, \perm}$ and $\perm\in \symg$.
 Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$. It holds
 \[
 e_2 = \stgx(\knowx_{k, \perm})
@@ -96,14 +119,14 @@ e_2 = \stgx(\knowx_{k, \perm})
     = e_1^\perm
 \]
 
-and, therefore, there exists $\permx\in Sym$ such that
+and, therefore, there exists $\permx\in\symg$ such that
 \begin{align}
  \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \} &=
  \{ (\knowx_{k, \perm} \wedge \formx)^\permx \| \formx\in\outcome(\exp_1^\perm) \} = \label{eq:sets}\tag{*}\\
 &= \{ (\know_k^\perm \wedge \formx^\perm)^\permx \| \formx\in\outcome(\exp_1) \} =
  \{ (\know_k \wedge \formx)^{\perm\permx} \| \formx\in\outcome(\exp_1) \}
 \end{align}
-As $\permx\in Sym(E)$ and $Sym$ is a permutation group, $\perm\permx\in Sym(E)$.
+As $\permx\in\symg$ and $\symg$ is a permutation group, $\perm\permx\in\symg$.
 
 Since we suppose the game is well-formed (Definition \ref{def-wellformed}),
   $v$ satisfies exactly one formula in
