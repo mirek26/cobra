@@ -9,16 +9,23 @@
 \contentsline {subsection}{\rmfamily String matching}{6}{section*.7}
 \contentsline {subsection}{\rmfamily Generalized Mastermind}{6}{section*.8}
 \contentsline {chapter}{\numberline {3}\bfseries General model}{7}{chapter.3}
-\contentsline {section}{\numberline {3.1}\slshape Notation}{7}{section.3.1}
+\contentsline {section}{\numberline {3.1}\slshape Notation and Terminology}{7}{section.3.1}
 \contentsline {section}{\numberline {3.2}\slshape Formal definition}{7}{section.3.2}
 \contentsline {section}{\numberline {3.3}\slshape Strategies}{12}{section.3.3}
-\contentsline {section}{\numberline {3.4}\slshape Symmetry Breaking}{14}{section.3.4}
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{12}{section*.9}
+\contentsline {subsection}{\rmfamily Memory-less strategies}{13}{section*.10}
+\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{14}{section.3.4}
+\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{16}{section.3.5}
+\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{16}{section*.11}
+\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{16}{section*.12}
+\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{16}{section*.13}
+\contentsline {subsection}{\rmfamily Comparison}{16}{section*.14}
 \contentsline {chapter}{\numberline {4}\bfseries COBRA - COde BReaking Game Analyzer}{17}{chapter.4}
 \contentsline {section}{\numberline {4.1}\slshape Input language}{17}{section.4.1}
 \contentsline {section}{\numberline {4.2}\slshape Modes}{17}{section.4.2}
-\contentsline {chapter}{\numberline {5}\bfseries Implementation details}{19}{chapter.5}
-\contentsline {section}{\numberline {5.1}\slshape Programming Language and Style}{19}{section.5.1}
-\contentsline {subsection}{\rmfamily Compiler Requirements}{19}{section*.9}
-\contentsline {subsection}{\rmfamily Unit testing.}{19}{section*.10}
-\contentsline {section}{\numberline {5.2}\slshape Sat solving}{20}{section.5.2}
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{21}{chapter.6}
+\contentsline {section}{\numberline {4.3}\slshape Implementation details}{17}{section.4.3}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{17}{section*.15}
+\contentsline {subsection}{\rmfamily Compiler Requirements}{18}{section*.16}
+\contentsline {subsection}{\rmfamily Unit testing.}{18}{section*.17}
+\contentsline {section}{\numberline {4.4}\slshape Sat solving}{18}{section.4.4}
+\contentsline {chapter}{\numberline {5}\bfseries Conclusions}{19}{chapter.5}

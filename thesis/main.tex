@@ -22,58 +22,7 @@
 }
 
 \begin{document}
-
-% znaceni
-\newcommand{\Val}{V} % mnoz vsech valuaci
-\newcommand{\val}{v} % jedna valuace
-\newcommand{\numval}[1]{\##1} % number of sat valutaions
-\renewcommand{\Form}{\textrm{Form}} % mnoz vsech formuli
-\newcommand{\PForm}{\textrm{PForm}} % mnoz vsech param formuli
-\newcommand{\form}{\varphi} % jedna formule
-\newcommand{\formx}{\psi} % jedna formule
-\newcommand{\pform}{\psi} % jedna formule
-
-% code-breaking game
-\newcommand{\game}{\mathcal{G}}
-\newcommand{\Var}{X}
-\newcommand{\init}{\varphi_0}
-\newcommand{\Expt}{T}
-\newcommand{\expt}{t}
-\newcommand{\exptx}{u}
-
-\newcommand{\Exp}{E}
-\renewcommand{\exp}{e}
-
-\newcommand{\param}{p}
-\newcommand{\outcome}{\Phi}
-
-% dalsi veci
-\newcommand{\Perm}{\textrm{Perm}}
-\newcommand{\perm}{\pi}
-\newcommand{\permx}{\rho}
-
-\newcommand{\SAT}[1]{SAT(#1)}
-
-% nep
-\newcommand{\stg}{\sigma}
-\newcommand{\stgx}{\tau}
-\newcommand{\stgknow}[3]{\kappa_{#1, #2}^{#3}}
-
-\newcommand{\know}{\alpha}
-\newcommand{\knowx}{\beta}
-
-\newcommand{\proc}{\lambda}
-\newcommand{\procstg}[2]{\lambda^{#1,#2}}
-\newcommand{\stglen}[2]{|#1|_{#2}}
-
-\newcommand{\len}{\Lambda}
-\newcommand{\lenstg}[2]{\len^{#1,#2}}
-\newcommand{\lenmax}[1]{\len^{#1}}
-\newcommand{\lvexp}[1]{\len^{#1}_\textrm{exp}}
-
-\newcommand{\exactly}[1]{\textrm{Exactly-#1}\:}
-\newcommand{\atleast}[1]{\textrm{AtLeast-#1}\:}
-\newcommand{\atmost}[1]{\textrm{AtMost-#1}\:}
+\input{macros}
 
 \FrontMatter
 \setlength{\parindent}{0pt}

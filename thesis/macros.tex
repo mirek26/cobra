@@ -1,0 +1,84 @@
+
+% General
+\renewcommand{\|}{\:\:|\:\:}
+\newcommand{\TODO}[1]{\textcolor{Red}{TODO: #1}}
+\newcommand{\qed}{\hfill \mbox{\raggedright \ensuremath\blacksquare}}
+\newcommand{\QED}{\qed}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\arrow}[1]{\xrightarrow{#1}}
+
+% Number sets
+\newcommand{\Nset}{\mathbb{N}}
+\newcommand{\Nseto}{\Nset_0}
+\newcommand{\Qset}{\mathbb{Q}}
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\Rsetp}{\mathbb{R}_{>0}}
+\newcommand{\Rsetpo}{\mathbb{R}_{\ge 0}}
+\newcommand{\Zset}{\mathbb{Z}}
+
+% Formulas - basics
+\newcommand{\Val}{\mathtt{Val}} % all valuations
+\newcommand{\val}{v} % a valuation
+\newcommand{\numval}[1]{\##1} % number of sat valutaions
+\renewcommand{\Form}{\mathtt{Form}} % all formulas
+\newcommand{\PForm}{\mathtt{PForm}} % all param formulas
+\newcommand{\form}{\varphi} % a formula
+\newcommand{\formx}{\psi} % another 'a formula'
+\newcommand{\pform}{\psi} % a parametrized formula
+\newcommand{\SAT}[1]{SAT(#1)} % satisfiability predicate \SAT(\form)
+
+% Code Breaking Game
+\newcommand{\game}{\mathcal{G}}
+
+\newcommand{\Var}{X}
+\newcommand{\init}{\varphi_0}
+\newcommand{\symg}{\Pi} % symmetry of the game
+
+% Types + parametrizations
+\newcommand{\Expt}{T} % set of all experiments
+\newcommand{\expt}{t} % a type
+\newcommand{\exptx}{u} % another 'a type'
+\newcommand{\param}{p} % a parametrization
+
+% Experiments
+\newcommand{\Exp}{E} % Experiment relation
+\renewcommand{\exp}{e} % an experiment
+\newcommand{\expeq}[1]{\cong_{#1}} % experiment equivalence
+
+% Outcome function
+\newcommand{\outcome}{\Phi}
+
+% Permutations
+\newcommand{\Perm}{\mathtt{Perm}} % set of all permutations (_X over X)
+\newcommand{\perm}{\pi} % a permutation
+\newcommand{\permx}{\rho} % another 'a permutation'
+\newcommand{\idperm}{\mathtt{id}} % identity
+
+% Solving process
+\newcommand{\proc}{\lambda}
+% \newcommand{\procstg}[2]{\proc^{#1,#2}} % induced by strategy #1 on valuation #2
+\newcommand{\procstg}[2]{\proc^{#1}_{#2}} % induced by strategy #1 on valuation #2
+
+% Strategies
+\newcommand{\stg}{\sigma}
+\newcommand{\stgx}{\tau}
+\newcommand{\stglen}[2]{|#1|_{#2}}
+
+% Accrued knowledge
+\newcommand{\stgknow}[3]{\procstg{#1}{#2}[..#3]}
+\newcommand{\aknow}[2]{#1}[..#3]}
+% \newcommand{\stgknow}[3]{{\kappa_{#1, #2}^{#3}}}
+% \newcommand{\aknow}[2]{\kappa_{#1}^{#2}}
+\newcommand{\know}{\alpha}
+\newcommand{\knowx}{\beta}
+
+% Value of strategies
+\newcommand{\len}{\Lambda}
+\newcommand{\lenstg}[2]{\len^{#1,#2}}
+\newcommand{\lenmax}[1]{\len^{#1}}
+\newcommand{\lvexp}[1]{\len^{#1}_\textrm{exp}}
+
+% Macro operators
+\newcommand{\exactly}[1]{\mathtt{Exactly-#1}\:}
+\newcommand{\atleast}[1]{\mathtt{AtLeast-#1}\:}
+\newcommand{\atmost}[1]{\mathtt{AtMost-#1}\:}

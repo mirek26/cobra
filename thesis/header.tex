@@ -8,13 +8,13 @@
 % colours and graphics
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
 
-
+%\usepackage{fontspec}
 \usepackage[normalem]{ulem}
 
-%\usepackage{subfig}
-% \usepackage[us,24hr]{datetime}
-% \newdateformat{mydate}{\THEDAY.\THEMONTH.\THEYEAR}
-% \newcommand{\verze}{  \scriptsize(v. \mydate\today\ \currenttime)}
+\usepackage{subfig}
+\usepackage[us,24hr]{datetime}
+\newdateformat{mydate}{\THEDAY.\THEMONTH.\THEYEAR}
+\newcommand{\verze}{  \scriptsize(v. \mydate\today\ \currenttime)}
 
 % font
 \usepackage[T1]{fontenc} % left bottom quote ,,  (,,bla'')
@@ -48,8 +48,6 @@
 
 %\usepackage[amsmath, amsthm, framed, thmmarks]{ntheorem}
 \usepackage[amsmath, amsthm, framed]{ntheorem}
-\newcommand{\qed}{\hfill \mbox{\raggedright \ensuremath\blacksquare}}
-
 
 % \usepackage{amsthm}
 \usepackage{tikz}
@@ -85,8 +83,6 @@
 %\newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[common]{Lemma}
 \newtheorem{corollary}[common]{Corollary}
-
-
 %\theoremstyle{nonumberplain}
 %\newtheorem{proof}{Proof}
 
@@ -107,32 +103,13 @@
 \mathlig{<=}{\leq}
 \mathlig{>=}{\geq}
 \mathlig{...}{\dotso}
-\renewcommand{\|}{\:\:|\:\:}
-
-% TODO :)
-\newcommand{\TODO}[1]{\textcolor{Red}{TODO: #1}}
-
-% makra pro clanek
-\newcommand{\QED}{\qed}
-
-\newcommand{\Nset}{\mathbb{N}}
-\newcommand{\Nseto}{\Nset_0}
-\newcommand{\Qset}{\mathbb{Q}}
-\newcommand{\Rset}{\mathbb{R}}
-\newcommand{\Rsetp}{\mathbb{R}_{>0}}
-\newcommand{\Rsetpo}{\mathbb{R}_{\ge 0}}
-\newcommand{\Zset}{\mathbb{Z}}
-
-\newcommand{\indicator}[1]{\mathbf{I}_#1}
-\newcommand{\field}{\mathfrak{F}}
-\newcommand{\borel}{\mathfrak{B}}
-
-\newcommand{\eps}{\varepsilon}
-
-\newcommand{\arrow}[1]{\xrightarrow{#1}}
 
 \pagestyle{plain}
 \sloppy
+
+%\renewcommand{\chaptermark}[1]{\markright{\thechapter.\ \verze#1}{}}
+% \renewcommand{\chaptermark}[1]{ \markboth{#1}{} }
+\renewcommand{\sectionmark}[1]{\markright{{\verze}\ \thesection\ #1}{}}
 
 \setlength{\parskip}{.3ex plus .2ex minus .1ex}
 \setlength{\parindent}{0pt}
