@@ -120,24 +120,35 @@ For simplicity, we omit the brackets around the pairs and write
   \[
   \proc = \exp_1, \form_1, \exp_2, \form_2, ...
   \]
-We use the notation $\proc(i) = \exp_i$ and $\proc[i] = \form_i$
-  to refer to the $i$-th experiment and $i$-th formula, respectively.
-For $k\in\Nseto$, $k <= |\proc|$ we denote by
-  $\aknow{\proc}{k} = \form_0 \wedge \form_1 \wedge ... \wedge \form_k$
-  the accrued knowledge after $k$ experiments.
+Let
+\begin{itemize}
+\item $|\proc|$ denote the length of the sequence,
+\item $\proc(k) = \exp_k$ denote the $k$-th experiment,
+\item $\proc[k] = \form_k$ denote the $k$-th outcome, and
+\item $\aknow{\proc}{k} = \init \wedge \form_1 \wedge ... \wedge \form_k$
+  denote the accrued knowledge after the first $k$ experiments
+  (including the initial restriction $\init$).
+\end{itemize}
 
-\TODO{Update:} Let us now describe the course of the game in the defined terms.
+Let us now describe the course of the game in the defined terms.
 First, the codemaker choose a valuation $\val$ of $\Var$
   which satisfies $\init$.
-Then, the codebreaker successively chooses a type $\expt\in\Expt$ and
+Second, the codebreaker chooses a type $\expt\in\Expt$ and
   a parametrization $\param\in\Sigma^*$ such that $(\expt, \param)\in\Exp$.
-The codemaker gives the codebreaker a formula $\form\in\outcome((\expt, \param))$
+Third, the codemaker gives the codebreaker a formula
+  $\form\in\outcome((\expt, \param))$,
   which is satisfied by the valuation $\val$.
+Then the evaluated experiment $((\expt, \param), \form)$ is appended to the
+  (initially empty) solving process $\proc$ and they continue with
+  the second step.
+The game continues until $\numval{\aknow{\proc}{|\proc|}} = 1$, which
+  corresponds to the situation in which the codebreaker can uniquely
+  determine the code.
 
-Here we hit a problem -- so that the codemaker can always fulfill the last step,
+So that the codemaker can always fulfill the third step,
   there must be a formula $\form\in\outcome(\exp)$ satisfied by any valuation.
-Since it might make sense to allow multiple satisfied formulas, we restrict
-  ourselves to game where the outcome is uniquely defined for given valuation.
+Although it might make sense to allow multiple satisfied formulas, we restrict
+  ourselves to games where the outcome is uniquely defined for given valuation.
 
 \begin{definition}[Well-formed game] \label{def-wellformed}
 A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
@@ -148,8 +159,9 @@ A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
 \end{equation}
 \end{definition}
 
-In sequel, we suppose a game to be well-formed, if not stated otherwise.
-Note that this property is not easy to check.
+As the semantics of non-well-formed games is unclear,
+  we focus only on well-formed games and, be default,
+  we suppose a game to be well-formed if not stated otherwise.
 
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM
@@ -386,31 +398,28 @@ A strategy $\stg$ together with a valuation $\val$ (satisfying $\form_0$)
   is such that
   $\val(\form_{i+1}) = 1$,
   for all $i\in\Nset$.
-Notice that due to the condition in Definition \ref{def-wellformed},
+Note that thanks to the well-formed property,
   there is always exactly one such $\form_{i+1}$.
-We denote the knowledge accrued by $\stg$ on $\val$ after $k$ experiments
-  by $\stgknow{\stg}{\val}{k}$.
-
+% We denote the knowledge accrued by $\stg$ on $\val$ after $k$ experiments
+%   by $\stgknow{\stg}{\val}{k}$.
 
 We define \emph{length} of a strategy $\stg$ on a valuation $\val$,
   denoted $\stglen{\stg}{\val}$,
   as the smallest $k\in\Nseto$ such that
-  $\stgknow{\stg}{\val}{k} = \form_0 \wedge \form_1 \wedge ... \wedge \form_k$ has only one model
-  ($\numval_\Var{\stgknow{\stg}{\val}{k}} = 1$).
+  $\stgknow{\stg}{\val}{k}$ uniquely determines the code, i.e.
+  \[
+  \stglen{\stg}{\val} = \min \;\{ k\in\Nseto \| \numval{\stgknow{\stg}{\val}{k}} = 1 \}
+  \]
+
+
 This corresponds to the point where we can uniquely
   determine the code.
-
-Note that it always holds $\numval{\stgknow{\stg}{\val}{k}} > 0$
-  because
-  $\val(\form_i) = 1$ for all $i\in\Nseto$.
-
-\TODO{Define average number of experiments.}
 
 The \emph{worst-case number of experiments} $\lenmax{\stg}$
   of a strategy $\stg$ is the maximal length of the strategy on a valuation $\val$,
   over all models $\val$ of $\form_0$, i.e.
   \[
-  \lenmax{\stg} = \max_{\val\in\Val_\Var, \;\val(\form_0) = 1} \stglen{\stg}{\val}.
+  \lenmax{\stg} = \max_{\val\in\Val_\Var, \;\val(\init) = 1} \stglen{\stg}{\val}.
   \]
 We say that a strategy $\stg$ \emph{solves the game} if $\lenmax{\stg}$ is finite.
 The game is \emph{solvable} if there exists a strategy that solves the game.
@@ -418,9 +427,21 @@ The game is \emph{solvable} if there exists a strategy that solves the game.
 % \TODO{Není to jednoduchý, ale je to zajímavý?
 % Given a code-breaking game $\game$, decide whether $\game$ is solvable.}
 
+The \emph{average-case number of experiments} $\lenexp{\stg}$
+  of a strategy $\stg$ is the expected number of experiments if the code
+  is selected from models of $\init$ with uniform distribution, i.e.
+  \[
+  \lenexp{\stg} = \frac{
+    \sum_{\val\in\Val_\Var, \;\val(\init) = 1} \stglen{\stg}{\val}
+    }{\numval{\init}}.
+  \]
+\medskip
+
 \begin{definition}[Optimal strategy]
 A strategy $\stg$ is \emph{worst-case optimal} if
   $\lenmax{\stg} <= \lenmax{\stg'}$ for any strategy $\stg'$.
+A strategy $\stg$ is \emph{average-case optimal} if
+  $\lenexp{\stg} <= \lenexp{\stg'}$ for any strategy $\stg'$.
 \end{definition}
 
 \begin{lemma}
@@ -432,47 +453,48 @@ Let $b = \max_{\expt\in\Expt} |\outcome(\expt)|$ be the maximal number of
 \end{lemma}
 
 \begin{proof}
-For a fixed $\stg$ and $k = \lenmax{\stg}$,
-  $\stgknow{\stg}{\val}{k}$ can \TODO{nabývat} at most
-  $b^k$ values.
+Let us fix a strategy $\stg$ and $k = \lenmax{\stg}$.
+For an unknown model $\val$ of $\init$,
+  $\stgknow{\stg}{\val}{k}$ can take up to
+  $b^k$ different values.
 By pidgeon-hole principle, if $\numval{\init} > b^k$, there must be a valuation
-  $v$ such that $\stgknow{\stg}{\val}{k} > 1$.
+  $v$ such that $\numval{\stgknow{\stg}{\val}{k}} > 1$.
 This would be a contradiction with $k = \lenmax{\stg}$ and, therefore,
   $\numval{\init} <= b^k$, which is equivalent with the statement of the lemma.
+  \qed
 \end{proof}
 
 \subsection{Non-adaptive strategies}
 \begin{definition}[Non-adaptive strategy]
 A strategy $\stg$ is \emph{non-adaptive} if it decides the next experiment
   based on the length of the solving process only, i.e.
-  whenever
-  $\proc_1 = e_1, \form_1, ..., e_k, \form_k$ and
-  $\proc_2 = e'_1, \form'_1, ..., e'_k, \form'_k$,
-  then $\stg(\proc_1) = \stg(\proc_2)$.
+  whenever $\proc_1$ and $\proc_2$ are processes such that
+  $|\proc_1| = |\proc_2|$,
+  then
+  $\stg(\proc_1) = \stg(\proc_2)$.
 
-Non-adaptive strategies can be seen as functions $\Nseto -> \Exp$.
+Non-adaptive strategies can be seen as functions $\stgx: \Nseto -> \Exp$.
+Then $\stg(\proc) = \tau(|\proc|)$.
 \end{definition}
 
 Non-adaptive strategies corresponds to the well studied problems of
   static mastermind and
-  non-adaptive strategies for the coutnerfeit coin problem.
-We mention them here only to show the possibility of formulating these problems
-  in our formalism but we do not study them any further.
+  non-adaptive strategies for the coutnerfeit coin problem \ref{} \ref{}.
+We mention them here just to show the possibility of formulating these problems
+  in our framework but we do not study them any further.
 
 \subsection{Memory-less strategies}
 
 \begin{definition}[Memory-less strategy]
 A strategy $\stg$ is \emph{memory-less} if it decides the next experiment
   based on the accumulated knowledge only, i.e.
-  whenever
-  $\proc_1 = e_1, \form_1, ..., e_k, \form_k$ and
-  $\proc_2 = e'_1, \form'_1, ..., e'_l, \form'_l$
-  are two solving processes such that
-  $ \form_1 \wedge ... \wedge \form_k \equiv \form'_1 \wedge ... \wedge \form'_l$,
+  whenever $\proc_1$ and $\proc_2$ are processes such that
+  $\aknow{\proc_1}{|\proc_1|} \equiv \aknow{\proc_2}{|\proc_2|}$
   then
   $\stg(\proc_1) = \stg(\proc_2)$.
 
 Memory-less strategies can be considered as functions $\Form_\Var -> \Exp$.
+Then $\stg(\proc) = \tau(\aknow{\proc}{|\proc|})$
 \end{definition}
 
 \begin{lemma}
@@ -498,6 +520,16 @@ By induction,
   $\stg(\know^{k+l}) = \stg(\know^{k})$ and
   $\know^{k+l} \equiv \know^{k}$
   for any $l\in\Nset$.\qed
+\end{proof}
+
+\begin{lemma}
+Let $\stg$ be a strategy.
+Then there exists a memory-less strategy $\stgx$ such that
+  $\stglen{\stg}{\val} >= \stglen{\stgx}{\val}$ for all $\val$ satisfying $\init$.
+\end{lemma}
+
+\begin{proof}
+\TODO{Napsat důkaz.}
 \end{proof}
 
 \begin{definition}[Greedy strategy]
@@ -527,9 +559,13 @@ then a greedy strategy $\stg$ is optimal and
 \]
 \end{lemma}
 
+\begin{proof}
+\TODO{Napsat důkaz.}
+\end{proof}
+
 \begin{example}
 Greedy strategies are optimal in the fake-coin game $\mathcal{F}_n$.
-\TODO{...}
+\TODO{Napsat důkaz.}
 \end{example}
 
 % \begin{problem}

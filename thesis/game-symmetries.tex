@@ -31,9 +31,12 @@ We define a \emph{symmetry group} $\symg$ as
 
 \begin{definition}[Consistent strategy]
 A memory-less strategy $\stg$ is \emph{consistent} if and only if
-  $\stg(\form^\perm) = \stg(\form)^\perm$ for any $\form\in\Form_\Var$ and
-  $\perm\in\symg$.
+  for every $\form\in\Form_\Var$ and every $\perm\in\symg$, there
+  exists $\permx\in\symg$ such that $\form^\perm \equiv \form^\permx$ and
+  $\stg(\form^\permx) = \stg(\form)^\permx$.
 \end{definition}
+
+\TODO{Example, na kterém bude vidět, že jednoduchá definice nevyhovuje, protože můžu vzít symetrie $\form$ a dostanu, že to má dávat různé věci.}
 
 \begin{lemma}
 Let $\stgx$ be a memory-less strategy.
@@ -49,7 +52,9 @@ There exists a consistent memory-less strategy $\stg$ such that
 
 \begin{lemma} \label{lma-accruedknowledge}
 Let $\stg$ be a consistent memory-less strategy and let $\val_1$, $\val_2$ be two models of $\init$.
-If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$, then $\stgknow{\stg}{\val_1}{k} = \stgknow{\stg}{\val_2}{k}$.
+If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
+  then $\stgknow{\stg}{\val_1}{i} = \stgknow{\stg}{\val_2}{i}$
+  for $i \in\Nseto$, $i <= k$.
 \end{lemma}
 
 \begin{proof}
@@ -57,14 +62,14 @@ Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
 and consider the first place where $\proc_1$ and $\proc_2$ differs.
 It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
   values of the same strategy on the same accrued knowledge:
-$\proc_1(i) = \stg(\stgknow{\stg}{\val_1}{i-1}) =
-              \stg(\stgknow{\stg}{\val_2}{i-1}) = \proc_2(i)$.
+$\proc_1(i) = \stg(\aknow{\proc_1}{i-1}) =
+              \stg(\aknow{\proc_2}{i-1}) = \proc_2(i)$.
 
-Suppose it is a result of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
+Suppose it is an outcome of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
   and $i <= k$.
-Since $\val_1$ satisfies $\stgknow{\stg}{\val_2}{k}$ and $i <= k$,
+Since $\val_1$ satisfies $\aknow{\proc_2}{k}$ and $i <= k$,
   it satisfies $\proc_2[i]$ as well.
-However $\val_1$ always satisfies $\proc_1[i]$ and
+However, $\val_1$ always satisfies $\proc_1[i]$ and
   both $\proc_1[i]$ and $\proc_2[i]$ are from the set
   $\outcome(\proc_1(i)) = \outcome(\proc_2(i))$.
 Since there is exactly one satisfied experiment for each valuation in the set,
@@ -118,7 +123,7 @@ and, therefore, there exists $\permx\in\symg$ such that
 \end{align}
 As $\permx\in\symg$ and $\symg$ is a permutation group, $\perm\permx\in\symg$.
 
-Since we suppose the game is well-formed (Definition \ref{def-wellformed}),
+Since the game is well-formed,
   $v$ satisfies exactly one formula in
   $\{ \know_k \wedge \formx \| \formx\in\outcome(\exp_1) \}$.
 Therefore $v^{\perm\permx}$ satisfies exactly one formula
@@ -131,8 +136,6 @@ Both $\know_{k+1}^{\perm\permx}$ and $\knowx_{k+1, \perm\permx}$ is thus the onl
   formula from (\refeq{eq:sets}) satisfied by $v^{\perm\permx}$ and
   the induction is complete.
 
-\TODO{Zkonstruovat bipartitní graf, natahat hrany zleva zprava podle permutací;
-  podle Hall's mariage theorem - existuje perfect matching, což odpovídá bijekci.}
 % Now for a fixed $\val$, take $k = \stglen{\stg}{\val}$, take
 %   $\perm\in\symg$ such that
 %   $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$
@@ -153,8 +156,9 @@ Both $\know_{k+1}^{\perm\permx}$ and $\knowx_{k+1, \perm\permx}$ is thus the onl
 
 \begin{corollary}
 Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
-$\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
-Then $\lenmax{\stg_1} = \lenmax{\stg_2}$.
+  $\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
+Then $\lenmax{\stg_1} = \lenmax{\stg_2}$
+  and $\lenexp{\stg_1} = \lenexp{\stg_2}$.
 \end{corollary}
 
 % For any accrued knowledge $\form$, this lemma gives us the right

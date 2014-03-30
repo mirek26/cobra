@@ -12,7 +12,7 @@
 \contentsline {section}{\numberline {3.1}\slshape Notation and Terminology}{7}{section.3.1}
 \contentsline {section}{\numberline {3.2}\slshape Formal definition}{7}{section.3.2}
 \contentsline {section}{\numberline {3.3}\slshape Strategies}{12}{section.3.3}
-\contentsline {subsection}{\rmfamily Non-adaptive strategies}{12}{section*.9}
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{13}{section*.9}
 \contentsline {subsection}{\rmfamily Memory-less strategies}{13}{section*.10}
 \contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{14}{section.3.4}
 \contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{16}{section.3.5}

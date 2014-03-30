@@ -11,23 +11,26 @@
 \contentsline {example}{{Example}{11}{Mastermind (alternative)}}{11}{common.11}
 \contentsline {definition}{{Definition}{12}{Strategy}}{12}{common.12}
 \contentsline {definition}{{Definition}{13}{Optimal strategy}}{12}{common.13}
-\contentsline {lemma}{{Lemma}{14}{}}{12}{common.14}
-\contentsline {proof}{{\proofname }{1}{}}{12}{proof.1}
+\contentsline {lemma}{{Lemma}{14}{}}{13}{common.14}
+\contentsline {proof}{{\proofname }{1}{}}{13}{proof.1}
 \contentsline {definition}{{Definition}{15}{Non-adaptive strategy}}{13}{common.15}
 \contentsline {definition}{{Definition}{16}{Memory-less strategy}}{13}{common.16}
 \contentsline {lemma}{{Lemma}{17}{}}{13}{common.17}
 \contentsline {proof}{{\proofname }{2}{}}{13}{proof.2}
-\contentsline {definition}{{Definition}{18}{Greedy strategy}}{13}{common.18}
-\contentsline {lemma}{{Lemma}{19}{}}{14}{common.19}
-\contentsline {example}{{Example}{20}{}}{14}{common.20}
-\contentsline {definition}{{Definition}{21}{Symmetric experiment}}{14}{common.21}
-\contentsline {definition}{{Definition}{22}{Symmetry group}}{14}{common.22}
-\contentsline {definition}{{Definition}{23}{Consistent strategy}}{14}{common.23}
-\contentsline {lemma}{{Lemma}{24}{}}{14}{common.24}
+\contentsline {lemma}{{Lemma}{18}{}}{14}{common.18}
 \contentsline {proof}{{\proofname }{3}{}}{14}{proof.3}
-\contentsline {lemma}{{Lemma}{25}{}}{14}{common.25}
-\contentsline {proof}{{\proofname }{4}{}}{15}{proof.4}
-\contentsline {definition}{{Definition}{26}{Experiment equivalence}}{15}{common.26}
-\contentsline {theorem}{{Theorem}{27}{}}{15}{common.27}
+\contentsline {definition}{{Definition}{19}{Greedy strategy}}{14}{common.19}
+\contentsline {lemma}{{Lemma}{20}{}}{14}{common.20}
+\contentsline {proof}{{\proofname }{4}{}}{14}{proof.4}
+\contentsline {example}{{Example}{21}{}}{14}{common.21}
+\contentsline {definition}{{Definition}{22}{Symmetric experiment}}{14}{common.22}
+\contentsline {definition}{{Definition}{23}{Symmetry group}}{14}{common.23}
+\contentsline {definition}{{Definition}{24}{Consistent strategy}}{15}{common.24}
+\contentsline {lemma}{{Lemma}{25}{}}{15}{common.25}
 \contentsline {proof}{{\proofname }{5}{}}{15}{proof.5}
-\contentsline {corollary}{{Corollary}{28}{}}{15}{common.28}
+\contentsline {lemma}{{Lemma}{26}{}}{15}{common.26}
+\contentsline {proof}{{\proofname }{6}{}}{15}{proof.6}
+\contentsline {definition}{{Definition}{27}{Experiment equivalence}}{15}{common.27}
+\contentsline {theorem}{{Theorem}{28}{}}{15}{common.28}
+\contentsline {proof}{{\proofname }{7}{}}{15}{proof.7}
+\contentsline {corollary}{{Corollary}{29}{}}{16}{common.29}

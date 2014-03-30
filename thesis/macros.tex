@@ -65,8 +65,8 @@
 \newcommand{\stglen}[2]{|#1|_{#2}}
 
 % Accrued knowledge
-\newcommand{\stgknow}[3]{\procstg{#1}{#2}[..#3]}
-\newcommand{\aknow}[2]{#1}[..#3]}
+\newcommand{\stgknow}[3]{\procstg{#1}{#2}\langle#3\rangle}
+\newcommand{\aknow}[2]{#1\langle#2\rangle}
 % \newcommand{\stgknow}[3]{{\kappa_{#1, #2}^{#3}}}
 % \newcommand{\aknow}[2]{\kappa_{#1}^{#2}}
 \newcommand{\know}{\alpha}
@@ -76,7 +76,7 @@
 \newcommand{\len}{\Lambda}
 \newcommand{\lenstg}[2]{\len^{#1,#2}}
 \newcommand{\lenmax}[1]{\len^{#1}}
-\newcommand{\lvexp}[1]{\len^{#1}_\textrm{exp}}
+\newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
 
 % Macro operators
 \newcommand{\exactly}[1]{\mathtt{Exactly-#1}\:}
