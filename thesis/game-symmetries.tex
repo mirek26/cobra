@@ -39,48 +39,45 @@ A memory-less strategy $\stg$ is \emph{consistent} if and only if
 \TODO{Example, na kterém bude vidět, že jednoduchá definice nevyhovuje, protože můžu vzít symetrie $\form$ a dostanu, že to má dávat různé věci.}
 
 \begin{lemma}
-Let $\stgx$ be a memory-less strategy.
-There exists a consistent memory-less strategy $\stg$ such that
-  $\stglen{\tau}{\val} >= \stglen{\stg}{\val}$ for all $\val\in\Val_X$ satisfying $\init$.
+Let $\stg$ be a memory-less strategy.
+There exists a consistent memory-less strategy $\stgx$ such that
+  $\stglen{\stg}{\val} >= \stglen{\stgx}{\val}$
+  for all $\val\in\Val_X$ satisfying $\init$.
 \end{lemma}
 
 \begin{proof}
-\TODO{Idea: když chci nadefinovat $\stg(\form)$, kouknu na všechny $\val$, $k$, takové, že
-  $\exists\perm\in\symg(\form^\perm = \stgknow{\stgx}{\val}{k})$, pro každý si spočítám
-  $\stglen{\stgx}{\val} - k$ (tj. počet experimentů do konce) a vezmu minimum.}
-\end{proof}
+Similar to the proof of Lemma \ref{lma-opt-memoryless}.
+Let us choose any total order $\form_1, \form_2, ...$ of $\Form_\Var$ such that
+if $\form_i$ implies $\form_j$, then $i <= j$.
+We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$ in the following way:
+Let $\stg_0 = \stg$ and for $i > 0,$
+\begin{equation}
+\stg_i(\form) = \left\{
+ \begin{array}{lll}
+ \stg_{i-1}(\form) & \textrm{ if } \not\exists\perm\in\symg.\form^\perm\equiv\form_i \\
+ \procstg{\stg_{i-1}}{\val_i}(k_i + 1) &
+    \textrm{ if } \exists\perm\in\symg.\form^\perm\equiv\form_i\textrm{, where }
+    (v_i, k_i) = \argmin_K \stglen{\stg_{i-1}}{v} - k,\\
+    & \textrm{ and }
+    K = \{(v, k)\in\Val\times\Nseto \| \exists\perm.\stgknow{\stg_{i-1}}{v}{k}^\perm\equiv\form_i\}.
+    \vspace{-2.5ex}
+ \end{array}
+ \right.
+ \vspace{2.5ex}
+\end{equation}
+We prove that $\stglen{\stg_{i}}{v} <= \stglen{\stg_{i-1}}{v}$.
+If there is no $k$ and $\perm$ such that $\stgknow{\stg_i}{v}{k}^\perm\equiv\form_i$ then
+  the processes $\procstg{\stg_i}{v}$ and $\procstg{\stg_{i-1}}{v}$ are the same.
+If the is such $k$ and \TODO{...}.
 
-\begin{lemma} \label{lma-accruedknowledge}
-Let $\stg$ be a consistent memory-less strategy and let $\val_1$, $\val_2$ be two models of $\init$.
-If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
-  then $\stgknow{\stg}{\val_1}{i} = \stgknow{\stg}{\val_2}{i}$
-  for $i \in\Nseto$, $i <= k$.
-\end{lemma}
-
-\begin{proof}
-Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
-and consider the first place where $\proc_1$ and $\proc_2$ differs.
-It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
-  values of the same strategy on the same accrued knowledge:
-$\proc_1(i) = \stg(\aknow{\proc_1}{i-1}) =
-              \stg(\aknow{\proc_2}{i-1}) = \proc_2(i)$.
-
-Suppose it is an outcome of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
-  and $i <= k$.
-Since $\val_1$ satisfies $\aknow{\proc_2}{k}$ and $i <= k$,
-  it satisfies $\proc_2[i]$ as well.
-However, $\val_1$ always satisfies $\proc_1[i]$ and
-  both $\proc_1[i]$ and $\proc_2[i]$ are from the set
-  $\outcome(\proc_1(i)) = \outcome(\proc_2(i))$.
-Since there is exactly one satisfied experiment for each valuation in the set,
-  $\proc_1[i]$ and $\proc_2[i]$ must be the same.
-Contradiction. \qed
+The last strategy of the sequence is consistent and satisfies the
+  condition in the lemma. \qed
 \end{proof}
 
 \begin{definition}[Experiment equivalence]
 An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $\form$,
   written $\exp_1\expeq{\form}\exp_2$,
-  if and only if there exists a permutation $\perm\in\symg$ such that % nebo Perm_Var?
+  if and only if there exists a permutation $\perm\in\symg$ such that
  $ \{ \form\wedge\formx \| \formx\in\outcome(\exp_1) \} \equiv
    \{ (\form\wedge\formx)^\perm \| \formx\in\outcome(\exp_2) \} $.
 \end{definition}
@@ -95,8 +92,8 @@ $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
 \begin{proof}
 First, we prove by induction for any $k\in\Nseto$,
   there is a permutation $\perm\in \symg$ such that
-  $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$.
-  \TODO{Pozděj pak možná potřebuju, že to platí každý $i<=k$..}
+  $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{\val^\perm}{i}$
+  for all $i\in\Nseto$, $i<=k$.
 For better readability, let
   $\know_k = \stgknow{\stg}{\val}{k}$ and
   $\knowx_{k, \perm} = \stgknow{\stgx}{\val^\perm}{k}$
@@ -104,13 +101,19 @@ For better readability, let
 For $k=0$, take $\perm = \idperm_\Var$.
 Clearly, $\stgknow{\stg}{\val}{0} = \init = \stgknow{\stgx}{\val^\idperm}{0}$.
 
-For the induction step, suppose $\know_k^\perm = \knowx_{k, \perm}$ and $\perm\in \symg$.
-Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$. It holds
+For the induction step, suppose we have $\perm\in\symg$ such that
+  $\know_i^\perm = \knowx_{i, \perm}$ for $i <= k$.
+Further, suppose $\perm$ is such that
+  $\stg(\know_k^\perm) = \stg(\know_k)^\perm$. \TODO{Víc zdůvodnit.}
+
+Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$
+  be the $(k+1)$-th experiments  of the strategies.
+It holds
 \begin{equation}
 e_2 = \stgx(\knowx_{k, \perm})
     \expeq{\knowx_{k, \perm}}  \stg(\knowx_{k, \perm})
     \stackrel{IH}{=} \stg(\know_k^\perm)
-    \stackrel{cons.}{=} \stg(\know_k)^\perm
+    = \stg(\know_k)^\perm
     = e_1^\perm \label{eq:expsym}\tag{$\sim$}
 \end{equation}
 
@@ -119,35 +122,39 @@ and, therefore, there exists $\permx\in\symg$ such that
  \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \} &= %\stackrel{(\refeq{eq:expsym})}{=}
  \{ (\knowx_{k, \perm} \wedge \formx)^\permx \| \formx\in\outcome(\exp_1^\perm) \} = \label{eq:sets}\tag{*}\\
 &= \{ (\know_k^\perm \wedge \formx^\perm)^\permx \| \formx\in\outcome(\exp_1) \} =
- \{ (\know_k \wedge \formx)^{\perm\permx} \| \formx\in\outcome(\exp_1) \}
+ \{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}
 \end{align}
-As $\permx\in\symg$ and $\symg$ is a permutation group, $\perm\permx\in\symg$.
+As $\permx\in\symg$ and $\symg$ is a permutation group, $\permx\perm\in\symg$.
 
 Since the game is well-formed,
   $v$ satisfies exactly one formula in
   $\{ \know_k \wedge \formx \| \formx\in\outcome(\exp_1) \}$.
-Therefore $v^{\perm\permx}$ satisfies exactly one formula
+Therefore $v^{\permx\perm}$ satisfies exactly one formula
   in
-  $\{ (\know_k \wedge \formx)^{\perm\permx} \| \formx\in\outcome(\exp_1) \}  =
+  $\{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}  =
    \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \}$,
-  which means that $v^{\perm\permx}$ satisfies $\knowx_{k, \perm}$.
-From Lemma \ref{lma-accruedknowledge}, $\knowx_{k, \perm} = \knowx_{k, \perm\permx}$.
-Both $\know_{k+1}^{\perm\permx}$ and $\knowx_{k+1, \perm\permx}$ is thus the only
-  formula from (\refeq{eq:sets}) satisfied by $v^{\perm\permx}$ and
-  the induction is complete.
+  which means that $v^{\permx\perm}$ satisfies $\knowx_{k, \perm}$.
+\TODO{Tohle nefugujeee!}
+From Lemma \ref{lma-accruedknowledge},
+  $\knowx_{k, \perm} = \knowx_{k, \permx\perm}$.
+Both $\know_{k+1}^{\permx\perm}$ and $\knowx_{k+1, \permx\perm}$ is thus the only
+  formula from (\refeq{eq:sets}) satisfied by $v^{\permx\perm}$ and, therefore,
+  $\know_{k+1}^{\permx\perm} = \knowx_{k+1, \permx\perm}$.
 
-% Now for a fixed $\val$, take $k = \stglen{\stg}{\val}$, take
-%   $\perm\in\symg$ such that
-%   $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$
-%   and define $f(\val) = \val^\perm$.
-% Since
-%  $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{f(\val)}{i}$
-%  for $i <= k$
-%  and variable permutation preserves the number of models of a formula, i.e.
-%   $\numval{\form} = \numval{\form^\perm}$ for any
-%   $\form\in\Form_\Var$, $\perm\in\Perm_\Var$,
-%  we have
-%   $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
+
+
+Now for a fixed $\val$, take $k = \stglen{\stg}{\val}$, take
+  $\perm\in\symg$ such that
+  $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$
+  and define $f(\val) = \val^\perm$.
+Since
+ $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{f(\val)}{i}$
+ for $i <= k$
+ and variable permutation preserves the number of models of a formula, i.e.
+  $\numval{\form} = \numval{\form^\perm}$ for any
+  $\form\in\Form_\Var$, $\perm\in\Perm_\Var$,
+ we have
+  $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
 % \TODO{It remains to show that $f$ is a bijection.}
   % Suppose $f$ is not injective, and $f(\val_1) = f(\val_2)$.
   % By definition, the only model of

@@ -18,9 +18,11 @@
 
 % Formulas - basics
 \newcommand{\Val}{\mathtt{Val}} % all valuations
+\newcommand{\Vals}{\mathtt{Val}^*} % all valuations sat. init
 \newcommand{\val}{v} % a valuation
 \newcommand{\numval}[1]{\##1} % number of sat valutaions
 \renewcommand{\Form}{\mathtt{Form}} % all formulas
+\newcommand{\Formr}{\mathtt{Form}^*} % all reachable formulas
 \newcommand{\PForm}{\mathtt{PForm}} % all param formulas
 \newcommand{\form}{\varphi} % a formula
 \newcommand{\formx}{\psi} % another 'a formula'
@@ -67,6 +69,7 @@
 % Accrued knowledge
 \newcommand{\stgknow}[3]{\procstg{#1}{#2}\langle#3\rangle}
 \newcommand{\aknow}[2]{#1\langle#2\rangle}
+\newcommand{\tknow}[1]{#1\langle\rangle}
 % \newcommand{\stgknow}[3]{{\kappa_{#1, #2}^{#3}}}
 % \newcommand{\aknow}[2]{\kappa_{#1}^{#2}}
 \newcommand{\know}{\alpha}
@@ -79,6 +82,9 @@
 \newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
 
 % Macro operators
-\newcommand{\exactly}[1]{\mathtt{Exactly-#1}\:}
-\newcommand{\atleast}[1]{\mathtt{AtLeast-#1}\:}
-\newcommand{\atmost}[1]{\mathtt{AtMost-#1}\:}
+\newcommand{\exactly}[1]{\mathtt{Exactly}_{#1}\:}
+\newcommand{\atleast}[1]{\mathtt{AtLeast}_{#1}\:}
+\newcommand{\atmost}[1]{\mathtt{AtMost_}{#1}\:}
+
+\renewcommand{\setminus}{\smallsetminus}
+\newcommand{\numpred}[2]{|\{#1 \| #2\}|}

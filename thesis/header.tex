@@ -34,8 +34,11 @@
 \newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
 \newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
 
-
 \usepackage[final]{hyperref}
+\providecommand*{\exampleautorefname}{Example}
+%\def\exampleautorefname{Example}
+\def\sectionautorefname{Section}
+\def\chapterautorefname{Chapter}
 
 % theorems
 
@@ -69,22 +72,30 @@
 \newcounter{common}
 %\numberwithin{common}{section}
 
+\usepackage{aliascnt}
+\newaliascnt{theorem}{common}
+\newaliascnt{definition}{common}
+\newaliascnt{example}{common}
+\newaliascnt{lemma}{common}
+\newaliascnt{problem}{common}
+\newaliascnt{corollary}{common}
+
 \theoremstyle{definition}
-\shadecolor{gray!5}
-\newshadedtheorem{definition}[common]{Definition}
-%\newtheorem{definition}{Definition}
-\newtheorem{example}[common]{Example}
+\newshadedtheorem{definition}{Definition}
+\newtheorem{example}{Example}
 
 \theoremstyle{plain}
-\newtheorem{problem}[common]{Problem}
-\shadecolor{gray!15}
-\newshadedtheorem{theorem}[common]{Theorem}
-%\newshadedtheorem{lemma}{Lemma}
-%\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}[common]{Lemma}
-\newtheorem{corollary}[common]{Corollary}
-%\theoremstyle{nonumberplain}
-%\newtheorem{proof}{Proof}
+\newtheorem{problem}{Problem}
+\newshadedtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\aliascntresetthe{definition}
+\aliascntresetthe{example}
+\aliascntresetthe{lemma}
+\aliascntresetthe{problem}
+\aliascntresetthe{corollary}
+
 
 \usepackage{graphicx}
 
