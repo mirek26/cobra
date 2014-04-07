@@ -25,9 +25,12 @@ Out goal is to create a general formalism and a computer language which could
   \includegraphics[width=0.23\textwidth]{pictures/scales.pdf}
   \vspace{-5mm}
   \end{center}
-  \caption{Balance scales (illustrative image).}
+  \caption{Balance scales (illustrative image)\protect\footnotemark.}
   \vspace{-10mm}
 \end{wrapfigure}
+\footnotetext{Adapted from
+  \texttt{http://pixabay.com/en/justice-silhouette-scales-law-147214},
+  under CC0 1.0 Licence.}
 
 The problem of finding a counterfeit coin among regular coins in the fewest
   number of weighings on a pair of scales balance is the folklore of
@@ -207,20 +210,82 @@ We list the most interesting variants and generalizations below.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mastermind}
 
+\emph{Mastermind} is a classical code-breaking board game for 2 players,
+  invented by Mordecai Meirowitz in 1970.
+One player has the role of a \emph{codemaker} and the other of a \emph{codebreaker}.
+First, the codemaker chooses a secret code of $n$ pegs of $c$ colors.
+Then a codebreaker tries to reveal the code by making guesses.
+The codebreaker evaluates the guesses using black and white markers.
+Black markers correspond to positions at which the code and the guess matches,
+  white marker correspond to a color peg which is both in the code and the guess,
+  but at different positions.
+The markers in the answer are not ordered, so the codebreaker does not know,
+  which marker correspond to which peg in the guess.
+The codebreaker strives to minimize the number of guesses.
+
 \begin{wrapfigure}{r}{0.32\textwidth}
+  \vspace{-10mm}
   \begin{center}
-  \vspace{-5mm}
-  \includegraphics[width=0.28\textwidth]{pictures/mastermind.png}
+  \includegraphics[width=0.25\textwidth]{pictures/mastermind.png}
   \vspace{-5mm}
   \end{center}
-  \caption{Mastermind game (illustrative image).}
-  \vspace{-10mm}
+  \caption{Mastermind game (illustrative image)\protect\footnotemark.}
+  \vspace{15mm}
 \end{wrapfigure}
+\footnotetext{Adapted from \texttt{http://commons.wikimedia.org/wiki/File:Mastermind\_beispiel.svg}, by Thomas Steiner under GFDL.}
 
-\emph{Mastermind} is a classic 2-player board game invented
-  by Mordecai Meirowitz in 1970[wiki].
-The principle of the game is the same as of \emph{Bulls and Cows},
-  it just uses colors instead of letters.
+More formally, let $C$ be a set of colors of size $c$.
+Define a distance $d : C^n\times C^n -> \Nseto\times\Nseto$
+  of two color sequences by $d(u, v) = (b, w)$, where
+\[
+b = |\{ i \in\Nset \| u[i] = v[i] \}|
+\]
+\[
+w = \sum_{j\in C} \min\big(\big|\{ i \| u[i] = j \}\big|,\;
+                           \big|\{ i \| v[i] = j\}\big|\big)  - b.
+\]
+If the codemaker's secret code is $h$ and the codebreaker's guess is $g$,
+  the guess should be evaluated with $b$ black pegs and $w$ white pegs, where
+  $(b,w) = d(h,g)$.
+Therefore, if the codebreaker have guessed $g_1, g_2, ..., g_k$ and the results
+  were $(b_1,w_1), ..., (b_k, w_k)$,
+  the search space is reduced to codes
+  \[
+  \{ u\in C^n \| \forall i<=k.\; d(u, g_i) = (b_i,w_i)\}.
+  \]
+
+Another way of looking at the guess evaluation is using
+  \emph{maximal matching} of the pegs in the code $h$ and the guess $g$.
+A matching is a set of pair-wise non-adjacent edges between
+  pegs in the code (represented by $(0,i)$ for $1<=i<=n$) and
+  pegs in the guess (represented by $(1,i)$ for $1<=i<=n$).
+Let $M$ be a maximal matching such that
+\begin{enumerate}
+\item an edge connects only pegs of the same color, i.e. if $((0,i),(1,i))\in M$, then $h[i] = g[j]$, and
+\item if $h[i] = g[i]$ then $((0,i),(1,i))\in M$.
+\end{enumerate}
+Maximal means that no edge can be added without breaking one of the conditions.
+The edges in $M$ correspond to the markers in the response,
+  a marker being black if and only if the corresponding edge connects $(0,i)$
+  with $(1,i)$ for some $i$.
+
+\subsection{Variants and generalizations}
+
+The old game of \emph{Bulls and Cows} has very similar principle to Mastermind,
+  it only uses letters instead of colors and does not allow repetitions.
+
+Static Mastermind is a variant of the game in which all guesses
+  must be made at one go.
+The codebreaker prepares a set of guesses,
+  then the codemakers evaluates each one as usual and
+  the codebreaker must determine the code from the outcomes.
+This corresponds to so-called \emph{non-adaptive} strategies
+  for The Counterfeit Coin Problem.
+
+\subsection{Known results and related research}
+
+\emph{one-step look-ahead} heuristics, tabulka...
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Other Problems and Applications}
