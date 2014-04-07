@@ -140,15 +140,16 @@ void Solver::solve(const string &file_name) {
 	} else {
 		statistics_.exit_state_ = SUCCESS;
 		statistics_.set_final_solution_count(0.0);
-		cout << endl << " FOUND UNSAT DURING PREPROCESSING " << endl;
+		//cout << endl << " FOUND UNSAT DURING PREPROCESSING " << endl;
 	}
 
 	stopwatch_.stop();
 	statistics_.time_elapsed_ = stopwatch_.getElapsedSeconds();
 
-	statistics_.writeToFile("data.out");
+	//statistics_.writeToFile("data.out");
 	if (!SolverConfiguration::quiet)
 		statistics_.printShort();
+	statistics_.print_final_solution_count();
 }
 
 SOLVER_StateT Solver::countSAT() {

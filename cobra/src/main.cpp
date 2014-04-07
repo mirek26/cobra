@@ -6,6 +6,8 @@
 #include <cerrno>
 #include <set>
 #include <iostream>
+#include <cmath>
+#include <ctime>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
 
@@ -40,6 +42,7 @@ void parse_input(int argc, char* argv[]) {
     printf("Cannot open %s: %s.", file, strerror(errno));
     exit(EXIT_FAILURE);
   }
+  auto t1 = clock();
   try {
     yyparse();
   } catch (ParserException* p) {
@@ -47,7 +50,36 @@ void parse_input(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
   fclose (yyin);
-  printf("Game loaded.\n");
+  auto t2 = clock();
+  printf("Input loaded in %.2fs.\n", double(t2 - t1)/CLOCKS_PER_SEC);
+}
+
+void print_stats(Game& game) {
+  printf("===== GAME STATISTICS =====\n");
+  printf("Num of variables: %lu\n", game.variables().size());
+  CnfFormula knowledge;
+  knowledge.AddConstraint(game.restriction());
+  uint models = knowledge.NumberOfModelsSat(game.variables().size());
+  printf("Num of possible codes: %u\n\n", models);
+
+  uint branching = 0, total = 0;
+  for (auto e: game.experiments()) {
+    if (e->outcomes().size() > branching) {
+      branching = e->outcomes().size();
+    }
+    total += e->NumberOfParametrizations();
+  }
+
+  printf("Num of types of experiments: %lu\n", game.experiments().size());
+  printf("Alphabet size: %lu\n", game.alphabet().size());
+  printf("Total num of experiments: %u\n", total);
+  printf("Avg num of parametrizations per type: %.2f\n",
+         (float)total/game.experiments().size());
+  printf("Maximal branching: %u\n", branching);
+  double d = log(models)/log(branching);
+  printf("Trivial lower bound (expected): %.2f\n", d);
+  printf("Trivial lower bound (worst-case): %.0f\n", ceil(d));
+  printf("===========================\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -55,8 +87,9 @@ int main(int argc, char* argv[]) {
 
   // INTERACTIVE MODE
   Game& game = m.game();
-  game.Precompute();
-
+  //game.Precompute();
+  print_stats(game);
+  exit(0);
   printf("Starting interactive mode [both].\n");
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);

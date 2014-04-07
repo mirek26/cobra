@@ -2,10 +2,11 @@
  * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
  */
 
+#include <cassert>
+#include <cmath>
 #include <vector>
 #include <map>
 #include <exception>
-#include <cassert>
 #include "common.h"
 #include "formula.h"
 #include "game.h"
@@ -67,6 +68,18 @@ class Experiment {
 
   set<vec<CharId>>* GenParams(vec<uint>&);
   void Precompute();
+
+  uint64_t NumberOfParametrizations() const {
+    uint64_t total = 1;
+    for (uint i = 0; i < num_params_; i++) {
+      int pos = alph_;
+      for (auto p: params_different_[i]) {
+        if (p < i) pos--;
+      }
+      total *= pos;
+    }
+    return total;
+  }
 
  private:
   // Computes used_maps_ and used_vars_.

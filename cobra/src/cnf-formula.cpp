@@ -328,4 +328,42 @@ vec<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
 //   return g;
 // }
 
+uint CnfFormula::NumberOfModels(){
+  FILE* f = fopen(".nummodels", "w");
+  InitSolver();
+  WriteDimacs(f);
+  fclose(f);
+  int r = system("./tools/sharpSAT/Release/sharpSAT -q .nummodels > .nummodels-result");
+  if (r != 0) {
+    printf("Error: sharpSAT failed :-(\n");
+    return 0;
+  }
+  FILE* g = fopen(".nummodels-result", "r");
+  uint k;
+  fscanf(g, "%i", &k);
+  return k;
+}
+
+void CnfFormula::NumberOfModelsTest(VarId var, VarId limit, uint* num){
+  for (VarId v: std::initializer_list<VarId>({var, -var})) {
+    picosat_assume(picosat_, v);
+    if (picosat_sat(picosat_, -1) == PICOSAT_SATISFIABLE) {
+      if (var + 1 == limit) (*num)++;
+      else {
+        picosat_push(picosat_);
+        picosat_add(picosat_, v);
+        picosat_add(picosat_, 0);
+        NumberOfModelsTest(var + 1, limit, num);
+        picosat_pop(picosat_);
+      }
+    }
+  }
+}
+
+uint CnfFormula::NumberOfModelsSat(VarId limit){
+  InitSolver();
+  uint k = 0;
+  NumberOfModelsTest(1, limit, &k);
+  return k;
+}
 

@@ -65,6 +65,10 @@ class CnfFormula {
 
   vec<int> ComputeVariableEquivalence(VarId limit);
 
+  uint NumberOfModels();
+  uint NumberOfModelsSat(VarId limit);
+  void NumberOfModelsTest(VarId s, VarId limit, uint* num);
+
   string pretty();
 };
 

@@ -42,9 +42,9 @@ void ComponentCache::init() {
 		cout << " Free RAM " << free_ram / 1000000 << "MB" << endl;
 	}
 
-	cout << "Maximum cache size:\t"
-			<< config_.maximum_cache_size_bytes / 1000000 << " MB" << endl
-			<< endl;
+	// cout << "Maximum cache size:\t"
+	// 		<< config_.maximum_cache_size_bytes / 1000000 << " MB" << endl
+	// 		<< endl;
 
 	recompute_bytes_memory_usage();
 }

@@ -181,8 +181,10 @@ public:
 
   void set_final_solution_count(const mpz_class &count) {
     // set final_solution_count_ = count * 2^(num_variables_ - num_used_variables_)
-    mpz_mul_2exp(final_solution_count_.get_mpz_t (),count.get_mpz_t (), num_variables_ - num_used_variables_);
+    //mpz_mul_2exp(final_solution_count_.get_mpz_t (),count.get_mpz_t (), num_variables_ - num_used_variables_);
+    final_solution_count_ = count;
   }
+
   const mpz_class &final_solution_count() const {
     return final_solution_count_;
   }
