@@ -1,45 +1,226 @@
 \chapter{Code Breaking Games}
 \label{ch:games}
-% tady představíme problémy, o kterých se budem bavit později
-% a u každého diskutujeme výsledky researche
+We introduce a few examples of Code Breaking Games in this Chapter.
+The counterfeit coin problem and Mastermind game are quite well known,
+  the other examples are based on various board games or less known
+  logic puzzles.
+We briefly summarize related research for each game, give a list of
+  references and discuss its application.
+
+Our goal in this work is neither to answer the research questions nor
+  to study possible generalizations.
+Out goal is to create a general formalism and a computer language which could
+  be used to describe arbitraty Code Breaking Game, if possible.
+% This is a basic overview and what we had in mind when we designed the
+% framework and language. It should be possible to formulate
+% all the problems stated or
+% We would love to create a tool that would be able to ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The Counterfeit Coin}
 
-There is a lot of variants of a logic puzzle with coins and a pair of scales balance.
-Here we present the most interesting ones and their generalization, which we study in the sequel.
+\begin{wrapfigure}{r}{0.26\textwidth}
+  \begin{center}
+  \vspace{-5mm}
+  \includegraphics[width=0.23\textwidth]{pictures/scales.pdf}
+  \vspace{-5mm}
+  \end{center}
+  \caption{Balance scales (illustrative image).}
+  \vspace{-10mm}
+\end{wrapfigure}
 
-In all the problems, you can use the scales only to weight coins.
-You can put as many coins at the sides as you like as long as the number is the same.
-All information you get is that both sides weight equally or which side is heavier (i.e., there are 3 possible results).
+The problem of finding a counterfeit coin among regular coins in the fewest
+  number of weighings on a pair of scales balance is the folklore of
+  recreational mathematics.
 
-The weight of a \emph{fake} coin is always different than
-the weight of a authentic one
-but it is not know whether it is heavier or ligther.
+In all problems of this kind, you can use the scales only to weight the coins.
+You put some coins on the left pan, the same number of coins on the right pan
+  and get one of the 3 possible outcomes.
+Either both the sides weight the same (denoted ``='')
+  or the left side is lighter (``<''),
+  or the right side is lighter (``>'').
 
-\begin{problem}[The twelve coin problem]
-You are given 12 coins, exactly one of which is fake.
-Determine the unique coin and its weight relavite to others.
-You can use the balance at most 3 times.
+The standard, easiest variant can be formulated as follows.
+
+\begin{problem}[The nine coin problem] \label{pr:coins9}
+You are given $n >= 3$ (typically 9) coins, all expect one have the same weight.
+The counterfeit coin is known to be lighter.
+Determine the coin in the minimal number of weightings.
 \end{problem}
 
-\begin{problem}[The thirteen coin problem]
-You are given 13 coins, exactly one of which is fake.
-You have one more coin at your disposal which is guaranteed to be authentic.
-Determine the unique fake coin and its weight relavite to others.
+This problem is very easy as one can use \emph{ternary search} algorithm.
+In short, we divide the coins into thirds, put one third agains another
+  on scales.
+If both sides weight the same, the counterfeit coin must be in the last third,
+  otherwise it must be in the lighter third.
+In this way, the size of search space reduces by a factor of 3 in one weighting,
+  which is clearly optimal.
+
+In 1940s, a more complicated variant was introduced by Grossman\cite{coins-grossman1945}.
+
+%whether the counterfeit coin is underweight or overweight
+\begin{problem}[The Twelve Coin Problem] \label{pr:coins12}
+You are given $n >= 3$ (typically 12) coins, exactly one of which is counterfeit,
+  but it is not known if it is heavier or ligher.
+Determine the unique coin and its weight relavite to others
+  in the minimal number of weightings.
 \end{problem}
 
-\begin{problem}[General fake coin problem]
-You are given $n$ coins, $f$ of them are fake (some of them may be lighter, some of them heavier).
-You have another $m$ authentic coins at your disposal.
-In as less weightings as possible, determine which coins are fake.
-\end{problem}
+\begin{figure}
+\includegraphics[width=\textwidth]{pictures/coins12.pdf}
+\caption{Decision tree for The Twelve Coin Problem. \\
+Leaf $x$ means that the coin number $x$ is lighter, $\underline{x}$ means that
+the coin number $x$ is heavier.}
+\label{fig:coins12tree}
+\end{figure}
+
+The optimal solution for $n=12$ requires 3 weightings and one of the optimal
+  strategies is shown in \autoref{fig:coins12tree} as a decision tree.
+
+The research usually focuses on bounds on the maximal value of $n$
+  for which the problem can be solved in $w$ weighings, for a given $w$.
+Thus a solution of a problem is usually formulated as a theorem like the
+  following one.
+
+\begin{theorem}[Dyson, \cite{coins-dyson1946}]\label{th:coins12}
+There exists a scheme that determines the counterfeit coin and
+  its type in \autoref{pr:coins12} with $w$ weighings,
+  if and only if
+  \[ 3 <= n <=\frac{3^w - 3}{2}. \]
+\end{theorem}
+
+\begin{proof}
+We show the main part of the original Dyson's proof\cite{coins-dyson1946}
+  here because of its elegant combinatorial idea.
+We show a scheme for $n = \frac{1}{2}(3^w - 3)$.
+
+Let us number the coins from $1$ to $n$.
+To a coin number $i$, we assing
+  two labels from $\{0,1,2\}^w$ -- those corresponding the numbers
+  $i$ and $3^w - 1 - i$ in ternary form.
+Notice that all possible labels are used exactly once, except for $0^w, 1^w$
+  and $2^w$, which were not assigned to any coin.
+The labeling has the property that you can
+  get one label of a coin from the other by substituing $0$ by $2$ and $2$ by $0$.
+
+A label is called ``clockwise'' if the first change of digit in it is
+the change from $0$ to $1$, from $1$ to $2$, or from $2$ to $0$.
+Otherwise, it is called ``anticlockwise''.
+Thanks to the property we mentioned, one of the labels of a coin is always
+  clockwise and the other is anticlockwise.
+
+Let $C(i, d)$ be a set of coins such that $i$-th symbol in
+  its clockwise label is $d$.
+Since a permutation changing $0$ to $1$, $1$ to $2$ and $2$ to $0$ transfers
+  coins from $C(i,0)$ to $C(i,1)$,
+        from $C(i,1)$ to $C(i,2)$ and
+        from $C(i,2)$ to $C(i,0)$,
+  all the sets $C(i, d)$ contain exactly $n/3$ coins.
+Now, let $i$-th experiment be the weighing of the coins $C(i,0)$ agains $C(i, 2)$.
+It remains to show that the experiments uniquely determine the counterfeit coin.
+Let $a_i$ be 0, 1, or 2 if the result of $i$-th experiment is
+  left side is lighter, both are the same, or right side is lighter, respectively.
+
+If the counterfeit code is overweight, the $i$-th symbol of its clockwise label
+  must be $a_i$. On the other hand, if it is underweight, the $i$-th symbol of
+  its anticlockwise label must be $a_i$.
+The solution of the problem is therefore the coin with the label $a_1a_2...a_w$
+  and is heavier than others if and only if this label is clockwise.
+\autoref{fig:coins12scheme} shows an example of the construction for $n = 12 = \frac{1}{2}(3^3 - 3)$.
+
+The case $n < \frac{1}{2}(3^w - 3)$ can be done similarly with some modifications
+  to the labelling.
+However, the scheme makes use of a genuine coin that was discovered in the first
+  weighing and, therefore the following experiments depend on the outcome of
+  the first.
+Finally, the prove that the coin cannot be detected if
+  $n > \frac{1}{2}(3^w - 3)$ can be done using information theory.
+
+\begin{figure}
+\begin{center}
+\includegraphics{pictures/coins12-th.pdf}
+\end{center}
+\caption{Demonstration of the ternary label construction for $n=12$.}
+\label{fig:coins12scheme}
+\end{figure}
+\end{proof}
+
+Naturally, the problem was generalized in various ways and
+  studied by many authors.
+In ``Coin-Weighing Problems''\cite{coins-cwproblems1995}, Guy and Nowakovski
+  gave a great overview of the research in the area until 1990s
+  with an extensive list of references.
+We list the most interesting variants and generalizations below.
+
+\begin{itemize}
+\item \textbf{Weight of counterfeit coin.}
+  Either it is known whether the counterfeit coin is lighter or heavier,
+  or it is not.
+  The first one allows for more generalizations due to its simpler nature
+  but both problems have been heavily researched.
+\item \textbf{Number of counterfeit coins.}
+  In the most common case, there is exactly one counterfeit coin,
+    which allows for natural generalizations.
+  First, a variant of \autoref{pr:coins9} with 2 or 3 counterfeit coins
+   was studied\cite{coins-2fakes}\cite{coins-3fakes},
+  then with $m$ counterfeit coins in general\cite{coins-mfakes}.
+  Some authors studied the problem for unknown number of counterfeit coins
+  \cite{coins-unknownfakes},
+  or for \emph{at most} $m$ counterfeit coins\cite{coins-atmostfakes}.
+\item \textbf{Additional regular coin(s).}
+  In some cases, it may help if you are given an additional coin (or more coins),
+    which is guaranteed not to be counterfeit.
+  For example, for $n = 13$ in \autoref{pr:coins12}, you need 4 weightings.
+  However, if you are given this one extra coin, you can determine the
+    solve in just 3 weightings\cite{coins-dyson1946}.
+\item \textbf{Non-adaptive strategies.}
+  In this popular variant of the problem you have to announce all experiments
+    in advance and then just collect the result.
+  In other words, later weighings must not depend on the outcomes of the earlier weighings.
+  Notice that the scheme constructed in the proof of \autoref{th:coins12} for
+  $n = \frac{1}{2}(3^w - w)$ is indeed non-adaptive.
+  However, the original proof uses an adaptive scheme for a smaller $n$.
+  This was later fixed, showing that there always exists an optimal scheme for
+  \autoref{pr:coins12} which is non-adaptive\cite{coins-nonadaptive}.
+\item \textbf{Unreliable balance.}
+  This generalization introduces the possibility that
+  one (or more) answers may be erroneous.
+  The problem of errors/lies in general search problems is well studied,
+    see \cite{games-lies}.
+  It was applied on the counterfeit coin problem (\autoref{pr:coins9} variant)
+  in \cite{coins-unreliable} with at most one erroneous outcome or in
+  \cite{coins-unreliable} with two.
+\item \textbf{Multi-arm balance.}
+  In this variant, your balance has $k$ arms. You put the same number of coins
+  on every arm and you get either the information that all
+  weight the same or which arm is lighter or heavier
+  than others\cite{coins-multiplearm}.
+\item \textbf{Parallel weighting.}
+  In this generalization, you have 2 (or $k$, in general)
+    balance scales, you can weight different coins on
+    the two scales simultaneously and it counts
+    as only one experiment\cite{coins-parallel}.
+  The motivation here is that the weighing takes some not insignificant time,
+  you have more scales and strive to minimize the time the whole process takes.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mastermind}
 
-\emph{Mastermind} is a classic 2-player board game invented by Mordecai Meirowitz in 1970[wiki].
-The principle of the game is the same as of \emph{Bulls and Cows}, it just uses colors instead of letters.
+\begin{wrapfigure}{r}{0.32\textwidth}
+  \begin{center}
+  \vspace{-5mm}
+  \includegraphics[width=0.28\textwidth]{pictures/mastermind.png}
+  \vspace{-5mm}
+  \end{center}
+  \caption{Mastermind game (illustrative image).}
+  \vspace{-10mm}
+\end{wrapfigure}
+
+\emph{Mastermind} is a classic 2-player board game invented
+  by Mordecai Meirowitz in 1970[wiki].
+The principle of the game is the same as of \emph{Bulls and Cows},
+  it just uses colors instead of letters.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Other Problems and Applications}

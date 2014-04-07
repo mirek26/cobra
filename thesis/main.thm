@@ -1,37 +1,38 @@
-\contentsline {problem}{{Problem}{1}{The twelve coin problem}}{5}{problem.1}
-\contentsline {problem}{{Problem}{2}{The thirteen coin problem}}{5}{problem.2}
-\contentsline {problem}{{Problem}{3}{General fake coin problem}}{5}{problem.3}
-\contentsline {definition}{{Definition}{4}{Code Breaking Game}}{7}{definition.4}
-\contentsline {definition}{{Definition}{5}{Parametrized formula}}{8}{definition.5}
-\contentsline {definition}{{Definition}{6}{Solving process}}{8}{definition.6}
-\contentsline {definition}{{Definition}{7}{Well-formed game}}{9}{definition.7}
-\contentsline {example}{{Example}{8}{Fake-coin problem}}{9}{example.8}
-\contentsline {example}{{Example}{9}{Fake-coin problem, alternative}}{10}{example.9}
-\contentsline {example}{{Example}{10}{Mastermind}}{10}{example.10}
-\contentsline {example}{{Example}{11}{Mastermind (alternative)}}{11}{example.11}
-\contentsline {definition}{{Definition}{12}{Strategy}}{12}{definition.12}
-\contentsline {definition}{{Definition}{13}{Optimal strategy}}{13}{definition.13}
-\contentsline {lemma}{{Lemma}{14}{}}{13}{lemma.14}
-\contentsline {proof}{{\proofname }{1}{}}{13}{proof.1}
-\contentsline {lemma}{{Lemma}{15}{}}{13}{lemma.15}
-\contentsline {proof}{{\proofname }{2}{}}{13}{proof.2}
-\contentsline {example}{{Example}{16}{}}{13}{example.16}
-\contentsline {definition}{{Definition}{17}{Non-adaptive strategy}}{14}{definition.17}
-\contentsline {definition}{{Definition}{18}{Memory-less strategy}}{14}{definition.18}
-\contentsline {lemma}{{Lemma}{19}{}}{14}{lemma.19}
-\contentsline {proof}{{\proofname }{3}{}}{14}{proof.3}
-\contentsline {lemma}{{Lemma}{20}{}}{14}{lemma.20}
-\contentsline {proof}{{\proofname }{4}{}}{14}{proof.4}
-\contentsline {definition}{{Definition}{21}{Greedy strategy}}{15}{definition.21}
-\contentsline {lemma}{{Lemma}{22}{}}{15}{lemma.22}
-\contentsline {proof}{{\proofname }{5}{}}{15}{proof.5}
-\contentsline {example}{{Example}{23}{}}{15}{example.23}
-\contentsline {definition}{{Definition}{24}{Symmetric experiment}}{15}{definition.24}
-\contentsline {definition}{{Definition}{25}{Symmetry group}}{16}{definition.25}
-\contentsline {definition}{{Definition}{26}{Consistent strategy}}{16}{definition.26}
-\contentsline {lemma}{{Lemma}{27}{}}{16}{lemma.27}
-\contentsline {proof}{{\proofname }{6}{}}{16}{proof.6}
-\contentsline {definition}{{Definition}{28}{Experiment equivalence}}{16}{definition.28}
-\contentsline {theorem}{{Theorem}{29}{}}{16}{theorem.29}
-\contentsline {proof}{{\proofname }{7}{}}{17}{proof.7}
-\contentsline {corollary}{{Corollary}{30}{}}{17}{corollary.30}
+\contentsline {problem}{{Problem}{1}{The nine coin problem}}{5}{problem.1}
+\contentsline {problem}{{Problem}{2}{The Twelve Coin Problem}}{5}{problem.2}
+\contentsline {theorem}{{Theorem}{3}{Dyson, \cite {coins-dyson1946}}}{6}{theorem.3}
+\contentsline {proof}{{\proofname }{1}{}}{6}{proof.1}
+\contentsline {definition}{{Definition}{4}{Code Breaking Game}}{11}{definition.4}
+\contentsline {definition}{{Definition}{5}{Parametrized formula}}{12}{definition.5}
+\contentsline {definition}{{Definition}{6}{Solving process}}{12}{definition.6}
+\contentsline {definition}{{Definition}{7}{Well-formed game}}{13}{definition.7}
+\contentsline {example}{{Example}{8}{Fake-coin problem}}{13}{example.8}
+\contentsline {example}{{Example}{9}{Fake-coin problem, alternative}}{14}{example.9}
+\contentsline {example}{{Example}{10}{Mastermind}}{14}{example.10}
+\contentsline {example}{{Example}{11}{Mastermind (alternative)}}{15}{example.11}
+\contentsline {definition}{{Definition}{12}{Strategy}}{16}{definition.12}
+\contentsline {definition}{{Definition}{13}{Optimal strategy}}{17}{definition.13}
+\contentsline {lemma}{{Lemma}{14}{}}{17}{lemma.14}
+\contentsline {proof}{{\proofname }{2}{}}{17}{proof.2}
+\contentsline {lemma}{{Lemma}{15}{}}{17}{lemma.15}
+\contentsline {proof}{{\proofname }{3}{}}{17}{proof.3}
+\contentsline {example}{{Example}{16}{}}{17}{example.16}
+\contentsline {definition}{{Definition}{17}{Non-adaptive strategy}}{18}{definition.17}
+\contentsline {definition}{{Definition}{18}{Memory-less strategy}}{18}{definition.18}
+\contentsline {lemma}{{Lemma}{19}{}}{18}{lemma.19}
+\contentsline {proof}{{\proofname }{4}{}}{18}{proof.4}
+\contentsline {lemma}{{Lemma}{20}{}}{18}{lemma.20}
+\contentsline {proof}{{\proofname }{5}{}}{18}{proof.5}
+\contentsline {definition}{{Definition}{21}{Greedy strategy}}{19}{definition.21}
+\contentsline {lemma}{{Lemma}{22}{}}{19}{lemma.22}
+\contentsline {proof}{{\proofname }{6}{}}{19}{proof.6}
+\contentsline {example}{{Example}{23}{}}{19}{example.23}
+\contentsline {definition}{{Definition}{24}{Symmetric experiment}}{20}{definition.24}
+\contentsline {definition}{{Definition}{25}{Symmetry group}}{20}{definition.25}
+\contentsline {definition}{{Definition}{26}{Consistent strategy}}{20}{definition.26}
+\contentsline {lemma}{{Lemma}{27}{}}{20}{lemma.27}
+\contentsline {proof}{{\proofname }{7}{}}{20}{proof.7}
+\contentsline {definition}{{Definition}{28}{Experiment equivalence}}{20}{definition.28}
+\contentsline {theorem}{{Theorem}{29}{}}{20}{theorem.29}
+\contentsline {proof}{{\proofname }{8}{}}{20}{proof.8}
+\contentsline {corollary}{{Corollary}{30}{}}{20}{corollary.30}

@@ -1,3 +1,69 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{10}
+
+\bibitem{coins-grossman1945}
+Howard~D Grossman.
+\newblock The twelve-coin problem.
+\newblock {\em Scripta Mathematica}, 11:360--363, 1945.
+
+\bibitem{coins-dyson1946}
+Freeman~J Dyson.
+\newblock 1931. the problem of the pennies.
+\newblock {\em The Mathematical Gazette}, pages 231--234, 1946.
+
+\bibitem{coins-cwproblems1995}
+Richard~K Guy and Richard~J Nowakowski.
+\newblock Coin-weighing problems.
+\newblock {\em American Mathematical Monthly}, pages 164--167, 1995.
+
+\bibitem{coins-2fakes}
+Ratko To{\v{s}}i{\'c}.
+\newblock Two counterfeit coins.
+\newblock {\em Discrete Mathematics}, 46(3):295--298, 1983.
+
+\bibitem{coins-3fakes}
+Anping Li.
+\newblock Three counterfeit coins problem.
+\newblock {\em Journal of Combinatorial Theory, Series A}, 66(1):93--101, 1994.
+
+\bibitem{coins-mfakes}
+L{\'a}szl{\'o} Pyber.
+\newblock How to find many counterfeit coins?
+\newblock {\em Graphs and Combinatorics}, 2(1):173--177, 1986.
+
+\bibitem{coins-unknownfakes}
+Xiao-Dong Hu, PD~Chen, and Frank~K. Hwang.
+\newblock A new competitive algorithm for the counterfeit coin problem.
+\newblock {\em Information Processing Letters}, 51(4):213--218, 1994.
+
+\bibitem{coins-atmostfakes}
+Martin Aigner and Anping Li.
+\newblock Searching for counterfeit coins.
+\newblock {\em Graphs and Combinatorics}, 13(1):9--20, 1997.
+
+\bibitem{coins-nonadaptive}
+Axel Born, Cor~AJ Hurkens, and Gerhard~J Woeginger.
+\newblock How to detect a counterfeit coin: Adaptive versus non-adaptive
+  solutions.
+\newblock {\em Information processing letters}, 86(3):137--141, 2003.
+
+\bibitem{games-lies}
+Andrzej Pelc.
+\newblock Searching games with errors—fifty years of coping with liars.
+\newblock {\em Theoretical Computer Science}, 270(1):71--109, 2002.
+
+\bibitem{coins-unreliable}
+A~Pelc.
+\newblock Detecting a counterfeit coin with unreliable weighings.
+\newblock {\em Ars Combinatoria}, 27:181--192, 1989.
+
+\bibitem{coins-multiplearm}
+Annalisa De~Bonis, Luisa Gargano, and Ugo Vaccaro.
+\newblock Optimal detection of a counterfeit coin with multi-arms balances.
+\newblock {\em Discrete applied mathematics}, 61(2):121--131, 1995.
+
+\bibitem{coins-parallel}
+Tanya Khovanova.
+\newblock Parallel weighings.
+\newblock {\em arXiv preprint arXiv:1310.7268}, 2013.
 
 \end{thebibliography}
