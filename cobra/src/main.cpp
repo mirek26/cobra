@@ -10,6 +10,7 @@
 #include <ctime>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
+#include <tclap/CmdLine.h>
 
 #include "formula.h"
 #include "game.h"
@@ -26,33 +27,6 @@ struct ExperimentSpec {
   vec<CharId> params;
   vec<bool> sat_outcomes;
 };
-
-void print_usage() {
-  printf("Usage: cobra-backend filename\n");
-}
-
-void parse_input(int argc, char* argv[]) {
-  // PARSE INPUT
-  if (argc != 2) {
-    print_usage();
-    exit(EXIT_FAILURE);
-  }
-  auto file = argv[1];
-  if (!(yyin = fopen(file, "r"))) {
-    printf("Cannot open %s: %s.", file, strerror(errno));
-    exit(EXIT_FAILURE);
-  }
-  auto t1 = clock();
-  try {
-    yyparse();
-  } catch (ParserException* p) {
-    printf("Invalid input: %s\n", p->what());
-    exit(EXIT_FAILURE);
-  }
-  fclose (yyin);
-  auto t2 = clock();
-  printf("Input loaded in %.2fs.\n", double(t2 - t1)/CLOCKS_PER_SEC);
-}
 
 void print_stats(Game& game) {
   printf("===== GAME STATISTICS =====\n");
@@ -82,14 +56,10 @@ void print_stats(Game& game) {
   printf("===========================\n");
 }
 
-int main(int argc, char* argv[]) {
-  parse_input(argc, argv);
-
+void play_mode() {
   // INTERACTIVE MODE
   Game& game = m.game();
-  //game.Precompute();
-  print_stats(game);
-  exit(0);
+  game.Precompute();
   printf("Starting interactive mode [both].\n");
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
@@ -183,6 +153,71 @@ int main(int argc, char* argv[]) {
     knowledge.InitSolver();
     knowledge.WriteDimacs(stdout);
     outcome->AddToGraph(*knowledge_graph, &params);
+  }
+}
+
+
+int main(int argc, char* argv[]) {
+  // Parse input with TCLAP library.
+  try {
+    using namespace TCLAP;
+    CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
+    SwitchArg infoArg(
+      "i", "info",
+      "Print basic information about the game.",
+      cmd, false);
+    SwitchArg playArg(
+      "p", "play",
+      "Starts interactive mode, player strategies can be specified by -b, -m.",
+      cmd, false);
+
+    vec<string> greedy_stgs({ "max", "exp", "entropy",
+      "parts", "random", "interactive" });
+    ValuesConstraint<string> greedyConst(greedy_stgs);
+    ValueArg<string> codemakerArg(
+      "m", "codemaker",
+      "Strategy to be played by the codemaker. Default: interactive.", false,
+      "interactive", &greedyConst);
+    ValueArg<string> codebreakerArg(
+      "b", "codebreaker",
+      "Strategy to be played by the codebreaker. Default: interactive.", false,
+      "interactive", &greedyConst);
+    cmd.add(codemakerArg);
+    cmd.add(codebreakerArg);
+
+    UnlabeledValueArg<std::string> filenameArg(
+      "filename",
+      "Input file name.", false,
+      "", "file name");
+    cmd.add(filenameArg);
+    cmd.parse(argc, argv);
+
+    auto file = filenameArg.getValue();
+    if (!(yyin = fopen(file.c_str(), "r"))) {
+      printf("Cannot open %s: %s.\n", file.c_str(), strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+    auto t1 = clock();
+    try {
+      yyparse();
+    } catch (ParserException* p) {
+      printf("Invalid input: %s\n", p->what());
+      exit(EXIT_FAILURE);
+    }
+    fclose (yyin);
+    auto t2 = clock();
+    printf("Input loaded in %.2fs.\n", double(t2 - t1)/CLOCKS_PER_SEC);
+
+    if (infoArg.getValue()) {
+      print_stats(m.game());
+    }
+
+    if (playArg.getValue()) {
+      play_mode();
+    }
+
+  } catch (TCLAP::ArgException &e) {
+    std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
   }
 
   return 0;

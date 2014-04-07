@@ -61,12 +61,16 @@ if __name__ == '__main__':
     __fout = tempfile.NamedTemporaryFile()
     __filename = __fout.name
     __F = __fout.file
-  execfile(sys.argv[1])
+  __execname = os.path.dirname(sys.argv[0])+'/cobra-backend'
+  if len(sys.argv) < 2:
+    subprocess.call([__execname] + ["-h"])
+    exit(1);
+
+  execfile(sys.argv[-1])
   __F.close()
   __end = time.time()
   print "Preprocessing finished in %.2fs, output written to %s." % (__end - __start, __filename);
-  __execname = os.path.dirname(sys.argv[0])+'/cobra-backend'
   if not os.path.isfile(__execname):
     print "cobra-backend not found; run 'make' first. "
     exit(0)
-  subprocess.call([__execname, __filename])
+  subprocess.call([__execname] + sys.argv[1:-1] + [__filename])
