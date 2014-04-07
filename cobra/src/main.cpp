@@ -26,7 +26,74 @@ struct ExperimentSpec {
   Experiment* type;
   vec<CharId> params;
   vec<bool> sat_outcomes;
+  int sat_outcomes_num;
 };
+
+std::function<uint(vec<ExperimentSpec>&, Game& game)> g_breakerStg;
+std::function<uint(ExperimentSpec&, Game& game)> g_makerStg;
+
+uint breaker_interactive(vec<ExperimentSpec>& options, Game& game) {
+  // Print options.
+  printf("Select experiment: \n");//%i: \n", exp_num++);
+  int o = 0;
+  for (auto& e: options) {
+    printf("%i) %s [ ", o++, e.type->name().c_str());
+    for (auto k: e.params)
+      printf("%s ", game.alphabet()[k].c_str());
+    printf("] (%i sat outcomes)\n", e.sat_outcomes_num);
+  }
+
+  // User prompt.
+  uint eid;
+  bool ok;
+  string str;
+  do {
+    printf("> ");
+    ok = readIntOrString(eid, str);
+  } while (!ok || eid >= options.size());
+  return eid;
+}
+
+uint maker_interactive(ExperimentSpec& option, Game&) {
+  // Print options.
+  printf("Select outcome: \n");
+  auto e = option.type;
+  auto params = option.params;
+  for (uint i = 0; i < e->outcomes().size(); i++) {
+    if (option.sat_outcomes[i]) printf("%i) ", i);
+    else printf("-) ");
+    printf("%s - %s %s\n",
+      e->outcomes_names()[i].c_str(),
+      e->outcomes()[i]->pretty(true, &params).c_str(),
+      option.sat_outcomes[i] ? "" : "(unsatisfiable)");
+  }
+
+  // User prompt.
+  uint oid;
+  bool ok;
+  string str;
+  do {
+    printf("> ");
+    ok = readIntOrString(oid, str);
+  } while (!ok || oid >= e->outcomes().size() ||
+           !option.sat_outcomes[oid]);
+  return oid;
+}
+
+uint breaker_random(vec<ExperimentSpec>& options, Game&) {
+  return rand() % options.size();
+}
+
+uint maker_random(ExperimentSpec& option, Game&) {
+  // Print options.
+  int p = rand() % option.sat_outcomes_num;
+  int i = -1;
+  while (p > 0) {
+    i++;
+    if (option.sat_outcomes[i]) p--;
+  }
+  return i;
+}
 
 void print_stats(Game& game) {
   printf("===== GAME STATISTICS =====\n");
@@ -60,21 +127,20 @@ void play_mode() {
   // INTERACTIVE MODE
   Game& game = m.game();
   game.Precompute();
-  printf("Starting interactive mode [both].\n");
+  printf("===== PLAY MODE =====\n");
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
   CnfFormula knowledge;
   knowledge.AddConstraint(game.restriction());
   knowledge.InitSolver();
-  knowledge.WriteDimacs(stdout);
+  //knowledge.WriteDimacs(stdout);
 
-  int exp_num = 1;
+  //int exp_num = 1;
   while (true) {
     // Compute var equivalence.
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
     //
-    int o = 0;
     vec<ExperimentSpec> experiments;
     for (auto e: game.experiments()) {
       auto params_all = e->GenParams(var_equiv);
@@ -82,9 +148,9 @@ void play_mode() {
         experiments.push_back(
           { e,
             params,
-            vec<bool>(e->outcomes().size(), false)});
+            vec<bool>(e->outcomes().size(), false),
+            0});
         // Perform basic analysis.
-        int sat_outcomes = 0;
         for (uint i = 0; i < e->outcomes().size(); i++) {
           CnfFormula n;
           n.AddConstraint(knowledge);
@@ -93,69 +159,38 @@ void play_mode() {
           if (n.Satisfiable()) {
             //auto fixed = n.GetFixedVariables();
             experiments.back().sat_outcomes[i] = true;
-            sat_outcomes++;
+            experiments.back().sat_outcomes_num++;
             //printf(" %i", fixed);
           }
         }
-        assert(sat_outcomes > 0);
-        if (sat_outcomes == 1) {
+        assert(experiments.back().sat_outcomes_num > 0);
+        if (experiments.back().sat_outcomes_num == 1) {
           experiments.pop_back();
           continue;
         }
-        // Print option.
-        if (experiments.size() == 1) {
-          printf("Select experiment #%i: \n", exp_num++);
-        }
-        printf("%i) %s [ ", o++, e->name().c_str());
-        for (auto k: params)
-          printf("%s ", game.alphabet()[k].c_str());
-        printf("] (%i sat outcomes)\n", sat_outcomes);
       }
     }
 
     if (experiments.size() == 0) {
-      printf("SOLVED! (You cannot get any new information from the experiments.)\n");
+      printf("SOLVED!\n");
       knowledge.InitSolver();
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
     }
 
-    uint eid, oid;
-    bool ok;
-    string str;
-    do {
-      printf("> ");
-      ok = readIntOrString(eid, str);
-    } while (!ok || eid >= experiments.size());
+    int eid = g_breakerStg(experiments, game);
+    int oid = g_makerStg(experiments[eid], game);
+    auto outcome = experiments[eid].type->outcomes()[oid];
 
-    printf("Select outcome: \n");
-    o = 0;
-    auto experiment = experiments[eid].type;
-    auto params = experiments[eid].params;
-    for (uint i = 0; i < experiment->outcomes().size(); i++) {
-      if (experiments[eid].sat_outcomes[i]) printf("%i) ", i);
-      else printf("-) ");
-      printf("%s - %s %s\n",
-        experiment->outcomes_names()[i].c_str(),
-        experiment->outcomes()[i]->pretty(true, &params).c_str(),
-        experiments[eid].sat_outcomes[i] ? "" : "(unsatisfiable)");
-    }
-    do {
-      printf("> ");
-      ok = readIntOrString(oid, str);
-    } while (!ok || oid >= experiment->outcomes().size() ||
-             !experiments[eid].sat_outcomes[oid]);
-
-    auto outcome = experiment->outcomes()[oid];
-    printf("Gained knowledge: %s\n", outcome->pretty(true, &params).c_str());
-    knowledge.AddConstraint(outcome, params);
-    knowledge.InitSolver();
-    knowledge.WriteDimacs(stdout);
-    outcome->AddToGraph(*knowledge_graph, &params);
+    printf("Gained knowledge: %s\n",
+           outcome->pretty(true, &experiments[eid].params).c_str());
+    knowledge.AddConstraint(outcome, experiments[eid].params);
+    //knowledge.InitSolver();
+    //knowledge.WriteDimacs(stdout);
+    outcome->AddToGraph(*knowledge_graph, &experiments[eid].params);
   }
 }
-
 
 int main(int argc, char* argv[]) {
   // Parse input with TCLAP library.
@@ -213,6 +248,17 @@ int main(int argc, char* argv[]) {
     }
 
     if (playArg.getValue()) {
+      if (codebreakerArg.getValue() == "interactive") {
+        g_breakerStg = breaker_interactive;
+      } else {
+        g_breakerStg = breaker_random;
+      }
+
+      if (codemakerArg.getValue() == "interactive") {
+        g_makerStg = maker_interactive;
+      } else {
+        g_makerStg = maker_random;
+      }
       play_mode();
     }
 
