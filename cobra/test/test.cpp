@@ -10,6 +10,7 @@ extern Parser m;
 // Parser tests.
 
 TEST(Parser, UndefinedVariable) {
+  m.reset();
   m.game().declareVariables({"a", "b", "c"});
   EXPECT_NO_THROW(Formula::Parse("a & b & c"));
   EXPECT_THROW(Formula::Parse("a & b & c & d"), ParserException);
@@ -17,6 +18,7 @@ TEST(Parser, UndefinedVariable) {
 }
 
 TEST(Parser, BasicParse) {
+  m.reset();
   m.game().declareVariables({"p1", "p2", "a", "b"});
   auto f1 = Formula::Parse("p1 & p2 -> (a <-> b)");
   EXPECT_STREQ("((p1 & p2) -> (a <-> b))", f1->pretty(false).c_str());
@@ -25,95 +27,155 @@ TEST(Parser, BasicParse) {
 // Tsetitin transformation tests.
 
 TEST(Tseitin, Exactly0) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
+  CnfFormula s(3);
   s.AddConstraint(Formula::Parse("!((!a1 & !a2 & !a3) <-> Exactly-0(a1, a2, a3))"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, Exactly1) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
+  CnfFormula s(3);
   s.AddConstraint(Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, Exactly1b) {
-  CnfFormula s;
-  m.game().declareVariables({"a1", "a2", "a3"});
+  m.reset();
+  m.game().declareVariables({"a", "b"});
+  CnfFormula s(2);
   s.AddConstraint(Formula::Parse("Exactly-1(a, a|b, b)"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, ExactlyN) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
+  CnfFormula s(3);
   s.AddConstraint(Formula::Parse("!((a1 & a2 & a3) <-> Exactly-3(a1, a2, a3))"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(SolverTest, Exactly1) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
+  CnfFormula s(3);
   s.AddConstraint(Formula::Parse("Exactly-1(a1, a2, a3)"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("a2 <-> a3"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("!a1"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 // Sat solver tests.
 
 TEST(SolverTest, BasicSatisfiability) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"a", "b", "c", "d"});
+  CnfFormula s(4);
   s.AddConstraint(Formula::Parse("a -> b"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("c -> d"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
-  s.AddConstraint(Formula::Parse("!b & !d"));
-  s.InitSolver();
+  s.AddConstraint(Formula::Parse("!b | !d"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("a & c"));
-  s.InitSolver();
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(SolverTest, OtherSatisfiability) {
-  CnfFormula s;
+  m.reset();
   m.game().declareVariables({"x", "a", "b", "c", "d"});
+  CnfFormula s(5);
   s.AddConstraint(Formula::Parse("a&!b&!c&!d | !a&b&!c&!d | !a&!b&c&!d | !a&!b&!c&d"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("(x & a) | (!x & b)"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("(!x & b) | (x & c)"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
 }
 
-TEST(SolverTest, BasicFixed) {
-  CnfFormula s;
+TEST(SolverTest, MustBeTrueFalse) {
+  m.reset();
+  m.game().declareVariables({"a", "b"});
+  CnfFormula s(2);
+  s.AddConstraint(Formula::Parse("(a -> b) & a"));
+  EXPECT_TRUE(s.Satisfiable());
+  EXPECT_TRUE(s.MustBeTrue(1));
+  EXPECT_FALSE(s.MustBeFalse(1));
+  EXPECT_TRUE(s.MustBeTrue(2));
+  EXPECT_FALSE(s.MustBeFalse(2));
+}
+
+TEST(SolverTest, ExactlyFixed) {
+  m.reset();
   m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
+  CnfFormula s(5);
   s.AddConstraint(Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("AtLeast-2(x1, x2, x3)"));
-  s.InitSolver();
   EXPECT_TRUE(s.Satisfiable());
-  EXPECT_EQ(s.GetFixedVariables(), 2); // x4 and x5 must be false.
+  EXPECT_EQ(2, s.GetNumOfFixedVars()); // x4 and x5 must be false.
 }
 
+TEST(SolverTest, NumOfModels) {
+  m.reset();
+  m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
+  CnfFormula s(5);
+  s.AddConstraint(Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
+  EXPECT_EQ(10, s.NumOfModels());
+}
 
+TEST(SolverTest, NumOfModelsSharpSat) {
+  m.reset();
+  m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
+  CnfFormula s(5);
+  s.AddConstraint(Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
+  EXPECT_EQ(10, s.NumOfModelsSharpSat());
+}
 
+// NumOfModelsUnsat
+// NumOfModelsSharpSatUnsat
+
+TEST(SolverTest, Context) {
+  m.reset();
+  m.game().declareVariables({"a", "b", "c", "d"});
+  CnfFormula s(4);
+  s.AddConstraint(Formula::Parse("(a -> b) & (c -> d) & (!b | !d)"));
+  EXPECT_TRUE(s.Satisfiable());
+  EXPECT_EQ(5, s.NumOfModels());
+  s.OpenContext();
+  s.AddConstraint(Formula::Parse("a & c"));
+  EXPECT_FALSE(s.Satisfiable());
+  s.CloseContext();
+  EXPECT_EQ(5, s.NumOfModels());
+}
+
+TEST(SolverTest, NestedContext) {
+  m.reset();
+  m.game().declareVariables({"a", "b", "c", "d"});
+  CnfFormula s(4);
+  s.AddConstraint(Formula::Parse("a | b"));
+  EXPECT_EQ("(1 | 2)", s.pretty());
+  EXPECT_EQ(12, s.NumOfModels()); // a|b -> 3 * 2^2
+  s.OpenContext();
+  s.AddConstraint(Formula::Parse("c | d"));
+  EXPECT_EQ("(1 | 2)&(3 | 4)", s.pretty());
+  EXPECT_EQ(9, s.NumOfModels()); // (a|b) & (c|d) -> 3*3
+  s.OpenContext();
+  s.AddConstraint(Formula::Parse("a | d"));
+  EXPECT_EQ("(1 | 2)&(3 | 4)&(1 | 4)", s.pretty());
+  EXPECT_EQ(8, s.NumOfModels()); // (a|b) & (c|d) & (a|d) -> as before - 0110
+  s.CloseContext();
+  EXPECT_EQ("(1 | 2)&(3 | 4)", s.pretty());
+  EXPECT_EQ(9, s.NumOfModels()); // (a|b) & (c|d)
+  s.AddConstraint(Formula::Parse("!a"));
+  EXPECT_EQ("(1 | 2)&(3 | 4)&(-1)", s.pretty());
+  EXPECT_EQ(3, s.NumOfModels()); // !a & (a|b) & (c|d) -> 3
+  s.CloseContext();
+  EXPECT_EQ("(1 | 2)", s.pretty());
+  EXPECT_EQ(12, s.NumOfModels()); // a|b
+}

@@ -29,9 +29,9 @@ std::function<uint(ExperimentSpec&, Game& game)> g_makerStg;
 void print_stats(Game& game) {
   printf("===== GAME STATISTICS =====\n");
   printf("Num of variables: %lu\n", game.variables().size());
-  CnfFormula knowledge;
+  CnfFormula knowledge(game.variables().size());
   knowledge.AddConstraint(game.restriction());
-  uint models = knowledge.NumberOfModelsSat(game.variables().size());
+  uint models = knowledge.NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
   uint branching = 0, total = 0;
@@ -62,15 +62,23 @@ void play_mode() {
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
-  CnfFormula knowledge;
+  CnfFormula knowledge(game.variables().size());
   knowledge.AddConstraint(game.restriction());
-  knowledge.InitSolver();
   //knowledge.WriteDimacs(stdout);
 
   int exp_num = 0;
   while (true) {
     // Compute var equivalence.
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
+    int t = game.variables().size(), f = t + 1;
+    for (uint i = 1; i < game.variables().size(); i++) {
+      if (knowledge.MustBeTrue(i)) var_equiv[i] = t;
+      else if (knowledge.MustBeFalse(i)) var_equiv[i] = f;
+    }
+    printf("Var equiv:\n");
+    for (auto i: var_equiv) {
+      printf("%i ", i);
+    }
     //
     vec<ExperimentSpec> experiments;
     for (auto e: game.experiments()) {
@@ -83,16 +91,15 @@ void play_mode() {
             0});
         // Perform basic analysis.
         for (uint i = 0; i < e->outcomes().size(); i++) {
-          CnfFormula n;
-          n.AddConstraint(knowledge);
-          n.AddConstraint(e->outcomes()[i], params);
-          n.InitSolver();
-          if (n.Satisfiable()) {
+          knowledge.OpenContext();
+          knowledge.AddConstraint(e->outcomes()[i], params);
+          if (knowledge.Satisfiable()) {
             //auto fixed = n.GetFixedVariables();
             experiments.back().sat_outcomes[i] = true;
             experiments.back().sat_outcomes_num++;
             //printf(" %i", fixed);
           }
+          knowledge.CloseContext();
         }
         assert(experiments.back().sat_outcomes_num > 0);
         if (experiments.back().sat_outcomes_num == 1) {
@@ -104,7 +111,6 @@ void play_mode() {
 
     if (experiments.size() == 0) {
       printf("SOLVED in %i experiments!\n", exp_num);
-      knowledge.InitSolver();
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
@@ -129,7 +135,6 @@ void play_mode() {
     // Prepare for another round.
     exp_num++;
     knowledge.AddConstraint(o, e.params);
-    //knowledge.InitSolver();
     //knowledge.WriteDimacs(stdout);
     o->AddToGraph(*knowledge_graph, &e.params);
   }
