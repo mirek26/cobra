@@ -17,6 +17,40 @@
 
 extern Parser m;
 
+void Option::ComputeSat() {
+  sat_.resize(type_.outcomes().size());
+  sat_num_ = 0;
+  for (uint i = 0; i < type_.outcomes().size(); i++) {
+    cnf_.OpenContext();
+    cnf_.AddConstraint(type_.outcomes()[i], params_);
+    sat_[i] = cnf_.Satisfiable();
+    sat_num_ += sat_[i];
+    cnf_.CloseContext();
+  }
+}
+
+void Option::ComputeNumOfModels() {
+  models_.resize(type_.outcomes().size());
+  models_total_ = 0;
+  for (uint i = 0; i < type_.outcomes().size(); i++) {
+    cnf_.OpenContext();
+    cnf_.AddConstraint(type_.outcomes()[i], params_);
+    models_[i] = cnf_.NumOfModels();
+    models_total_ += models_[i];
+    cnf_.CloseContext();
+  }
+}
+
+void Option::ComputeFixedVars() {
+  fixed_.resize(type_.outcomes().size());
+  for (uint i = 0; i < type_.outcomes().size(); i++) {
+    cnf_.OpenContext();
+    cnf_.AddConstraint(type_.outcomes()[i], params_);
+    fixed_[i] = cnf_.GetNumOfFixedVars();
+    cnf_.CloseContext();
+  }
+}
+
 void Experiment::addOutcome(string name, Formula* outcome) {
   outcomes_names_.push_back(name);
   outcomes_.push_back(outcome);

@@ -230,7 +230,7 @@ void AtMostOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
 }
 
 void Formula::AddToGraph(bliss::Digraph& g,
-                         vec<CharId>* params,
+                         const vec<CharId>* params,
                          int parent) {
   if (isLiteral()) {
     // just create an edge from parent to the variable

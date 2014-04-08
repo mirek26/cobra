@@ -19,12 +19,63 @@ struct GenParamsStats {
   uint ph1 = 0, ph2 = 0, ph3 = 0;
 };
 
-struct ExperimentSpec {
-  Experiment* type;
-  vec<CharId> params;
-  vec<bool> sat_outcomes;
-  int sat_outcomes_num;
+class Option {
+  CnfFormula& cnf_;
+  Experiment& type_;
+  vec<CharId> params_;
+  uint index_;
+
+  vec<bool> sat_;
+  uint sat_num_;
+  vec<int> models_;
+  uint models_total_;
+  vec<int> fixed_;
+
+ public:
+  Option(CnfFormula& cnf, Experiment& e, vec<CharId> params, uint index):
+    cnf_(cnf),
+    type_(e),
+    params_(params),
+    index_(index) { }
+
+  Experiment& type() const { return type_; }
+  const vec<CharId>& params() const { return params_; }
+  uint index() const { return index_; }
+
+  uint GetNumOfSatOutcomes() {
+    if (sat_.empty()) ComputeSat();
+    return sat_num_;
+  }
+
+  bool IsOutcomeSat(uint id) {
+    if (sat_.empty()) ComputeSat();
+    assert(id < sat_.size());
+    return sat_[id];
+  }
+
+  uint GetNumOfModelsForOutcome(uint id) {
+    if (models_.empty()) ComputeNumOfModels();
+    assert(id < models_.size());
+    return models_[id];
+  }
+
+  uint GetTotalNumOfModels() {
+    if (models_.empty()) ComputeNumOfModels();
+    return models_total_;
+  }
+
+  uint GetNumOfFixedVarsForOutcome(uint id) {
+    if (fixed_.empty()) ComputeFixedVars();
+    assert(id < fixed_.size());
+    return fixed_[id];
+  }
+
+ private:
+  void ComputeSat();
+  void ComputeNumOfModels();
+  void ComputeFixedVars();
 };
+
 
 class Experiment {
   Game* game_;

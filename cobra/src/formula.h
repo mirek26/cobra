@@ -114,7 +114,7 @@ class Formula {
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
 
   void AddToGraph(bliss::Digraph& g,
-                  vec<CharId>* params,
+                  const vec<CharId>* params,
                   int parent = -1);
 
   static Formula* Parse(string str);

@@ -23,11 +23,11 @@ extern "C" int yyparse();
 extern "C" FILE* yyin;
 extern Parser m;
 
-std::function<uint(vec<ExperimentSpec>&, Game& game)> g_breakerStg;
-std::function<uint(ExperimentSpec&, Game& game)> g_makerStg;
+std::function<uint(vec<Option>&, Game& game)> g_breakerStg;
+std::function<uint(Option&, Game& game)> g_makerStg;
 
 void print_stats(Game& game) {
-  printf("===== GAME STATISTICS =====\n");
+  printf("\n===== GAME STATISTICS =====\n");
   printf("Num of variables: %lu\n", game.variables().size());
   CnfFormula knowledge(game.variables().size());
   knowledge.AddConstraint(game.restriction());
@@ -54,11 +54,10 @@ void print_stats(Game& game) {
   printf("===========================\n");
 }
 
-void play_mode() {
-  // INTERACTIVE MODE
+void simulation_mode() {
   Game& game = m.game();
   game.Precompute();
-  printf("===== PLAY MODE =====\n");
+  printf("\n===== SIMULATION MODE =====\n\n");
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
@@ -66,77 +65,58 @@ void play_mode() {
   knowledge.AddConstraint(game.restriction());
   //knowledge.WriteDimacs(stdout);
 
-  int exp_num = 0;
+  int exp_num = 1;
   while (true) {
     // Compute var equivalence.
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
     int t = game.variables().size(), f = t + 1;
-    for (uint i = 1; i < game.variables().size(); i++) {
+    for (uint i = 1; i <= game.variables().size(); i++) {
       if (knowledge.MustBeTrue(i)) var_equiv[i] = t;
       else if (knowledge.MustBeFalse(i)) var_equiv[i] = f;
     }
-    printf("Var equiv:\n");
-    for (auto i: var_equiv) {
-      printf("%i ", i);
-    }
-    //
-    vec<ExperimentSpec> experiments;
+    // printf("Var equiv:\n");
+    // for (auto i: var_equiv) {
+    //   printf("%i ", i);
+    // }
+    // printf("\n");
+
+    // Prepare list of all sensible experiments in this round.
+    vec<Option> options;
     for (auto e: game.experiments()) {
       auto params_all = e->GenParams(var_equiv);
       for (auto& params: *params_all) {
-        experiments.push_back(
-          { e,
-            params,
-            vec<bool>(e->outcomes().size(), false),
-            0});
-        // Perform basic analysis.
-        for (uint i = 0; i < e->outcomes().size(); i++) {
-          knowledge.OpenContext();
-          knowledge.AddConstraint(e->outcomes()[i], params);
-          if (knowledge.Satisfiable()) {
-            //auto fixed = n.GetFixedVariables();
-            experiments.back().sat_outcomes[i] = true;
-            experiments.back().sat_outcomes_num++;
-            //printf(" %i", fixed);
-          }
-          knowledge.CloseContext();
-        }
-        assert(experiments.back().sat_outcomes_num > 0);
-        if (experiments.back().sat_outcomes_num == 1) {
-          experiments.pop_back();
-          continue;
-        }
+        options.push_back(Option(knowledge, *e, params, options.size()));
       }
     }
 
-    if (experiments.size() == 0) {
+    // Choose and print an experiment
+    auto experiment = options[g_breakerStg(options, game)];
+    printf("EXPERIMENT: %s ", experiment.type().name().c_str());
+    for (auto k: experiment.params())
+      printf("%s ", game.alphabet()[k].c_str());
+    printf("\n");
+
+    // Choose and print an outcome
+    uint oid = g_makerStg(experiment, game);
+    assert(oid < experiment.type().outcomes().size());
+    assert(experiment.IsOutcomeSat(oid) == true);
+    auto outcome = experiment.type().outcomes()[oid];
+    printf("OUTCOME: %s\n", experiment.type().outcomes_names()[oid].c_str());
+    printf("  ->     %s\n\n", outcome->pretty(true, &experiment.params()).c_str());
+
+    // Check if solved.
+    knowledge.AddConstraint(outcome, experiment.params());
+    if (knowledge.NumOfModels() == 1) {
       printf("SOLVED in %i experiments!\n", exp_num);
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
     }
 
-    // Choose and print an experiment
-    uint eid = g_breakerStg(experiments, game);
-    auto e = experiments[eid];
-    printf("EXPERIMENT: %s ", e.type->name().c_str());
-    for (auto k: e.params)
-      printf("%s ", game.alphabet()[k].c_str());
-    printf("\n");
-
-    // Choose and print an outcome
-    uint oid = g_makerStg(e, game);
-    assert(oid < e.type->outcomes().size());
-    assert(e.sat_outcomes[oid] == true);
-    auto o = e.type->outcomes()[oid];
-    printf("OUTCOME: %s\n", e.type->outcomes_names()[oid].c_str());
-    printf("  ->     %s\n\n", o->pretty(true, &e.params).c_str());
-
     // Prepare for another round.
     exp_num++;
-    knowledge.AddConstraint(o, e.params);
     //knowledge.WriteDimacs(stdout);
-    o->AddToGraph(*knowledge_graph, &e.params);
+    outcome->AddToGraph(*knowledge_graph, &experiment.params());
   }
 }
 
@@ -150,13 +130,15 @@ int main(int argc, char* argv[]) {
       "i", "info",
       "Print basic information about the game.",
       cmd, false);
-    SwitchArg playArg(
-      "p", "play",
-      "Starts interactive mode, player strategies can be specified by -b, -m.",
+    SwitchArg simArg(
+      "s", "simulation",
+      "Starts simulation mode, player strategies can be specified by -b, -m.",
       cmd, false);
 
-    vec<string> greedy_stgs({ "max", "exp", "entropy",
-      "parts", "random", "interactive" });
+    vec<string> greedy_stgs;
+    for (auto x: Strategy::breaker_strategies)
+      greedy_stgs.push_back(x.first);
+
     ValuesConstraint<string> greedyConst(greedy_stgs);
     ValueArg<string> codemakerArg(
       "m", "codemaker",
@@ -196,10 +178,10 @@ int main(int argc, char* argv[]) {
       print_stats(m.game());
     }
 
-    if (playArg.getValue()) {
+    if (simArg.getValue()) {
       g_breakerStg = Strategy::breaker_strategies.at(codebreakerArg.getValue());
       g_makerStg = Strategy::maker_strategies.at(codemakerArg.getValue());
-      play_mode();
+      simulation_mode();
     }
 
   } catch (TCLAP::ArgException &e) {

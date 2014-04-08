@@ -22,7 +22,7 @@ CnfFormula::CnfFormula(VarId limit) {
   limit_ = limit;
   picosat_ = picosat_init();
   // Reserve id's for original variables.
-  for (uint i = 0; i < limit; i++)
+  for (VarId i = 0; i < limit; i++)
     picosat_inc_max_var(picosat_);
 }
 
