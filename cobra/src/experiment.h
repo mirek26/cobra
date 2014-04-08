@@ -19,6 +19,13 @@ struct GenParamsStats {
   uint ph1 = 0, ph2 = 0, ph3 = 0;
 };
 
+struct ExperimentSpec {
+  Experiment* type;
+  vec<CharId> params;
+  vec<bool> sat_outcomes;
+  int sat_outcomes_num;
+};
+
 class Experiment {
   Game* game_;
   uint alph_;

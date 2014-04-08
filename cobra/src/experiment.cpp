@@ -120,7 +120,7 @@ Experiment::GenParams(vec<uint>& groups) {
   gen_params_basic_.clear();
   gen_params_final_.clear();
   GenParamsFill(0);
-  printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+  //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
   assert(gen_stats_.ph2 == gen_params_basic_.size());
   assert(gen_stats_.ph3 == gen_params_final_.size());
   return &gen_params_final_;

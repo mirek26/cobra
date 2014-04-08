@@ -17,83 +17,14 @@
 #include "experiment.h"
 #include "common.h"
 #include "parser.h"
+#include "strategy.h"
 
 extern "C" int yyparse();
 extern "C" FILE* yyin;
 extern Parser m;
 
-struct ExperimentSpec {
-  Experiment* type;
-  vec<CharId> params;
-  vec<bool> sat_outcomes;
-  int sat_outcomes_num;
-};
-
 std::function<uint(vec<ExperimentSpec>&, Game& game)> g_breakerStg;
 std::function<uint(ExperimentSpec&, Game& game)> g_makerStg;
-
-uint breaker_interactive(vec<ExperimentSpec>& options, Game& game) {
-  // Print options.
-  printf("Select experiment: \n");//%i: \n", exp_num++);
-  int o = 0;
-  for (auto& e: options) {
-    printf("%i) %s [ ", o++, e.type->name().c_str());
-    for (auto k: e.params)
-      printf("%s ", game.alphabet()[k].c_str());
-    printf("] (%i sat outcomes)\n", e.sat_outcomes_num);
-  }
-
-  // User prompt.
-  uint eid;
-  bool ok;
-  string str;
-  do {
-    printf("> ");
-    ok = readIntOrString(eid, str);
-  } while (!ok || eid >= options.size());
-  return eid;
-}
-
-uint maker_interactive(ExperimentSpec& option, Game&) {
-  // Print options.
-  printf("Select outcome: \n");
-  auto e = option.type;
-  auto params = option.params;
-  for (uint i = 0; i < e->outcomes().size(); i++) {
-    if (option.sat_outcomes[i]) printf("%i) ", i);
-    else printf("-) ");
-    printf("%s - %s %s\n",
-      e->outcomes_names()[i].c_str(),
-      e->outcomes()[i]->pretty(true, &params).c_str(),
-      option.sat_outcomes[i] ? "" : "(unsatisfiable)");
-  }
-
-  // User prompt.
-  uint oid;
-  bool ok;
-  string str;
-  do {
-    printf("> ");
-    ok = readIntOrString(oid, str);
-  } while (!ok || oid >= e->outcomes().size() ||
-           !option.sat_outcomes[oid]);
-  return oid;
-}
-
-uint breaker_random(vec<ExperimentSpec>& options, Game&) {
-  return rand() % options.size();
-}
-
-uint maker_random(ExperimentSpec& option, Game&) {
-  // Print options.
-  int p = rand() % option.sat_outcomes_num;
-  int i = -1;
-  while (p > 0) {
-    i++;
-    if (option.sat_outcomes[i]) p--;
-  }
-  return i;
-}
 
 void print_stats(Game& game) {
   printf("===== GAME STATISTICS =====\n");
@@ -136,7 +67,7 @@ void play_mode() {
   knowledge.InitSolver();
   //knowledge.WriteDimacs(stdout);
 
-  //int exp_num = 1;
+  int exp_num = 0;
   while (true) {
     // Compute var equivalence.
     auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
@@ -172,28 +103,41 @@ void play_mode() {
     }
 
     if (experiments.size() == 0) {
-      printf("SOLVED!\n");
+      printf("SOLVED in %i experiments!\n", exp_num);
       knowledge.InitSolver();
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
     }
 
-    int eid = g_breakerStg(experiments, game);
-    int oid = g_makerStg(experiments[eid], game);
-    auto outcome = experiments[eid].type->outcomes()[oid];
+    // Choose and print an experiment
+    uint eid = g_breakerStg(experiments, game);
+    auto e = experiments[eid];
+    printf("EXPERIMENT: %s ", e.type->name().c_str());
+    for (auto k: e.params)
+      printf("%s ", game.alphabet()[k].c_str());
+    printf("\n");
 
-    printf("Gained knowledge: %s\n",
-           outcome->pretty(true, &experiments[eid].params).c_str());
-    knowledge.AddConstraint(outcome, experiments[eid].params);
+    // Choose and print an outcome
+    uint oid = g_makerStg(e, game);
+    assert(oid < e.type->outcomes().size());
+    assert(e.sat_outcomes[oid] == true);
+    auto o = e.type->outcomes()[oid];
+    printf("OUTCOME: %s\n", e.type->outcomes_names()[oid].c_str());
+    printf("  ->     %s\n\n", o->pretty(true, &e.params).c_str());
+
+    // Prepare for another round.
+    exp_num++;
+    knowledge.AddConstraint(o, e.params);
     //knowledge.InitSolver();
     //knowledge.WriteDimacs(stdout);
-    outcome->AddToGraph(*knowledge_graph, &experiments[eid].params);
+    o->AddToGraph(*knowledge_graph, &e.params);
   }
 }
 
 int main(int argc, char* argv[]) {
   // Parse input with TCLAP library.
+  srand(time(NULL));
   try {
     using namespace TCLAP;
     CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
@@ -248,17 +192,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (playArg.getValue()) {
-      if (codebreakerArg.getValue() == "interactive") {
-        g_breakerStg = breaker_interactive;
-      } else {
-        g_breakerStg = breaker_random;
-      }
-
-      if (codemakerArg.getValue() == "interactive") {
-        g_makerStg = maker_interactive;
-      } else {
-        g_makerStg = maker_random;
-      }
+      g_breakerStg = Strategy::breaker_strategies.at(codebreakerArg.getValue());
+      g_makerStg = Strategy::maker_strategies.at(codemakerArg.getValue());
       play_mode();
     }
 
