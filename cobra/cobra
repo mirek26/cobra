@@ -66,10 +66,12 @@ if __name__ == '__main__':
     subprocess.call([__execname] + ["-h"])
     exit(1);
 
+  print "Preprocessing...",
+  sys.stdout.flush()
   execfile(sys.argv[-1])
   __F.close()
   __end = time.time()
-  print "Preprocessing finished in %.2fs, output written to %s." % (__end - __start, __filename);
+  print "[%.2fs] (%s)" % (__end - __start, __filename)
   if not os.path.isfile(__execname):
     print "cobra-backend not found; run 'make' first. "
     exit(0)

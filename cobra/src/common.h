@@ -35,6 +35,12 @@ template<typename T> using set = std::set<T>;
 template<typename T>
 struct identity { typedef T type; };
 
+namespace color {
+  extern const char* const head;
+  extern const char* const emph;
+  extern const char* const normal;
+}
+
 template<class T>
 void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> action, int offset = 0);
 

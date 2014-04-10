@@ -1832,6 +1832,7 @@ yyreturn:
 
 
 void yyerror(const char *error) {
-  printf("%d: %s at %s\n", yylineno, error, yytext);
+  printf("\n%d: %s at %s\n", yylineno, error, yytext);
+  exit(EXIT_FAILURE);
 }
 

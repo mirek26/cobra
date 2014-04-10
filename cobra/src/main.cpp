@@ -27,7 +27,7 @@ std::function<uint(vec<Option>&, Game& game)> g_breakerStg;
 std::function<uint(Option&, Game& game)> g_makerStg;
 
 void print_stats(Game& game) {
-  printf("\n===== GAME STATISTICS =====\n");
+  printf("\n%s===== GAME STATISTICS =====%s\n", color::head, color::normal);
   printf("Num of variables: %lu\n", game.variables().size());
   CnfFormula knowledge(game.variables().size());
   knowledge.AddConstraint(game.restriction());
@@ -51,13 +51,12 @@ void print_stats(Game& game) {
   double d = log(models)/log(branching);
   printf("Trivial lower bound (expected): %.2f\n", d);
   printf("Trivial lower bound (worst-case): %.0f\n", ceil(d));
-  printf("===========================\n");
 }
 
 void simulation_mode() {
   Game& game = m.game();
   game.Precompute();
-  printf("\n===== SIMULATION MODE =====\n\n");
+  printf("\n%s===== SIMULATION MODE =====%s\n\n", color::head, color::normal);
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
@@ -91,23 +90,29 @@ void simulation_mode() {
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options, game)];
-    printf("EXPERIMENT: %s ", experiment.type().name().c_str());
+    printf("%sEXPERIMENT: %s ",
+           color::emph,
+           experiment.type().name().c_str());
     for (auto k: experiment.params())
       printf("%s ", game.alphabet()[k].c_str());
-    printf("\n");
+    printf("%s\n", color::normal);
 
     // Choose and print an outcome
     uint oid = g_makerStg(experiment, game);
     assert(oid < experiment.type().outcomes().size());
     assert(experiment.IsOutcomeSat(oid) == true);
     auto outcome = experiment.type().outcomes()[oid];
-    printf("OUTCOME: %s\n", experiment.type().outcomes_names()[oid].c_str());
-    printf("  ->     %s\n\n", outcome->pretty(true, &experiment.params()).c_str());
+    printf("%sOUTCOME: %s\n",
+           color::emph,
+           experiment.type().outcomes_names()[oid].c_str());
+    printf("  ->     %s\n\n%s",
+           outcome->pretty(true, &experiment.params()).c_str(),
+           color::normal);
 
     // Check if solved.
     knowledge.AddConstraint(outcome, experiment.params());
     if (knowledge.NumOfModels() == 1) {
-      printf("SOLVED in %i experiments!\n", exp_num);
+      printf("%sSOLVED in %i experiments!%s\n", color::head, exp_num, color::normal);
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
@@ -164,15 +169,16 @@ int main(int argc, char* argv[]) {
       exit(EXIT_FAILURE);
     }
     auto t1 = clock();
+    printf("Loading... ");
     try {
       yyparse();
     } catch (ParserException* p) {
-      printf("Invalid input: %s\n", p->what());
+      printf("\nInvalid input: %s\n", p->what());
       exit(EXIT_FAILURE);
     }
     fclose (yyin);
     auto t2 = clock();
-    printf("Input loaded in %.2fs.\n", double(t2 - t1)/CLOCKS_PER_SEC);
+    printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
 
     if (infoArg.getValue()) {
       print_stats(m.game());
