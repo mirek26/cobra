@@ -10,9 +10,12 @@
 #include "common.h"
 
 namespace color {
-  const char* const head = "\033[1;97m";
-  const char* const emph = "\033[32m";
-  const char* const normal = "\033[0m";
+  const string head = "\033[1;97m";
+  const string emph = "\033[32m";
+  const string normal = "\033[0m";
+  const char* const shead = "\033[1;97m";
+  const char* const semph = "\033[32m";
+  const char* const snormal = "\033[0m";
 }
 
 vec<string> split(string s) {

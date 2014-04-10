@@ -114,7 +114,7 @@ void Experiment::Precompute() {
       interchangable_[d][a] = true;
       set<int> vars;
       for (auto& f: used_maps_[d]) {
-        auto var = game_->getMappingValue(f, a);
+        auto var = game_.getMappingValue(f, a);
         vars.insert(var);
         if (used_vars_.count(var) > 0) interchangable_[d][a] = false;
       }
@@ -125,7 +125,7 @@ void Experiment::Precompute() {
           if (a == b && params_different_[e].count(d) > 0) continue;
           if (a >= b && params_smaller_than_[e].count(d) > 0) continue;
           for (auto f: used_maps_[e]) {
-            if (vars.count(game_->getMappingValue(f, b)) > 0)
+            if (vars.count(game_.getMappingValue(f, b)) > 0)
               interchangable_[d][a] = false;
           }
         }
@@ -138,8 +138,8 @@ void Experiment::Precompute() {
 bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
   bool equiv = true;
   for (auto f: maps) {
-    if (gen_var_groups_[game_->getMappingValue(f, a)] !=
-        gen_var_groups_[game_->getMappingValue(f, b)]) {
+    if (gen_var_groups_[game_.getMappingValue(f, a)] !=
+        gen_var_groups_[game_.getMappingValue(f, b)]) {
       equiv = false;
     }
   }
@@ -209,8 +209,8 @@ void Experiment::GenParamsBasicFilter() {
     for (uint j = i + 1; j < num_params_; j++)
       for (auto fi: used_maps_[i])
         for (auto fj: used_maps_[j])
-          if (game_->getMappingValue(fi, params[i]) ==
-              game_->getMappingValue(fj, params[j])) {
+          if (game_.getMappingValue(fi, params[i]) ==
+              game_.getMappingValue(fj, params[j])) {
             if (dfu[i] > dfu[j])
               dfu[i] = dfu[j];
             else
@@ -229,12 +229,12 @@ void Experiment::GenParamsBasicFilter() {
       if (dfu[p] == n) {
         if (params[p] != chr) keep = true;
         for (auto f: used_maps_[p]) {
-          if (used_vars_.count(game_->getMappingValue(f, chr))) keep = true;
+          if (used_vars_.count(game_.getMappingValue(f, chr))) keep = true;
           maps.insert(f);
         }
       } else {
         for (auto f: used_maps_[p]) {
-          other_vars.insert(game_->getMappingValue(f, params[p]));
+          other_vars.insert(game_.getMappingValue(f, params[p]));
         }
       }
     }
@@ -247,7 +247,7 @@ void Experiment::GenParamsBasicFilter() {
       // Doesn't it indroduce conflicting vars?
       keep = false;
       for (auto f: maps) {
-        VarId var = game_->getMappingValue(f, a);
+        VarId var = game_.getMappingValue(f, a);
         if (other_vars.count(var)) keep = true;
       }
       if (!keep) {
@@ -281,9 +281,9 @@ void Experiment::GenParamsGraphFilter() {
 
 bliss::Digraph* Experiment::CreateGraphForParams(vec<uint>& groups,
                                                  vec<CharId>& params) {
-  auto g = game_->CreateGraph();
+  auto g = game_.CreateGraph();
   // Change color of var vertices according to 'groups'.
-  for (auto var: game_->variables()) {
+  for (auto var: game_.variables()) {
     uint group = std::numeric_limits<uint>::max() - groups[var->id()];
     g->change_color(2*var->id() - 2, group);
     g->change_color(2*var->id() - 1, group);

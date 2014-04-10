@@ -23,7 +23,7 @@ equiv - equivalence
 // common types
 typedef unsigned int uint;
 typedef unsigned char CharId;
-typedef short int VarId; // must se signed, -1 denotes negation of var 1
+typedef int VarId; // must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
 
 // type aliases for
@@ -36,9 +36,12 @@ template<typename T>
 struct identity { typedef T type; };
 
 namespace color {
-  extern const char* const head;
-  extern const char* const emph;
-  extern const char* const normal;
+  extern const string head;
+  extern const string emph;
+  extern const string normal;
+  extern const char* const shead;
+  extern const char* const semph;
+  extern const char* const snormal;
 }
 
 template<class T>

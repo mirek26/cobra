@@ -66,12 +66,12 @@ MapId Game::getMappingId(string ident) {
 
 VarId Game::getMappingValue(MapId mapping, CharId a) {
   assert(mapping < mappings_.size());
-  assert(a >= 0 && a < alphabet_.size());
+  assert(a < alphabet_.size());
   return mappings_[mapping][a];
 }
 
 Experiment* Game::addExperiment(string name, uint num_params) {
-  auto e = new Experiment(this, name, num_params);
+  auto e = new Experiment(*this, name, num_params);
   experiments_.push_back(e);
   return e;
 }

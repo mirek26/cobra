@@ -27,9 +27,9 @@ class Option {
 
   vec<bool> sat_;
   uint sat_num_;
-  vec<int> models_;
+  vec<uint> models_;
   uint models_total_;
-  vec<int> fixed_;
+  vec<uint> fixed_;
 
  public:
   Option(CnfFormula& cnf, Experiment& e, vec<CharId> params, uint index):
@@ -53,10 +53,9 @@ class Option {
     return sat_[id];
   }
 
-  uint GetNumOfModelsForOutcome(uint id) {
+  vec<uint>& GetNumOfModels() {
     if (models_.empty()) ComputeNumOfModels();
-    assert(id < models_.size());
-    return models_[id];
+    return models_;
   }
 
   uint GetTotalNumOfModels() {
@@ -64,10 +63,9 @@ class Option {
     return models_total_;
   }
 
-  uint GetNumOfFixedVarsForOutcome(uint id) {
+  vec<uint>& GetNumOfFixedVars() {
     if (fixed_.empty()) ComputeFixedVars();
-    assert(id < fixed_.size());
-    return fixed_[id];
+    return fixed_;
   }
 
  private:
@@ -78,7 +76,7 @@ class Option {
 
 
 class Experiment {
-  Game* game_;
+  Game& game_;
   uint alph_;
 
   string name_;
@@ -104,16 +102,17 @@ class Experiment {
   std::map<unsigned int, vec<CharId>> gen_graphs_;
 
  public:
-  Experiment(Game* game, string name, uint num_params):
+  Experiment(Game& game, string name, uint num_params):
       game_(game),
       name_(name),
       num_params_(num_params) {
     params_different_.resize(num_params);
     params_smaller_than_.resize(num_params);
-    alph_ = game_->alphabet().size();
+    alph_ = game_.alphabet().size();
   }
 
   string name() const { return name_; }
+  Game& game() const { return game_; }
   const vec<Formula*>& outcomes() const { return outcomes_; }
   const vec<string>& outcomes_names() const { return outcomes_names_; }
 

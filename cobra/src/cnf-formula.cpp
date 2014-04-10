@@ -195,7 +195,7 @@ uint CnfFormula::NumOfModelsSharpSat(){
   }
   FILE* g = fopen(".nummodels-result", "r");
   uint k;
-  fscanf(g, "%i", &k);
+  fscanf(g, "%u", &k);
   return k;
 }
 

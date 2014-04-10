@@ -23,11 +23,11 @@ extern "C" int yyparse();
 extern "C" FILE* yyin;
 extern Parser m;
 
-std::function<uint(vec<Option>&, Game& game)> g_breakerStg;
-std::function<uint(Option&, Game& game)> g_makerStg;
+std::function<uint(vec<Option>&)> g_breakerStg;
+std::function<uint(Option&)> g_makerStg;
 
 void print_stats(Game& game) {
-  printf("\n%s===== GAME STATISTICS =====%s\n", color::head, color::normal);
+  printf("\n%s===== GAME STATISTICS =====%s\n", color::shead, color::snormal);
   printf("Num of variables: %lu\n", game.variables().size());
   CnfFormula knowledge(game.variables().size());
   knowledge.AddConstraint(game.restriction());
@@ -56,7 +56,7 @@ void print_stats(Game& game) {
 void simulation_mode() {
   Game& game = m.game();
   game.Precompute();
-  printf("\n%s===== SIMULATION MODE =====%s\n\n", color::head, color::normal);
+  printf("\n%s===== SIMULATION MODE =====%s\n\n", color::shead, color::snormal);
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
@@ -89,30 +89,29 @@ void simulation_mode() {
     }
 
     // Choose and print an experiment
-    auto experiment = options[g_breakerStg(options, game)];
+    auto experiment = options[g_breakerStg(options)];
     printf("%sEXPERIMENT: %s ",
-           color::emph,
+           color::semph,
            experiment.type().name().c_str());
-    for (auto k: experiment.params())
-      printf("%s ", game.alphabet()[k].c_str());
-    printf("%s\n", color::normal);
+    game.printParams(experiment.params());
+    printf("%s\n", color::snormal);
 
     // Choose and print an outcome
-    uint oid = g_makerStg(experiment, game);
+    uint oid = g_makerStg(experiment);
     assert(oid < experiment.type().outcomes().size());
     assert(experiment.IsOutcomeSat(oid) == true);
     auto outcome = experiment.type().outcomes()[oid];
     printf("%sOUTCOME: %s\n",
-           color::emph,
+           color::semph,
            experiment.type().outcomes_names()[oid].c_str());
     printf("  ->     %s\n\n%s",
            outcome->pretty(true, &experiment.params()).c_str(),
-           color::normal);
+           color::snormal);
 
     // Check if solved.
     knowledge.AddConstraint(outcome, experiment.params());
     if (knowledge.NumOfModels() == 1) {
-      printf("%sSOLVED in %i experiments!%s\n", color::head, exp_num, color::normal);
+      printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
       knowledge.Satisfiable();
       knowledge.PrintAssignment(game.variables());
       break;
@@ -140,19 +139,27 @@ int main(int argc, char* argv[]) {
       "Starts simulation mode, player strategies can be specified by -b, -m.",
       cmd, false);
 
-    vec<string> greedy_stgs;
-    for (auto x: Strategy::breaker_strategies)
-      greedy_stgs.push_back(x.first);
+    vec<string> breaker_stgs, maker_stgs;
+    string breaker_man = "", maker_man = "";
+    for (auto s: strategy::breaker_strategies) {
+      breaker_stgs.push_back(s.first);
+      breaker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+    }
+    for (auto s: strategy::maker_strategies) {
+      maker_stgs.push_back(s.first);
+      maker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+    }
 
-    ValuesConstraint<string> greedyConst(greedy_stgs);
+    ValuesConstraint<string> makerConstraint(maker_stgs);
     ValueArg<string> codemakerArg(
       "m", "codemaker",
-      "Strategy to be played by the codemaker. Default: interactive.", false,
-      "interactive", &greedyConst);
+      "Strategy to be played by the codemaker. Default: interactive." + maker_man, false,
+      "interactive", &makerConstraint);
+    ValuesConstraint<string> breakerConstraint(breaker_stgs);
     ValueArg<string> codebreakerArg(
       "b", "codebreaker",
-      "Strategy to be played by the codebreaker. Default: interactive.", false,
-      "interactive", &greedyConst);
+      "Strategy to be played by the codebreaker. Default: interactive." + breaker_man, false,
+      "interactive", &breakerConstraint);
     cmd.add(codemakerArg);
     cmd.add(codebreakerArg);
 
@@ -185,8 +192,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (simArg.getValue()) {
-      g_breakerStg = Strategy::breaker_strategies.at(codebreakerArg.getValue());
-      g_makerStg = Strategy::maker_strategies.at(codemakerArg.getValue());
+      g_breakerStg = strategy::breaker_strategies.at(codebreakerArg.getValue()).second;
+      g_makerStg = strategy::maker_strategies.at(codemakerArg.getValue()).second;
       simulation_mode();
     }
 

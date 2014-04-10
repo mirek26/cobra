@@ -54,10 +54,18 @@ class Game {
   Experiment* addExperiment(string name, uint num_params);
   vec<Experiment*>& experiments() {  return experiments_;  }
 
+  void printParams(const vec<CharId>& params){
+    for (auto a: params)
+      printf("%s ", alphabet_[a].c_str());
+    printf("\b");
+  }
+
   void Precompute();
 
   bliss::Digraph* CreateGraph();
   vec<uint> ComputeVarEquiv(bliss::Digraph&);
+
+
 };
 
 #endif   // COBRA_GAME_H_
