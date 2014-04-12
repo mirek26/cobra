@@ -123,7 +123,7 @@ class Experiment {
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
 
-  set<vec<CharId>>* GenParams(vec<uint>&);
+  set<vec<CharId>>& GenParams(vec<uint>&);
   void Precompute();
 
   uint64_t NumberOfParametrizations() const {

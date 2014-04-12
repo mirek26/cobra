@@ -26,6 +26,18 @@ TEST(Parser, BasicParse) {
 
 // Tsetitin transformation tests.
 
+TEST(Tseitin, Basic) {
+  m.reset();
+  m.game().declareVariables({"x", "y"});
+  auto f = Formula::Parse("!(And(Or(x&!y, y&!x)))");
+  CnfFormula s1(2);
+  s1.AddConstraint(f);
+  EXPECT_EQ(2, s1.NumOfModels());
+  CnfFormula s2(2);
+  s2.AddConstraint(f);
+  EXPECT_EQ(2, s2.NumOfModels());
+}
+
 TEST(Tseitin, Exactly0) {
   m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});

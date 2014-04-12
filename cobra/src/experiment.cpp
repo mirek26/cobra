@@ -146,18 +146,19 @@ bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
   return equiv;
 }
 
-set<vec<CharId>>*
+set<vec<CharId>>&
 Experiment::GenParams(vec<uint>& groups) {
   gen_stats_ = GenParamsStats();
   gen_var_groups_ = groups;
   gen_params_.resize(num_params_);
   gen_params_basic_.clear();
   gen_params_final_.clear();
+  gen_graphs_.clear();
   GenParamsFill(0);
   //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
   assert(gen_stats_.ph2 == gen_params_basic_.size());
   assert(gen_stats_.ph3 == gen_params_final_.size());
-  return &gen_params_final_;
+  return gen_params_final_;
 }
 
 // Recursive function that substitudes char at position n for all posibilities.

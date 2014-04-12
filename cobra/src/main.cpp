@@ -11,7 +11,7 @@
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
 #include <tclap/CmdLine.h>
-
+#include <sys/stat.h>
 #include "formula.h"
 #include "game.h"
 #include "experiment.h"
@@ -26,7 +26,7 @@ extern Parser m;
 std::function<uint(vec<Option>&)> g_breakerStg;
 std::function<uint(Option&)> g_makerStg;
 
-void print_stats(Game& game) {
+void print_stats(Game& game, string filename) {
   printf("\n%s===== GAME STATISTICS =====%s\n", color::shead, color::snormal);
   printf("Num of variables: %lu\n", game.variables().size());
   CnfFormula knowledge(game.variables().size());
@@ -34,23 +34,65 @@ void print_stats(Game& game) {
   uint models = knowledge.NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
-  uint branching = 0, total = 0;
+  struct stat file_st;
+  stat(filename.c_str(), &file_st);
+  uint branching = 0, num_exp = 0, nodes = 0;
   for (auto e: game.experiments()) {
+    for (auto f: e->outcomes()) {
+      nodes += f->Size();
+    }
     if (e->outcomes().size() > branching) {
       branching = e->outcomes().size();
     }
-    total += e->NumberOfParametrizations();
+    num_exp += e->NumberOfParametrizations();
   }
+
+  printf("Read from file: %s\n", filename.c_str());
+  printf("File size: %lli\n", file_st.st_size);
+  printf("Num of nodes in formulas: %u\n\n", nodes);
+
 
   printf("Num of types of experiments: %lu\n", game.experiments().size());
   printf("Alphabet size: %lu\n", game.alphabet().size());
-  printf("Total num of experiments: %u\n", total);
+  printf("Total num of experiments: %u\n", num_exp);
   printf("Avg num of parametrizations per type: %.2f\n",
-         (float)total/game.experiments().size());
+         (float)num_exp/game.experiments().size());
   printf("Maximal branching: %u\n", branching);
   double d = log(models)/log(branching);
   printf("Trivial lower bound (expected): %.2f\n", d);
-  printf("Trivial lower bound (worst-case): %.0f\n", ceil(d));
+  printf("Trivial lower bound (worst-case): %.0f\n\n", ceil(d));
+
+  printf("Well-formed check...");
+
+  auto t1 = clock();
+  game.Precompute();
+  auto knowledge_graph = game.CreateGraph();
+  game.restriction()->AddToGraph(*knowledge_graph, nullptr);
+  auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
+  for (auto e: game.experiments()) {
+    auto& params_all = e->GenParams(var_equiv);
+    for (auto& params: params_all) {
+      auto f1 = new vec<Formula*>(e->outcomes().begin(), e->outcomes().end());
+      auto f2 = m.get<ExactlyOperator>(1, f1);
+      auto f3 = m.get<ImpliesOperator>(game.restriction(), f2);
+      auto f4 = m.get<NotOperator>(f3);
+
+      CnfFormula knowledge(game.variables().size());
+      knowledge.AddConstraint(f4, params);
+      if (knowledge.Satisfiable()) {
+        printf("%s failed!%s\n", color::serror, color::snormal);
+        printf("EXPERIMENT: %s ", e->name().c_str());
+        game.printParams(params);
+        printf("\n");
+        printf("PROBLEMATIC ASSIGNMENT: \n");
+        knowledge.PrintAssignment(game.variables());
+        printf("\n");
+        return;
+      }
+    }
+  }
+  auto t2 = clock();
+  printf("ok [%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
 }
 
 void simulation_mode() {
@@ -82,11 +124,12 @@ void simulation_mode() {
     // Prepare list of all sensible experiments in this round.
     vec<Option> options;
     for (auto e: game.experiments()) {
-      auto params_all = e->GenParams(var_equiv);
-      for (auto& params: *params_all) {
+      auto& params_all = e->GenParams(var_equiv);
+      for (auto& params: params_all) {
         options.push_back(Option(knowledge, *e, params, options.size()));
       }
     }
+    assert(options.size() > 0);
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options)];
@@ -188,7 +231,7 @@ int main(int argc, char* argv[]) {
     printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
 
     if (infoArg.getValue()) {
-      print_stats(m.game());
+      print_stats(m.game(), file);
     }
 
     if (simArg.getValue()) {

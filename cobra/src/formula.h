@@ -66,8 +66,8 @@ class Formula {
       : kChildCount(childCount) { }
 
   virtual ~Formula() { }
-  virtual uint child_count() { return kChildCount; }
-  virtual Formula* child(uint) { assert(false); };
+  virtual uint child_count() const { return kChildCount; }
+  virtual Formula* child(uint) const { assert(false); };
   virtual void set_child(uint nth, Formula* value) { assert(child(nth) == value); }
   virtual string name() = 0;
   virtual uint node_id() = 0;
@@ -118,6 +118,22 @@ class Formula {
                   int parent = -1);
 
   static Formula* Parse(string str);
+
+  uint Size() const {
+    uint r = 1;
+    for (uint i = 0; i < child_count(); ++i) {
+      r += child(i)->Size();
+    }
+    return r;
+  }
+
+  void clearTseitinIds() {
+    tseitin_var_ = 0;
+    for (uint i = 0; i < child_count(); ++i) {
+      child(i)->clearTseitinIds();
+    }
+  }
+
 };
 
 
@@ -160,16 +176,16 @@ class NaryOperator: public Formula {
     children_.pop_back();
   }
 
-  virtual uint child_count() {
+  virtual uint child_count() const {
     return children_.size();
   }
 
-  virtual Formula* child(uint nth) {
+  virtual Formula* child(uint nth) const {
     assert(nth < children_.size());
     return children_[nth];
   }
 
-  vec<Formula*>& children() {
+  const vec<Formula*>& children() const {
     return children_;
   }
 
@@ -363,7 +379,7 @@ class EquivalenceOperator: public Formula {
       ")";
   }
 
-  virtual Formula* child(uint nth) {
+  virtual Formula* child(uint nth) const {
     assert(nth < child_count());
     switch (nth) {
       case 0: return left_;
@@ -405,7 +421,7 @@ class ImpliesOperator: public Formula {
       ")";
   }
 
-  virtual Formula* child(uint nth) {
+  virtual Formula* child(uint nth) const {
     assert(nth < child_count());
     switch (nth) {
       case 0: return left_;
@@ -440,7 +456,7 @@ class NotOperator: public Formula {
     return (utf8 ? "¬" : "!") + child_->pretty(utf8, params);
   }
 
-  virtual Formula* child(uint nth) {
+  virtual Formula* child(uint nth) const {
     assert(nth == 0);
     return child_;
   }
@@ -546,7 +562,7 @@ class Variable: public Formula {
     return "Variable " + pretty() + "(" + std::to_string(id_) +")";
   }
 
-  virtual Formula* child(uint) {
+  virtual Formula* child(uint) const {
     // this have no children - child() should never be called
     assert(false);
   }

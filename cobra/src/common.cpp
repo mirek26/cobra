@@ -13,9 +13,11 @@ namespace color {
   const string head = "\033[1;97m";
   const string emph = "\033[32m";
   const string normal = "\033[0m";
+  const string error = "\033[31m";
   const char* const shead = "\033[1;97m";
   const char* const semph = "\033[32m";
   const char* const snormal = "\033[0m";
+  const char* const serror = "\033[31m";
 }
 
 vec<string> split(string s) {

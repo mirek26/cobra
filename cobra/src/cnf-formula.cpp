@@ -50,12 +50,14 @@ void CnfFormula::AddClause(const Clause& c) {
 
 void CnfFormula::AddConstraint(Formula* formula) {
   assert(formula);
+  formula->clearTseitinIds();
   formula->TseitinTransformation(*this, true);
 }
 
 void CnfFormula::AddConstraint(Formula* formula, const vec<CharId>& params) {
   assert(formula);
   build_for_params_ = &params;
+  formula->clearTseitinIds();
   formula->TseitinTransformation(*this, true);
   build_for_params_ = nullptr;
 }

@@ -39,9 +39,11 @@ namespace color {
   extern const string head;
   extern const string emph;
   extern const string normal;
+  extern const string error;
   extern const char* const shead;
   extern const char* const semph;
   extern const char* const snormal;
+  extern const char* const serror;
 }
 
 template<class T>
