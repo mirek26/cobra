@@ -271,20 +271,67 @@ The edges in $M$ correspond to the markers in the response,
 
 \subsection{Variants and generalizations}
 
-The old game of \emph{Bulls and Cows} has very similar principle to Mastermind,
-  it only uses letters instead of colors and does not allow repetitions.
+An old game called \emph{Bulls and Cows} has very similar principle to Mastermind,
+  it only uses digits instead of colors and does not allow repetitions.
 
 Static Mastermind is a variant of the game in which all guesses
   must be made at one go.
 The codebreaker prepares a set of guesses,
   then the codemakers evaluates each one as usual and
   the codebreaker must determine the code from the outcomes.
-This corresponds to so-called \emph{non-adaptive} strategies
+This variant was introduced by Chvátil\cite{mm-chvatil} and,
+  for $n <= 4$, solved by Goddard \cite{mm-static},
+  proving that for $4$ pegs and $k$ colors,
+  the optimal strategy performs $k-1$ guesses.
+Note that this corresponds to so-called \emph{non-adaptive} strategies
   for The Counterfeit Coin Problem.
 
 \subsection{Known results and related research}
 
-\emph{one-step look-ahead} heuristics, tabulka...
+Much research on this game has been done, authors focusing
+  on \emph{exact values}, \emph{asymptotics} (e.g. \cite{mm-chvatil}), or
+  computer generated strategies.
+
+The papers either strives to optimize \emph{the maximal number of guesses}
+  or \emph{the expected number of guesses}, given that the code
+  is selected from the set of possible codes with uniform distribution.
+These two problems are quite different and strategies performing well
+  in one case perform poorly in the other.
+
+Knuth\cite{mm-knuth} proposes a strategy that chooses the guess
+  that minimizes the maximal number of remaining possibilities over all
+  possible responses by the codemaker.
+This strategy requires at most 5 guesses in the standard $MM(4,6)$ variant,
+  which can be shown optimal.
+In the average case, it makes $4.48$ guesses.
+
+\begin{table} \label{tbl:one-step}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline Strategy & First guess & Expected-case & Worst-case \\ \hline
+Maximal num. & AABB & 4.476 & 5 \\ \hline
+Expected num. & AABC & 4.395 & 6 \\ \hline
+Entropy & ABCD & 4.416 & 6 \\ \hline
+Most parts & AABC & 4.373 & 6 \\ \hline
+Exp-case optimal & AABC & 4.340 & 6 \\ \hline
+\end{tabular}
+\caption{Comparison of one-step look-ahead strategies. Data from \cite{mm-ville} and \cite{mm-mostparts}.}
+\end{center}
+\end{table}
+
+Other authors proposed other one-step look-ahead strategies.
+Irving\cite{mm-expnum} suggested minimizing the expected number
+  of remaining possibilities,
+Neuwirth\cite{mm-entropy} maximized the entropy of the number
+  of possibilities in the next round.
+Much later, Kooi\cite{mm-mostparts} came up with a simple strategy that
+  just maximizes the number of possible responses by the codemaker,
+  which is computationally easier and performs better that the previous two.
+
+Using a backtracking algorithm, Koyama and Lai \cite{mm-exp-opt} found
+  the optimal strategy for the expected case, which requires $4.34$
+  guesses on average.
+The comparison of the described strategies is shown in \autoref{tbl:one-step}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -66,4 +66,47 @@ Tanya Khovanova.
 \newblock Parallel weighings.
 \newblock {\em arXiv preprint arXiv:1310.7268}, 2013.
 
+\bibitem{mm-chvatil}
+Vasek Chv{\'a}tal.
+\newblock Mastermind.
+\newblock {\em Combinatorica}, 3(3-4):325--329, 1983.
+
+\bibitem{mm-static}
+Wayne Goddard.
+\newblock Static mastermind.
+\newblock {\em Journal of Combinatorial Mathematics and Combinatorial
+  Computing}, 47:225--236, 2003.
+
+\bibitem{mm-knuth}
+Donald~E Knuth.
+\newblock The computer as master mind.
+\newblock {\em Journal of Recreational Mathematics}, 9(1):1--6, 1976.
+
+\bibitem{mm-ville}
+Geoffroy Ville.
+\newblock An optimal mastermind (4, 7) strategy and more results in the
+  expected case.
+\newblock {\em arXiv preprint arXiv:1305.1010}, 2013.
+
+\bibitem{mm-mostparts}
+Barteld~P Kooi.
+\newblock Yet another mastermind strategy.
+\newblock {\em ICGA Journal}, 28(1):13--20, 2005.
+
+\bibitem{mm-expnum}
+Robert~W Irving.
+\newblock Towards an optimum mastermind strategy.
+\newblock {\em Journal of Recreational Mathematics}, 11(2):81--87, 1978.
+
+\bibitem{mm-entropy}
+E~Neuwirth.
+\newblock Some strategies for mastermind.
+\newblock {\em Zeitschrift f{\"u}r Operations Research}, 26(1):B257--B278,
+  1982.
+
+\bibitem{mm-exp-opt}
+Kenji Koyama and Tony~W Lai.
+\newblock An optimal mastermind strategy.
+\newblock {\em Journal of Recreational Mathematics}, 25(4):251--256, 1993.
+
 \end{thebibliography}
