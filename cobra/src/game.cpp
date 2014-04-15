@@ -115,21 +115,41 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<uint> Game::ComputeVarEquiv(bliss::Digraph& graph) {
+vec<uint> Game::ComputeVarEquiv(CnfFormula& solver, bliss::Digraph& graph) {
   bliss::Stats stats;
   auto var_count = variables_.size();
   vec<uint> var_equiv(var_count + 1, 0);
+  // Assign label t/f to fixed variables, label others by their position
+  auto t = var_count, f = var_count + 1;
   for (uint i = 1; i <= var_count; i++) {
+    if (solver.MustBeTrue(i)) var_equiv[i] = t;
+    else if (solver.MustBeFalse(i)) var_equiv[i] = f;
     var_equiv[i] = i;
   }
   graph.find_automorphisms(stats,
                            ComputeVarEquiv_NewGenerator,
                            (void*)&var_equiv);
-  //printf("VAREQUIV:\n");
   for (uint i = 1; i <= var_count; i++) {
     var_equiv[i] = var_equiv[var_equiv[i]];
-    //printf("%i : %i \n", i, var_equiv[i]);
   }
-  //printf("\n");
+
   return var_equiv;
+}
+
+vec<Option> Game::GenerateExperiments(CnfFormula& solver, bliss::Digraph& graph) {
+  auto var_equiv = ComputeVarEquiv(solver, graph);
+  // printf("Var equiv:\n");
+  // for (auto i: var_equiv) printf("%i ", i);
+  // printf("\n");
+
+  // Prepare list of all sensible experiments in this round.
+  vec<Option> options;
+  for (auto e: experiments_) {
+    auto& params_all = e->GenParams(var_equiv);
+    for (auto& params: params_all) {
+      options.push_back(Option(solver, *e, params, options.size()));
+    }
+  }
+  assert(options.size() > 0);
+  return options;
 }

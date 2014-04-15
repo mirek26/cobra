@@ -14,6 +14,7 @@
 class Formula;
 class Experiment;
 class AndOperator;
+class Option;
 
 class Game {
   vec<Variable*> variables_;
@@ -63,7 +64,9 @@ class Game {
   void Precompute();
 
   bliss::Digraph* CreateGraph();
-  vec<uint> ComputeVarEquiv(bliss::Digraph&);
+  vec<uint> ComputeVarEquiv(CnfFormula& solver, bliss::Digraph& graph);
+  vec<Option> GenerateExperiments(CnfFormula& solver, bliss::Digraph& graph);
+
 
 
 };

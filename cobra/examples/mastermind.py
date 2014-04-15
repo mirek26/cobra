@@ -32,6 +32,8 @@ for num_total in range(N + 1): # total number of pegs
               formula[-1].add("F%i$%i"%(b, b))
             for i in range(num_whites):
               formula[-1].add("F%i$%i"%(whitesfor[i], whites[i]))
+              formula[-1].add("!F%i$%i"%(whites[i], whites[i]))
+              formula[-1].add("!F%i$%i"%(whitesfor[i], whitesfor[i]))
             for p in remaining - set(whites):
               for q in remaining - set(whitesfor):
                 formula[-1].add("!F%i$%i"%(q, p))

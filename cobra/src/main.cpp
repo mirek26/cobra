@@ -63,12 +63,15 @@ void print_stats(Game& game, string filename) {
   printf("Trivial lower bound (worst-case): %.0f\n\n", ceil(d));
 
   printf("Well-formed check...");
+  fflush(stdout);
 
   auto t1 = clock();
   game.Precompute();
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-  auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
+  CnfFormula restriction(game.variables().size());
+  restriction.AddConstraint(game.restriction());
+  auto var_equiv = game.ComputeVarEquiv(restriction, *knowledge_graph);
   for (auto e: game.experiments()) {
     auto& params_all = e->GenParams(var_equiv);
     for (auto& params: params_all) {
@@ -108,28 +111,7 @@ void simulation_mode() {
 
   int exp_num = 1;
   while (true) {
-    // Compute var equivalence.
-    auto var_equiv = game.ComputeVarEquiv(*knowledge_graph);
-    int t = game.variables().size(), f = t + 1;
-    for (uint i = 1; i <= game.variables().size(); i++) {
-      if (knowledge.MustBeTrue(i)) var_equiv[i] = t;
-      else if (knowledge.MustBeFalse(i)) var_equiv[i] = f;
-    }
-    // printf("Var equiv:\n");
-    // for (auto i: var_equiv) {
-    //   printf("%i ", i);
-    // }
-    // printf("\n");
-
-    // Prepare list of all sensible experiments in this round.
-    vec<Option> options;
-    for (auto e: game.experiments()) {
-      auto& params_all = e->GenParams(var_equiv);
-      for (auto& params: params_all) {
-        options.push_back(Option(knowledge, *e, params, options.size()));
-      }
-    }
-    assert(options.size() > 0);
+    auto options = game.GenerateExperiments(knowledge, *knowledge_graph);
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options)];
@@ -167,6 +149,10 @@ void simulation_mode() {
   }
 }
 
+void analyze_mode() {
+  printf("Not implemented yet.\n");
+}
+
 int main(int argc, char* argv[]) {
   // Parse input with TCLAP library.
   srand(time(NULL));
@@ -180,6 +166,10 @@ int main(int argc, char* argv[]) {
     SwitchArg simArg(
       "s", "simulation",
       "Starts simulation mode, player strategies can be specified by -b, -m.",
+      cmd, false);
+    SwitchArg analyzeArg(
+      "a", "analyze",
+      "Analyze codebreaker's strategy.",
       cmd, false);
 
     vec<string> breaker_stgs, maker_stgs;
@@ -195,12 +185,12 @@ int main(int argc, char* argv[]) {
 
     ValuesConstraint<string> makerConstraint(maker_stgs);
     ValueArg<string> codemakerArg(
-      "m", "codemaker",
+      "1", "codemaker",
       "Strategy to be played by the codemaker. Default: interactive." + maker_man, false,
       "interactive", &makerConstraint);
     ValuesConstraint<string> breakerConstraint(breaker_stgs);
     ValueArg<string> codebreakerArg(
-      "b", "codebreaker",
+      "2", "codebreaker",
       "Strategy to be played by the codebreaker. Default: interactive." + breaker_man, false,
       "interactive", &breakerConstraint);
     cmd.add(codemakerArg);
@@ -240,6 +230,14 @@ int main(int argc, char* argv[]) {
       simulation_mode();
     }
 
+    if (analyzeArg.getValue()) {
+      if (codebreakerArg.getValue() == "interactive") {
+        printf("Cannot analyze strategy 'interactive'. \n");
+        exit(EXIT_FAILURE);
+      }
+      g_breakerStg = strategy::breaker_strategies.at(codebreakerArg.getValue()).second;
+      analyze_mode();
+    }
   } catch (TCLAP::ArgException &e) {
     std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
   }
