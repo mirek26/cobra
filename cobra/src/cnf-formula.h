@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include "common.h"
+#include "solver.h"
 
 extern "C" {
   #include <picosat/picosat.h>
@@ -18,23 +19,17 @@ extern "C" {
 class Variable;
 class Formula;
 
-typedef set<VarId> Clause;
-
-class CnfFormula {
-  VarId limit_;
+class CnfFormula: public Solver {
   vec<Clause> clauses_;
   PicoSAT* picosat_;
   vec<int> context_;
-
+  const vec<Variable*>& vars_;
   const vec<CharId>* build_for_params_ = nullptr;
 
  public:
-  CnfFormula(VarId limit);
+  CnfFormula(const vec<Variable*>& vars, Formula* restriction);
 
   const vec<CharId>* build_for_params() const { return build_for_params_; }
-  void set_build_for_params(vec<CharId>* value) {
-    build_for_params_ = value;
-  }
 
   void AddClause(vec<VarId>& list);
   void AddClause(std::initializer_list<VarId> list);
@@ -43,37 +38,39 @@ class CnfFormula {
   void AddConstraint(Formula* formula, const vec<CharId>& params);
   void AddConstraint(CnfFormula& cnf);
 
-  void OpenContext();
-  void CloseContext();
+  virtual void OpenContext();
+  virtual void CloseContext();
 
-  bool MustBeTrue(VarId id);
-  bool MustBeFalse(VarId id);
-  uint GetNumOfFixedVars();
+  virtual bool MustBeTrue(VarId id);
+  virtual bool MustBeFalse(VarId id);
+  virtual uint GetNumOfFixedVars();
 
-  bool Satisfiable();
+  virtual bool Satisfiable();
 
   void WriteDimacs(FILE* f) {
     picosat_print(picosat_, f);
   }
 
   VarId NewVarId() {
-    return picosat_inc_max_var(picosat_);
+    assert(picosat_);
+    int k = picosat_inc_max_var(picosat_);
+    return k;
   }
 
-  void PrintAssignment(vec<Variable*>& vars);
+  virtual void PrintAssignment();
 
-  //vec<int> ComputeVariableEquivalence(VarId limit);
-
-  uint NumOfModelsSharpSat();
-  uint NumOfModels();
+  virtual uint NumOfModelsSharpSat();
+  virtual uint NumOfModels();
+  vec<vec<bool>> GenerateModels();
 
   string pretty();
 
  private:
   string pretty_clause(const Clause& clause);
 
+  void NumOfModelsRecursive(VarId var, std::function<void()> callback);
   //bool ProbeEquivalence(const Clause& clause, VarId var1, VarId var2);
-  void NumOfModelsRecursive(VarId s, uint* num);
+  //void NumOfModelsRecursive(VarId s, uint* num);
 
 };
 

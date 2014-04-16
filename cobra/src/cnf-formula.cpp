@@ -18,12 +18,14 @@ extern "C" {
 
 #include "cnf-formula.h"
 
-CnfFormula::CnfFormula(VarId limit) {
-  limit_ = limit;
+CnfFormula::CnfFormula(const vec<Variable*>& vars, Formula* restriction):
+    vars_(vars) {
   picosat_ = picosat_init();
   // Reserve id's for original variables.
-  for (VarId i = 0; i < limit; i++)
+  for (uint i = 0; i < vars_.size(); i++) {
     picosat_inc_max_var(picosat_);
+  }
+  AddConstraint(restriction);
 }
 
 //------------------------------------------------------------------------------
@@ -55,10 +57,8 @@ void CnfFormula::AddConstraint(Formula* formula) {
 }
 
 void CnfFormula::AddConstraint(Formula* formula, const vec<CharId>& params) {
-  assert(formula);
   build_for_params_ = &params;
-  formula->clearTseitinIds();
-  formula->TseitinTransformation(*this, true);
+  AddConstraint(formula);
   build_for_params_ = nullptr;
 }
 
@@ -73,10 +73,14 @@ void CnfFormula::AddConstraint(CnfFormula& cnf) {
 
 string CnfFormula::pretty_clause(const Clause& clause) {
   if (clause.empty()) return "()";
-  string s = "(" + std::to_string(*clause.begin());
-  for (auto it = std::next(clause.begin()); it != clause.end(); ++it) {
-    s += " | " + std::to_string(*it);
+  string s = "(";
+  for (auto lit: clause) {
+    int alit = abs(lit);
+    s += (lit != alit ? "-" : "") +
+         ((unsigned)alit <= vars_.size() ? vars_[alit-1]->ident() : std::to_string(alit)) +
+         " | ";
   }
+  s.erase(s.size() - 3, 3);
   s += ")";
   return s;
 }
@@ -85,7 +89,7 @@ string CnfFormula::pretty() {
   if (clauses_.empty()) return "(empty)";
   string s = pretty_clause(*clauses_.begin());
   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
-    s += "&" + pretty_clause(*it);
+    s += " & " + pretty_clause(*it);
   }
   return s;
 }
@@ -123,7 +127,7 @@ bool CnfFormula::MustBeFalse(VarId id) {
 
 uint CnfFormula::GetNumOfFixedVars() {
   uint r = 0;
-  for (auto id = 1; id <= limit_; id++) {
+  for (uint id = 1; id <= vars_.size(); id++) {
     r += MustBeTrue(id);
     r += MustBeFalse(id);
   }
@@ -135,17 +139,17 @@ bool CnfFormula::Satisfiable() {
   return (result == PICOSAT_SATISFIABLE);
 }
 
-void CnfFormula::PrintAssignment(vec<Variable*>& vars) {
+void CnfFormula::PrintAssignment() {
   vec<int> trueVar;
   vec<int> falseVar;
-  for (uint id = 1; id <= vars.size(); id++) {
+  for (uint id = 1; id <= vars_.size(); id++) {
     if (picosat_deref(picosat_, id) == 1) trueVar.push_back(id);
     else falseVar.push_back(id);
   }
   printf("TRUE: ");
-  for (auto s: trueVar) printf("%s ", vars[s-1]->ident().c_str());
+  for (auto s: trueVar) printf("%s ", vars_[s-1]->ident().c_str());
   printf("\nFALSE: ");
-  for (auto s: falseVar) printf("%s ", vars[s-1]->ident().c_str());
+  for (auto s: falseVar) printf("%s ", vars_[s-1]->ident().c_str());
   printf("\n");
 }
 
@@ -201,16 +205,20 @@ uint CnfFormula::NumOfModelsSharpSat(){
   return k;
 }
 
-void CnfFormula::NumOfModelsRecursive(VarId var, uint* num){
+void CnfFormula::NumOfModelsRecursive(VarId var, std::function<void()> callback){
+  assert(var > 0 && (unsigned)var <= vars_.size());
   for (VarId v: std::initializer_list<VarId>({var, -var})) {
     picosat_assume(picosat_, v);
     if (picosat_sat(picosat_, -1) == PICOSAT_SATISFIABLE) {
-      if (var == limit_) (*num)++;
+      if ((unsigned)var == vars_.size()) {
+        //PrintAssignment();
+        callback();
+      }
       else {
         picosat_push(picosat_);
         picosat_add(picosat_, v);
         picosat_add(picosat_, 0);
-        NumOfModelsRecursive(var + 1, num);
+        NumOfModelsRecursive(var + 1, callback);
         picosat_pop(picosat_);
       }
     }
@@ -219,7 +227,18 @@ void CnfFormula::NumOfModelsRecursive(VarId var, uint* num){
 
 uint CnfFormula::NumOfModels() {
   uint k = 0;
-  NumOfModelsRecursive(1, &k);
+  NumOfModelsRecursive(1, [&](){ k++; });
   return k;
 }
 
+vec<vec<bool>> CnfFormula::GenerateModels() {
+  vec<vec<bool>> models;
+  NumOfModelsRecursive(1, [&](){
+    vec<bool> n(vars_.size() + 1, false);
+    for (uint id = 1; id <= vars_.size(); id++) {
+      if (picosat_deref(picosat_, id) == 1) n[id] = true;
+    }
+    models.push_back(n);
+  });
+  return models;
+}

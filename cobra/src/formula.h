@@ -134,6 +134,7 @@ class Formula {
     }
   }
 
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) = 0;
 };
 
 
@@ -236,6 +237,13 @@ class AndOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    for (uint i = 0; i < child_count(); ++i) {
+      if (!child(i)->Satisfied(model, params)) return false;
+    }
+    return true;
+  }
 };
 
 /******************************************************************************
@@ -264,6 +272,13 @@ class OrOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    for (uint i = 0; i < child_count(); ++i) {
+      if (child(i)->Satisfied(model, params)) return true;
+    }
+    return false;
+  }
 };
 
 /******************************************************************************
@@ -293,6 +308,15 @@ class AtLeastOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    uint sat = 0;
+    for (uint i = 0; i < child_count(); ++i) {
+      sat += child(i)->Satisfied(model, params);
+      if (sat >= value_) return true;
+    }
+    return false;
+  }
 };
 
 /******************************************************************************
@@ -322,6 +346,14 @@ class AtMostOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    uint sat = 0;
+    for (uint i = 0; i < child_count(); ++i) {
+      sat += child(i)->Satisfied(model, params);
+    }
+    return sat <= value_;
+  }
 };
 
 /******************************************************************************
@@ -351,6 +383,14 @@ class ExactlyOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    uint sat = 0;
+    for (uint i = 0; i < child_count(); ++i) {
+      sat += child(i)->Satisfied(model, params);
+    }
+    return sat == value_;
+  }
 };
 
 /******************************************************************************
@@ -393,6 +433,10 @@ class EquivalenceOperator: public Formula {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    return left_->Satisfied(model, params) == right_->Satisfied(model, params);
+  }
 };
 
 /******************************************************************************
@@ -435,6 +479,10 @@ class ImpliesOperator: public Formula {
   // }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    return !left_->Satisfied(model, params) || right_->Satisfied(model, params);
+  }
 };
 
 /******************************************************************************
@@ -479,6 +527,10 @@ class NotOperator: public Formula {
   }
 
   virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    return !child_->Satisfied(model, params);
+  }
 };
 
 class Mapping: public Formula {
@@ -528,6 +580,10 @@ class Mapping: public Formula {
       assert(cnf.build_for_params());
       cnf.AddClause({ getValue(*cnf.build_for_params()) });
     }
+  }
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
+    return model[getValue(params)];
   }
 };
 
@@ -595,6 +651,11 @@ class Variable: public Formula {
     if (top) {
       cnf.AddClause({ id_ });
     }
+  }
+
+  virtual bool Satisfied(const vec<bool>& model, const vec<CharId>) {
+    assert((unsigned)id_ < model.size());
+    return model[id_];
   }
 };
 

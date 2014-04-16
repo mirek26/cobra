@@ -18,6 +18,8 @@
 #include "common.h"
 #include "parser.h"
 #include "strategy.h"
+#include "cnf-formula.h"
+#include "simple-solver.h"
 
 extern "C" int yyparse();
 extern "C" FILE* yyin;
@@ -29,9 +31,8 @@ std::function<uint(Option&)> g_makerStg;
 void print_stats(Game& game, string filename) {
   printf("\n%s===== GAME STATISTICS =====%s\n", color::shead, color::snormal);
   printf("Num of variables: %lu\n", game.variables().size());
-  CnfFormula knowledge(game.variables().size());
-  knowledge.AddConstraint(game.restriction());
-  uint models = knowledge.NumOfModels();
+  CnfFormula solver(game.variables(), game.restriction());
+  uint models = solver.NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
   struct stat file_st;
@@ -69,8 +70,7 @@ void print_stats(Game& game, string filename) {
   game.Precompute();
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-  CnfFormula restriction(game.variables().size());
-  restriction.AddConstraint(game.restriction());
+  CnfFormula restriction(game.variables(), game.restriction());
   auto var_equiv = game.ComputeVarEquiv(restriction, *knowledge_graph);
   for (auto e: game.experiments()) {
     auto& params_all = e->GenParams(var_equiv);
@@ -80,15 +80,18 @@ void print_stats(Game& game, string filename) {
       auto f3 = m.get<ImpliesOperator>(game.restriction(), f2);
       auto f4 = m.get<NotOperator>(f3);
 
-      CnfFormula knowledge(game.variables().size());
+      CnfFormula knowledge(game.variables(), game.restriction());
+      SimpleSolver simple(game.variables(), game.restriction());
+      simple.AddConstraint(f4, params);
       knowledge.AddConstraint(f4, params);
+      assert(simple.Satisfiable() == knowledge.Satisfiable());
       if (knowledge.Satisfiable()) {
         printf("%s failed!%s\n", color::serror, color::snormal);
         printf("EXPERIMENT: %s ", e->name().c_str());
         game.printParams(params);
         printf("\n");
         printf("PROBLEMATIC ASSIGNMENT: \n");
-        knowledge.PrintAssignment(game.variables());
+        knowledge.PrintAssignment();
         printf("\n");
         return;
       }
@@ -105,8 +108,7 @@ void simulation_mode() {
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
-  CnfFormula knowledge(game.variables().size());
-  knowledge.AddConstraint(game.restriction());
+  CnfFormula knowledge(game.variables(), game.restriction());
   //knowledge.WriteDimacs(stdout);
 
   int exp_num = 1;
@@ -138,7 +140,7 @@ void simulation_mode() {
     if (knowledge.NumOfModels() == 1) {
       printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
       knowledge.Satisfiable();
-      knowledge.PrintAssignment(game.variables());
+      knowledge.PrintAssignment();
       break;
     }
 
