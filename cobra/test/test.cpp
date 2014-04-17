@@ -2,7 +2,7 @@
 #include <initializer_list>
 #include "include/gtest/gtest.h"
 #include "../src/formula.h"
-#include "../src/cnf-formula.h"
+#include "../src/pico-solver.h"
 #include "../src/simple-solver.h"
 #include "../src/parser.h"
 
@@ -31,16 +31,16 @@ TEST(Tseitin, Basic) {
   m.reset();
   m.game().declareVariables({"x", "y"});
   auto f = Formula::Parse("!(And(Or(x&!y, y&!x)))");
-  CnfFormula s1(m.game().variables(), f);
+  PicoSolver s1(m.game().variables(), f);
   // EXPECT_EQ(2, s1.NumOfModels());
-  // CnfFormula s2(m.game().variables(), f);
+  // PicoSolver s2(m.game().variables(), f);
   // EXPECT_EQ(2, s2.NumOfModels());
 }
 
 TEST(Tseitin, Exactly0) {
   m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
-  CnfFormula s(m.game().variables(),
+  PicoSolver s(m.game().variables(),
                Formula::Parse("!((!a1 & !a2 & !a3) <-> Exactly-0(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -48,7 +48,7 @@ TEST(Tseitin, Exactly0) {
 TEST(Tseitin, Exactly1) {
   m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
-  CnfFormula s(m.game().variables(),
+  PicoSolver s(m.game().variables(),
                Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -56,7 +56,7 @@ TEST(Tseitin, Exactly1) {
 TEST(Tseitin, Exactly1b) {
   m.reset();
   m.game().declareVariables({"a", "b"});
-  CnfFormula s(m.game().variables(),
+  PicoSolver s(m.game().variables(),
                Formula::Parse("Exactly-1(a, a|b, b)"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -64,7 +64,7 @@ TEST(Tseitin, Exactly1b) {
 TEST(Tseitin, ExactlyN) {
   m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
-  CnfFormula s(m.game().variables(),
+  PicoSolver s(m.game().variables(),
                Formula::Parse("!((a1 & a2 & a3) <-> Exactly-3(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -72,7 +72,7 @@ TEST(Tseitin, ExactlyN) {
 TEST(SolverTest, Exactly1) {
   m.reset();
   m.game().declareVariables({"a1", "a2", "a3"});
-  CnfFormula s(m.game().variables(), Formula::Parse("Exactly-1(a1, a2, a3)"));
+  PicoSolver s(m.game().variables(), Formula::Parse("Exactly-1(a1, a2, a3)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("a2 <-> a3"));
   EXPECT_TRUE(s.Satisfiable());
@@ -83,7 +83,7 @@ TEST(SolverTest, Exactly1) {
 // Sat solver tests.
 
 using testing::Types;
-typedef Types<CnfFormula, SimpleSolver> Implementations;
+typedef Types<PicoSolver, SimpleSolver> Implementations;
 TYPED_TEST_CASE(SolverTest, Implementations);
 
 template <class T>

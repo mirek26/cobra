@@ -11,7 +11,7 @@
 #include <bliss/graph.hh>
 #include "common.h"
 #include "parser.h"
-#include "cnf-formula.h"
+#include "pico-solver.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -79,7 +79,7 @@ class Formula {
   /* Getter function for tseitin_var_. If tseitin_var_ was not used yet,
    * a new variable id will be created.
    */
-  virtual VarId tseitin_var(CnfFormula& cnf);
+  virtual VarId tseitin_var(PicoSolver& cnf);
 
   /* Negate the formula. Equivalent to m.get<NotOperator>(this), except for
    * NotOperator nodes, for which it just returns the child (and thus avoids
@@ -102,12 +102,12 @@ class Formula {
    * that are added to the vector 'clauses'. Recursively calls the same
    * on all children.
    */
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top) = 0;
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top) = 0;
 
   /* Converts the formula to CNF using Tseitin transformation.
    */
-  // CnfFormula* ToCnf();
-  // CnfFormula* ToCnf(vec<CharId>& param);
+  // PicoSolver* ToCnf();
+  // PicoSolver* ToCnf(vec<CharId>& param);
 
   // virtual Formula* clone() = 0;
 
@@ -191,7 +191,7 @@ class NaryOperator: public Formula {
   }
 
  protected:
-  vec<VarId> tseitin_children(CnfFormula& cnf) {
+  vec<VarId> tseitin_children(PicoSolver& cnf) {
     vec<VarId> vars(children_.size(), 0);
     std::transform(children_.begin(), children_.end(), vars.begin(), [&](Formula* f){
       return f->tseitin_var(cnf);
@@ -236,7 +236,7 @@ class AndOperator: public NaryOperator {
   //   // return m.get<AndOperator>(children_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     for (uint i = 0; i < child_count(); ++i) {
@@ -271,7 +271,7 @@ class OrOperator: public NaryOperator {
   //   return m.get<OrOperator>(children_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     for (uint i = 0; i < child_count(); ++i) {
@@ -307,7 +307,7 @@ class AtLeastOperator: public NaryOperator {
   //   return m.get<AtLeastOperator>(value_, children_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -345,7 +345,7 @@ class AtMostOperator: public NaryOperator {
   //   return m.get<AtMostOperator>(value_, children_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -382,7 +382,7 @@ class ExactlyOperator: public NaryOperator {
   //   return m.get<ExactlyOperator>(value_, children_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -432,7 +432,7 @@ class EquivalenceOperator: public Formula {
   //   return m.get<EquivalenceOperator>(left_->clone(), right_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return left_->Satisfied(model, params) == right_->Satisfied(model, params);
@@ -478,7 +478,7 @@ class ImpliesOperator: public Formula {
   //   return m.get<ImpliesOperator>(left_->clone(), right_->clone());
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return !left_->Satisfied(model, params) || right_->Satisfied(model, params);
@@ -509,7 +509,7 @@ class NotOperator: public Formula {
     return child_;
   }
 
-  virtual VarId tseitin_var(CnfFormula& cnf) {
+  virtual VarId tseitin_var(PicoSolver& cnf) {
     if (isLiteral()) return -child_->tseitin_var(cnf);
     else return Formula::tseitin_var(cnf);
   }
@@ -526,7 +526,7 @@ class NotOperator: public Formula {
     return child_->isLiteral();
   }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top);
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return !child_->Satisfied(model, params);
@@ -562,7 +562,7 @@ class Mapping: public Formula {
     return m.game().getMappingValue(mapping_id_, params[param_id_]);
   }
 
-  virtual VarId tseitin_var(CnfFormula& cnf) {
+  virtual VarId tseitin_var(PicoSolver& cnf) {
     assert(cnf.build_for_params());
     return getValue(*cnf.build_for_params());
   }
@@ -575,7 +575,7 @@ class Mapping: public Formula {
   //   return m.get<Mapping>(ident_, mapping_id_, param_id_);
   // }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top) {
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top) {
     if (top) {
       assert(cnf.build_for_params());
       cnf.AddClause({ getValue(*cnf.build_for_params()) });
@@ -623,7 +623,7 @@ class Variable: public Formula {
     assert(false);
   }
 
-  virtual VarId tseitin_var(CnfFormula&) {
+  virtual VarId tseitin_var(PicoSolver&) {
     return id_;
   }
 
@@ -647,7 +647,7 @@ class Variable: public Formula {
     return true;
   }
 
-  virtual void TseitinTransformation(CnfFormula& cnf, bool top) {
+  virtual void TseitinTransformation(PicoSolver& cnf, bool top) {
     if (top) {
       cnf.AddClause({ id_ });
     }

@@ -8,7 +8,7 @@
 #include <set>
 #include "common.h"
 #include "solver.h"
-#include "cnf-formula.h"
+#include "pico-solver.h"
 
 #ifndef COBRA_SOLVER_SIMPLE_H_
 #define COBRA_SOLVER_SIMPLE_H_
@@ -17,6 +17,8 @@ class Variable;
 class Formula;
 
 class SimpleSolver: public Solver {
+  static SolverStats stats_;
+
   vec<std::pair<Formula*, vec<CharId>>> constraints_;
   vec<int> contexts_;
 
@@ -30,12 +32,15 @@ class SimpleSolver: public Solver {
  public:
   SimpleSolver(const vec<Variable*>& vars, Formula* restriction) :
       vars_(vars), restriction_(restriction) {
-    CnfFormula sat(vars, restriction);
+    PicoSolver sat(vars, restriction);
     codes_ = sat.GenerateModels();
     for (uint i = 0; i < codes_.size(); i++)
       sat_.push_back(i);
     ready_ = true;
   }
+
+  virtual SolverStats& stats() { return stats_; }
+  static SolverStats& s_stats() { return stats_; }
 
   virtual void AddConstraint(Formula* formula) {
     ready_ = false;
@@ -58,21 +63,21 @@ class SimpleSolver: public Solver {
     ready_ = false;
   }
 
-  virtual bool MustBeTrue(VarId id) {
+  virtual bool _MustBeTrue(VarId id) {
     if (!ready_) Update();
     for (auto& x: sat_)
       if (!codes_[x][id]) return false;
     return true;
   }
 
-  virtual bool MustBeFalse(VarId id) {
+  virtual bool _MustBeFalse(VarId id) {
     if (!ready_) Update();
     for (auto& x: sat_)
       if (codes_[x][id]) return false;
     return true;
   }
 
-  virtual uint GetNumOfFixedVars() {
+  virtual uint _GetNumOfFixedVars() {
     if (!ready_) Update();
     vec<bool> canbe[2];
     canbe[0].resize(vars_.size());
@@ -86,16 +91,24 @@ class SimpleSolver: public Solver {
     return f;
   }
 
-  virtual bool Satisfiable() {
+  virtual bool _Satisfiable() {
     if (!ready_) Update();
     return !sat_.empty();
   }
 
   virtual void PrintAssignment();
 
-  virtual uint NumOfModels() {
+  virtual uint _NumOfModels() {
     if (!ready_) Update();
     return sat_.size();
+  }
+
+  virtual vec<vec<bool>> _GenerateModels() {
+    if (!ready_) Update();
+    vec<vec<bool>> result;
+    for (auto x: sat_)
+      result.push_back(codes_[x]);
+    return result;
   }
 
   virtual string pretty();

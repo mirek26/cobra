@@ -115,7 +115,7 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<uint> Game::ComputeVarEquiv(CnfFormula& solver, bliss::Digraph& graph) {
+vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
   bliss::Stats stats;
   auto var_count = variables_.size();
   vec<uint> var_equiv(var_count + 1, 0);
@@ -136,7 +136,7 @@ vec<uint> Game::ComputeVarEquiv(CnfFormula& solver, bliss::Digraph& graph) {
   return var_equiv;
 }
 
-vec<Option> Game::GenerateExperiments(CnfFormula& solver, bliss::Digraph& graph) {
+vec<Option> Game::GenerateExperiments(Solver& solver, bliss::Digraph& graph) {
   auto var_equiv = ComputeVarEquiv(solver, graph);
   // printf("Var equiv:\n");
   // for (auto i: var_equiv) printf("%i ", i);

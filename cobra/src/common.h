@@ -72,5 +72,6 @@ void transform(vec<T>& from, vec<R>& to, std::function<R(T)>& fun) {
 
 vec<string> split(string s);
 bool readIntOrString(uint& i, string& str);
+double toSeconds(clock_t time);
 
 #endif  // COBRA_COMMON_H_

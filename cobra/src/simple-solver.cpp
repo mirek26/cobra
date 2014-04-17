@@ -2,6 +2,7 @@
 #include "formula.h"
 #include "simple-solver.h"
 
+SolverStats SimpleSolver::stats_ = SolverStats();
 
 void SimpleSolver::PrintAssignment() {
   assert(!sat_.empty());
@@ -31,6 +32,7 @@ void SimpleSolver::Update() {
     }
     if (ok) sat_.push_back(i);
   }
+  ready_ = true;
 }
 
 string SimpleSolver::pretty() {

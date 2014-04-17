@@ -20,7 +20,7 @@ struct GenParamsStats {
 };
 
 class Option {
-  CnfFormula& cnf_;
+  Solver& solver_;
   Experiment& type_;
   vec<CharId> params_;
   uint index_;
@@ -32,8 +32,8 @@ class Option {
   vec<uint> fixed_;
 
  public:
-  Option(CnfFormula& cnf, Experiment& e, vec<CharId> params, uint index):
-    cnf_(cnf),
+  Option(Solver& solver, Experiment& e, vec<CharId> params, uint index):
+    solver_(solver),
     type_(e),
     params_(params),
     index_(index) { }
@@ -84,7 +84,6 @@ class Experiment {
 
   vec<string> outcomes_names_;
   vec<Formula*> outcomes_;
-  vec<CnfFormula> outcomes_cnf_;
 
   vec<set<MapId>> used_maps_;
   set<VarId> used_vars_;

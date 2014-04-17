@@ -17,7 +17,7 @@ class Variable;
 class Formula;
 class Experiment;
 class Game;
-class CnfFormula;
+class PicoSolver;
 
 class ParserException: public std::exception {
   string what_;

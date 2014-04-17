@@ -42,14 +42,14 @@ string Mapping::pretty(bool, const vec<CharId>* params) {
 }
 
 // Tseitin transformation of arbitrary formula to CNF
-// CnfFormula* Formula::ToCnf() {
-//   CnfFormula* r = new CnfFormula();
+// PicoSolver* Formula::ToCnf() {
+//   PicoSolver* r = new PicoSolver();
 //   TseitinTransformation(r, true);
 //   return r;
 // }
 
-// CnfFormula* Formula::ToCnf(vec<CharId>& param) {
-//   CnfFormula* r = new CnfFormula();
+// PicoSolver* Formula::ToCnf(vec<CharId>& param) {
+//   PicoSolver* r = new PicoSolver();
 //   r->set_build_for_params(&param);
 //   TseitinTransformation(r, true);
 //   r->set_build_for_params(nullptr);
@@ -57,7 +57,7 @@ string Mapping::pretty(bool, const vec<CharId>* params) {
 // }
 
 // return the variable corresponding to the node during Tseitin transformation
-VarId Formula::tseitin_var(CnfFormula& cnf) {
+VarId Formula::tseitin_var(PicoSolver& cnf) {
   if (tseitin_var_ == 0) {
     tseitin_var_ = cnf.NewVarId();
   }
@@ -68,7 +68,7 @@ VarId Formula::tseitin_var(CnfFormula& cnf) {
  * Tseitin transformation.
  */
 
-void TseitinAnd(VarId thisVar, CnfFormula& cnf,
+void TseitinAnd(VarId thisVar, PicoSolver& cnf,
                 const vec<VarId>& list, uint offset,
                 bool negate = false) {
   int neg = negate ? -1 : 1;
@@ -86,7 +86,7 @@ void TseitinAnd(VarId thisVar, CnfFormula& cnf,
   }
 }
 
-void AndOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void AndOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   // if on top level, all childs must be true - just recurse down
   if (!top) {
     TseitinAnd(tseitin_var(cnf), cnf,
@@ -98,7 +98,7 @@ void AndOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   }
 }
 
-void OrOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void OrOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   vec<VarId> first;
   for (auto& f: children_) {
     first.push_back(f->tseitin_var(cnf));
@@ -122,7 +122,7 @@ void OrOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   }
 }
 
-void NotOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void NotOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   // X <-> (!Y)
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var(cnf);
@@ -135,7 +135,7 @@ void NotOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   }
 }
 
-void ImpliesOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void ImpliesOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   auto leftVar = left_->tseitin_var(cnf);
   auto rightVar = right_->tseitin_var(cnf);
@@ -152,7 +152,7 @@ void ImpliesOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   right_->TseitinTransformation(cnf, false);
 }
 
-void EquivalenceOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   auto leftVar = left_->tseitin_var(cnf);
   auto rightVar = right_->tseitin_var(cnf);
@@ -172,7 +172,7 @@ void EquivalenceOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
 }
 
 // 'to' exclusively
-void TseitinNumerical(VarId thisVar, CnfFormula& cnf,
+void TseitinNumerical(VarId thisVar, PicoSolver& cnf,
                       bool at_least, bool at_most, uint value,
                       const vec<VarId>& children, uint offset) {
   // X <-> ( A1 & T1 ) | ( !A1 & T2 )
@@ -193,7 +193,7 @@ void TseitinNumerical(VarId thisVar, CnfFormula& cnf,
   }
 }
 
-void ExactlyOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void ExactlyOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
@@ -205,7 +205,7 @@ void ExactlyOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   }
 }
 
-void AtLeastOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void AtLeastOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
@@ -217,7 +217,7 @@ void AtLeastOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
   }
 }
 
-void AtMostOperator::TseitinTransformation(CnfFormula& cnf, bool top) {
+void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,

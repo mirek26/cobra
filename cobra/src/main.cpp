@@ -18,7 +18,7 @@
 #include "common.h"
 #include "parser.h"
 #include "strategy.h"
-#include "cnf-formula.h"
+#include "pico-solver.h"
 #include "simple-solver.h"
 
 extern "C" int yyparse();
@@ -28,10 +28,25 @@ extern Parser m;
 std::function<uint(vec<Option>&)> g_breakerStg;
 std::function<uint(Option&)> g_makerStg;
 
+void time_overview() {
+  printf("= Time overview = \n");
+  auto s1 = PicoSolver::s_stats();
+  printf("PicoSolver: sat %i [%.2f] fixed %i [%.2f] models %i [%.2f]\n",
+    s1.sat_calls, toSeconds(s1.sat_time),
+    s1.fixed_calls, toSeconds(s1.fixed_time),
+    s1.models_calls, toSeconds(s1.models_time));
+  auto s2 = SimpleSolver::s_stats();
+  printf("SimpleSolver: sat %i [%.2f] fixed %i [%.2f] models %i [%.2f]\n",
+    s2.sat_calls, toSeconds(s2.sat_time),
+    s2.fixed_calls, toSeconds(s2.fixed_time),
+    s2.models_calls, toSeconds(s2.models_time));
+}
+
 void print_stats(Game& game, string filename) {
   printf("\n%s===== GAME STATISTICS =====%s\n", color::shead, color::snormal);
   printf("Num of variables: %lu\n", game.variables().size());
-  CnfFormula solver(game.variables(), game.restriction());
+  SimpleSolver s(game.variables(), game.restriction());
+  Solver& solver = s;
   uint models = solver.NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
@@ -70,8 +85,7 @@ void print_stats(Game& game, string filename) {
   game.Precompute();
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-  CnfFormula restriction(game.variables(), game.restriction());
-  auto var_equiv = game.ComputeVarEquiv(restriction, *knowledge_graph);
+  auto var_equiv = game.ComputeVarEquiv(solver, *knowledge_graph);
   for (auto e: game.experiments()) {
     auto& params_all = e->GenParams(var_equiv);
     for (auto& params: params_all) {
@@ -80,18 +94,14 @@ void print_stats(Game& game, string filename) {
       auto f3 = m.get<ImpliesOperator>(game.restriction(), f2);
       auto f4 = m.get<NotOperator>(f3);
 
-      CnfFormula knowledge(game.variables(), game.restriction());
-      SimpleSolver simple(game.variables(), game.restriction());
-      simple.AddConstraint(f4, params);
-      knowledge.AddConstraint(f4, params);
-      assert(simple.Satisfiable() == knowledge.Satisfiable());
-      if (knowledge.Satisfiable()) {
+      solver.OpenContext();
+      solver.AddConstraint(f4, params);
+      if (solver.Satisfiable()) {
         printf("%s failed!%s\n", color::serror, color::snormal);
         printf("EXPERIMENT: %s ", e->name().c_str());
         game.printParams(params);
-        printf("\n");
-        printf("PROBLEMATIC ASSIGNMENT: \n");
-        knowledge.PrintAssignment();
+        printf("\nPROBLEMATIC ASSIGNMENT: \n");
+        solver.PrintAssignment();
         printf("\n");
         return;
       }
@@ -108,7 +118,7 @@ void simulation_mode() {
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
-  CnfFormula knowledge(game.variables(), game.restriction());
+  PicoSolver knowledge(game.variables(), game.restriction());
   //knowledge.WriteDimacs(stdout);
 
   int exp_num = 1;
@@ -240,6 +250,8 @@ int main(int argc, char* argv[]) {
       g_breakerStg = strategy::breaker_strategies.at(codebreakerArg.getValue()).second;
       analyze_mode();
     }
+
+    time_overview();
   } catch (TCLAP::ArgException &e) {
     std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
   }

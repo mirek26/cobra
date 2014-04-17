@@ -44,3 +44,7 @@ bool readIntOrString(uint& i, string& str) {
   } catch (std::invalid_argument) { }
   return false;
 }
+
+double toSeconds(clock_t time) {
+  return double(time)/CLOCKS_PER_SEC;
+}

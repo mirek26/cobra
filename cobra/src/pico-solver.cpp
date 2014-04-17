@@ -16,9 +16,11 @@ extern "C" {
   #include <picosat/picosat.h>
 }
 
-#include "cnf-formula.h"
+#include "pico-solver.h"
 
-CnfFormula::CnfFormula(const vec<Variable*>& vars, Formula* restriction):
+SolverStats PicoSolver::stats_ = SolverStats();
+
+PicoSolver::PicoSolver(const vec<Variable*>& vars, Formula* restriction):
     vars_(vars) {
   picosat_ = picosat_init();
   // Reserve id's for original variables.
@@ -31,17 +33,17 @@ CnfFormula::CnfFormula(const vec<Variable*>& vars, Formula* restriction):
 //------------------------------------------------------------------------------
 // Adding constraints
 
-void CnfFormula::AddClause(vec<VarId>& list) {
+void PicoSolver::AddClause(vec<VarId>& list) {
   Clause c(list.begin(), list.end());
   AddClause(c);
 }
 
-void CnfFormula::AddClause(std::initializer_list<VarId> list) {
+void PicoSolver::AddClause(std::initializer_list<VarId> list) {
   Clause c(list.begin(), list.end());
   AddClause(c);
 }
 
-void CnfFormula::AddClause(const Clause& c) {
+void PicoSolver::AddClause(const Clause& c) {
   clauses_.push_back(c);
   for (auto l: c) {
     assert(l != 0);
@@ -50,19 +52,19 @@ void CnfFormula::AddClause(const Clause& c) {
   picosat_add(picosat_, 0);
 }
 
-void CnfFormula::AddConstraint(Formula* formula) {
+void PicoSolver::AddConstraint(Formula* formula) {
   assert(formula);
   formula->clearTseitinIds();
   formula->TseitinTransformation(*this, true);
 }
 
-void CnfFormula::AddConstraint(Formula* formula, const vec<CharId>& params) {
+void PicoSolver::AddConstraint(Formula* formula, const vec<CharId>& params) {
   build_for_params_ = &params;
   AddConstraint(formula);
   build_for_params_ = nullptr;
 }
 
-void CnfFormula::AddConstraint(CnfFormula& cnf) {
+void PicoSolver::AddConstraint(PicoSolver& cnf) {
   for (auto& clause: cnf.clauses_) {
     AddClause(clause);
   }
@@ -71,7 +73,7 @@ void CnfFormula::AddConstraint(CnfFormula& cnf) {
 //------------------------------------------------------------------------------
 // Pretty print
 
-string CnfFormula::pretty_clause(const Clause& clause) {
+string PicoSolver::pretty_clause(const Clause& clause) {
   if (clause.empty()) return "()";
   string s = "(";
   for (auto lit: clause) {
@@ -85,8 +87,8 @@ string CnfFormula::pretty_clause(const Clause& clause) {
   return s;
 }
 
-string CnfFormula::pretty() {
-  if (clauses_.empty()) return "(empty)";
+string PicoSolver::pretty() {
+  if (clauses_.empty()) return "()";
   string s = pretty_clause(*clauses_.begin());
   for (auto it = std::next(clauses_.begin()); it != clauses_.end(); ++it) {
     s += " & " + pretty_clause(*it);
@@ -96,12 +98,12 @@ string CnfFormula::pretty() {
 
 //------------------------------------------------------------------------------
 
-void CnfFormula::OpenContext() {
+void PicoSolver::OpenContext() {
   picosat_push(picosat_);
   context_.push_back(clauses_.size());
 }
 
-void CnfFormula::CloseContext() {
+void PicoSolver::CloseContext() {
   assert(!context_.empty());
   int k = context_.back();
   clauses_.erase(clauses_.begin()+k, clauses_.end());
@@ -113,33 +115,33 @@ void CnfFormula::CloseContext() {
 //------------------------------------------------------------------------------
 // SAT solver stuff
 
-bool CnfFormula::MustBeTrue(VarId id) {
+bool PicoSolver::_MustBeTrue(VarId id) {
   assert(id > 0);
   picosat_assume(picosat_, -id);
-  return !Satisfiable();
+  return !_Satisfiable();
 }
 
-bool CnfFormula::MustBeFalse(VarId id) {
+bool PicoSolver::_MustBeFalse(VarId id) {
   assert(id > 0);
   picosat_assume(picosat_, id);
-  return !Satisfiable();
+  return !_Satisfiable();
 }
 
-uint CnfFormula::GetNumOfFixedVars() {
+uint PicoSolver::_GetNumOfFixedVars() {
   uint r = 0;
   for (uint id = 1; id <= vars_.size(); id++) {
-    r += MustBeTrue(id);
-    r += MustBeFalse(id);
+    r += _MustBeTrue(id);
+    r += _MustBeFalse(id);
   }
   return r;
 }
 
-bool CnfFormula::Satisfiable() {
+bool PicoSolver::_Satisfiable() {
   auto result = picosat_sat(picosat_, -1);
   return (result == PICOSAT_SATISFIABLE);
 }
 
-void CnfFormula::PrintAssignment() {
+void PicoSolver::PrintAssignment() {
   vec<int> trueVar;
   vec<int> falseVar;
   for (uint id = 1; id <= vars_.size(); id++) {
@@ -156,7 +158,7 @@ void CnfFormula::PrintAssignment() {
 //------------------------------------------------------------------------------
 // Symmetry-breaking stuff
 
-// bool CnfFormula::ProbeEquivalence(const Clause& clause, VarId var1, VarId var2) {
+// bool PicoSolver::ProbeEquivalence(const Clause& clause, VarId var1, VarId var2) {
 //   Clause test(clause);
 //   bool p1 = test.erase(var1);
 //   bool p2 = test.erase(var2);
@@ -170,7 +172,7 @@ void CnfFormula::PrintAssignment() {
 // }
 
 // // Compute 'syntactical' equivalence on variables with ids 1 - limit; how about semantical?
-// vec<int> CnfFormula::ComputeVariableEquivalence(VarId limit) {
+// vec<int> PicoSolver::ComputeVariableEquivalence(VarId limit) {
 //   assert(context_.empty());
 //   vec<int> components(limit + 1, 0);
 //   int cid = 1;
@@ -190,7 +192,7 @@ void CnfFormula::PrintAssignment() {
 //   return components;
 // }
 
-uint CnfFormula::NumOfModelsSharpSat(){
+uint PicoSolver::NumOfModelsSharpSat(){
   FILE* f = fopen(".nummodels", "w");
   WriteDimacs(f);
   fclose(f);
@@ -205,7 +207,7 @@ uint CnfFormula::NumOfModelsSharpSat(){
   return k;
 }
 
-void CnfFormula::NumOfModelsRecursive(VarId var, std::function<void()> callback){
+void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
   assert(var > 0 && (unsigned)var <= vars_.size());
   for (VarId v: std::initializer_list<VarId>({var, -var})) {
     picosat_assume(picosat_, v);
@@ -218,22 +220,22 @@ void CnfFormula::NumOfModelsRecursive(VarId var, std::function<void()> callback)
         picosat_push(picosat_);
         picosat_add(picosat_, v);
         picosat_add(picosat_, 0);
-        NumOfModelsRecursive(var + 1, callback);
+        ForAllModels(var + 1, callback);
         picosat_pop(picosat_);
       }
     }
   }
 }
 
-uint CnfFormula::NumOfModels() {
+uint PicoSolver::_NumOfModels() {
   uint k = 0;
-  NumOfModelsRecursive(1, [&](){ k++; });
+  ForAllModels(1, [&](){ k++; });
   return k;
 }
 
-vec<vec<bool>> CnfFormula::GenerateModels() {
+vec<vec<bool>> PicoSolver::_GenerateModels() {
   vec<vec<bool>> models;
-  NumOfModelsRecursive(1, [&](){
+  ForAllModels(1, [&](){
     vec<bool> n(vars_.size() + 1, false);
     for (uint id = 1; id <= vars_.size(); id++) {
       if (picosat_deref(picosat_, id) == 1) n[id] = true;

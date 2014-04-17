@@ -6,7 +6,7 @@
 #include <vector>
 #include <bliss/graph.hh>
 #include "common.h"
-#include "cnf-formula.h"
+#include "pico-solver.h"
 
 #ifndef COBRA_GAME_H_
 #define COBRA_GAME_H_
@@ -64,8 +64,8 @@ class Game {
   void Precompute();
 
   bliss::Digraph* CreateGraph();
-  vec<uint> ComputeVarEquiv(CnfFormula& solver, bliss::Digraph& graph);
-  vec<Option> GenerateExperiments(CnfFormula& solver, bliss::Digraph& graph);
+  vec<uint> ComputeVarEquiv(Solver& solver, bliss::Digraph& graph);
+  vec<Option> GenerateExperiments(Solver& solver, bliss::Digraph& graph);
 
 
 
