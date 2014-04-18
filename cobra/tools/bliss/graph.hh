@@ -4,18 +4,18 @@
 /*
   Copyright (c) 2006-2011 Tommi Junttila
   Released under the GNU General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 3
   as published by the Free Software Foundation.
-  
+
   bliss is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -482,7 +482,7 @@ public:
   /**
    * Get a hash value for the graph.
    * \return  the hash value
-   */ 
+   */
   virtual unsigned int get_hash() = 0;
 
   /**
@@ -614,7 +614,7 @@ protected:
   void make_initial_equitable_partition();
 
   void initialize_certificate();
-  
+
   bool is_automorphism(unsigned int* const perm);
 
 
@@ -678,7 +678,7 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */ 
+   */
   virtual unsigned int get_hash();
 
   /**
@@ -691,7 +691,7 @@ public:
    */
   Graph* permute(const unsigned int* const perm) const;
   Graph* permute(const std::vector<unsigned int>& perm) const;
-  
+
   /**
    * Add a new vertex with color \a color in the graph and return its index.
    */
@@ -727,7 +727,7 @@ public:
    * for both graphs.
    */
   void set_splitting_heuristic(const SplittingHeuristic shs) {sh = shs; }
-  
+
 
 };
 
@@ -872,6 +872,8 @@ public:
    */
   Digraph(const unsigned int N = 0);
 
+  Digraph(const Digraph& orig);
+
   /**
    * Destroy the graph.
    */
@@ -917,14 +919,14 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */ 
+   */
   virtual unsigned int get_hash();
 
   /**
    * Return the number of vertices in the graph.
    */
   unsigned int get_nof_vertices() const {return vertices.size(); }
-  
+
   /**
    * Add a new vertex with color 'color' in the graph and return its index.
    */
@@ -964,7 +966,7 @@ public:
   /**
    * \copydoc AbstractGraph::permute(const unsigned int* const perm) const
    */
-  Digraph* permute(const unsigned int* const perm) const;  
+  Digraph* permute(const unsigned int* const perm) const;
   Digraph* permute(const std::vector<unsigned int>& perm) const;
 };
 

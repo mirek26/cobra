@@ -28,24 +28,30 @@ extern Parser m;
 std::function<uint(vec<Option>&)> g_breakerStg;
 std::function<uint(Option&)> g_makerStg;
 
-void time_overview() {
-  printf("= Time overview = \n");
+void print_head(string name) {
+  printf("\n%s===== %s =====%s\n", color::shead, name.c_str(), color::snormal);
+}
+
+void time_overview(clock_t start) {
+  print_head("TIME OVERVIEW");
+  printf("Total time: %.2fs\n", toSeconds(clock() - start));
   auto s1 = PicoSolver::s_stats();
-  printf("PicoSolver: sat %i [%.2f] fixed %i [%.2f] models %i [%.2f]\n",
+  printf("PicoSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s1.sat_calls, toSeconds(s1.sat_time),
     s1.fixed_calls, toSeconds(s1.fixed_time),
     s1.models_calls, toSeconds(s1.models_time));
   auto s2 = SimpleSolver::s_stats();
-  printf("SimpleSolver: sat %i [%.2f] fixed %i [%.2f] models %i [%.2f]\n",
+  printf("SimpleSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s2.sat_calls, toSeconds(s2.sat_time),
     s2.fixed_calls, toSeconds(s2.fixed_time),
     s2.models_calls, toSeconds(s2.models_time));
+
 }
 
 void print_stats(Game& game, string filename) {
-  printf("\n%s===== GAME STATISTICS =====%s\n", color::shead, color::snormal);
+  print_head("GAME OVERVIEW");
   printf("Num of variables: %lu\n", game.variables().size());
-  SimpleSolver s(game.variables(), game.restriction());
+  PicoSolver s(game.variables(), game.restriction());
   Solver& solver = s;
   uint models = solver.NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
@@ -112,9 +118,9 @@ void print_stats(Game& game, string filename) {
 }
 
 void simulation_mode() {
+  print_head("SIMULATION");
   Game& game = m.game();
   game.Precompute();
-  printf("\n%s===== SIMULATION MODE =====%s\n\n", color::shead, color::snormal);
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
@@ -147,7 +153,7 @@ void simulation_mode() {
 
     // Check if solved.
     knowledge.AddConstraint(outcome, experiment.params());
-    if (knowledge.NumOfModels() == 1) {
+    if (knowledge.NumOfModels() == 1) { // TODO: nepotrebuju presne, staci vedet jestli jich neni vic
       printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
       knowledge.Satisfiable();
       knowledge.PrintAssignment();
@@ -159,10 +165,41 @@ void simulation_mode() {
     //knowledge.WriteDimacs(stdout);
     outcome->AddToGraph(*knowledge_graph, &experiment.params());
   }
+  delete knowledge_graph;
+}
+
+void analyze(PicoSolver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum) {
+  Game& game = m.game();
+  auto options = game.GenerateExperiments(solver, graph);
+  auto experiment = options[g_breakerStg(options)];
+  for (uint i = 0; i < experiment.type().outcomes().size(); i++) {
+    solver.OpenContext();
+    auto outcome = experiment.type().outcomes()[i];
+    solver.AddConstraint(outcome, experiment.params());
+    auto m = solver.NumOfModels();
+    if (m == 1) {
+      sum += depth;
+      max = std::max(max, depth);
+    } else if (m > 1) {
+      bliss::Digraph ngraph(graph);
+      outcome->AddToGraph(ngraph, &experiment.params());
+      analyze(solver, ngraph, depth + 1, max, sum);
+    }
+    solver.CloseContext();
+  }
 }
 
 void analyze_mode() {
-  printf("Not implemented yet.\n");
+  print_head("STRATEGY ANALYSIS");
+  Game& game = m.game();
+  game.Precompute();
+  auto graph = game.CreateGraph();
+  game.restriction()->AddToGraph(*graph, nullptr);
+  PicoSolver solver(game.variables(), game.restriction());
+  uint max = 0, sum = 0;
+  analyze(solver, *graph, 1, max, sum);
+  printf("Worst-case: %u\n", max);
+  printf("Average-case: %.2f (%u)\n", (double)sum/solver.NumOfModels(), sum);
 }
 
 int main(int argc, char* argv[]) {
@@ -231,8 +268,9 @@ int main(int argc, char* argv[]) {
     fclose (yyin);
     auto t2 = clock();
     printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
+    t1 = clock();
 
-    if (infoArg.getValue()) {
+    if (infoArg.getValue() || (!simArg.getValue() && !analyzeArg.getValue())) {
       print_stats(m.game(), file);
     }
 
@@ -251,7 +289,7 @@ int main(int argc, char* argv[]) {
       analyze_mode();
     }
 
-    time_overview();
+    time_overview(t1);
   } catch (TCLAP::ArgException &e) {
     std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
   }

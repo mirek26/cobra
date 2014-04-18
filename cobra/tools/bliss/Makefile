@@ -19,7 +19,7 @@ LIB =
 #LIB += /usr/lib/ccmalloc.o -ldl
 
 #CC = g++-mp-4.9
-#CC = clang++
+CC = clang++
 #CC = g++
 RANLIB = ranlib
 AR = ar
