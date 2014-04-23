@@ -34,14 +34,16 @@ uint breaker::interactive(vec<Option>& options) {
   printf("Select an experiment: \n");//%i: \n", exp_num++);
   for (auto& experiment: options) {
     if (experiment.GetNumOfSatOutcomes() > 1) {
-      printf("%i) %s [ ", experiment.index(), experiment.type().name().c_str());
-      experiment.type().game().printParams(experiment.params());
-      printf(" ] - M: ");
-      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-        printf("%i ", experiment.GetNumOfModels()[i]);
-      printf("F: ");
-      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-        printf("%i ", experiment.GetNumOfFixedVars()[i]);
+      printf("%i) %s [ %s ] ",
+        experiment.index(),
+        experiment.type().name().c_str(),
+        experiment.type().game().ParamsToStr(experiment.params()).c_str());
+      // printf(" ] - M: ");
+      // for (uint i = 0; i < experiment.type().outcomes().size(); i++)
+      //   printf("%i ", experiment.GetNumOfModels()[i]);
+      // printf("F: ");
+      // for (uint i = 0; i < experiment.type().outcomes().size(); i++)
+      //   printf("%i ", experiment.GetNumOfFixedVars()[i]);
       printf("\n");
     }
   }

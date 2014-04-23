@@ -96,6 +96,13 @@ class SimpleSolver: public Solver {
     return !sat_.empty();
   }
 
+  virtual bool _OnlyOneModel() {
+    assert(ready_);
+    assert(!sat_.empty());
+    return sat_.size() == 1;
+  }
+
+  virtual vec<bool> GetAssignment();
   virtual void PrintAssignment();
 
   virtual uint _NumOfModels() {

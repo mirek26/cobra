@@ -272,6 +272,14 @@ void Experiment::GenParamsGraphFilter() {
   bliss::Stats stats;
   auto graph = CreateGraphForParams(gen_var_groups_, params);
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
+  // Graph output -> DOT file
+  // canonical->write_dot((game_.ParamsToStr(params, '_')+".dot").c_str());
+  // auto name = game_.ParamsToStr(params, '_');
+  // auto f = fopen(name.c_str(), "w");
+  // for (auto form: outcomes_)
+  //   fprintf(f, "%s\n", form->pretty(false, &params).c_str());
+  // fclose(f);
+  //
   auto h = canonical->get_hash();
   if (gen_graphs_.count(h) > 0)
     return;

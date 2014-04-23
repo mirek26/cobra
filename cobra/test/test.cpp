@@ -127,6 +127,18 @@ TYPED_TEST(SolverTest, MustBeTrueFalse) {
   EXPECT_FALSE(s.MustBeFalse(2));
 }
 
+TYPED_TEST(SolverTest, OnlyOneModel) {
+  m.reset();
+  m.game().declareVariables({"a", "b"});
+  TypeParam s(m.game().variables(),
+               Formula::Parse("a -> b"));
+  EXPECT_TRUE(s.Satisfiable());
+  EXPECT_FALSE(s.OnlyOneModel());
+  s.AddConstraint(Formula::Parse("a"));
+  EXPECT_TRUE(s.Satisfiable());
+  EXPECT_TRUE(s.OnlyOneModel());
+}
+
 TYPED_TEST(SolverTest, ExactlyFixed) {
   m.reset();
   m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});

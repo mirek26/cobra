@@ -65,6 +65,15 @@ class Solver {
     return result;
   }
 
+  bool OnlyOneModel() {
+    // should be called right after Satisfiable
+    auto t1 = clock();
+    auto result = _OnlyOneModel();
+    stats().sat_calls++;
+    stats().sat_time += clock() - t1;
+    return result;
+  }
+
   uint NumOfModels() {
     auto t1 = clock();
     auto result = _NumOfModels();
@@ -81,6 +90,7 @@ class Solver {
     return result;
   }
 
+  virtual vec<bool> GetAssignment() = 0;
   virtual void PrintAssignment() = 0;
   virtual string pretty() = 0;
 
@@ -90,6 +100,7 @@ class Solver {
   virtual bool _MustBeFalse(VarId id) = 0;
   virtual uint _GetNumOfFixedVars() = 0;
   virtual bool _Satisfiable() = 0;
+  virtual bool _OnlyOneModel() = 0;
   virtual uint _NumOfModels() = 0;
   virtual vec<vec<bool>> _GenerateModels() = 0;
 

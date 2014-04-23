@@ -55,10 +55,12 @@ class Game {
   Experiment* addExperiment(string name, uint num_params);
   vec<Experiment*>& experiments() {  return experiments_;  }
 
-  void printParams(const vec<CharId>& params){
+  string ParamsToStr(const vec<CharId>& params, char sep = ' '){
+    string s = "";
     for (auto a: params)
-      printf("%s ", alphabet_[a].c_str());
-    printf("\b");
+      s += alphabet_[a] + sep;
+    s.erase(s.length()-1, 1);
+    return s;
   }
 
   void Precompute();

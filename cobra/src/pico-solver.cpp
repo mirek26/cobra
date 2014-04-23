@@ -141,6 +141,26 @@ bool PicoSolver::_Satisfiable() {
   return (result == PICOSAT_SATISFIABLE);
 }
 
+bool PicoSolver::_OnlyOneModel() {
+  vec<bool> ass = GetAssignment();
+  picosat_push(picosat_);
+  for (uint id = 1; id <= vars_.size(); id++) {
+    picosat_add(picosat_, id * (ass[id] ? -1 : 1));
+  }
+  picosat_add(picosat_, 0);
+  auto s = _Satisfiable();
+  picosat_pop(picosat_);
+  return !s;
+}
+
+vec<bool> PicoSolver::GetAssignment() {
+  vec<bool> result(vars_.size() + 1, false);
+  for (uint id = 1; id <= vars_.size(); id++) {
+    if (picosat_deref(picosat_, id) == 1) result[id] = true;
+  }
+  return result;
+}
+
 void PicoSolver::PrintAssignment() {
   vec<int> trueVar;
   vec<int> falseVar;

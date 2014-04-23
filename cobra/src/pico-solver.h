@@ -58,6 +58,7 @@ class PicoSolver: public Solver {
     return k;
   }
 
+  virtual vec<bool> GetAssignment();
   virtual void PrintAssignment();
 
   uint NumOfModelsSharpSat();
@@ -69,6 +70,7 @@ class PicoSolver: public Solver {
   virtual bool _MustBeFalse(VarId id);
   virtual uint _GetNumOfFixedVars();
   virtual bool _Satisfiable();
+  virtual bool _OnlyOneModel();
   virtual uint _NumOfModels();
   virtual vec<vec<bool>> _GenerateModels();
 

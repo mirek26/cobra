@@ -4,6 +4,11 @@
 
 SolverStats SimpleSolver::stats_ = SolverStats();
 
+vec<bool> SimpleSolver::GetAssignment() {
+  assert(!sat_.empty());
+  return codes_[sat_[0]];
+}
+
 void SimpleSolver::PrintAssignment() {
   assert(!sat_.empty());
   auto& a = codes_[sat_[0]];

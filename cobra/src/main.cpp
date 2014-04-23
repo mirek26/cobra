@@ -104,8 +104,7 @@ void print_stats(Game& game, string filename) {
       solver.AddConstraint(f4, params);
       if (solver.Satisfiable()) {
         printf("%s failed!%s\n", color::serror, color::snormal);
-        printf("EXPERIMENT: %s ", e->name().c_str());
-        game.printParams(params);
+        printf("EXPERIMENT: %s %s", e->name().c_str(), game.ParamsToStr(params).c_str());
         printf("\nPROBLEMATIC ASSIGNMENT: \n");
         solver.PrintAssignment();
         printf("\n");
@@ -133,11 +132,11 @@ void simulation_mode() {
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options)];
-    printf("%sEXPERIMENT: %s ",
+    printf("%sEXPERIMENT: %s %s %s\n",
            color::semph,
-           experiment.type().name().c_str());
-    game.printParams(experiment.params());
-    printf("%s\n", color::snormal);
+           experiment.type().name().c_str(),
+           game.ParamsToStr(experiment.params()).c_str(),
+           color::snormal);
 
     // Choose and print an outcome
     uint oid = g_makerStg(experiment);
@@ -176,11 +175,12 @@ void analyze(PicoSolver& solver, bliss::Digraph& graph, uint depth, uint& max, u
     solver.OpenContext();
     auto outcome = experiment.type().outcomes()[i];
     solver.AddConstraint(outcome, experiment.params());
-    auto m = solver.NumOfModels();
-    if (m == 1) {
+    bool sat = solver.Satisfiable(), one = false;
+    if (sat) one = solver.OnlyOneModel();
+    if (one) {
       sum += depth;
       max = std::max(max, depth);
-    } else if (m > 1) {
+    } else if (sat) {
       bliss::Digraph ngraph(graph);
       outcome->AddToGraph(ngraph, &experiment.params());
       analyze(solver, ngraph, depth + 1, max, sum);
