@@ -1,7 +1,34 @@
-\chapter{COBRA - COde BReaking Game Analyzer}
+\chapter{COBRA tool}
 \label{ch:cobra}
+The main part of our work was development a general tool for analysis of
+  code breaking games.
+We named the tool COBRA, the COde-BReaking game Analyzer.
+Currently, it can read a game specification given in a special language, which
+  we describe first.
+Then it can perform various tasks with the game, which are described in detail
+  afterwards as \emph{modes of operation}.
+In the end of this chapter, we describe the external tools and libraries COBRA uses,
+  what we need them for, and some implementation details.
+\TODO{.. odůvodnit volby které jsme udělali (...)}
+
+The source code of the tool, together with detailed documentation
+  and specification of the games described in \autoref{ch:games}
+  can be found as an \TODO{electronic attachment} to this thesis.
+
+The tool was developed under GitHub\footnote{\url{http://www.github.com}},
+  so another way of obtaining the code is by cloning
+  the git repository at \url{https://github.com/myreg/cobra}.
+This website also serves as a homepage of the project, and contains
+  all related documents.
+
+COBRA is available under \emph{BSD 3-Clause License}\footnote{\url{http://opensource.org/licenses/BSD-3-Clause}},
+  text of which is a part of the source codes.
 
 \section{Input language}
+
+\TODO{First we describe the low-level language that is the input of our COBRA tool. }
+
+\subsection{Low-level language}
 
 \newcommand{\symb}[1]{\;\textcolor{DarkBlue}{\textrm{$<$#1$>$}}\;}
 \newcommand{\txt}[1]{\;\textcolor{DarkRed}{\textsc{#1}}\;}
@@ -27,4 +54,35 @@
 \symb{string-list} ::=\;& \term{string} \| \symb{string-list} \txt{,} \term{string}
 \end{align*}
 
-\section{Modes}
+\subsection{Python preprocessing}
+\TODO{Lepsi generovat, based on python with extra function calls.}
+\TODO{example: MM}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Basic usage}
+\TODO{Cobra vs cobra backend. Flagy, specifikace strategií - rozšířitelnost. Volba backendu, time overview. }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Modes of operation}
+
+\subsection{Overview mode}
+
+Prints masic statistics about the game and performes the well-formed check.
+\TODO{How?}
+
+\subsection{Simulation mode}
+\TODO{Interactive vs one-step look ahead strategy.}
+
+\subsection{Strategy analysis mode}
+\begin{description}
+\item[Min-num.]
+\item[Min-exp.]
+\item[Entropy.]
+\item[Fixed.]
+\item[Most-parts.]
+\end{description}
+
+\subsection{Optimal strategy mode}
+\TODO{Bude?}
+
+

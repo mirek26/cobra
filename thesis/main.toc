@@ -1,33 +1,89 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}\bfseries Introduction}{3}{chapter.1}
-\contentsline {chapter}{\numberline {2}\bfseries Code Breaking Games}{5}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}\bfseries Studied Games and Known Results}{5}{chapter.2}
+\defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.1}\slshape The Counterfeit Coin}{5}{section.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Known results}{6}{section*.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Generalizations and related research}{7}{section*.9}
+\defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.2}\slshape Mastermind}{8}{section.2.2}
-\contentsline {subsection}{\rmfamily Variants and generalizations}{9}{section*.8}
-\contentsline {subsection}{\rmfamily Known results and related research}{10}{section*.9}
-\contentsline {section}{\numberline {2.3}\slshape Other Problems and Applications}{11}{section.2.3}
-\contentsline {subsection}{\rmfamily Black Box}{11}{section*.11}
-\contentsline {subsection}{\rmfamily Bags of Gold}{11}{section*.12}
-\contentsline {subsection}{\rmfamily Code 777}{11}{section*.13}
-\contentsline {subsection}{\rmfamily String matching}{11}{section*.14}
-\contentsline {subsection}{\rmfamily Generalized Mastermind}{11}{section*.15}
-\contentsline {chapter}{\numberline {3}\bfseries General model}{13}{chapter.3}
-\contentsline {section}{\numberline {3.1}\slshape Notation and Terminology}{13}{section.3.1}
-\contentsline {section}{\numberline {3.2}\slshape Formal definition}{13}{section.3.2}
-\contentsline {section}{\numberline {3.3}\slshape Strategies}{18}{section.3.3}
-\contentsline {subsection}{\rmfamily Non-adaptive strategies}{19}{section*.16}
-\contentsline {subsection}{\rmfamily Memory-less strategies}{20}{section*.17}
-\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{22}{section.3.4}
-\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{23}{section.3.5}
-\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{23}{section*.18}
-\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{23}{section*.19}
-\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{23}{section*.20}
-\contentsline {subsection}{\rmfamily Comparison}{23}{section*.21}
-\contentsline {chapter}{\numberline {4}\bfseries COBRA - COde BReaking Game Analyzer}{25}{chapter.4}
-\contentsline {section}{\numberline {4.1}\slshape Input language}{25}{section.4.1}
-\contentsline {section}{\numberline {4.2}\slshape Modes}{25}{section.4.2}
-\contentsline {section}{\numberline {4.3}\slshape Implementation details}{25}{section.4.3}
-\contentsline {subsection}{\rmfamily Programming Language and Style}{25}{section*.22}
-\contentsline {subsection}{\rmfamily Compiler Requirements}{26}{section*.23}
-\contentsline {subsection}{\rmfamily Unit testing.}{26}{section*.24}
-\contentsline {section}{\numberline {4.4}\slshape Sat solving}{26}{section.4.4}
-\contentsline {chapter}{\numberline {5}\bfseries Conclusions}{27}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Known results and related research}{10}{section*.11}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Variations and applications}{11}{section*.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}\slshape Other Problems}{11}{section.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Black Box}{11}{section*.14}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Code 777}{13}{section*.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Bags of Gold}{13}{section*.18}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}\bfseries Formal model}{15}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}\slshape Notation and Terminology}{15}{section.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}\slshape Formal definition}{15}{section.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}\slshape Strategies}{20}{section.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{21}{section*.19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Memory-less strategies}{22}{section*.20}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{24}{section.3.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{25}{section.3.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{25}{section*.21}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{25}{section*.22}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{25}{section*.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Comparison}{25}{section*.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{27}{chapter.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}\slshape Input language}{27}{section.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Low-level language}{28}{section*.25}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Python preprocessing}{28}{section*.26}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}\slshape Basic usage}{28}{section.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{28}{section.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Overview mode}{28}{section*.27}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Simulation mode}{29}{section*.28}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Strategy analysis mode}{29}{section*.29}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Optimal strategy mode}{29}{section*.30}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.4}\slshape SAT solving}{29}{section.4.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Transformation to CNF}{29}{section*.31}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{29}{section.4.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.6}\slshape Extensibility}{29}{section.4.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{30}{section.4.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Programming Language and Style}{30}{section*.32}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Compiler Requirements}{30}{section*.33}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Unit testing}{30}{section*.34}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{33}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{35}{chapter.6}

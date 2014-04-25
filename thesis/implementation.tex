@@ -1,10 +1,42 @@
+\section{SAT solving}
+\TODO{incremental blah blah blah}
+
+\subsection{Transformation to CNF}
+\TODO{tseitin}
+\TODO{tseitin expansion of Exactly et al.}
+
+\section{Symmetry breaking}
+\TODO{Bliss, vs saucy vs nauty}
+
+\section{Extensibility}
+
+COBRA was designed as a universal tool that should be easy to extend with
+  upcoming ideas, especially adding new strategies for analysis
+  and new backend solvers.
+
+If you want to analyze a new strategy, all you need to do is to implement
+  a new function in \texttt{strategy.h/.cpp} file and add a corresponding entry
+  to the \TODO{...} table in the same file.
+The function would take a list of sensible experiments in the next step as a parameter
+  and it only needs to return the index of the selected one.
+If your strategy only maximizes or minimizes some metrics on the experiments,
+  you can use a template provided.
+
+For exact details, see the documentation in the file.
+\TODO{Example?}
+
+If you want to try another SAT solver, or alter the algorithm for model counting,
+  you can implement your own solver class that inherits from Solver and
+  implements all the necessary methods.
+\TODO{Tohle je docela důležitý, chtělo by to pořádně říct, co se musí udělat.}
+
 \section{Implementation details}
 
 \subsection{Programming Language and Style}
 
 Since the problem we are trying to solve is very computationally demanding,
   we had to choose a high-performing programming language.
-The tools we want to use, especially SAT solvers, are typically written in C/C++,
+The external tools we use, especially SAT solvers, are typically written in C/C++,
   so C++ was a natural choice for our tool.
 Cobra is written in the latest standard of ISO C++, namely C++11, which
   contains significant changes both in the language and in the standard libraries
@@ -13,10 +45,10 @@ Cobra is written in the latest standard of ISO C++, namely C++11, which
 We wanted the style of our code to be consistent and to usage of the language in the best
  manner possible according to industrial practice.
 From the wide range of style guides available online
- we chose \emph{Google C++ Style Guide}\ref{google-style} and made
+ we chose \emph{Google C++ Style Guide}\cite{google-style} and made
  the code compliant with all its rules except for a few exception.
 The only significant one of those are lambda functions, which are forbidden
- by the style guide due to various reasons\ref{google-style},
+ by the style guide due to various reasons,
  but we think they are more beneficial than harmful in this project.
 
 \subsection{Compiler Requirements}
@@ -30,7 +62,7 @@ The tool is platform independent.
   all three major operating systems, on Linux (Ubuntu 12.04),
   Mac OS X (10.9) and Windows (8.1).
 
-\subsection{Unit testing.}
+\subsection{Unit testing}
 Unit testing has became a common part of software development process
   in the recent years.
 Correctness was a top priority during the development and
@@ -40,12 +72,10 @@ Correctness was a top priority during the development and
 There is a lot of unit tests framework for C++.
 We focused on simplicity, minimal amount of work needed to add new tests
   and good assertion support, and opted for
-  \emph{Google Test}\ref{google-test}.
+  \emph{Google Test}\footnote{https://code.google.com/p/googletest/}.
 
 All available tests are compiled and excecuted if you run \texttt{make test}
   in the root folder.
 This should serve as a basic sanity test and we highly recommend
   doing this in case anyone needs to change something in the code.
-
-\section{Sat solving}
 
