@@ -21,6 +21,8 @@
     urlcolor=cyan           % color of external links
 }
 
+\addbibresource{biblio.bib}
+
 \begin{document}
 \input{macros}
 
@@ -54,15 +56,17 @@ and a list of references is given.
 
 \begin{ThesisKeyWords}
 code braking games, \\
-searching games,\\
-counterfeit coin,\\
-mastermind,\\
-sat solving,\\
-greedy strategy
+deductive games,\\
+strategy synthesis, \\
+greedy strategy,\\
+SAT solving,\\
+model counting, \\
+mastermind, \\
+counterfeit coin\\
 \end{ThesisKeyWords}
 
 
-% \begin{ThesisAbstract}
+\begin{ThesisAbstract}
 % Markov decision processes provide us with a mathematical framework
 %   for modeling decision-making in randomized systems,
 %   where a scheduler controls the behavior of the system through the decisions.
@@ -84,8 +88,7 @@ greedy strategy
 %   for a given discrete-time system.
 % For continuous-time processes, we adopt the discretization technique
 %   to reduce the problem to the discrete-time case.
-% \end{ThesisAbstract}
-
+\end{ThesisAbstract}
 
 \MainMatter
 \setlength{\parindent}{0pt}
@@ -105,8 +108,8 @@ greedy strategy
 \input{conclusions}
 
 \pagestyle{plain}
-\bibliographystyle{unsrt}
-{\small
-\bibliography{biblio}
-}
+\printbibheading
+\printbibliography[keyword=cc,heading=subbibliography,title={Counterfeit Coin}]
+\printbibliography[keyword=mm,heading=subbibliography,title={Mastermind}]
+\printbibliography[keyword=other,heading=subbibliography,title={Other}]
 \end{document}

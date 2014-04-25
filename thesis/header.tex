@@ -73,7 +73,6 @@
 \let\theoremframecommand\thmbox
 
 \newcounter{common}
-%\numberwithin{common}{section}
 
 \usepackage{aliascnt}
 \newaliascnt{theorem}{common}
@@ -82,6 +81,16 @@
 \newaliascnt{lemma}{common}
 \newaliascnt{problem}{common}
 \newaliascnt{corollary}{common}
+\newaliascnt{mytable}{common}
+
+% \numberwithin{table}{common}
+% \renewcommand*{\thetable}{\arabic{chapter}.\arabic{common}}
+% \numberwithin{figure}{common}
+% \renewcommand*{\thefigure}{\arabic{chapter}.\arabic{common}}
+
+% \numberwithin{table}{mytable}
+% \renewcommand*{\thetable}{\arabic{chapter}.\arabic{mytable}}
+
 
 \theoremstyle{definition}
 \newshadedtheorem{definition}{Definition}
@@ -107,6 +116,10 @@
 \usepackage{MnSymbol}
 \usepackage{wasysym}
 % \usepackage{marvosym}
+
+\usepackage{csquotes}
+
+\usepackage[style=numeric, sorting=none]{biblatex}
 
 % zkratky pro zprehledneni
 \usepackage[ligature]{semantic}

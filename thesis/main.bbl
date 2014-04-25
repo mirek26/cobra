@@ -1,112 +1,735 @@
-\begin{thebibliography}{10}
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
 
-\bibitem{coins-grossman1945}
-Howard~D Grossman.
-\newblock The twelve-coin problem.
-\newblock {\em Scripta Mathematica}, 11:360--363, 1945.
 
-\bibitem{coins-dyson1946}
-Freeman~J Dyson.
-\newblock 1931. the problem of the pennies.
-\newblock {\em The Mathematical Gazette}, pages 231--234, 1946.
+\refsection{0}
+  \sortlist{entry}{none}
+    \entry{coins-grossman1945}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=dc0aa4cd7dc12d1ea49e8a5b0a727f0f}{Grossman}{G\bibinitperiod}{Howard\bibnamedelima D}{H\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=dc0aa4cd7dc12d1ea49e8a5b0a727f0f}{Grossman}{G\bibinitperiod}{Howard\bibnamedelima D}{H\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{dc0aa4cd7dc12d1ea49e8a5b0a727f0f}
+      \strng{fullhash}{dc0aa4cd7dc12d1ea49e8a5b0a727f0f}
+      \field{sortinit}{0}
+      \field{labeltitle}{The twelve-coin problem}
+      \field{journaltitle}{Scripta Mathematica}
+      \field{title}{The twelve-coin problem}
+      \field{volume}{11}
+      \field{year}{1945}
+      \field{pages}{360\bibrangedash 363}
+      \keyw{cc}
+    \endentry
+    \entry{coins-dyson1946}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=d42facd743b235ab20fe469eb819d209}{Dyson}{D\bibinitperiod}{Freeman\bibnamedelima J}{F\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=d42facd743b235ab20fe469eb819d209}{Dyson}{D\bibinitperiod}{Freeman\bibnamedelima J}{F\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {JSTOR}%
+      }
+      \strng{namehash}{d42facd743b235ab20fe469eb819d209}
+      \strng{fullhash}{d42facd743b235ab20fe469eb819d209}
+      \field{sortinit}{0}
+      \field{labeltitle}{1931. The Problem of the Pennies}
+      \field{journaltitle}{The Mathematical Gazette}
+      \field{title}{1931. The Problem of the Pennies}
+      \field{year}{1946}
+      \field{pages}{231\bibrangedash 234}
+      \keyw{cc}
+    \endentry
+    \entry{coins-cwproblems1995}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=63827a6730b99e99f7b9f1f672ffcdc3}{Guy}{G\bibinitperiod}{Richard\bibnamedelima K}{R\bibinitperiod\bibinitdelim K\bibinitperiod}{}{}{}{}}%
+        {{hash=b2b4c3e65f61fb8c9fd3249108ee2d74}{Nowakowski}{N\bibinitperiod}{Richard\bibnamedelima J}{R\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=63827a6730b99e99f7b9f1f672ffcdc3}{Guy}{G\bibinitperiod}{Richard\bibnamedelima K}{R\bibinitperiod\bibinitdelim K\bibinitperiod}{}{}{}{}}%
+        {{hash=b2b4c3e65f61fb8c9fd3249108ee2d74}{Nowakowski}{N\bibinitperiod}{Richard\bibnamedelima J}{R\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {JSTOR}%
+      }
+      \strng{namehash}{f7a3d45861c8d48ef93b1dcd758d9a19}
+      \strng{fullhash}{f7a3d45861c8d48ef93b1dcd758d9a19}
+      \field{sortinit}{0}
+      \field{labeltitle}{Coin-weighing problems}
+      \field{journaltitle}{American Mathematical Monthly}
+      \field{title}{Coin-weighing problems}
+      \field{year}{1995}
+      \field{pages}{164\bibrangedash 167}
+      \keyw{cc}
+    \endentry
+    \entry{coins-2fakes}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=cd173023d631c0f269ead091d1782e5c}{Tošić}{T\bibinitperiod}{Ratko}{R\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=cd173023d631c0f269ead091d1782e5c}{Tošić}{T\bibinitperiod}{Ratko}{R\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{cd173023d631c0f269ead091d1782e5c}
+      \strng{fullhash}{cd173023d631c0f269ead091d1782e5c}
+      \field{sortinit}{0}
+      \field{labeltitle}{Two counterfeit coins}
+      \field{journaltitle}{Discrete Mathematics}
+      \field{number}{3}
+      \field{title}{Two counterfeit coins}
+      \field{volume}{46}
+      \field{year}{1983}
+      \field{pages}{295\bibrangedash 298}
+      \keyw{cc}
+    \endentry
+    \entry{coins-3fakes}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=5906c2768e43ace552e9c59d44bf93fc}{Li}{L\bibinitperiod}{Anping}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=5906c2768e43ace552e9c59d44bf93fc}{Li}{L\bibinitperiod}{Anping}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{5906c2768e43ace552e9c59d44bf93fc}
+      \strng{fullhash}{5906c2768e43ace552e9c59d44bf93fc}
+      \field{sortinit}{0}
+      \field{labeltitle}{Three counterfeit coins problem}
+      \field{journaltitle}{Journal of Combinatorial Theory, Series A}
+      \field{number}{1}
+      \field{title}{Three counterfeit coins problem}
+      \field{volume}{66}
+      \field{year}{1994}
+      \field{pages}{93\bibrangedash 101}
+      \keyw{cc}
+    \endentry
+    \entry{coins-mfakes}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=8e972df2bdc986a3026fe9ef2a1a6a1e}{Pyber}{P\bibinitperiod}{László}{L\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=8e972df2bdc986a3026fe9ef2a1a6a1e}{Pyber}{P\bibinitperiod}{László}{L\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{8e972df2bdc986a3026fe9ef2a1a6a1e}
+      \strng{fullhash}{8e972df2bdc986a3026fe9ef2a1a6a1e}
+      \field{sortinit}{0}
+      \field{labeltitle}{How to find many counterfeit coins?}
+      \field{journaltitle}{Graphs and Combinatorics}
+      \field{number}{1}
+      \field{title}{How to find many counterfeit coins?}
+      \field{volume}{2}
+      \field{year}{1986}
+      \field{pages}{173\bibrangedash 177}
+      \keyw{cc}
+    \endentry
+    \entry{coins-unknownfakes}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=63d6d3eca846b84b7aea4e1fbb05697b}{Hu}{H\bibinitperiod}{Xiao-Dong}{X\bibinithyphendelim D\bibinitperiod}{}{}{}{}}%
+        {{hash=52eb74e2dd25563d38ee813d248fa85e}{Chen}{C\bibinitperiod}{PD}{P\bibinitperiod}{}{}{}{}}%
+        {{hash=f34e7cb0e74e4d2f0fc87586eb67540e}{Hwang}{H\bibinitperiod}{Frank\bibnamedelima K.}{F\bibinitperiod\bibinitdelim K\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=63d6d3eca846b84b7aea4e1fbb05697b}{Hu}{H\bibinitperiod}{Xiao-Dong}{X\bibinithyphendelim D\bibinitperiod}{}{}{}{}}%
+        {{hash=52eb74e2dd25563d38ee813d248fa85e}{Chen}{C\bibinitperiod}{PD}{P\bibinitperiod}{}{}{}{}}%
+        {{hash=f34e7cb0e74e4d2f0fc87586eb67540e}{Hwang}{H\bibinitperiod}{Frank\bibnamedelima K.}{F\bibinitperiod\bibinitdelim K\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{ad2c63331d4a529f5b4a980dfe149877}
+      \strng{fullhash}{ad2c63331d4a529f5b4a980dfe149877}
+      \field{sortinit}{0}
+      \field{labeltitle}{A new competitive algorithm for the counterfeit coin problem}
+      \field{journaltitle}{Information Processing Letters}
+      \field{number}{4}
+      \field{title}{A new competitive algorithm for the counterfeit coin problem}
+      \field{volume}{51}
+      \field{year}{1994}
+      \field{pages}{213\bibrangedash 218}
+      \keyw{cc}
+    \endentry
+    \entry{coins-atmostfakes}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=ef95611aaa6551f2a39bf2efea6ee471}{Aigner}{A\bibinitperiod}{Martin}{M\bibinitperiod}{}{}{}{}}%
+        {{hash=5906c2768e43ace552e9c59d44bf93fc}{Li}{L\bibinitperiod}{Anping}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=ef95611aaa6551f2a39bf2efea6ee471}{Aigner}{A\bibinitperiod}{Martin}{M\bibinitperiod}{}{}{}{}}%
+        {{hash=5906c2768e43ace552e9c59d44bf93fc}{Li}{L\bibinitperiod}{Anping}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{b6e81328c83c139d18c899828f6aa8e7}
+      \strng{fullhash}{b6e81328c83c139d18c899828f6aa8e7}
+      \field{sortinit}{0}
+      \field{labeltitle}{Searching for counterfeit coins}
+      \field{journaltitle}{Graphs and Combinatorics}
+      \field{number}{1}
+      \field{title}{Searching for counterfeit coins}
+      \field{volume}{13}
+      \field{year}{1997}
+      \field{pages}{9\bibrangedash 20}
+      \keyw{cc}
+    \endentry
+    \entry{coins-nonadaptive}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=abc4d28d43b7bcf232d9fc04879112eb}{Born}{B\bibinitperiod}{Axel}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=d2121fc9a1b9bee917b7aff06597c4cf}{Hurkens}{H\bibinitperiod}{Cor\bibnamedelima AJ}{C\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=a9603d1d5accf0ed36480a6436e0b208}{Woeginger}{W\bibinitperiod}{Gerhard\bibnamedelima J}{G\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=abc4d28d43b7bcf232d9fc04879112eb}{Born}{B\bibinitperiod}{Axel}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=d2121fc9a1b9bee917b7aff06597c4cf}{Hurkens}{H\bibinitperiod}{Cor\bibnamedelima AJ}{C\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=a9603d1d5accf0ed36480a6436e0b208}{Woeginger}{W\bibinitperiod}{Gerhard\bibnamedelima J}{G\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{1606696d7fb4126b2812c445588384d5}
+      \strng{fullhash}{1606696d7fb4126b2812c445588384d5}
+      \field{sortinit}{0}
+      \field{labeltitle}{How to detect a counterfeit coin: Adaptive versus non-adaptive solutions}
+      \field{journaltitle}{Information processing letters}
+      \field{number}{3}
+      \field{title}{How to detect a counterfeit coin: Adaptive versus non-adaptive solutions}
+      \field{volume}{86}
+      \field{year}{2003}
+      \field{pages}{137\bibrangedash 141}
+      \keyw{cc}
+    \endentry
+    \entry{games-lies}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=bb3711a6a082dd40db50470e6a5d26be}{Pelc}{P\bibinitperiod}{Andrzej}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=bb3711a6a082dd40db50470e6a5d26be}{Pelc}{P\bibinitperiod}{Andrzej}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{bb3711a6a082dd40db50470e6a5d26be}
+      \strng{fullhash}{bb3711a6a082dd40db50470e6a5d26be}
+      \field{sortinit}{0}
+      \field{labeltitle}{Searching games with errors—fifty years of coping with liars}
+      \field{journaltitle}{Theoretical Computer Science}
+      \field{number}{1}
+      \field{title}{Searching games with errors—fifty years of coping with liars}
+      \field{volume}{270}
+      \field{year}{2002}
+      \field{pages}{71\bibrangedash 109}
+      \keyw{other}
+    \endentry
+    \entry{coins-unreliable}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=265e5c396cd3d52f0bab59b4a62c3013}{Pelc}{P\bibinitperiod}{A}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=265e5c396cd3d52f0bab59b4a62c3013}{Pelc}{P\bibinitperiod}{A}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {CHARLES BABBAGE RES CTR PO BOX 272 ST NORBERT POSTAL STATION, WINNIPEG MB R3T 2N2, CANADA}%
+      }
+      \strng{namehash}{265e5c396cd3d52f0bab59b4a62c3013}
+      \strng{fullhash}{265e5c396cd3d52f0bab59b4a62c3013}
+      \field{sortinit}{0}
+      \field{labeltitle}{Detecting a counterfeit coin with unreliable weighings}
+      \field{journaltitle}{Ars Combinatoria}
+      \field{title}{Detecting a counterfeit coin with unreliable weighings}
+      \field{volume}{27}
+      \field{year}{1989}
+      \field{pages}{181\bibrangedash 192}
+      \keyw{cc}
+    \endentry
+    \entry{coins-unreliable2}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=ab30689e9c3b2b6f4ac28f277ec2c0c9}{Liu}{L\bibinitperiod}{Wen-An}{W\bibinithyphendelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=8182416dbd62aaf3dce72381a6909dee}{Zhang}{Z\bibinitperiod}{Qi-Min}{Q\bibinithyphendelim M\bibinitperiod}{}{}{}{}}%
+        {{hash=4f8cb550835ad358655990c5e1364498}{Nie}{N\bibinitperiod}{Zan-Kan}{Z\bibinithyphendelim K\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=ab30689e9c3b2b6f4ac28f277ec2c0c9}{Liu}{L\bibinitperiod}{Wen-An}{W\bibinithyphendelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=8182416dbd62aaf3dce72381a6909dee}{Zhang}{Z\bibinitperiod}{Qi-Min}{Q\bibinithyphendelim M\bibinitperiod}{}{}{}{}}%
+        {{hash=4f8cb550835ad358655990c5e1364498}{Nie}{N\bibinitperiod}{Zan-Kan}{Z\bibinithyphendelim K\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{463a8aca9027ce337502c540be175ce5}
+      \strng{fullhash}{463a8aca9027ce337502c540be175ce5}
+      \field{sortinit}{0}
+      \field{labeltitle}{Searching for a counterfeit coin with two unreliable weighings}
+      \field{journaltitle}{Discrete applied mathematics}
+      \field{number}{1}
+      \field{title}{Searching for a counterfeit coin with two unreliable weighings}
+      \field{volume}{150}
+      \field{year}{2005}
+      \field{pages}{160\bibrangedash 181}
+      \keyw{cc}
+    \endentry
+    \entry{coins-multiplearm}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=5a9784b6fb5267f4abfd3d39fff1ce9d}{De\bibnamedelima Bonis}{D\bibinitperiod\bibinitdelim B\bibinitperiod}{Annalisa}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=918344bf38d46f8159aea2c4bcc2142d}{Gargano}{G\bibinitperiod}{Luisa}{L\bibinitperiod}{}{}{}{}}%
+        {{hash=5430dbb6a6dd1cf1b12a322bb746679c}{Vaccaro}{V\bibinitperiod}{Ugo}{U\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=5a9784b6fb5267f4abfd3d39fff1ce9d}{De\bibnamedelima Bonis}{D\bibinitperiod\bibinitdelim B\bibinitperiod}{Annalisa}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=918344bf38d46f8159aea2c4bcc2142d}{Gargano}{G\bibinitperiod}{Luisa}{L\bibinitperiod}{}{}{}{}}%
+        {{hash=5430dbb6a6dd1cf1b12a322bb746679c}{Vaccaro}{V\bibinitperiod}{Ugo}{U\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{add7b6867e1c065885aba559992c450c}
+      \strng{fullhash}{add7b6867e1c065885aba559992c450c}
+      \field{sortinit}{0}
+      \field{labeltitle}{Optimal detection of a counterfeit coin with multi-arms balances}
+      \field{journaltitle}{Discrete applied mathematics}
+      \field{number}{2}
+      \field{title}{Optimal detection of a counterfeit coin with multi-arms balances}
+      \field{volume}{61}
+      \field{year}{1995}
+      \field{pages}{121\bibrangedash 131}
+      \keyw{cc}
+    \endentry
+    \entry{coins-parallel}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=a84541469842e72cea5a5781f92ee178}{Khovanova}{K\bibinitperiod}{Tanya}{T\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=a84541469842e72cea5a5781f92ee178}{Khovanova}{K\bibinitperiod}{Tanya}{T\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{a84541469842e72cea5a5781f92ee178}
+      \strng{fullhash}{a84541469842e72cea5a5781f92ee178}
+      \field{sortinit}{0}
+      \field{labeltitle}{Parallel Weighings}
+      \field{journaltitle}{arXiv preprint arXiv:1310.7268}
+      \field{title}{Parallel Weighings}
+      \field{year}{2013}
+      \keyw{cc}
+    \endentry
+    \entry{mm-chvatal}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=4c1ee92f9b36f6a981b9231235e02891}{Chvátal}{C\bibinitperiod}{Vasek}{V\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=4c1ee92f9b36f6a981b9231235e02891}{Chvátal}{C\bibinitperiod}{Vasek}{V\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{4c1ee92f9b36f6a981b9231235e02891}
+      \strng{fullhash}{4c1ee92f9b36f6a981b9231235e02891}
+      \field{sortinit}{0}
+      \field{labeltitle}{Mastermind}
+      \field{journaltitle}{Combinatorica}
+      \field{number}{3-4}
+      \field{title}{Mastermind}
+      \field{volume}{3}
+      \field{year}{1983}
+      \field{pages}{325\bibrangedash 329}
+      \keyw{mm}
+    \endentry
+    \entry{mm-np}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=a02046ed4bf7c9e4e3c1410d59eb1fa7}{Stuckman}{S\bibinitperiod}{Jeff}{J\bibinitperiod}{}{}{}{}}%
+        {{hash=164de6155e6da8568838c343c107748f}{Zhang}{Z\bibinitperiod}{Guo-Qiang}{G\bibinithyphendelim Q\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=a02046ed4bf7c9e4e3c1410d59eb1fa7}{Stuckman}{S\bibinitperiod}{Jeff}{J\bibinitperiod}{}{}{}{}}%
+        {{hash=164de6155e6da8568838c343c107748f}{Zhang}{Z\bibinitperiod}{Guo-Qiang}{G\bibinithyphendelim Q\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{5e99cd392ca3057b93201d09549dfffd}
+      \strng{fullhash}{5e99cd392ca3057b93201d09549dfffd}
+      \field{sortinit}{0}
+      \field{labeltitle}{Mastermind is NP-complete}
+      \field{journaltitle}{arXiv preprint cs/0512049}
+      \field{title}{Mastermind is NP-complete}
+      \field{year}{2005}
+      \keyw{mm}
+    \endentry
+    \entry{mm-knuth}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=b2511d7ad47b3c83562d2021bd231303}{Knuth}{K\bibinitperiod}{Donald\bibnamedelima E}{D\bibinitperiod\bibinitdelim E\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=b2511d7ad47b3c83562d2021bd231303}{Knuth}{K\bibinitperiod}{Donald\bibnamedelima E}{D\bibinitperiod\bibinitdelim E\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{b2511d7ad47b3c83562d2021bd231303}
+      \strng{fullhash}{b2511d7ad47b3c83562d2021bd231303}
+      \field{sortinit}{0}
+      \field{labeltitle}{The computer as master mind}
+      \field{journaltitle}{Journal of Recreational Mathematics}
+      \field{number}{1}
+      \field{title}{The computer as master mind}
+      \field{volume}{9}
+      \field{year}{1976}
+      \field{pages}{1\bibrangedash 6}
+      \keyw{mm}
+    \endentry
+    \entry{mm-expnum}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=740e368ff9ad945fb04f8e7af37acf70}{Irving}{I\bibinitperiod}{Robert\bibnamedelima W}{R\bibinitperiod\bibinitdelim W\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=740e368ff9ad945fb04f8e7af37acf70}{Irving}{I\bibinitperiod}{Robert\bibnamedelima W}{R\bibinitperiod\bibinitdelim W\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{740e368ff9ad945fb04f8e7af37acf70}
+      \strng{fullhash}{740e368ff9ad945fb04f8e7af37acf70}
+      \field{sortinit}{0}
+      \field{labeltitle}{Towards an optimum Mastermind strategy}
+      \field{journaltitle}{Journal of Recreational Mathematics}
+      \field{number}{2}
+      \field{title}{Towards an optimum Mastermind strategy}
+      \field{volume}{11}
+      \field{year}{1978}
+      \field{pages}{81\bibrangedash 87}
+      \keyw{mm}
+    \endentry
+    \entry{mm-entropy}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=728f4fd243060ec8ffda02b615f9d35f}{Neuwirth}{N\bibinitperiod}{E}{E\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=728f4fd243060ec8ffda02b615f9d35f}{Neuwirth}{N\bibinitperiod}{E}{E\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{728f4fd243060ec8ffda02b615f9d35f}
+      \strng{fullhash}{728f4fd243060ec8ffda02b615f9d35f}
+      \field{sortinit}{0}
+      \field{labeltitle}{Some strategies for Mastermind}
+      \field{journaltitle}{Zeitschrift für Operations Research}
+      \field{number}{1}
+      \field{title}{Some strategies for Mastermind}
+      \field{volume}{26}
+      \field{year}{1982}
+      \field{pages}{B257\bibrangedash B278}
+      \keyw{mm}
+    \endentry
+    \entry{mm-mostparts}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=816cd5a0a1d583fd01446a48b2795a45}{Kooi}{K\bibinitperiod}{Barteld\bibnamedelima P}{B\bibinitperiod\bibinitdelim P\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=816cd5a0a1d583fd01446a48b2795a45}{Kooi}{K\bibinitperiod}{Barteld\bibnamedelima P}{B\bibinitperiod\bibinitdelim P\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Citeseer}%
+      }
+      \strng{namehash}{816cd5a0a1d583fd01446a48b2795a45}
+      \strng{fullhash}{816cd5a0a1d583fd01446a48b2795a45}
+      \field{sortinit}{0}
+      \field{labeltitle}{Yet Another Mastermind Strategy.}
+      \field{journaltitle}{ICGA Journal}
+      \field{number}{1}
+      \field{title}{Yet Another Mastermind Strategy.}
+      \field{volume}{28}
+      \field{year}{2005}
+      \field{pages}{13\bibrangedash 20}
+      \keyw{mm}
+    \endentry
+    \entry{mm-ville}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=ff0756ff2101e19f51d7a6d869dfb534}{Ville}{V\bibinitperiod}{Geoffroy}{G\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=ff0756ff2101e19f51d7a6d869dfb534}{Ville}{V\bibinitperiod}{Geoffroy}{G\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{ff0756ff2101e19f51d7a6d869dfb534}
+      \strng{fullhash}{ff0756ff2101e19f51d7a6d869dfb534}
+      \field{sortinit}{0}
+      \field{labeltitle}{An Optimal Mastermind (4, 7) Strategy and More Results in the Expected Case}
+      \field{journaltitle}{arXiv preprint arXiv:1305.1010}
+      \field{title}{An Optimal Mastermind (4, 7) Strategy and More Results in the Expected Case}
+      \field{year}{2013}
+      \keyw{mm}
+    \endentry
+    \entry{mm-exp-opt}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=a27a7b51eb5bf3f22fc93254c07b9206}{Koyama}{K\bibinitperiod}{Kenji}{K\bibinitperiod}{}{}{}{}}%
+        {{hash=c1c73df0d8f92f54e41a9e305118b2c1}{Lai}{L\bibinitperiod}{Tony\bibnamedelima W}{T\bibinitperiod\bibinitdelim W\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=a27a7b51eb5bf3f22fc93254c07b9206}{Koyama}{K\bibinitperiod}{Kenji}{K\bibinitperiod}{}{}{}{}}%
+        {{hash=c1c73df0d8f92f54e41a9e305118b2c1}{Lai}{L\bibinitperiod}{Tony\bibnamedelima W}{T\bibinitperiod\bibinitdelim W\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{4f8b92aa11b7dac4bc3751ce3d3e9c64}
+      \strng{fullhash}{4f8b92aa11b7dac4bc3751ce3d3e9c64}
+      \field{sortinit}{0}
+      \field{labeltitle}{An optimal Mastermind strategy}
+      \field{journaltitle}{Journal of Recreational Mathematics}
+      \field{number}{4}
+      \field{title}{An optimal Mastermind strategy}
+      \field{volume}{25}
+      \field{year}{1993}
+      \field{pages}{251\bibrangedash 256}
+      \keyw{mm}
+    \endentry
+    \entry{mm-ga}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=3e03015b1c047e715b18e7a3d469a41a}{Berghman}{B\bibinitperiod}{Lotte}{L\bibinitperiod}{}{}{}{}}%
+        {{hash=892d9dd382984273ab346fe7194ad3d1}{Goossens}{G\bibinitperiod}{Dries}{D\bibinitperiod}{}{}{}{}}%
+        {{hash=14a19d8b194820b3140aac9b48f6a020}{Leus}{L\bibinitperiod}{Roel}{R\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=3e03015b1c047e715b18e7a3d469a41a}{Berghman}{B\bibinitperiod}{Lotte}{L\bibinitperiod}{}{}{}{}}%
+        {{hash=892d9dd382984273ab346fe7194ad3d1}{Goossens}{G\bibinitperiod}{Dries}{D\bibinitperiod}{}{}{}{}}%
+        {{hash=14a19d8b194820b3140aac9b48f6a020}{Leus}{L\bibinitperiod}{Roel}{R\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{ba57cf799f2fb7dcd6e0c3931dcc3c27}
+      \strng{fullhash}{ba57cf799f2fb7dcd6e0c3931dcc3c27}
+      \field{sortinit}{0}
+      \field{labeltitle}{Efficient solutions for Mastermind using genetic algorithms}
+      \field{journaltitle}{Computers \& operations research}
+      \field{number}{6}
+      \field{title}{Efficient solutions for Mastermind using genetic algorithms}
+      \field{volume}{36}
+      \field{year}{2009}
+      \field{pages}{1880\bibrangedash 1885}
+      \keyw{mm}
+    \endentry
+    \entry{mm-heuristic}{inproceedings}{}
+      \name{labelname}{2}{}{%
+        {{hash=d8425c7dcb161032f0a81a4697524b38}{Temporel}{T\bibinitperiod}{Alexandre}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=de4b01c0f10f58a4eb5fea6304b4647b}{Kovacs}{K\bibinitperiod}{Tim}{T\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=d8425c7dcb161032f0a81a4697524b38}{Temporel}{T\bibinitperiod}{Alexandre}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=de4b01c0f10f58a4eb5fea6304b4647b}{Kovacs}{K\bibinitperiod}{Tim}{T\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{15f84ca3c5a854a951dea89cbe30f277}
+      \strng{fullhash}{15f84ca3c5a854a951dea89cbe30f277}
+      \field{sortinit}{0}
+      \field{labeltitle}{A heuristic hill climbing algorithm for Mastermind}
+      \field{booktitle}{UKCI’03: Proceedings of the 2003 UK Workshop on Computational Intelligence, Bristol, United Kingdom}
+      \field{title}{A heuristic hill climbing algorithm for Mastermind}
+      \field{year}{2003}
+      \field{pages}{189\bibrangedash 196}
+      \keyw{mm}
+    \endentry
+    \entry{bullsandcows}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=bedc1e634e04a9a0643c0c3dbfa68b53}{Slovesnov}{S\bibinitperiod}{Alexey}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=bedc1e634e04a9a0643c0c3dbfa68b53}{Slovesnov}{S\bibinitperiod}{Alexey}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{bedc1e634e04a9a0643c0c3dbfa68b53}
+      \strng{fullhash}{bedc1e634e04a9a0643c0c3dbfa68b53}
+      \field{sortinit}{0}
+      \field{labeltitle}{Search of optimal algorithms for bulls and cows game}
+      \field{title}{Search of optimal algorithms for bulls and cows game}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{2013}
+      \verb{url}
+      \verb http://slovesnov.users.sourceforge.net/bullscows/bullscows.pdf
+      \endverb
+      \keyw{other}
+    \endentry
+    \entry{mm-static}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=c007b965a42f4305d3b597301fc531e7}{Goddard}{G\bibinitperiod}{Wayne}{W\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=c007b965a42f4305d3b597301fc531e7}{Goddard}{G\bibinitperiod}{Wayne}{W\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Citeseer}%
+      }
+      \strng{namehash}{c007b965a42f4305d3b597301fc531e7}
+      \strng{fullhash}{c007b965a42f4305d3b597301fc531e7}
+      \field{sortinit}{0}
+      \field{labeltitle}{Static mastermind}
+      \field{journaltitle}{Journal of Combinatorial Mathematics and Combinatorial Computing}
+      \field{title}{Static mastermind}
+      \field{volume}{47}
+      \field{year}{2003}
+      \field{pages}{225\bibrangedash 236}
+      \keyw{mm}
+    \endentry
+    \entry{erdos-two}{online}{}
+      \name{labelname}{2}{}{%
+        {{hash=6bdf16ead0815d7b7b3548f89f0f1355}{Erdős}{E\bibinitperiod}{Paul}{P\bibinitperiod}{}{}{}{}}%
+        {{hash=71364c60260207c5545e16bb4b706df9}{Rénei}{R\bibinitperiod}{Alfréd}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=6bdf16ead0815d7b7b3548f89f0f1355}{Erdős}{E\bibinitperiod}{Paul}{P\bibinitperiod}{}{}{}{}}%
+        {{hash=71364c60260207c5545e16bb4b706df9}{Rénei}{R\bibinitperiod}{Alfréd}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{4f1c870ba55af002c08c2299e97e589d}
+      \strng{fullhash}{4f1c870ba55af002c08c2299e97e589d}
+      \field{sortinit}{0}
+      \field{labeltitle}{On two problems of information theory}
+      \field{title}{On two problems of information theory}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{1963}
+      \verb{url}
+      \verb http://193.224.79.10/~p_erdos/1963-12.pdf
+      \endverb
+      \keyw{other}
+    \endentry
+    \entry{mm-app-gen2}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=7c1533a443a68e80b465a9cd8f6abe35}{Goodrich}{G\bibinitperiod}{Michael\bibnamedelima T}{M\bibinitperiod\bibinitdelim T\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=7c1533a443a68e80b465a9cd8f6abe35}{Goodrich}{G\bibinitperiod}{Michael\bibnamedelima T}{M\bibinitperiod\bibinitdelim T\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{7c1533a443a68e80b465a9cd8f6abe35}
+      \strng{fullhash}{7c1533a443a68e80b465a9cd8f6abe35}
+      \field{sortinit}{0}
+      \field{labeltitle}{On the algorithmic complexity of the Mastermind game with black-peg results}
+      \field{journaltitle}{arXiv preprint arXiv:0904.4911}
+      \field{title}{On the algorithmic complexity of the Mastermind game with black-peg results}
+      \field{year}{2009}
+      \keyw{mm}
+    \endentry
+    \entry{mm-app-gen}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=319f41b4178b74d824c5f1290d0c94ba}{Gagneur}{G\bibinitperiod}{Julien}{J\bibinitperiod}{}{}{}{}}%
+        {{hash=ad9a2fb3e144feb8afb6dd0a1b13cd34}{Elze}{E\bibinitperiod}{Markus\bibnamedelima C}{M\bibinitperiod\bibinitdelim C\bibinitperiod}{}{}{}{}}%
+        {{hash=2924bd232a5d29340305994c84fdf6e0}{Tresch}{T\bibinitperiod}{Achim}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=319f41b4178b74d824c5f1290d0c94ba}{Gagneur}{G\bibinitperiod}{Julien}{J\bibinitperiod}{}{}{}{}}%
+        {{hash=ad9a2fb3e144feb8afb6dd0a1b13cd34}{Elze}{E\bibinitperiod}{Markus\bibnamedelima C}{M\bibinitperiod\bibinitdelim C\bibinitperiod}{}{}{}{}}%
+        {{hash=2924bd232a5d29340305994c84fdf6e0}{Tresch}{T\bibinitperiod}{Achim}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {BioMed Central Ltd}%
+      }
+      \strng{namehash}{c983934d4d18842a9de926b774273d07}
+      \strng{fullhash}{c983934d4d18842a9de926b774273d07}
+      \field{sortinit}{0}
+      \field{labeltitle}{Selective phenotyping, entropy reduction, and the mastermind game}
+      \field{journaltitle}{BMC bioinformatics}
+      \field{number}{1}
+      \field{title}{Selective phenotyping, entropy reduction, and the mastermind game}
+      \field{volume}{12}
+      \field{year}{2011}
+      \field{pages}{406}
+      \keyw{mm}
+    \endentry
+    \entry{mm-pins}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=ea42e755f2ddfa717a9c64598f941fcc}{Focardi}{F\bibinitperiod}{Riccardo}{R\bibinitperiod}{}{}{}{}}%
+        {{hash=8140481670c4f0b953cca68ea093aca6}{Luccio}{L\bibinitperiod}{Flaminia\bibnamedelima L}{F\bibinitperiod\bibinitdelim L\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=ea42e755f2ddfa717a9c64598f941fcc}{Focardi}{F\bibinitperiod}{Riccardo}{R\bibinitperiod}{}{}{}{}}%
+        {{hash=8140481670c4f0b953cca68ea093aca6}{Luccio}{L\bibinitperiod}{Flaminia\bibnamedelima L}{F\bibinitperiod\bibinitdelim L\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{3e9629a8c775d3ad8d367adaa3007988}
+      \strng{fullhash}{3e9629a8c775d3ad8d367adaa3007988}
+      \field{sortinit}{0}
+      \field{labeltitle}{Guessing bank pins by winning a mastermind game}
+      \field{journaltitle}{Theory of Computing Systems}
+      \field{number}{1}
+      \field{title}{Guessing bank pins by winning a mastermind game}
+      \field{volume}{50}
+      \field{year}{2012}
+      \field{pages}{52\bibrangedash 71}
+      \keyw{mm}
+    \endentry
+    \entry{blackbox}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=9c677286866aad38f8e9b660f5411814}{Wikipedia}{W\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=9c677286866aad38f8e9b660f5411814}{Wikipedia}{W\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{sortinit}{0}
+      \field{labeltitle}{Black Box (game) --- Wikipedia{,} The Free Encyclopedia}
+      \field{title}{Black Box (game) --- Wikipedia{,} The Free Encyclopedia}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{2014}
+      \verb{url}
+      \verb http://en.wikipedia.org/wiki/Black_Box_(game)
+      \endverb
+      \keyw{other}
+    \endentry
+    \entry{lasermaze}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=f73b7ec2b24c4c53b7932433d4f8b70b}{Liu}{L\bibinitperiod}{Jonathan\bibnamedelima H.}{J\bibinitperiod\bibinitdelim H\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=f73b7ec2b24c4c53b7932433d4f8b70b}{Liu}{L\bibinitperiod}{Jonathan\bibnamedelima H.}{J\bibinitperiod\bibinitdelim H\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{f73b7ec2b24c4c53b7932433d4f8b70b}
+      \strng{fullhash}{f73b7ec2b24c4c53b7932433d4f8b70b}
+      \field{sortinit}{0}
+      \field{labeltitle}{Laser Maze: A Delightful Puzzle Game}
+      \field{title}{Laser Maze: A Delightful Puzzle Game}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{2013}
+      \verb{url}
+      \verb http://geekdad.com/2013/06/laser-maze
+      \endverb
+      \keyw{other}
+    \endentry
+    \entry{code777}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=d0695041807573c2b92194080543278c}{geek}{g\bibinitperiod}{Board}{B\bibinitperiod}{game}{g\bibinitperiod}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=d0695041807573c2b92194080543278c}{geek}{g\bibinitperiod}{Board}{B\bibinitperiod}{game}{g\bibinitperiod}{}{}}%
+      }
+      \strng{namehash}{d0695041807573c2b92194080543278c}
+      \strng{fullhash}{d0695041807573c2b92194080543278c}
+      \field{sortinit}{0}
+      \field{labeltitle}{Code 777 (1985)}
+      \field{title}{Code 777 (1985)}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \verb{url}
+      \verb http://boardgamegeek.com/boardgame/443/code-777
+      \endverb
+      \keyw{other}
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
 
-\bibitem{coins-cwproblems1995}
-Richard~K Guy and Richard~J Nowakowski.
-\newblock Coin-weighing problems.
-\newblock {\em American Mathematical Monthly}, pages 164--167, 1995.
-
-\bibitem{coins-2fakes}
-Ratko To{\v{s}}i{\'c}.
-\newblock Two counterfeit coins.
-\newblock {\em Discrete Mathematics}, 46(3):295--298, 1983.
-
-\bibitem{coins-3fakes}
-Anping Li.
-\newblock Three counterfeit coins problem.
-\newblock {\em Journal of Combinatorial Theory, Series A}, 66(1):93--101, 1994.
-
-\bibitem{coins-mfakes}
-L{\'a}szl{\'o} Pyber.
-\newblock How to find many counterfeit coins?
-\newblock {\em Graphs and Combinatorics}, 2(1):173--177, 1986.
-
-\bibitem{coins-unknownfakes}
-Xiao-Dong Hu, PD~Chen, and Frank~K. Hwang.
-\newblock A new competitive algorithm for the counterfeit coin problem.
-\newblock {\em Information Processing Letters}, 51(4):213--218, 1994.
-
-\bibitem{coins-atmostfakes}
-Martin Aigner and Anping Li.
-\newblock Searching for counterfeit coins.
-\newblock {\em Graphs and Combinatorics}, 13(1):9--20, 1997.
-
-\bibitem{coins-nonadaptive}
-Axel Born, Cor~AJ Hurkens, and Gerhard~J Woeginger.
-\newblock How to detect a counterfeit coin: Adaptive versus non-adaptive
-  solutions.
-\newblock {\em Information processing letters}, 86(3):137--141, 2003.
-
-\bibitem{games-lies}
-Andrzej Pelc.
-\newblock Searching games with errors—fifty years of coping with liars.
-\newblock {\em Theoretical Computer Science}, 270(1):71--109, 2002.
-
-\bibitem{coins-unreliable}
-A~Pelc.
-\newblock Detecting a counterfeit coin with unreliable weighings.
-\newblock {\em Ars Combinatoria}, 27:181--192, 1989.
-
-\bibitem{coins-multiplearm}
-Annalisa De~Bonis, Luisa Gargano, and Ugo Vaccaro.
-\newblock Optimal detection of a counterfeit coin with multi-arms balances.
-\newblock {\em Discrete applied mathematics}, 61(2):121--131, 1995.
-
-\bibitem{coins-parallel}
-Tanya Khovanova.
-\newblock Parallel weighings.
-\newblock {\em arXiv preprint arXiv:1310.7268}, 2013.
-
-\bibitem{mm-chvatil}
-Vasek Chv{\'a}tal.
-\newblock Mastermind.
-\newblock {\em Combinatorica}, 3(3-4):325--329, 1983.
-
-\bibitem{mm-static}
-Wayne Goddard.
-\newblock Static mastermind.
-\newblock {\em Journal of Combinatorial Mathematics and Combinatorial
-  Computing}, 47:225--236, 2003.
-
-\bibitem{mm-knuth}
-Donald~E Knuth.
-\newblock The computer as master mind.
-\newblock {\em Journal of Recreational Mathematics}, 9(1):1--6, 1976.
-
-\bibitem{mm-ville}
-Geoffroy Ville.
-\newblock An optimal mastermind (4, 7) strategy and more results in the
-  expected case.
-\newblock {\em arXiv preprint arXiv:1305.1010}, 2013.
-
-\bibitem{mm-mostparts}
-Barteld~P Kooi.
-\newblock Yet another mastermind strategy.
-\newblock {\em ICGA Journal}, 28(1):13--20, 2005.
-
-\bibitem{mm-expnum}
-Robert~W Irving.
-\newblock Towards an optimum mastermind strategy.
-\newblock {\em Journal of Recreational Mathematics}, 11(2):81--87, 1978.
-
-\bibitem{mm-entropy}
-E~Neuwirth.
-\newblock Some strategies for mastermind.
-\newblock {\em Zeitschrift f{\"u}r Operations Research}, 26(1):B257--B278,
-  1982.
-
-\bibitem{mm-exp-opt}
-Kenji Koyama and Tony~W Lai.
-\newblock An optimal mastermind strategy.
-\newblock {\em Journal of Recreational Mathematics}, 25(4):251--256, 1993.
-
-\end{thebibliography}

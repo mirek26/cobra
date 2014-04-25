@@ -1,38 +1,76 @@
+\defcounter {refsection}{0}\relax 
 \contentsline {problem}{{Problem}{1}{The nine coin problem}}{5}{problem.1}
+\defcounter {refsection}{0}\relax 
 \contentsline {problem}{{Problem}{2}{The Twelve Coin Problem}}{5}{problem.2}
+\defcounter {refsection}{0}\relax 
 \contentsline {theorem}{{Theorem}{3}{Dyson, \cite {coins-dyson1946}}}{6}{theorem.3}
+\defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{1}{}}{6}{proof.1}
-\contentsline {definition}{{Definition}{4}{Code Breaking Game}}{13}{definition.4}
-\contentsline {definition}{{Definition}{5}{Parametrized formula}}{14}{definition.5}
-\contentsline {definition}{{Definition}{6}{Solving process}}{14}{definition.6}
-\contentsline {definition}{{Definition}{7}{Well-formed game}}{15}{definition.7}
-\contentsline {example}{{Example}{8}{Fake-coin problem}}{15}{example.8}
-\contentsline {example}{{Example}{9}{Fake-coin problem, alternative}}{16}{example.9}
-\contentsline {example}{{Example}{10}{Mastermind}}{16}{example.10}
-\contentsline {example}{{Example}{11}{Mastermind (alternative)}}{17}{example.11}
-\contentsline {definition}{{Definition}{12}{Strategy}}{18}{definition.12}
-\contentsline {definition}{{Definition}{13}{Optimal strategy}}{19}{definition.13}
-\contentsline {lemma}{{Lemma}{14}{}}{19}{lemma.14}
-\contentsline {proof}{{\proofname }{2}{}}{19}{proof.2}
-\contentsline {lemma}{{Lemma}{15}{}}{19}{lemma.15}
-\contentsline {proof}{{\proofname }{3}{}}{19}{proof.3}
-\contentsline {example}{{Example}{16}{}}{19}{example.16}
-\contentsline {definition}{{Definition}{17}{Non-adaptive strategy}}{20}{definition.17}
-\contentsline {definition}{{Definition}{18}{Memory-less strategy}}{20}{definition.18}
-\contentsline {lemma}{{Lemma}{19}{}}{20}{lemma.19}
-\contentsline {proof}{{\proofname }{4}{}}{20}{proof.4}
-\contentsline {lemma}{{Lemma}{20}{}}{20}{lemma.20}
-\contentsline {proof}{{\proofname }{5}{}}{20}{proof.5}
-\contentsline {definition}{{Definition}{21}{Greedy strategy}}{21}{definition.21}
-\contentsline {lemma}{{Lemma}{22}{}}{21}{lemma.22}
-\contentsline {proof}{{\proofname }{6}{}}{21}{proof.6}
-\contentsline {example}{{Example}{23}{}}{21}{example.23}
-\contentsline {definition}{{Definition}{24}{Symmetric experiment}}{22}{definition.24}
-\contentsline {definition}{{Definition}{25}{Symmetry group}}{22}{definition.25}
-\contentsline {definition}{{Definition}{26}{Consistent strategy}}{22}{definition.26}
-\contentsline {lemma}{{Lemma}{27}{}}{22}{lemma.27}
-\contentsline {proof}{{\proofname }{7}{}}{22}{proof.7}
-\contentsline {definition}{{Definition}{28}{Experiment equivalence}}{22}{definition.28}
-\contentsline {theorem}{{Theorem}{29}{}}{22}{theorem.29}
-\contentsline {proof}{{\proofname }{8}{}}{22}{proof.8}
-\contentsline {corollary}{{Corollary}{30}{}}{22}{corollary.30}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{4}{Code Breaking Game}}{15}{definition.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{5}{Parametrized formula}}{16}{definition.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{6}{Solving process}}{16}{definition.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{7}{Well-formed game}}{17}{definition.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{8}{Fake-coin problem}}{17}{example.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{9}{Fake-coin problem, alternative}}{18}{example.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{10}{Mastermind}}{18}{example.10}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{11}{Mastermind (alternative)}}{19}{example.11}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{12}{Strategy}}{20}{definition.12}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{13}{Optimal strategy}}{21}{definition.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{14}{}}{21}{lemma.14}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{2}{}}{21}{proof.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{15}{}}{21}{lemma.15}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{3}{}}{21}{proof.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{16}{}}{21}{example.16}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{17}{Non-adaptive strategy}}{22}{definition.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{18}{Memory-less strategy}}{22}{definition.18}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{19}{}}{22}{lemma.19}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{4}{}}{22}{proof.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{20}{}}{22}{lemma.20}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{5}{}}{22}{proof.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{21}{Greedy strategy}}{23}{definition.21}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{22}{}}{23}{lemma.22}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{6}{}}{23}{proof.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{23}{}}{23}{example.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{24}{Symmetric experiment}}{24}{definition.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{25}{Symmetry group}}{24}{definition.25}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{26}{Consistent strategy}}{24}{definition.26}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{27}{}}{24}{lemma.27}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{7}{}}{24}{proof.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{28}{Experiment equivalence}}{24}{definition.28}
+\defcounter {refsection}{0}\relax 
+\contentsline {theorem}{{Theorem}{29}{}}{24}{theorem.29}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{8}{}}{24}{proof.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {corollary}{{Corollary}{30}{}}{24}{corollary.30}
