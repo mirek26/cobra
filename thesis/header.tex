@@ -17,7 +17,6 @@
 \newcommand{\verze}{  \scriptsize(v. \mydate\today\ \currenttime)}
 
 % font
-\usepackage[T1]{fontenc} % left bottom quote ,,  (,,bla'')
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{indentfirst}
@@ -30,6 +29,19 @@
 
 \usepackage[ruled,lined]{algorithm2e}
 \setlength{\algomargin}{0.5cm}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{Gray},
+  showspaces=false,
+  stringstyle=\color{orange},
+  %frame=single,
+  showstringspaces=false,
+  keywordstyle=\bfseries\color{BrickRed},
+  commentstyle=\itshape\color{Gray}
+}
+
 
 \newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
 \newcommand{\argmin}{\operatornamewithlimits{arg\,min}}

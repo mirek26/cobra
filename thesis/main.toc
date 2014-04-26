@@ -52,38 +52,38 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.1}\slshape Input language}{27}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{28}{section*.25}
+\contentsline {subsection}{\rmfamily Low-level language}{27}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{28}{section*.26}
+\contentsline {subsection}{\rmfamily Python preprocessing}{29}{section*.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Basic usage}{28}{section.4.2}
+\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{30}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{28}{section.4.3}
+\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{31}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode}{28}{section*.27}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{31}{section*.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode}{29}{section*.28}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{31}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode}{29}{section*.29}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{32}{section*.29}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode}{29}{section*.30}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{32}{section*.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape SAT solving}{29}{section.4.4}
+\contentsline {section}{\numberline {4.4}\slshape SAT solving}{32}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{29}{section*.31}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{32}{section*.31}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{29}{section.4.5}
+\contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{32}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Extensibility}{29}{section.4.6}
+\contentsline {section}{\numberline {4.6}\slshape Extensibility}{32}{section.4.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{30}{section.4.7}
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{33}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{30}{section*.32}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{33}{section*.32}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Compiler Requirements}{30}{section*.33}
+\contentsline {subsection}{\rmfamily Compiler Requirements}{33}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{30}{section*.34}
+\contentsline {subsection}{\rmfamily Unit testing}{33}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{33}{chapter.5}
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{35}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{35}{chapter.6}
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{37}{chapter.6}
