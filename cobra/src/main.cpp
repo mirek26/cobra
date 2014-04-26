@@ -28,6 +28,25 @@ extern Parser m;
 std::function<uint(vec<Option>&)> g_breakerStg;
 std::function<uint(Option&)> g_makerStg;
 
+typedef struct Args{
+  string filename;
+  string mode;
+  string backend;
+  string stg1;
+  string stg2;
+} Args;
+
+Args args;
+
+Solver* get_solver(const vec<Variable*>& vars, Formula* restriction = nullptr) {
+  if (args.backend == "picosat") {
+    return new PicoSolver(vars, restriction);
+  } else if (args.backend == "simple") {
+    return new SimpleSolver(vars, restriction);
+  }
+  assert(false);
+}
+
 void print_head(string name) {
   printf("\n%s===== %s =====%s\n", color::shead, name.c_str(), color::snormal);
 }
@@ -45,19 +64,18 @@ void time_overview(clock_t start) {
     s2.sat_calls, toSeconds(s2.sat_time),
     s2.fixed_calls, toSeconds(s2.fixed_time),
     s2.models_calls, toSeconds(s2.models_time));
-
 }
 
-void print_stats(Game& game, string filename) {
+void overview_mode() {
+  Game& game = m.game();
   print_head("GAME OVERVIEW");
   printf("Num of variables: %lu\n", game.variables().size());
-  PicoSolver s(game.variables(), game.restriction());
-  Solver& solver = s;
-  uint models = solver.NumOfModels();
+  Solver* solver = get_solver(game.variables(), game.restriction());
+  uint models = solver->NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
   struct stat file_st;
-  stat(filename.c_str(), &file_st);
+  stat(args.filename.c_str(), &file_st);
   uint branching = 0, num_exp = 0, nodes = 0;
   for (auto e: game.experiments()) {
     for (auto f: e->outcomes()) {
@@ -69,7 +87,7 @@ void print_stats(Game& game, string filename) {
     num_exp += e->NumberOfParametrizations();
   }
 
-  printf("Read from file: %s\n", filename.c_str());
+  printf("Read from file: %s\n", args.filename.c_str());
   printf("File size: %lli\n", file_st.st_size);
   printf("Num of nodes in formulas: %u\n\n", nodes);
 
@@ -91,27 +109,29 @@ void print_stats(Game& game, string filename) {
   game.Precompute();
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-  auto var_equiv = game.ComputeVarEquiv(solver, *knowledge_graph);
+  auto var_equiv = game.ComputeVarEquiv(*solver, *knowledge_graph);
   for (auto e: game.experiments()) {
     auto& params_all = e->GenParams(var_equiv);
     for (auto& params: params_all) {
       auto f1 = new vec<Formula*>(e->outcomes().begin(), e->outcomes().end());
       auto f2 = m.get<ExactlyOperator>(1, f1);
-      auto f3 = m.get<ImpliesOperator>(game.restriction(), f2);
-      auto f4 = m.get<NotOperator>(f3);
+      auto f3 = m.get<NotOperator>(f2);
 
-      solver.OpenContext();
-      solver.AddConstraint(f4, params);
-      if (solver.Satisfiable()) {
+      solver->OpenContext();
+      solver->AddConstraint(f3, params);
+      if (solver->Satisfiable()) {
         printf("%s failed!%s\n", color::serror, color::snormal);
         printf("EXPERIMENT: %s %s", e->name().c_str(), game.ParamsToStr(params).c_str());
         printf("\nPROBLEMATIC ASSIGNMENT: \n");
-        solver.PrintAssignment();
+        solver->PrintAssignment();
         printf("\n");
         return;
       }
+      solver->CloseContext();
     }
   }
+
+  delete solver;
   auto t2 = clock();
   printf("ok [%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
 }
@@ -123,12 +143,11 @@ void simulation_mode() {
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
-  PicoSolver knowledge(game.variables(), game.restriction());
-  //knowledge.WriteDimacs(stdout);
+  Solver* solver = get_solver(game.variables(), game.restriction());
 
   int exp_num = 1;
   while (true) {
-    auto options = game.GenerateExperiments(knowledge, *knowledge_graph);
+    auto options = game.GenerateExperiments(*solver, *knowledge_graph);
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options)];
@@ -151,23 +170,23 @@ void simulation_mode() {
            color::snormal);
 
     // Check if solved.
-    knowledge.AddConstraint(outcome, experiment.params());
-    if (knowledge.NumOfModels() == 1) { // TODO: nepotrebuju presne, staci vedet jestli jich neni vic
+    solver->AddConstraint(outcome, experiment.params());
+    if (solver->NumOfModels() == 1) { // TODO: nepotrebuju presne, staci vedet jestli jich neni vic
       printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
-      knowledge.Satisfiable();
-      knowledge.PrintAssignment();
+      solver->Satisfiable();
+      solver->PrintAssignment();
       break;
     }
 
     // Prepare for another round.
     exp_num++;
-    //knowledge.WriteDimacs(stdout);
+    //solver->WriteDimacs(stdout);
     outcome->AddToGraph(*knowledge_graph, &experiment.params());
   }
   delete knowledge_graph;
 }
 
-void analyze(PicoSolver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum) {
+void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum) {
   Game& game = m.game();
   auto options = game.GenerateExperiments(solver, graph);
   auto experiment = options[g_breakerStg(options)];
@@ -195,66 +214,80 @@ void analyze_mode() {
   game.Precompute();
   auto graph = game.CreateGraph();
   game.restriction()->AddToGraph(*graph, nullptr);
-  PicoSolver solver(game.variables(), game.restriction());
+  Solver* solver = get_solver(game.variables(), game.restriction());
   uint max = 0, sum = 0;
-  analyze(solver, *graph, 1, max, sum);
+  analyze(*solver, *graph, 1, max, sum);
   printf("Worst-case: %u\n", max);
-  printf("Average-case: %.2f (%u)\n", (double)sum/solver.NumOfModels(), sum);
+  printf("Average-case: %.2f (%u)\n", (double)sum/solver->NumOfModels(), sum);
+}
+
+// Parse program arguments with TCLAP library.
+void parse_args(int argc, char* argv[]) {
+  using namespace TCLAP;
+  CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
+
+  vec<string> modes = { "o", "overview", "s", "simulation", "a", "analysis", "o", "optimal" };
+  ValuesConstraint<string> modeConstraint(modes);
+  ValueArg<string> modeArg(
+    "m", "mode",
+    "Mode of operation. Default: overview.", false,
+    "o", &modeConstraint);
+
+  vec<string> backends = { "picosat", "simple" };
+  ValuesConstraint<string> backendConstraint(backends);
+  ValueArg<string> backendArg(
+    "b", "backend",
+    "Specifies SAT solver that will be used. Default: picosat.", false,
+    "picosat", &backendConstraint);
+
+  vec<string> breaker_stgs, maker_stgs;
+  string breaker_man = "", maker_man = "";
+  for (auto s: strategy::breaker_strategies) {
+    breaker_stgs.push_back(s.first);
+    breaker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+  }
+  for (auto s: strategy::maker_strategies) {
+    maker_stgs.push_back(s.first);
+    maker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+  }
+  ValuesConstraint<string> makerConstraint(maker_stgs);
+  ValueArg<string> codemakerArg(
+    "1", "codemaker",
+    "Strategy to be played by the codemaker. Default: interactive." + maker_man, false,
+    "interactive", &makerConstraint);
+  ValuesConstraint<string> breakerConstraint(breaker_stgs);
+  ValueArg<string> codebreakerArg(
+    "2", "codebreaker",
+    "Strategy to be played by the codebreaker. Default: interactive." + breaker_man, false,
+    "interactive", &breakerConstraint);
+
+
+  UnlabeledValueArg<std::string> filenameArg(
+    "filename",
+    "Input file name.", false,
+    "", "file name");
+
+  cmd.add(codebreakerArg);
+  cmd.add(codemakerArg);
+  cmd.add(backendArg);
+  cmd.add(modeArg);
+  cmd.add(filenameArg);
+  cmd.parse(argc, argv);
+
+  args.filename = filenameArg.getValue();
+  args.mode = modeArg.getValue();
+  args.backend = backendArg.getValue();
+  args.stg1 = codemakerArg.getValue();
+  args.stg2 = codebreakerArg.getValue();
 }
 
 int main(int argc, char* argv[]) {
-  // Parse input with TCLAP library.
   srand(time(NULL));
   try {
-    using namespace TCLAP;
-    CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
-    SwitchArg infoArg(
-      "i", "info",
-      "Print basic information about the game.",
-      cmd, false);
-    SwitchArg simArg(
-      "s", "simulation",
-      "Starts simulation mode, player strategies can be specified by -b, -m.",
-      cmd, false);
-    SwitchArg analyzeArg(
-      "a", "analyze",
-      "Analyze codebreaker's strategy.",
-      cmd, false);
+    parse_args(argc, argv);
 
-    vec<string> breaker_stgs, maker_stgs;
-    string breaker_man = "", maker_man = "";
-    for (auto s: strategy::breaker_strategies) {
-      breaker_stgs.push_back(s.first);
-      breaker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
-    }
-    for (auto s: strategy::maker_strategies) {
-      maker_stgs.push_back(s.first);
-      maker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
-    }
-
-    ValuesConstraint<string> makerConstraint(maker_stgs);
-    ValueArg<string> codemakerArg(
-      "1", "codemaker",
-      "Strategy to be played by the codemaker. Default: interactive." + maker_man, false,
-      "interactive", &makerConstraint);
-    ValuesConstraint<string> breakerConstraint(breaker_stgs);
-    ValueArg<string> codebreakerArg(
-      "2", "codebreaker",
-      "Strategy to be played by the codebreaker. Default: interactive." + breaker_man, false,
-      "interactive", &breakerConstraint);
-    cmd.add(codemakerArg);
-    cmd.add(codebreakerArg);
-
-    UnlabeledValueArg<std::string> filenameArg(
-      "filename",
-      "Input file name.", false,
-      "", "file name");
-    cmd.add(filenameArg);
-    cmd.parse(argc, argv);
-
-    auto file = filenameArg.getValue();
-    if (!(yyin = fopen(file.c_str(), "r"))) {
-      printf("Cannot open %s: %s.\n", file.c_str(), strerror(errno));
+    if (!(yyin = fopen(args.filename.c_str(), "r"))) {
+      printf("Cannot open %s: %s.\n", args.filename.c_str(), strerror(errno));
       exit(EXIT_FAILURE);
     }
     auto t1 = clock();
@@ -270,22 +303,18 @@ int main(int argc, char* argv[]) {
     printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
     t1 = clock();
 
-    if (infoArg.getValue() || (!simArg.getValue() && !analyzeArg.getValue())) {
-      print_stats(m.game(), file);
-    }
+    g_makerStg = strategy::maker_strategies.at(args.stg1).second;
+    g_breakerStg = strategy::breaker_strategies.at(args.stg2).second;
 
-    if (simArg.getValue()) {
-      g_breakerStg = strategy::breaker_strategies.at(codebreakerArg.getValue()).second;
-      g_makerStg = strategy::maker_strategies.at(codemakerArg.getValue()).second;
+    if (args.mode == "o" || args.mode == "overview") {
+      overview_mode();
+    } else if (args.mode == "s" || args.mode == "simulation") {
       simulation_mode();
-    }
-
-    if (analyzeArg.getValue()) {
-      if (codebreakerArg.getValue() == "interactive") {
-        printf("Cannot analyze strategy 'interactive'. \n");
+    } else if (args.mode == "a" || args.mode == "analysis") {
+      if (args.stg2 == "interactive" || args.stg2 == "random") {
+        printf("Cannot analyze strategy '%s'. \n", args.stg2.c_str());
         exit(EXIT_FAILURE);
       }
-      g_breakerStg = strategy::breaker_strategies.at(codebreakerArg.getValue()).second;
       analyze_mode();
     }
 

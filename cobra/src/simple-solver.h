@@ -30,7 +30,7 @@ class SimpleSolver: public Solver {
   bool ready_;
 
  public:
-  SimpleSolver(const vec<Variable*>& vars, Formula* restriction) :
+  SimpleSolver(const vec<Variable*>& vars, Formula* restriction = nullptr) :
       vars_(vars), restriction_(restriction) {
     PicoSolver sat(vars, restriction);
     codes_ = sat.GenerateModels();

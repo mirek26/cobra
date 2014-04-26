@@ -13,6 +13,7 @@
 
 class Variable;
 class Formula;
+class Solver;
 
 typedef struct SolverStats {
   clock_t fixed_time = 0;
@@ -25,6 +26,7 @@ typedef struct SolverStats {
 
 class Solver {
  public:
+  virtual ~Solver() { }
   virtual SolverStats& stats() = 0;
 
   virtual void AddConstraint(Formula* formula) = 0;

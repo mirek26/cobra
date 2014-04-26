@@ -27,7 +27,7 @@ PicoSolver::PicoSolver(const vec<Variable*>& vars, Formula* restriction):
   for (uint i = 0; i < vars_.size(); i++) {
     picosat_inc_max_var(picosat_);
   }
-  AddConstraint(restriction);
+  if (restriction) AddConstraint(restriction);
 }
 
 //------------------------------------------------------------------------------

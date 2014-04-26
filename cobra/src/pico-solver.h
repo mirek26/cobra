@@ -31,7 +31,7 @@ class PicoSolver: public Solver {
   const vec<CharId>* build_for_params_ = nullptr;
 
  public:
-  PicoSolver(const vec<Variable*>& vars, Formula* restriction);
+  PicoSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
 
   virtual SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
