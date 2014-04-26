@@ -93,32 +93,23 @@
 \newaliascnt{lemma}{common}
 \newaliascnt{problem}{common}
 \newaliascnt{corollary}{common}
-\newaliascnt{mytable}{common}
 
-% \numberwithin{table}{common}
-% \renewcommand*{\thetable}{\arabic{chapter}.\arabic{common}}
-% \numberwithin{figure}{common}
-% \renewcommand*{\thefigure}{\arabic{chapter}.\arabic{common}}
-
-% \numberwithin{table}{mytable}
-% \renewcommand*{\thetable}{\arabic{chapter}.\arabic{mytable}}
-
+\makeatletter
+\renewcommand*{\thetable}{\arabic{chapter}.\arabic{table}}
+\renewcommand*{\thefigure}{\arabic{chapter}.\arabic{figure}}
+\let\c@table\c@common
+\let\c@figure\c@common
+\makeatother
 
 \theoremstyle{definition}
-\newshadedtheorem{definition}{Definition}
-\newtheorem{example}{Example}
+\newshadedtheorem{definition}{Definition}[chapter]
+\newtheorem{example}{Example}[chapter]
 
 \theoremstyle{plain}
-\newtheorem{problem}{Problem}
-\newshadedtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{corollary}{Corollary}
-
-\aliascntresetthe{definition}
-\aliascntresetthe{example}
-\aliascntresetthe{lemma}
-\aliascntresetthe{problem}
-\aliascntresetthe{corollary}
+\newtheorem{problem}{Problem}[chapter]
+\newshadedtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{corollary}{Corollary}[chapter]
 
 
 \usepackage{graphicx}
