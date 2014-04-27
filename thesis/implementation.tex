@@ -4,27 +4,29 @@ COBRA uses a SAT solver for the following tasks.
 \begin{itemize}
 \item Compute the total number of possible codes.
 \item Verify that an experiment is well-formed (see \autoref{s:cobra-modes} for details).
-\item Identify possible outcomes of an experiment and exclude the unsatisfiables.
-\item Decide whether the game is finished -- whether the formula has only one model.
+\item Identify satisfiable outcomes of an experiment and disregard the others.
+\item Decide whether the game is finished -- whether the accumulated
+  knowledge as a formula has only one model.
 \item Evaluate the strategies -- count models, fixed variable, etc.
 \end{itemize}
 
-Most of these tasks need an \emph{incremental SAT solver}, i.e. a
+Most of these tasks require an \emph{incremental SAT solver}, i.e. a
   sat solver to which you can add constraints and take them back later.
-Without this feature, we would have to call the SAT solver on the whole formula
-  many times which would ruin the computation time.
-% The notion of \emph{incremental SAT solving} is not uniquely defined and
-%   its support varies.
+Without this feature, we would have to call the solver from a clean state
+  many times on the whole formula, which would ruin the computation time.
 
-COBRA uses a solver as an abstract class which can have multiple implementation,
-  thus allowing a simple extension with another SAT solver.
+COBRA uses a SAT solver as an abstract class, which can have multiple implementations.
+This allows a simple extension with another SAT backend.
 The solver to be used can be specified with
-  the \texttt{-b} or \texttt{--backend} swith.
+  the \texttt{-b} or \texttt{--backend} switch.
 
 Solver must implement the following methods:
 \begin{itemize}
 \item \textsc{AddConstraint}(formula). Adds a constraint to the SAT solver.
 \item \textsc{Satisfiable()} $->$ Bool. Decides whether the current formula is satisfiable.
+\item \textsc{GetAssignment()} $->$ Assignment.
+  After \textsc{Satisfiable} call, this function retrieves
+  a satisfying assignment from the solver.
 \item \textsc{OpenContext(), CloseContext()}.
   This is our understanding of incremental SAT solving.
   \textsc{OpenContext} adds a context to a stack.
@@ -37,60 +39,105 @@ Solver must implement the following methods:
   if yes, retrieving the satisfying assignment, adding
   a clause with the assignment negated and asking for satisfiability again.
   Adding the new clause should be done in a new context in order not to pollute
-  the solver state.
+  the solver state. The pseudocode is shown in \autoref{alg:onlyonemodel}.
+
 \item \textsc{CountModels()} $->$ Int.
-   SAT solvers do not typically include support for model counting, the problem
-   usually refered to as \#SAT. Possible solutions of this problem are described next.
-\end{itemize}
-
-\subsection{Model counting}
-
-First option is to use special tools designed for this purpose,
-  such as SharpSAT or sharpCDCL \TODO{refs?}.
+SAT solvers do not typically include support for model counting, the problem
+  commonly referred to as \#SAT.
+One solution is to use
+  special tools designed for this purpose,
+  such as SharpSAT\footnote{\url{https://sites.google.com/site/marcthurley/sharpsat}}
+  \cite{sharpsat}.
 However, these tools do not support incremental solving and
   must be run from a clean state for each formula models of which we want to count.
 
-Second option is to use a SAT solver, repeateadly ask for satisfiability and
+Second option is to use a SAT solver, repeatedly ask for satisfiability and
   add clauses that forbids the current assignment until we get
-  an unsatisfiable formula.
-\TODO{pseudokód.}
+  an unsatisfiable formula. The pseudocode is shown in \autoref{alg:modelcounting2}.
 
 Third option is to use a SAT solver and a simple backtracking approach,
   progressively assuming a variable to be true or false and cut the non-perspective
   branches.
-\TODO{pseudokód.}
+The pseudocode is shown as a recursive function in \autoref{alg:modelcounting3}.
+\end{itemize}
 
+\begin{algorithm}[h]
+\caption{Decision whether a formula has exactly one model.}
+\label{alg:onlyonemodel}
+\DontPrintSemicolon
+\lIf{not \textsc{Satisfiable()}}{\Return{false}}
+$v <- $ \textsc{GetAssignment()}\;
+\textsc{OpenContext()}\;
+\textsc{AddConstraint($\overline{x_1}\| ... \|\overline{x_n}$)},
+  where $\overline{x_i}$ is $\neg\:x_i$ if $v(x_i) = 1$ and $x_i$ otherwise\;
+$sat <- $\textsc{Satisfiable()}\;
+\textsc{CloseContext()}\;
+\Return{$\neg sat$}
+\end{algorithm}
+\begin{algorithm}[h]
+\caption{Model counting, second option.}
+\label{alg:modelcounting2}
+\DontPrintSemicolon
+$models <- 0$\;
+\textsc{OpenContext()}\;
+\While{\textsc{Satisfiable()}} {
+  $v <- $ \textsc{GetAssignment()}\;
+  \textsc{AddConstraint($\overline{x_1}\| ... \|\overline{x_n}$)},
+    where $\overline{x_i}$ is $\neg\:x_i$ if $v(x_i) = 1$ and $x_i$ otherwise\;
+  $models <- models + 1$\;
+}
+\textsc{CloseContext()}\;
+\Return{$models$}
+\end{algorithm}
+\begin{algorithm}[h!]
+\caption{Model counting, third option.}
+\label{alg:modelcounting3}
+\DontPrintSemicolon
+$models <- 0$\;
+$x <- $ any variable from $vars$\;
+\textsc{OpenContext()}\;
+\textsc{AddConstraint}($x$)\;
+\lIf{\textsc{Satifiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
+\textsc{CloseContext()}\;
+\textsc{OpenContext()}\;
+\textsc{AddConstraint}($\neg x$)\;
+\lIf{\textsc{Satifiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
+\textsc{CloseContext()}\;
+\Return{$models$}
+\end{algorithm}
 
 COBRA includes three solver implementations which we describe next.
 
 \subsection{PicoSat}
-Picosat \footnote{\url{http://fmv.jku.at/picosat/}}\cite{picosat} is a simple
+Picosat\footnote{\url{http://fmv.jku.at/picosat/}} \cite{picosat} is a simple,
   extensible SAT solver, which supports incremental SAT solving exactly in the way
   we need.
 
 Bindings to Picosat are implemented in \texttt{PicoSolver} class.
-This class also implements model counting with the third approach described in
-the previous subsection as Picosat does not support model counting itself.
+This class also implements model counting algorithm \ref{alg:modelcounting3}
+ as Picosat does not support model counting itself.
+
 
 \subsection{MiniSat}
 
-Minisat \footnote{\url{http://minisat.se/}}\cite{minisat} is a minimalistic,
+Minisat\footnote{\url{http://minisat.se/}} \cite{minisat} is a minimalistic,
   extensible SAT solver that won several SAT competitions in the past.
 
 Minisat does not support incremental SAT solving in the manner we described,
-  but it supports assumptions -- you can assume arbitrary number of unit clauses
+  but it supports assumptions.
+You can assume arbitrary number of unit clauses
   (i.e. that a variable is true of false) and ask for satisfiability under
   those assumptions.
 
 The behaviour we want can be simulated by assumptions in the following way.
 For each context, we create a new variable, say $a$.
 Then, instead of adding clauses $C_1, C_2, ..., C_n$ to the context,
-  we add clauses $\{-a, C_1\}$, $\{-a, C_2\}$, ... $\{-a, C_n\}$ and ask
+  we add clauses $\{\neg a, C_1\}$, $\{\neg a, C_2\}$, ... $\{\neg a, C_n\}$ and ask
   for satisfiability under the assumption $a$ (in general,
   assumption that all variables of open contexts are true).
-Afterwards, when a context is closed, we add a unit clause $\{-a\}$,
+Afterwards, when a context is closed, we add a unit clause $\{\neg a\}$,
   which effectively removes all the clauses added in the context.
-The only problem with this approach is that the variable $a$ is wasted,
+The only minor issue with this approach is that the variable $a$ is wasted,
   the solver will remember it somewhere and may consume more memory.
 
 Bindings to Minisat are implemented in \texttt{MiniSolver} class.
@@ -101,9 +148,9 @@ This class implements the context opening and closing in the way described above
 
 We include a special SAT solver, called \texttt{SimpleSolver} to show that
   the usage of a proper SAT solver in this application is justifiable.
-Simple solver uses another SAT solver (Picosat) to generate all
+Simple solver uses another SAT backend (Picosat) to generate all
   models of the initial restriction $\init$ (or of the first constraint, in general).
-Later satisfiability questions with additional constrainst are
+Later satisfiability questions with additional constraint are
   resolved by going though all possible codes (assignments) and
   checking that the constraints are satisfied.
 Model counting and the other functions are implemented similarly.
@@ -111,33 +158,35 @@ Model counting and the other functions are implemented similarly.
 \subsection{Extensibility}
 If you want to try another SAT solver, alter the algorithm for model counting,
   or test any other modification,
-  you can implement your own solver class that inherits from Solver and
+  you can implement your own solver class that inherits from \texttt{Solver} and
   implements all the necessary methods.
 
 Check the \texttt{solver.h} file and the documentation therein
-  for the information about the exact methods required.
+  for the information about the exact functions required.
 Further, you need to to include the file with your class in
   \texttt{main.cpp} and add a new case
-  into the \texttt{get\_solver} function in the file.
+  into the \texttt{get\_solver} function in this file.
 
 \subsection{Transformation to CNF}
 
-All the SAT solver take the input formula in the conjunctive normal form(CNF).
-Since we allow arbitrary form in the input file and support non-standard
-  numerical operators, we need to transform a formula to CNF first.
+The input formula for a SAT solver must be typically specified
+  in the conjunctive normal form(CNF).
+As we do not have such requirement for formulas in the input format,
+  and allow non-standard numerical operators,
+  we need to transform a formula to CNF first.
 
 The standard transformation works as follows.
 First, we express the formula in a form
-  that uses only negation, conjunction and disjunction as operator.
+  that uses only negations, conjunctions and disjunctions as operators.
 Then, we transform it to \emph{negation normal form} using De Morgan's laws
   and, finally, we use distributivity of conjunction and disjunction to
   move all the conjunction to the top level.
 However, this may lead to an exponential explosion of the formula, so
 another solution, called \emph{Tseitin Transformation}, is commonly used
-  when converting a formula for a SAT solver. \TODO{Cite. Tseitin + Wiki?}
+  when converting a formula for a SAT solver\cite{tseitin}.
 
 Imagine the formula as a circuit with gates corresponding to the logical operators.
-Input vectors then correspond to variable assignments and the circuit output
+Input vectors correspond to variable assignments and the circuit output
   is true if and only if the input assignment satisfies the formula.
 
 For each gate, a new variable representing its output is created.
@@ -145,41 +194,42 @@ The resulting formula is a conjunction of sub-formulas that enforce
   the proper operation of the gates.
 
 For example, consider an AND gate, inputs of which corresponds to variables
-  $x$, $y$ and output corresponds to a variable $z$.
-Then we need to ensure that $z$ is true if and only if both $x$ and $y$ are true,
-  which is done by adding a sub-formula $z <-> (x \wedge y)$, which can be
+  $x$, $y$ and output corresponds to a variable $w$.
+We need to ensure that $w$ is true if and only if both $x$ and $y$ are true,
+  which is done by adding a sub-formula $w <-> (x \wedge y)$, which can be
   expressed in CNF as
 \[
-(\neg x \vee \neg y \vee z) \wedge
-(x \vee \neg z) \wedge
-(y \vee \neg z).
+(\neg x \vee \neg y \vee w) \wedge
+(x \vee \neg w) \wedge
+(y \vee \neg w).
 \]
 
-Other gates are handled similarly and this is done for all all of them in the circuit.
-Finally, the variable
+Other gates types are handled similarly and this is done for all gates in the circuit.
+Finally, the variables
   corresponding to the result of the top level operator is added
-  to the resulting formula as a unit clasue.
+  to the resulting formula as a unit clause.
 
-It remains to explain how we handle the numberical operators
-  $\atleast{}$, $\atmost{}$ and $\exactly{}$.
-We show it on the $\exactly{k}(f_1, ..., f_n)$ operator,
+It remains to explain how we handle the numerical operators
+  $\atleast$, $\atmost$ and $\exactly$.
+We show it on the $\exactlyk{k}(f_1, ..., f_n)$ operator,
   others are transformed similarly. For simplicity,
   assume $f_i$ are variables; if not, we take the variable corresponding the
   the sub-formulas.
 
 For each $l\in\{0,1,...,k\}$ and $m\in\{1,...,n\}$, $l <= m$, we create
   a new variable $z_{l,\:m}$ which will be true if and only if
-  the formula $\exactly{l}(f_1, ..., f_m)$ is satisfied.
+  the formula $\exactlyk{l}(f_1, ..., f_m)$ is satisfied.
 To enforce this assignment, we add sub-formulas of the form
   \[ z_{l,\:m} <-> (f_m \wedge z_{l-1,\:m-1}) \vee (\neg f_m \wedge z_{l,\:m-1}) \]
   for each $l > 1$, $m > 1$ (in CNF form, of course).
-Special cases $l = m$ and $l = 0$ are equivalent to AND and OR formulas, repsectively,
+Special cases $l = m$ and $l = 0$ are equivalent to AND and OR formulas, respectively,
   and are handled accordingly.
 
 The size of the resulting sub-formula is linear in $n\cdot k$.
-Hence the size is not polynomial in the size of the input
-  (suppose $k$ is encoded in binary form) but it is much better
-  that expressing the operator as a conjucntion of the $n\choose k$ posibilities,
+Although this is not polynomial in the size of the input
+  (supposing $k$ is encoded in binary form) but it is much better
+  than the na\"ive solution to express the formula
+  as a conjunction of the $n\choose k$ possibilities,
   which would be double exponential.
 
 \section{Symmetry breaking}
@@ -189,28 +239,29 @@ Hence the size is not polynomial in the size of the input
 
 \subsection{Programming Language and Style}
 
-Since the problem we are trying to solve is very computationally demanding,
+Since the problems we solve are computationally very demanding,
   we had to choose a high-performing programming language.
 The external tools we use, especially SAT solvers, are typically written in C/C++,
   so C++ was a natural choice for our tool.
-Cobra is written in the latest standard of ISO C++, namely C++11, which
+COBRA is written in the latest standard of ISO C++, C++11, which
   contains significant changes both in the language and in the standard libraries
-  and, in our opinion, improves readability compared to previous versions.
+  and, in our opinion, improves readability and programmer's efficiency
+  compared to previous versions.
 
-We wanted the style of our code to be consistent and to usage of the language in the best
- manner possible according to industrial practice.
+We wanted the style of our code to be consistent and to use
+  the language in the best manner possible according to industrial practice.
 From the wide range of style guides available online
- we chose \emph{Google C++ Style Guide}\cite{google-style} and made
+ we chose \emph{Google C++ Style Guide}\cite{googlestyle} and made
  the code compliant with all its rules except for a few exception.
-The only significant one of those are lambda functions, which are forbidden
- by the style guide due to various reasons,
+The only significant violation are lambda functions, which are forbidden
+due to various reasons,
  but we think they are more beneficial than harmful in this project.
 
-\subsection{Compiler Requirements}
-The usage of a modern standard requires a modern compiler,
-  which supports all the C++11 feautres we use.
-We recommend using starndard \texttt{gcc}; you need version $4.8$ or higher.
-For \texttt{clang}, you need version $3.2$ or higher.
+\subsection{Requirements}
+As noted earlier, compilation of COBRA requires a compiler,
+  which supports all the C++11 features we use.
+We recommend using standard \texttt{gcc} version $4.8$ or higher, or
+ \texttt{clang} version $3.2$ or higher.
 
 The tool is platform independent.
   We tested compilation and functionality on
@@ -220,17 +271,17 @@ The tool is platform independent.
 \subsection{Unit testing}
 Unit testing has became a common part of software development process
   in the recent years.
-Correctness was a top priority during the development and
+Correctness is automatically a top priority for a tool of this kind and
   unit tests are a perfect way to capture potential programmer's error
   as soon as possible and avoid regression.
 
-There is a lot of unit tests framework for C++.
+Lots of unit tests framework for C++ are available.
 We focused on simplicity, minimal amount of work needed to add new tests
   and good assertion support, and opted for
   \emph{Google Test}\footnote{https://code.google.com/p/googletest/}.
 
-All available tests are compiled and excecuted if you run \texttt{make test}
-  in the root folder.
+All available tests are compiled and executed if you run \texttt{make test}
+  in the tool directory.
 This should serve as a basic sanity test and we highly recommend
-  doing this in case anyone needs to change something in the code.
+  doing this in case you make any changes in the code.
 

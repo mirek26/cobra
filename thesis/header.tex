@@ -28,6 +28,8 @@
 \setitemize{itemsep=.5ex, topsep=.5ex, parsep=0pt, partopsep=0pt}
 
 \usepackage[ruled,lined]{algorithm2e}
+\SetAlgorithmName{Algorithm}{Algorithm}
+
 \setlength{\algomargin}{0.5cm}
 
 \usepackage{listings}
@@ -51,6 +53,8 @@
 \providecommand*{\exampleautorefname}{Example}
 \providecommand*{\lemmaautorefname}{Lemma}
 \providecommand*{\definitionautorefname}{Definition}
+\providecommand*{\algorithmautorefname}{Algorithm}
+\providecommand*{\algocfautorefname}{Algorithm}
 %\def\exampleautorefname{Example}
 \def\sectionautorefname{Section}
 \def\chapterautorefname{Chapter}
@@ -95,8 +99,10 @@
 \newaliascnt{corollary}{common}
 
 \makeatletter
+\renewcommand*{\thealgocf}{\arabic{chapter}.\arabic{algocf}}
 \renewcommand*{\thetable}{\arabic{chapter}.\arabic{table}}
 \renewcommand*{\thefigure}{\arabic{chapter}.\arabic{figure}}
+\let\c@algocf\c@common
 \let\c@table\c@common
 \let\c@figure\c@common
 \makeatother
@@ -111,7 +117,7 @@
 \newtheorem{lemma}{Lemma}[chapter]
 \newtheorem{corollary}{Corollary}[chapter]
 
-
+\usepackage[justification=centering]{caption}
 \usepackage{graphicx}
 
 % cool symbols

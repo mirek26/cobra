@@ -183,7 +183,7 @@ $\mathcal{F}_n = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n, y\}$, \\
-$\init = \exactly{1}\{x_1, ..., x_n\}$. \\
+$\init = \exactlyk{1}\{x_1, ..., x_n\}$. \\
 Intuitively, variable $x_i$ tells weather the coin $i$ is fake.
 Variable $y$ tells weather it is lighter or heavier.
 Formula $\init$ says that exactly one coin is fake.
@@ -222,7 +222,7 @@ $\mathcal{F'}_n = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n, y_1, y_2, ..., y_n\}$, \\
-$\init = \exactly{1}\{x_1, ..., x_n, y_1, ..., y_n \}$. \\
+$\init = \exactlyk{1}\{x_1, ..., x_n, y_1, ..., y_n \}$. \\
 Variable $x_i$ tells that the coin $i$ is lighter, variable $y_i$ tells that the coin $i$ is heavier.
 Formule $\init$ says that exactly one coin is different.
 
@@ -251,7 +251,7 @@ $\mathcal{M}_{n,m} = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \item
 $\Var = \{x_{i,j} \| 1<=i<=n, 1<=j<=m \}$, \\
 $\init = \bigwedge\left\{
-  \exactly{1} \{x_{i,j} \| 1<=j<=m\} \| 1<=i<=n\right\}$. \\
+  \exactlyk{1} \{x_{i,j} \| 1<=j<=m\} \| 1<=i<=n\right\}$. \\
 Variable $x_{i,j}$ tells whether there is the color $j$ at position $i$.
 Formula $\init$ says that there is exactly one color at each position.
 
@@ -361,8 +361,8 @@ $F = \{ f_1, ..., f_n \}$, where $f_i(c) = x_{i,c}$ for $1<=i<=n$,
 \vspace{-2mm}
 \begin{flalign}
 \outcome(& g_{k_1,...,k_n}) =  \Big\{ &\\
- & \exactly{b}\{ f_i(\$i) \| 1<=i<=n \} \;\wedge & \label{eq:mm-blacks}\tag{1}\\
- & \exactly{t}\bigcup
+ & \exactlyk{b}\{ f_i(\$i) \| 1<=i<=n \} \;\wedge & \label{eq:mm-blacks}\tag{1}\\
+ & \exactlyk{t}\bigcup
       \big\{
            \{ \atleast{l}(x_{1,j},...,x_{n,j}) \| 1 <= l <= k_j \}
            \| 1<=j<=m

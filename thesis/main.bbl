@@ -729,6 +729,25 @@
       \endverb
       \keyw{other}
     \endentry
+    \entry{sharpsat}{incollection}{}
+      \name{labelname}{1}{}{%
+        {{hash=128f9757c2ae944fa7faac7649649d99}{Thurley}{T\bibinitperiod}{Marc}{M\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=128f9757c2ae944fa7faac7649649d99}{Thurley}{T\bibinitperiod}{Marc}{M\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{128f9757c2ae944fa7faac7649649d99}
+      \strng{fullhash}{128f9757c2ae944fa7faac7649649d99}
+      \field{sortinit}{0}
+      \field{labeltitle}{sharpSAT--counting models with advanced component caching and implicit BCP}
+      \field{booktitle}{Theory and Applications of Satisfiability Testing-SAT 2006}
+      \field{title}{sharpSAT--counting models with advanced component caching and implicit BCP}
+      \field{year}{2006}
+      \field{pages}{424\bibrangedash 429}
+    \endentry
     \entry{picosat}{article}{}
       \name{labelname}{1}{}{%
         {{hash=22081d00e30965a89f413e528510617e}{Biere}{B\bibinitperiod}{Armin}{A\bibinitperiod}{}{}{}{}}%
@@ -768,6 +787,48 @@
       \field{title}{An extensible SAT-solver}
       \field{year}{2004}
       \field{pages}{502\bibrangedash 518}
+      \keyw{other}
+    \endentry
+    \entry{tseitin}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=9c677286866aad38f8e9b660f5411814}{Wikipedia}{W\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=9c677286866aad38f8e9b660f5411814}{Wikipedia}{W\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{sortinit}{0}
+      \field{labeltitle}{Tseitin transformation --- Wikipedia{,} The Free Encyclopedia}
+      \field{title}{Tseitin transformation --- Wikipedia{,} The Free Encyclopedia}
+      \field{urlday}{27}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{2014}
+      \verb{url}
+      \verb http://en.wikipedia.org/wiki/Tseitin_transformation
+      \endverb
+      \keyw{other}
+    \endentry
+    \entry{googlestyle}{online}{}
+      \name{labelname}{1}{}{%
+        {{hash=8b36e9207c24c76e6719268e49201d94}{Google}{G\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=8b36e9207c24c76e6719268e49201d94}{Google}{G\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \strng{namehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{fullhash}{8b36e9207c24c76e6719268e49201d94}
+      \field{sortinit}{0}
+      \field{labeltitle}{Google C++ Style Guide}
+      \field{title}{Google C++ Style Guide}
+      \field{urlday}{20}
+      \field{urlmonth}{04}
+      \field{urlyear}{2014}
+      \field{year}{2013}
+      \verb{url}
+      \verb http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+      \endverb
       \keyw{other}
     \endentry
   \endsortlist
