@@ -12,7 +12,7 @@ extern Parser m;
 
 TEST(Parser, UndefinedVariable) {
   m.reset();
-  m.game().declareVariables({"a", "b", "c"});
+  m.game().declareVars({"a", "b", "c"});
   EXPECT_NO_THROW(Formula::Parse("a & b & c"));
   EXPECT_THROW(Formula::Parse("a & b & c & d"), ParserException);
   EXPECT_THROW(Formula::Parse("Exactly-1(a1, a2, a3)"), ParserException);
@@ -20,7 +20,7 @@ TEST(Parser, UndefinedVariable) {
 
 TEST(Parser, BasicParse) {
   m.reset();
-  m.game().declareVariables({"p1", "p2", "a", "b"});
+  m.game().declareVars({"p1", "p2", "a", "b"});
   auto f1 = Formula::Parse("p1 & p2 -> (a <-> b)");
   EXPECT_STREQ("((p1 & p2) -> (a <-> b))", f1->pretty(false).c_str());
 }
@@ -29,50 +29,50 @@ TEST(Parser, BasicParse) {
 
 TEST(Tseitin, Basic) {
   m.reset();
-  m.game().declareVariables({"x", "y"});
+  m.game().declareVars({"x", "y"});
   auto f = Formula::Parse("!(And(Or(x&!y, y&!x)))");
-  PicoSolver s1(m.game().variables(), f);
+  PicoSolver s1(m.game().vars(), f);
   // EXPECT_EQ(2, s1.NumOfModels());
-  // PicoSolver s2(m.game().variables(), f);
+  // PicoSolver s2(m.game().vars(), f);
   // EXPECT_EQ(2, s2.NumOfModels());
 }
 
 TEST(Tseitin, Exactly0) {
   m.reset();
-  m.game().declareVariables({"a1", "a2", "a3"});
-  PicoSolver s(m.game().variables(),
+  m.game().declareVars({"a1", "a2", "a3"});
+  PicoSolver s(m.game().vars(),
                Formula::Parse("!((!a1 & !a2 & !a3) <-> Exactly-0(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, Exactly1) {
   m.reset();
-  m.game().declareVariables({"a1", "a2", "a3"});
-  PicoSolver s(m.game().variables(),
+  m.game().declareVars({"a1", "a2", "a3"});
+  PicoSolver s(m.game().vars(),
                Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, Exactly1b) {
   m.reset();
-  m.game().declareVariables({"a", "b"});
-  PicoSolver s(m.game().variables(),
+  m.game().declareVars({"a", "b"});
+  PicoSolver s(m.game().vars(),
                Formula::Parse("Exactly-1(a, a|b, b)"));
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(Tseitin, ExactlyN) {
   m.reset();
-  m.game().declareVariables({"a1", "a2", "a3"});
-  PicoSolver s(m.game().variables(),
+  m.game().declareVars({"a1", "a2", "a3"});
+  PicoSolver s(m.game().vars(),
                Formula::Parse("!((a1 & a2 & a3) <-> Exactly-3(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
 
 TEST(SolverTest, Exactly1) {
   m.reset();
-  m.game().declareVariables({"a1", "a2", "a3"});
-  PicoSolver s(m.game().variables(), Formula::Parse("Exactly-1(a1, a2, a3)"));
+  m.game().declareVars({"a1", "a2", "a3"});
+  PicoSolver s(m.game().vars(), Formula::Parse("Exactly-1(a1, a2, a3)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("a2 <-> a3"));
   EXPECT_TRUE(s.Satisfiable());
@@ -92,8 +92,8 @@ class SolverTest : public testing::Test {
 
 TYPED_TEST(SolverTest, BasicSatisfiability) {
   m.reset();
-  m.game().declareVariables({"a", "b", "c", "d"});
-  TypeParam s(m.game().variables(), Formula::Parse("a -> b"));
+  m.game().declareVars({"a", "b", "c", "d"});
+  TypeParam s(m.game().vars(), Formula::Parse("a -> b"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("c -> d"));
   EXPECT_TRUE(s.Satisfiable());
@@ -105,8 +105,8 @@ TYPED_TEST(SolverTest, BasicSatisfiability) {
 
 TYPED_TEST(SolverTest, OtherSatisfiability) {
   m.reset();
-  m.game().declareVariables({"x", "a", "b", "c", "d"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"x", "a", "b", "c", "d"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("a&!b&!c&!d | !a&b&!c&!d | !a&!b&c&!d | !a&!b&!c&d"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("(x & a) | (!x & b)"));
@@ -117,8 +117,8 @@ TYPED_TEST(SolverTest, OtherSatisfiability) {
 
 TYPED_TEST(SolverTest, MustBeTrueFalse) {
   m.reset();
-  m.game().declareVariables({"a", "b"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"a", "b"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("(a -> b) & a"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_TRUE(s.MustBeTrue(1));
@@ -129,8 +129,8 @@ TYPED_TEST(SolverTest, MustBeTrueFalse) {
 
 TYPED_TEST(SolverTest, OnlyOneModel) {
   m.reset();
-  m.game().declareVariables({"a", "b"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"a", "b"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("a -> b"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_FALSE(s.OnlyOneModel());
@@ -141,8 +141,8 @@ TYPED_TEST(SolverTest, OnlyOneModel) {
 
 TYPED_TEST(SolverTest, ExactlyFixed) {
   m.reset();
-  m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("AtLeast-2(x1, x2, x3)"));
@@ -152,16 +152,16 @@ TYPED_TEST(SolverTest, ExactlyFixed) {
 
 TYPED_TEST(SolverTest, NumOfModels) {
   m.reset();
-  m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
   EXPECT_EQ(10, s.NumOfModels());
 }
 
 // TYPED_TEST(SolverTest, NumOfModelsSharpSat) {
 //   m.reset();
-//   m.game().declareVariables({"x1", "x2", "x3", "x4", "x5"});
-//   TypeParam s(m.game().variables(),
+//   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
+//   TypeParam s(m.game().vars(),
 //                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
 //   EXPECT_EQ(10, s.NumOfModelsSharpSat());
 // }
@@ -171,8 +171,8 @@ TYPED_TEST(SolverTest, NumOfModels) {
 
 TYPED_TEST(SolverTest, Context) {
   m.reset();
-  m.game().declareVariables({"a", "b", "c", "d"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"a", "b", "c", "d"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("(a -> b) & (c -> d) & (!b | !d)"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_EQ(5, s.NumOfModels());
@@ -185,8 +185,8 @@ TYPED_TEST(SolverTest, Context) {
 
 TYPED_TEST(SolverTest, NestedContext) {
   m.reset();
-  m.game().declareVariables({"a", "b", "c", "d"});
-  TypeParam s(m.game().variables(),
+  m.game().declareVars({"a", "b", "c", "d"});
+  TypeParam s(m.game().vars(),
                Formula::Parse("a | b"));
   EXPECT_EQ("(a | b)", s.pretty());
   EXPECT_EQ(12, s.NumOfModels()); // a|b -> 3 * 2^2

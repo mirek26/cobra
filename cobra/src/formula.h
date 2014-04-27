@@ -70,7 +70,7 @@ class Formula {
   virtual Formula* child(uint) const { assert(false); };
   virtual void set_child(uint nth, Formula* value) { assert(child(nth) == value); }
   virtual string name() = 0;
-  virtual uint node_id() = 0;
+  virtual uint type_id() = 0;
 
   /* Returns true for variables or a negations of a variable, false otherwise.
    */
@@ -223,7 +223,7 @@ class AndOperator: public NaryOperator {
   explicit AndOperator(vec<Formula*>* list)
       : NaryOperator(list) { }
 
-  virtual uint node_id() { return kAndId; }
+  virtual uint type_id() { return kAndId; }
   virtual string name() {
     return "AndOperator";
   }
@@ -258,7 +258,7 @@ class OrOperator: public NaryOperator {
   explicit OrOperator(vec<Formula*>* list)
      : NaryOperator(list) {}
 
-  virtual uint node_id() { return kOrId; }
+  virtual uint type_id() { return kOrId; }
   virtual string name() {
     return "OrOperator";
   }
@@ -294,7 +294,7 @@ class AtLeastOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return kAtLeastId + 3*value_; }
+  virtual uint type_id() { return kAtLeastId + 3*value_; }
   virtual string name() {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
@@ -332,7 +332,7 @@ class AtMostOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return kAtMostId + 3*value_; }
+  virtual uint type_id() { return kAtMostId + 3*value_; }
   virtual string name() {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
@@ -369,7 +369,7 @@ class ExactlyOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint node_id() { return kExactlyId + 3*value_; }
+  virtual uint type_id() { return kExactlyId + 3*value_; }
   virtual string name() {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
@@ -406,7 +406,7 @@ class EquivalenceOperator: public Formula {
         left_(left),
         right_(right) { }
 
-  virtual uint node_id() { return kEquivalenceId; }
+  virtual uint type_id() { return kEquivalenceId; }
   virtual string name() {
     return "EquivalenceOperator";
   }
@@ -452,7 +452,7 @@ class ImpliesOperator: public Formula {
         left_(premise),
         right_(consequence) { }
 
-  virtual uint node_id() { return kImpliesId; }
+  virtual uint type_id() { return kImpliesId; }
   virtual string name() {
     return "ImpliesOperator";
   }
@@ -495,7 +495,7 @@ class NotOperator: public Formula {
       : Formula(1),
         child_(child) { }
 
-  virtual uint node_id() { return kNotId; }
+  virtual uint type_id() { return kNotId; }
   virtual string name() {
     return "NotOperator";
   }
@@ -549,7 +549,7 @@ class Mapping: public Formula {
   MapId mapping_id() { return mapping_id_; }
   uint param_id() { return param_id_; }
 
-  virtual uint node_id() { return kMappingId; }
+  virtual uint type_id() { return kMappingId; }
 
   virtual string pretty(bool = true, const vec<CharId>* params = nullptr);
 
@@ -601,7 +601,7 @@ class Variable: public Formula {
         ident_(ident)
   { }
 
-  virtual uint node_id() { return kVariableId; }
+  virtual uint type_id() { return kVariableId; }
 
   VarId id() { return id_; }
   void set_id(VarId value) {

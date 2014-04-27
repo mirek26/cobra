@@ -17,25 +17,25 @@ class AndOperator;
 class Option;
 
 class Game {
-  vec<Variable*> variables_;
-  std::map<string, VarId> variables_ids_;
+  vec<Variable*> vars_;
+  std::map<string, VarId> vars_ids_;
   AndOperator* restriction_;
   vec<Experiment*> experiments_;
   vec<string> alphabet_;
 
-  // list of mappings between alphabet and variables
+  // list of mappings between alphabet and vars
   vec<vec<VarId>> mappings_;
   std::map<string, MapId> mappings_ids_;
 
  public:
   Game();
 
-  void declareVariable(Variable*);
-  void declareVariables(vec<Variable*>*);
-  void declareVariables(std::initializer_list<string>);
-  vec<Variable*>& variables() { return variables_; }
+  void declareVar(Variable*);
+  void declareVars(vec<Variable*>*);
+  void declareVars(std::initializer_list<string>);
+  vec<Variable*>& vars() { return vars_; }
 
-  Variable* getVariableByName(string);
+  Variable* getVarByName(string);
 
   void addRestriction(Formula*);
   Formula* restriction();
@@ -54,6 +54,8 @@ class Game {
 
   Experiment* addExperiment(string name, uint num_params);
   vec<Experiment*>& experiments() {  return experiments_;  }
+
+  void PrintCode(vec<bool> code);
 
   string ParamsToStr(const vec<CharId>& params, char sep = ' '){
     string s = "";

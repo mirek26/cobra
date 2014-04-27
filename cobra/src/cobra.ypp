@@ -91,9 +91,9 @@ code :
 
 line :
     T_VARIABLE ident
-    {  m.game().declareVariable(m.get<Variable>($2)); }
+    {  m.game().declareVar(m.get<Variable>($2)); }
   | T_VARIABLES variable_list
-    {  m.game().declareVariables($2);  }
+    {  m.game().declareVars($2);  }
   | T_RESTRICTION formula
     {  m.game().addRestriction($2);  }
   | T_ALPHABET string_list
@@ -164,7 +164,7 @@ formula :
           "Argument $" + std::to_string($3) + " invalid for mapping " + $1);
         $$ = m.get<Mapping>($1, m.game().getMappingId($1), $3); }
   | T_IDENT
-      { $$ = m.game().getVariableByName($1); }
+      { $$ = m.game().getVarByName($1); }
 
 formula_list:
     formula

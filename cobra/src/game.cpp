@@ -13,29 +13,30 @@ extern Parser m;
 
 Game::Game() {
   restriction_ = m.get<AndOperator>();
+  vars_.push_back(nullptr);
 }
 
-void Game::declareVariable(Variable* var) {
-  var->set_id(variables_.size() + 1);
-  variables_.push_back(var);
-  variables_ids_[var->ident()] = var->id();
+void Game::declareVar(Variable* var) {
+  var->set_id(vars_.size());
+  vars_.push_back(var);
+  vars_ids_[var->ident()] = var->id();
 }
 
-void Game::declareVariables(vec<Variable*>* list) {
+void Game::declareVars(vec<Variable*>* list) {
   for (auto var: *list)
-    declareVariable(var);
+    declareVar(var);
   delete list;
 }
 
-void Game::declareVariables(std::initializer_list<string> list) {
+void Game::declareVars(std::initializer_list<string> list) {
   for (auto x: list)
-    declareVariable(m.get<Variable>(x));
+    declareVar(m.get<Variable>(x));
 }
 
-Variable* Game::getVariableByName(string name) {
-  m.input_assert(variables_ids_.count(name) > 0,
+Variable* Game::getVarByName(string name) {
+  m.input_assert(vars_ids_.count(name) > 0,
     "Undefined prepositional variable '" + name + "'.");
-  return variables_[variables_ids_[name] - 1];
+  return vars_[vars_ids_[name]];
 }
 
 void Game::addRestriction(Formula* f) {
@@ -53,7 +54,7 @@ MapId Game::addMapping(string ident, vec<Variable*>* vars) {
   mappings_ids_[ident] = new_id;
   mappings_.push_back(vec<VarId>());
   for (auto v: *vars) {
-    mappings_.back().push_back(getVariableByName(v->ident())->id());
+    mappings_.back().push_back(getVarByName(v->ident())->id());
   }
   return new_id;
 }
@@ -76,6 +77,20 @@ Experiment* Game::addExperiment(string name, uint num_params) {
   return e;
 }
 
+void Game::PrintCode(vec<bool> code) {
+  vec<int> trueVar;
+  vec<int> falseVar;
+  assert(code.size() == vars_.size());
+  for (uint id = 1; id < vars_.size(); id++) {
+    if (code[id] == 1) trueVar.push_back(id);
+    else falseVar.push_back(id);
+  }
+  printf("TRUE: ");
+  for (auto s: trueVar) printf("%s ", vars_[s]->ident().c_str());
+  printf("\nFALSE: ");
+  for (auto s: falseVar) printf("%s ", vars_[s]->ident().c_str());
+  printf("\n");
+}
 
 void Game::Precompute() {
   for (auto e: experiments_) {
@@ -87,10 +102,10 @@ bliss::Digraph* Game::CreateGraph() {
   int new_id = 0;
   // Create the graph
   auto g = new bliss::Digraph(0);
-  // Add vertices for variables, create edge between a variable and its negation
-  for (auto var: variables()) {
-    g->add_vertex(var->node_id());
-    g->add_vertex(var->node_id());
+  // Add vertices for vars, create edge between a variable and its negation
+  for (auto it = vars().begin() + 1; it != vars().end(); ++it) {
+    g->add_vertex((*it)->type_id());
+    g->add_vertex((*it)->type_id());
     g->add_edge(new_id, new_id + 1);
     g->add_edge(new_id + 1, new_id);
     new_id += 2;
@@ -117,11 +132,11 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
 
 vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
   bliss::Stats stats;
-  auto var_count = variables_.size();
-  vec<uint> var_equiv(var_count + 1, 0);
-  // Assign label t/f to fixed variables, label others by their position
-  auto t = var_count, f = var_count + 1;
-  for (uint i = 1; i <= var_count; i++) {
+  auto var_count = vars_.size();
+  vec<uint> var_equiv(var_count, 0);
+  // Assign label t/f to fixed vars, label others by their position
+  auto t = var_count, f = var_count;
+  for (uint i = 1; i < var_count; i++) {
     if (solver.MustBeTrue(i)) var_equiv[i] = t;
     else if (solver.MustBeFalse(i)) var_equiv[i] = f;
     var_equiv[i] = i;
@@ -129,7 +144,7 @@ vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
   graph.find_automorphisms(stats,
                            ComputeVarEquiv_NewGenerator,
                            (void*)&var_equiv);
-  for (uint i = 1; i <= var_count; i++) {
+  for (uint i = 1; i < var_count; i++) {
     var_equiv[i] = var_equiv[var_equiv[i]];
   }
 

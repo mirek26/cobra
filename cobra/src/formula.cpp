@@ -35,7 +35,7 @@ Formula* Formula::neg() {
 
 string Mapping::pretty(bool, const vec<CharId>* params) {
   if (params) {
-    return m.game().variables()[getValue(*params) - 1]->pretty();
+    return m.game().vars()[getValue(*params)]->pretty();
   } else {
     return ident_ + "$" + std::to_string(param_id_);
   }
@@ -254,7 +254,7 @@ void Formula::AddToGraph(bliss::Digraph& g,
   } else {
     // create a new node for the operator and call recursively for children
     auto id = g.get_nof_vertices();
-    g.add_vertex(node_id());
+    g.add_vertex(type_id());
     if (parent > 0)
       g.add_edge(parent, id);
     for (uint i = 0; i < child_count(); i++)

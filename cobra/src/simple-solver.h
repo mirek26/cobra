@@ -83,10 +83,10 @@ class SimpleSolver: public Solver {
     canbe[0].resize(vars_.size());
     canbe[1].resize(vars_.size());
     for (auto x: sat_)
-      for (uint i = 0; i < vars_.size(); i++)
+      for (uint i = 1; i < vars_.size(); i++)
         canbe[codes_[x][i]][i] = true;
     uint f = 0;
-    for (uint i = 0; i < vars_.size(); i++)
+    for (uint i = 1; i < vars_.size(); i++)
       if (!(canbe[0][i] && canbe[1][i])) f++;
     return f;
   }

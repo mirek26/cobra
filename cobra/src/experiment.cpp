@@ -292,10 +292,10 @@ bliss::Digraph* Experiment::CreateGraphForParams(vec<uint>& groups,
                                                  vec<CharId>& params) {
   auto g = game_.CreateGraph();
   // Change color of var vertices according to 'groups'.
-  for (auto var: game_.variables()) {
-    uint group = std::numeric_limits<uint>::max() - groups[var->id()];
-    g->change_color(2*var->id() - 2, group);
-    g->change_color(2*var->id() - 1, group);
+  for (uint id = 1; id < game_.vars().size(); id++) {
+    uint group = std::numeric_limits<uint>::max() - groups[id];
+    g->change_color(2*id - 2, group);
+    g->change_color(2*id - 1, group);
   }
   // Construct graphs for outcome formulas.
   for (auto outcome: outcomes_) {

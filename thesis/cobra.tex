@@ -270,12 +270,13 @@ If a problem is found, the tool outputs an assignment and an experiment
 
 \subsection{Simulation mode [s, simulation]}
 
-\centerline{\texttt{./cobra -m simulation -1 <strategy> -2 <strategy> <input file> }}
+\centerline{\texttt{./cobra -m simulation -e <strategy> -o <strategy> <input file> }}
 
 In the simulation mode, you specify a strategy for
-  the codebreaker and for the codemaker.
-This can be done using \texttt{-1} or \texttt{--codemaker} switch, and
-\texttt{-2} or \texttt{--codebreaker} switch, respectively.
+  the codebreaker (which chooses an experiment) and for the codemaker
+   (which chooses an outcome).
+This can be done using \texttt{-e} or \texttt{--codebreaker} switch, and
+\texttt{-o} or \texttt{--codemaker} switch, respectively.
 
 Here, we do not consider the codemaker as a player who just chooses the codes
 and evaluates experiments, but as a player who chooses the outcomes
@@ -309,7 +310,7 @@ The default values for both codemaker and codebreaker are interactive,
 
 \subsection{Strategy analysis mode [a, analysis]}
 
-\centerline{\texttt{./cobra -m analysis -2 <strategy> <input file> }}
+\centerline{\texttt{./cobra -m analysis -e <strategy> <input file> }}
 
 This makes the tool compute worst-case number of experiments and
 average-case number of experiments for a given codebreaker's strategy.
@@ -330,23 +331,23 @@ and for a fixed experiment, let $n_i$ denote number of possible codes that
 will end up in outcome $i$.
 
 \begin{description}
-\item[Min-num.] \texttt{-2 minnum} \\
+\item[Min-num.] \texttt{-e minnum} \\
   Minimizes the worst-case number of remaining codes
   in the next step, i.e. selects experiment with minimal $\max_i n_i$.
   For Mastermind, this was suggested by Knuth\cite{mm-knuth}.
-\item[Min-exp.]  \texttt{-2 minexp} \\
+\item[Min-exp.]  \texttt{-e minexp} \\
    Minimizes the expected number of remaining codes
   in the next step, i.e. minimize $\sum_in_i^2/N$.
   For Mastermind, this was suggested by Irwing\cite{mm-expnum}.
-\item[Entropy.] \texttt{-2 entropy} \\
+\item[Entropy.] \texttt{-e entropy} \\
   Maximizes the entropy of numbers of remaining codes,
   i.e. maximizes $-log(k_i)\cdot k_i$, where $k_i=n_i/N$.
   For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
-\item[Most-parts.] \texttt{-2 parts} \\
+\item[Most-parts.] \texttt{-e parts} \\
   Maximizes the number of possible outcomes,
   i.e. maximize $\# i. (n_i > 0)$.
   For Mastermind, this was suggested by Kooi\cite{mm-mostparts}.
-\item[Fixed.] \texttt{-2 fixed} \\
+\item[Fixed.] \texttt{-e fixed} \\
   Maximize the number of fixed variables
   in the next step.
   This is specific to propositional logic representation of a code-breaking game.
@@ -365,10 +366,10 @@ Note that none of them is guaranteed to maximize the
   number of experiments of any codebreaker's strategy.
 
 \begin{description}
-\item[Max-num.] \texttt{-1 maxnum} \\
+\item[Max-num.] \texttt{-o maxnum} \\
   Select an outcome with largest $n_i$. This
   corresponds to the \emph{min-num} strategy for codebreaker.
-\item[Fixed.] \texttt{-1 fixed} \\
+\item[Fixed.] \texttt{-o fixed} \\
   Minimizes the number of fixed variables in the next step.
 \end{description}
 

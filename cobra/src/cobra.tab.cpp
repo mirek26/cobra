@@ -1448,12 +1448,12 @@ yyreduce:
 
   case 8:
 #line 94 "src/cobra.ypp"
-    {  m.game().declareVariable(m.get<Variable>((yyvsp[(2) - (2)].tstr))); ;}
+    {  m.game().declareVar(m.get<Variable>((yyvsp[(2) - (2)].tstr))); ;}
     break;
 
   case 9:
 #line 96 "src/cobra.ypp"
-    {  m.game().declareVariables((yyvsp[(2) - (2)].variable_list));  ;}
+    {  m.game().declareVars((yyvsp[(2) - (2)].variable_list));  ;}
     break;
 
   case 10:
@@ -1597,7 +1597,7 @@ yyreduce:
 
   case 36:
 #line 167 "src/cobra.ypp"
-    { (yyval.formula) = m.game().getVariableByName((yyvsp[(1) - (1)].tstr)); ;}
+    { (yyval.formula) = m.game().getVarByName((yyvsp[(1) - (1)].tstr)); ;}
     break;
 
   case 37:

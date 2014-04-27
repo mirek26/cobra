@@ -69,8 +69,8 @@ void time_overview(clock_t start) {
 void overview_mode() {
   Game& game = m.game();
   print_head("GAME OVERVIEW");
-  printf("Num of variables: %lu\n", game.variables().size());
-  Solver* solver = get_solver(game.variables(), game.restriction());
+  printf("Num of variables: %lu\n", game.vars().size());
+  Solver* solver = get_solver(game.vars(), game.restriction());
   uint models = solver->NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
@@ -143,7 +143,7 @@ void simulation_mode() {
   auto knowledge_graph = game.CreateGraph();
   game.restriction()->AddToGraph(*knowledge_graph, nullptr);
 
-  Solver* solver = get_solver(game.variables(), game.restriction());
+  Solver* solver = get_solver(game.vars(), game.restriction());
 
   int exp_num = 1;
   while (true) {
@@ -171,16 +171,17 @@ void simulation_mode() {
 
     // Check if solved.
     solver->AddConstraint(outcome, experiment.params());
-    if (solver->NumOfModels() == 1) { // TODO: nepotrebuju presne, staci vedet jestli jich neni vic
+    auto sat = solver->Satisfiable();
+    assert(sat);
+    auto assingment = solver->GetAssignment();
+    if (solver->OnlyOneModel()) {
       printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
-      solver->Satisfiable();
-      solver->PrintAssignment();
+      game.PrintCode(assingment);
       break;
     }
 
     // Prepare for another round.
     exp_num++;
-    //solver->WriteDimacs(stdout);
     outcome->AddToGraph(*knowledge_graph, &experiment.params());
   }
   delete knowledge_graph;
@@ -214,7 +215,7 @@ void analyze_mode() {
   game.Precompute();
   auto graph = game.CreateGraph();
   game.restriction()->AddToGraph(*graph, nullptr);
-  Solver* solver = get_solver(game.variables(), game.restriction());
+  Solver* solver = get_solver(game.vars(), game.restriction());
   uint max = 0, sum = 0;
   analyze(*solver, *graph, 1, max, sum);
   printf("Worst-case: %u\n", max);
@@ -244,21 +245,21 @@ void parse_args(int argc, char* argv[]) {
   string breaker_man = "", maker_man = "";
   for (auto s: strategy::breaker_strategies) {
     breaker_stgs.push_back(s.first);
-    breaker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+    breaker_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
   for (auto s: strategy::maker_strategies) {
     maker_stgs.push_back(s.first);
-    maker_man += "\n" + color::emph + s.first + ": " + color::normal + s.second.first;
+    maker_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
   ValuesConstraint<string> makerConstraint(maker_stgs);
   ValueArg<string> codemakerArg(
-    "1", "codemaker",
-    "Strategy to be played by the codemaker. Default: interactive." + maker_man, false,
+    "e", "codemaker",
+    "Strategy that selects an experiment, played by the codemaker. Default: interactive." + maker_man, false,
     "interactive", &makerConstraint);
   ValuesConstraint<string> breakerConstraint(breaker_stgs);
   ValueArg<string> codebreakerArg(
-    "2", "codebreaker",
-    "Strategy to be played by the codebreaker. Default: interactive." + breaker_man, false,
+    "o", "codebreaker",
+    "Strategy that selects an outcome, played by the codebreaker. Default: interactive." + breaker_man, false,
     "interactive", &breakerConstraint);
 
 

@@ -24,7 +24,7 @@ PicoSolver::PicoSolver(const vec<Variable*>& vars, Formula* restriction):
     vars_(vars) {
   picosat_ = picosat_init();
   // Reserve id's for original variables.
-  for (uint i = 1; i <= vars_.size(); i++) {
+  for (uint i = 1; i < vars_.size(); i++) {
     picosat_inc_max_var(picosat_);
     // TODO: try this
     //picosat_set_more_important_lit(picosat_, i);
@@ -83,7 +83,7 @@ string PicoSolver::pretty_clause(const Clause& clause) {
   for (auto lit: clause) {
     int alit = abs(lit);
     s += (lit != alit ? "-" : "") +
-         ((unsigned)alit <= vars_.size() ? vars_[alit-1]->ident() : std::to_string(alit)) +
+         ((unsigned)alit < vars_.size() ? vars_[alit]->ident() : std::to_string(alit)) +
          " | ";
   }
   s.erase(s.size() - 3, 3);
@@ -133,7 +133,7 @@ bool PicoSolver::_MustBeFalse(VarId id) {
 
 uint PicoSolver::_GetNumOfFixedVars() {
   uint r = 0;
-  for (uint id = 1; id <= vars_.size(); id++) {
+  for (uint id = 1; id < vars_.size(); id++) {
     r += _MustBeTrue(id);
     r += _MustBeFalse(id);
   }
@@ -148,7 +148,7 @@ bool PicoSolver::_Satisfiable() {
 bool PicoSolver::_OnlyOneModel() {
   vec<bool> ass = GetAssignment();
   picosat_push(picosat_);
-  for (uint id = 1; id <= vars_.size(); id++) {
+  for (uint id = 1; id < vars_.size(); id++) {
     picosat_add(picosat_, id * (ass[id] ? -1 : 1));
   }
   picosat_add(picosat_, 0);
@@ -158,8 +158,8 @@ bool PicoSolver::_OnlyOneModel() {
 }
 
 vec<bool> PicoSolver::GetAssignment() {
-  vec<bool> result(vars_.size() + 1, false);
-  for (uint id = 1; id <= vars_.size(); id++) {
+  vec<bool> result(vars_.size(), false);
+  for (uint id = 1; id < vars_.size(); id++) {
     if (picosat_deref(picosat_, id) == 1) result[id] = true;
   }
   return result;
@@ -168,14 +168,14 @@ vec<bool> PicoSolver::GetAssignment() {
 void PicoSolver::PrintAssignment() {
   vec<int> trueVar;
   vec<int> falseVar;
-  for (uint id = 1; id <= vars_.size(); id++) {
+  for (uint id = 1; id < vars_.size(); id++) {
     if (picosat_deref(picosat_, id) == 1) trueVar.push_back(id);
     else falseVar.push_back(id);
   }
   printf("TRUE: ");
-  for (auto s: trueVar) printf("%s ", vars_[s-1]->ident().c_str());
+  for (auto s: trueVar) printf("%s ", vars_[s]->ident().c_str());
   printf("\nFALSE: ");
-  for (auto s: falseVar) printf("%s ", vars_[s-1]->ident().c_str());
+  for (auto s: falseVar) printf("%s ", vars_[s]->ident().c_str());
   printf("\n");
 }
 
@@ -232,11 +232,11 @@ uint PicoSolver::NumOfModelsSharpSat(){
 }
 
 void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
-  assert(var > 0 && (unsigned)var <= vars_.size());
+  assert(var > 0 && (unsigned)var < vars_.size());
   for (VarId v: std::initializer_list<VarId>({var, -var})) {
     picosat_assume(picosat_, v);
     if (picosat_sat(picosat_, -1) == PICOSAT_SATISFIABLE) {
-      if ((unsigned)var == vars_.size()) {
+      if ((unsigned)var == vars_.size() - 1) {
         //PrintAssignment();
         callback();
       }
@@ -260,8 +260,8 @@ uint PicoSolver::_NumOfModels() {
 vec<vec<bool>> PicoSolver::_GenerateModels() {
   vec<vec<bool>> models;
   ForAllModels(1, [&](){
-    vec<bool> n(vars_.size() + 1, false);
-    for (uint id = 1; id <= vars_.size(); id++) {
+    vec<bool> n(vars_.size(), false);
+    for (uint id = 1; id < vars_.size(); id++) {
       if (picosat_deref(picosat_, id) == 1) n[id] = true;
     }
     models.push_back(n);
