@@ -141,9 +141,12 @@ vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
     else if (solver.MustBeFalse(i)) var_equiv[i] = f;
     var_equiv[i] = i;
   }
+  clock_t t1 = clock();
   graph.find_automorphisms(stats,
                            ComputeVarEquiv_NewGenerator,
                            (void*)&var_equiv);
+  bliss_calls_ += 1;
+  bliss_time_ += clock() - t1;
   for (uint i = 1; i < var_count; i++) {
     var_equiv[i] = var_equiv[var_equiv[i]];
   }

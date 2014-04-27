@@ -23,6 +23,9 @@ class Game {
   vec<Experiment*> experiments_;
   vec<string> alphabet_;
 
+  uint bliss_calls_;
+  clock_t bliss_time_;
+
   // list of mappings between alphabet and vars
   vec<vec<VarId>> mappings_;
   std::map<string, MapId> mappings_ids_;
@@ -47,6 +50,9 @@ class Game {
   }
 
   const vec<string>& alphabet() { return alphabet_; }
+
+  uint& bliss_calls() { return bliss_calls_; }
+  clock_t& bliss_time() { return bliss_time_; }
 
   MapId addMapping(string, vec<Variable*>*);
   MapId getMappingId(string);

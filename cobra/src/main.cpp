@@ -54,6 +54,8 @@ void print_head(string name) {
 void time_overview(clock_t start) {
   print_head("TIME OVERVIEW");
   printf("Total time: %.2fs\n", toSeconds(clock() - start));
+  printf("Bliss (calls/time): %u/%.2fs\n",
+         m.game().bliss_calls(), toSeconds(m.game().bliss_time()));
   auto s1 = PicoSolver::s_stats();
   printf("PicoSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s1.sat_calls, toSeconds(s1.sat_time),

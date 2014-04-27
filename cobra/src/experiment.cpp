@@ -271,7 +271,10 @@ void Experiment::GenParamsGraphFilter() {
   auto& params = gen_params_;
   bliss::Stats stats;
   auto graph = CreateGraphForParams(gen_var_groups_, params);
+  clock_t t1 = clock();
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
+  game_.bliss_calls() += 1;
+  game_.bliss_time() += clock() - t1;
   // Graph output -> DOT file
   // canonical->write_dot((game_.ParamsToStr(params, '_')+".dot").c_str());
   // auto name = game_.ParamsToStr(params, '_');
