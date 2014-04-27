@@ -32,8 +32,8 @@ typedef struct Args{
   string filename;
   string mode;
   string backend;
-  string stg1;
-  string stg2;
+  string stg_experiment;
+  string stg_outcome;
 } Args;
 
 Args args;
@@ -250,26 +250,26 @@ void parse_args(int argc, char* argv[]) {
     "Specifies SAT solver that will be used. Default: picosat.", false,
     "picosat", &backendConstraint);
 
-  vec<string> breaker_stgs, maker_stgs;
-  string breaker_man = "", maker_man = "";
+  vec<string> e_stgs, o_stgs;
+  string e_man = "", o_man = "";
   for (auto s: strategy::breaker_strategies) {
-    breaker_stgs.push_back(s.first);
-    breaker_man += color::emph + s.first + ": " + color::normal + s.second.first;
+    e_stgs.push_back(s.first);
+    e_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
   for (auto s: strategy::maker_strategies) {
-    maker_stgs.push_back(s.first);
-    maker_man += color::emph + s.first + ": " + color::normal + s.second.first;
+    o_stgs.push_back(s.first);
+    o_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
-  ValuesConstraint<string> makerConstraint(maker_stgs);
-  ValueArg<string> codemakerArg(
-    "e", "codemaker",
-    "Strategy that selects an experiment, played by the codemaker. Default: interactive." + maker_man, false,
-    "interactive", &makerConstraint);
-  ValuesConstraint<string> breakerConstraint(breaker_stgs);
-  ValueArg<string> codebreakerArg(
-    "o", "codebreaker",
-    "Strategy that selects an outcome, played by the codebreaker. Default: interactive." + breaker_man, false,
-    "interactive", &breakerConstraint);
+  ValuesConstraint<string> o_constr(o_stgs);
+  ValueArg<string> o_arg(
+    "o", "codemaker",
+    "Strategy that selects an outcome, played by the codemaker. Default: interactive." + o_man, false,
+    "interactive", &o_constr);
+  ValuesConstraint<string> e_constr(e_stgs);
+  ValueArg<string> e_arg(
+    "e", "codebreaker",
+    "Strategy that selects an experiment, played by the codebreaker. Default: interactive." + e_man, false,
+    "interactive", &e_constr);
 
 
   UnlabeledValueArg<std::string> filenameArg(
@@ -277,8 +277,8 @@ void parse_args(int argc, char* argv[]) {
     "Input file name.", false,
     "", "file name");
 
-  cmd.add(codebreakerArg);
-  cmd.add(codemakerArg);
+  cmd.add(e_arg);
+  cmd.add(o_arg);
   cmd.add(backendArg);
   cmd.add(modeArg);
   cmd.add(filenameArg);
@@ -287,8 +287,8 @@ void parse_args(int argc, char* argv[]) {
   args.filename = filenameArg.getValue();
   args.mode = modeArg.getValue();
   args.backend = backendArg.getValue();
-  args.stg1 = codemakerArg.getValue();
-  args.stg2 = codebreakerArg.getValue();
+  args.stg_experiment = e_arg.getValue();
+  args.stg_outcome = o_arg.getValue();
 }
 
 int main(int argc, char* argv[]) {
@@ -313,16 +313,16 @@ int main(int argc, char* argv[]) {
     printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
     t1 = clock();
 
-    g_makerStg = strategy::maker_strategies.at(args.stg1).second;
-    g_breakerStg = strategy::breaker_strategies.at(args.stg2).second;
+    g_breakerStg = strategy::breaker_strategies.at(args.stg_experiment).second;
+    g_makerStg = strategy::maker_strategies.at(args.stg_outcome).second;
 
     if (args.mode == "o" || args.mode == "overview") {
       overview_mode();
     } else if (args.mode == "s" || args.mode == "simulation") {
       simulation_mode();
     } else if (args.mode == "a" || args.mode == "analysis") {
-      if (args.stg2 == "interactive" || args.stg2 == "random") {
-        printf("Cannot analyze strategy '%s'. \n", args.stg2.c_str());
+      if (args.stg_experiment == "interactive" || args.stg_experiment == "random") {
+        printf("Cannot analyze strategy '%s'. \n", args.stg_experiment.c_str());
         exit(EXIT_FAILURE);
       }
       analyze_mode();
