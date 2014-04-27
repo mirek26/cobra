@@ -189,7 +189,7 @@ void simulation_mode() {
   delete knowledge_graph;
 }
 
-void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum) {
+void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum, uint& num) {
   Game& game = m.game();
   auto options = game.GenerateExperiments(solver, graph);
   auto experiment = options[g_breakerStg(options)];
@@ -200,12 +200,15 @@ void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint&
     bool sat = solver.Satisfiable(), one = false;
     if (sat) one = solver.OnlyOneModel();
     if (one) {
+      num += 1;
+      printf("\b\b\b\b\b%5u", num);
+      fflush(stdout);
       sum += depth;
       max = std::max(max, depth);
     } else if (sat) {
       bliss::Digraph ngraph(graph);
       outcome->AddToGraph(ngraph, &experiment.params());
-      analyze(solver, ngraph, depth + 1, max, sum);
+      analyze(solver, ngraph, depth + 1, max, sum, num);
     }
     solver.CloseContext();
   }
@@ -218,10 +221,14 @@ void analyze_mode() {
   auto graph = game.CreateGraph();
   game.restriction()->AddToGraph(*graph, nullptr);
   Solver* solver = get_solver(game.vars(), game.restriction());
-  uint max = 0, sum = 0;
-  analyze(*solver, *graph, 1, max, sum);
-  printf("Worst-case: %u\n", max);
-  printf("Average-case: %.2f (%u)\n", (double)sum/solver->NumOfModels(), sum);
+  uint models = solver->NumOfModels();
+  uint max = 0, sum = 0, num = 0;
+  printf("Codes found (total %u):     0", models);
+  fflush(stdout);
+  // TODO: jeste bych mohl vypisovat nejake ETA, ale mozna neni potreba
+  analyze(*solver, *graph, 1, max, sum, num);
+  printf("\nWorst-case: %u\n", max);
+  printf("Average-case: %.2f (%u)\n", (double)sum/models, sum);
 }
 
 // Parse program arguments with TCLAP library.
