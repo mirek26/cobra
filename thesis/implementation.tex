@@ -1,34 +1,189 @@
 \section{SAT solving} \label{s:cobra-sat}
-\TODO{incremental blah blah blah}
+
+COBRA uses a SAT solver for the following tasks.
+\begin{itemize}
+\item Compute the total number of possible codes.
+\item Verify that an experiment is well-formed (see \autoref{s:cobra-modes} for details).
+\item Identify possible outcomes of an experiment and exclude the unsatisfiables.
+\item Decide whether the game is finished -- whether the formula has only one model.
+\item Evaluate the strategies -- count models, fixed variable, etc.
+\end{itemize}
+
+Most of these tasks need an \emph{incremental SAT solver}, i.e. a
+  sat solver to which you can add constraints and take them back later.
+Without this feature, we would have to call the SAT solver on the whole formula
+  many times which would ruin the computation time.
+% The notion of \emph{incremental SAT solving} is not uniquely defined and
+%   its support varies.
+
+COBRA uses a solver as an abstract class which can have multiple implementation,
+  thus allowing a simple extension with another SAT solver.
+The solver to be used can be specified with
+  the \texttt{-b} or \texttt{--backend} swith.
+
+Solver must implement the following methods:
+\begin{itemize}
+\item \textsc{AddConstraint}(formula). Adds a constraint to the SAT solver.
+\item \textsc{Satisfiable()} $->$ Bool. Decides whether the current formula is satisfiable.
+\item \textsc{OpenContext(), CloseContext()}.
+  This is our understanding of incremental SAT solving.
+  \textsc{OpenContext} adds a context to a stack.
+  Every call to \textsc{AddConstraint} adds the constraint to the current context.
+  \textsc{CloseContext} removes all the constraint in the current context and removes it
+  from the stack. It must be possible to nest contexts arbitrarily.
+  The two methods are sometimes called just \textsc{Push} and \textsc{Pop}.
+\item \textsc{HasOnlyOneModel()} $->$ Bool. Decides whether to formula has only one model.
+  This can be implemented by asking whether the formula is satisfiable,
+  if yes, retrieving the satisfying assignment, adding
+  a clause with the assignment negated and asking for satisfiability again.
+  Adding the new clause should be done in a new context in order not to pollute
+  the solver state.
+\item \textsc{CountModels()} $->$ Int.
+   SAT solvers do not typically include support for model counting, the problem
+   usually refered to as \#SAT. Possible solutions of this problem are described next.
+\end{itemize}
+
+\subsection{Model counting}
+
+First option is to use special tools designed for this purpose,
+  such as SharpSAT or sharpCDCL \TODO{refs?}.
+However, these tools do not support incremental solving and
+  must be run from a clean state for each formula models of which we want to count.
+
+Second option is to use a SAT solver, repeateadly ask for satisfiability and
+  add clauses that forbids the current assignment until we get
+  an unsatisfiable formula.
+\TODO{pseudokód.}
+
+Third option is to use a SAT solver and a simple backtracking approach,
+  progressively assuming a variable to be true or false and cut the non-perspective
+  branches.
+\TODO{pseudokód.}
+
+
+COBRA includes three solver implementations which we describe next.
+
+\subsection{PicoSat}
+Picosat \footnote{\url{http://fmv.jku.at/picosat/}}\cite{picosat} is a simple
+  extensible SAT solver, which supports incremental SAT solving exactly in the way
+  we need.
+
+Bindings to Picosat are implemented in \texttt{PicoSolver} class.
+This class also implements model counting with the third approach described in
+the previous subsection as Picosat does not support model counting itself.
+
+\subsection{MiniSat}
+
+Minisat \footnote{\url{http://minisat.se/}}\cite{minisat} is a minimalistic,
+  extensible SAT solver that won several SAT competitions in the past.
+
+Minisat does not support incremental SAT solving in the manner we described,
+  but it supports assumptions -- you can assume arbitrary number of unit clauses
+  (i.e. that a variable is true of false) and ask for satisfiability under
+  those assumptions.
+
+The behaviour we want can be simulated by assumptions in the following way.
+For each context, we create a new variable, say $a$.
+Then, instead of adding clauses $C_1, C_2, ..., C_n$ to the context,
+  we add clauses $\{-a, C_1\}$, $\{-a, C_2\}$, ... $\{-a, C_n\}$ and ask
+  for satisfiability under the assumption $a$ (in general,
+  assumption that all variables of open contexts are true).
+Afterwards, when a context is closed, we add a unit clause $\{-a\}$,
+  which effectively removes all the clauses added in the context.
+The only problem with this approach is that the variable $a$ is wasted,
+  the solver will remember it somewhere and may consume more memory.
+
+Bindings to Minisat are implemented in \texttt{MiniSolver} class.
+This class implements the context opening and closing in the way described above.
+\TODO{Model counting?}.
+
+\subsection{Simple solver}
+
+We include a special SAT solver, called \texttt{SimpleSolver} to show that
+  the usage of a proper SAT solver in this application is justifiable.
+Simple solver uses another SAT solver (Picosat) to generate all
+  models of the initial restriction $\init$ (or of the first constraint, in general).
+Later satisfiability questions with additional constrainst are
+  resolved by going though all possible codes (assignments) and
+  checking that the constraints are satisfied.
+Model counting and the other functions are implemented similarly.
+
+\subsection{Extensibility}
+If you want to try another SAT solver, alter the algorithm for model counting,
+  or test any other modification,
+  you can implement your own solver class that inherits from Solver and
+  implements all the necessary methods.
+
+Check the \texttt{solver.h} file and the documentation therein
+  for the information about the exact methods required.
+Further, you need to to include the file with your class in
+  \texttt{main.cpp} and add a new case
+  into the \texttt{get\_solver} function in the file.
 
 \subsection{Transformation to CNF}
-\TODO{tseitin}
-\TODO{tseitin expansion of Exactly et al.}
+
+All the SAT solver take the input formula in the conjunctive normal form(CNF).
+Since we allow arbitrary form in the input file and support non-standard
+  numerical operators, we need to transform a formula to CNF first.
+
+The standard transformation works as follows.
+First, we express the formula in a form
+  that uses only negation, conjunction and disjunction as operator.
+Then, we transform it to \emph{negation normal form} using De Morgan's laws
+  and, finally, we use distributivity of conjunction and disjunction to
+  move all the conjunction to the top level.
+However, this may lead to an exponential explosion of the formula, so
+another solution, called \emph{Tseitin Transformation}, is commonly used
+  when converting a formula for a SAT solver. \TODO{Cite. Tseitin + Wiki?}
+
+Imagine the formula as a circuit with gates corresponding to the logical operators.
+Input vectors then correspond to variable assignments and the circuit output
+  is true if and only if the input assignment satisfies the formula.
+
+For each gate, a new variable representing its output is created.
+The resulting formula is a conjunction of sub-formulas that enforce
+  the proper operation of the gates.
+
+For example, consider an AND gate, inputs of which corresponds to variables
+  $x$, $y$ and output corresponds to a variable $z$.
+Then we need to ensure that $z$ is true if and only if both $x$ and $y$ are true,
+  which is done by adding a sub-formula $z <-> (x \wedge y)$, which can be
+  expressed in CNF as
+\[
+(\neg x \vee \neg y \vee z) \wedge
+(x \vee \neg z) \wedge
+(y \vee \neg z).
+\]
+
+Other gates are handled similarly and this is done for all all of them in the circuit.
+Finally, the variable
+  corresponding to the result of the top level operator is added
+  to the resulting formula as a unit clasue.
+
+It remains to explain how we handle the numberical operators
+  $\atleast{}$, $\atmost{}$ and $\exactly{}$.
+We show it on the $\exactly{k}(f_1, ..., f_n)$ operator,
+  others are transformed similarly. For simplicity,
+  assume $f_i$ are variables; if not, we take the variable corresponding the
+  the sub-formulas.
+
+For each $l\in\{0,1,...,k\}$ and $m\in\{1,...,n\}$, $l <= m$, we create
+  a new variable $z_{l,\:m}$ which will be true if and only if
+  the formula $\exactly{l}(f_1, ..., f_m)$ is satisfied.
+To enforce this assignment, we add sub-formulas of the form
+  \[ z_{l,\:m} <-> (f_m \wedge z_{l-1,\:m-1}) \vee (\neg f_m \wedge z_{l,\:m-1}) \]
+  for each $l > 1$, $m > 1$ (in CNF form, of course).
+Special cases $l = m$ and $l = 0$ are equivalent to AND and OR formulas, repsectively,
+  and are handled accordingly.
+
+The size of the resulting sub-formula is linear in $n\cdot k$.
+Hence the size is not polynomial in the size of the input
+  (suppose $k$ is encoded in binary form) but it is much better
+  that expressing the operator as a conjucntion of the $n\choose k$ posibilities,
+  which would be double exponential.
 
 \section{Symmetry breaking}
 \TODO{Bliss, vs saucy vs nauty}
-
-\section{Extensibility}
-
-COBRA was designed as a universal tool that should be easy to extend with
-  upcoming ideas, especially adding new strategies for analysis
-  and new backend solvers.
-
-If you want to analyze a new strategy, all you need to do is to implement
-  a new function in \texttt{strategy.h/.cpp} file and add a corresponding entry
-  to the \TODO{...} table in the same file.
-The function would take a list of sensible experiments in the next step as a parameter
-  and it only needs to return the index of the selected one.
-If your strategy only maximizes or minimizes some metrics on the experiments,
-  you can use a template provided.
-
-For exact details, see the documentation in the file.
-\TODO{Example?}
-
-If you want to try another SAT solver, or alter the algorithm for model counting,
-  you can implement your own solver class that inherits from Solver and
-  implements all the necessary methods.
-\TODO{Tohle je docela důležitý, chtělo by to pořádně říct, co se musí udělat.}
 
 \section{Implementation details}
 

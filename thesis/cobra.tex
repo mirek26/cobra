@@ -241,6 +241,9 @@ SAT: ...
 
 \subsection{Overview mode [o, overview] (default)}
 
+\centerline{\texttt{./cobra -m overview <input file> }}
+\medskip
+
 Overviwe mode serves as a basic check that your input file is
   syntactically correct and that the game you specified is sensible.
 
@@ -266,22 +269,134 @@ If a problem is found, the tool outputs an assignment and an experiment
   for which no outcome, or more that one outcome, is satisfied.
 
 \subsection{Simulation mode [s, simulation]}
+
+\centerline{\texttt{./cobra -m simulation -1 <strategy> -2 <strategy> <input file> }}
+
 In the simulation mode, you specify a strategy for
   the codebreaker and for the codemaker.
-\TODO{Codemaker - strategie nevybira code, ale outcomy}
-\TODO{Interactive vs one-step look ahead strategy.}
-\TODO{Popisy strategii}
+This can be done using \texttt{-1} or \texttt{--codemaker} switch, and
+\texttt{-2} or \texttt{--codebreaker} switch, respectively.
+
+Here, we do not consider the codemaker as a player who just chooses the codes
+and evaluates experiments, but as a player who chooses the outcomes
+of experiments accroding to his will.
+The only condition is, that he must be consistent.
+
+Implemented strategies for both codebreaker and codemaker
+  are described in the next section and mostly correspond to strategies
+  that can be found in the literature on Mastermind.
+Apart from these, the tool supports two extra options, \textbf{interactive}
+  and \textbf{random}, which are not strategies in the sense of \autoref{def:strategy}.
+
+If ``interactive'' is specified as the codebreaker's strategy,
+  the tool prints a list of all non-equivalent experiments
+  (together with the number of posiible outcomes, number of fixed variables
+  and number of remaing possibilities) and the user is asked
+  to choose the experiment that would be performed.
+This effectively allows the user to play the game against a codemaker's strategy.
+
+Similarly, is ``'interactive'' is codemaker's strategy, possible outcomes
+  are printed after each experiment and the user is asked to choose one.
+Unsatisfiable outcomes are printed as well but are marked as such and
+  the user cannot choose them.
+
+In the random mode, an experiment, or an outcome of an experiment, is
+  choosen by random from the list.
+
+The default values for both codemaker and codebreaker are interactive,
+  so if you run the simulation mode without strategy specification,
+  you will be asked both to select experiments and to select the outcome.
 
 \subsection{Strategy analysis mode [a, analysis]}
-\TODO{Simple backtracking.}
-\begin{description}
-\item[Min-num.]
-\item[Min-exp.]
-\item[Entropy.]
-\item[Fixed.]
-\item[Most-parts.]
-\end{description}
+
+\centerline{\texttt{./cobra -m analysis -2 <strategy> <input file> }}
+
+This makes the tool compute worst-case number of experiments and
+average-case number of experiments for a given codebreaker's strategy.
+
+\TODO{pseudocode?}
 
 \subsection{Optimal strategy mode [o, optimal]}
 \TODO{...}
+
+
+\section{Strategies}
+
+\subsection{Codebreaker's strategy}
+
+We support the following one-step look-ahead strategies for the codebreaker.
+Let $N$ denote the number of possible codes in the current state,
+and for a fixed experiment, let $n_i$ denote number of possible codes that
+will end up in outcome $i$.
+
+\begin{description}
+\item[Min-num.] \texttt{-2 minnum} \\
+  Minimizes the worst-case number of remaining codes
+  in the next step, i.e. selects experiment with minimal $\max_i n_i$.
+  For Mastermind, this was suggested by Knuth\cite{mm-knuth}.
+\item[Min-exp.]  \texttt{-2 minexp} \\
+   Minimizes the expected number of remaining codes
+  in the next step, i.e. minimize $\sum_in_i^2/N$.
+  For Mastermind, this was suggested by Irwing\cite{mm-expnum}.
+\item[Entropy.] \texttt{-2 entropy} \\
+  Maximizes the entropy of numbers of remaining codes,
+  i.e. maximizes $-log(k_i)\cdot k_i$, where $k_i=n_i/N$.
+  For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
+\item[Most-parts.] \texttt{-2 parts} \\
+  Maximizes the number of possible outcomes,
+  i.e. maximize $\# i. (n_i > 0)$.
+  For Mastermind, this was suggested by Kooi\cite{mm-mostparts}.
+\item[Fixed.] \texttt{-2 fixed} \\
+  Maximize the number of fixed variables
+  in the next step.
+  This is specific to propositional logic representation of a code-breaking game.
+  Further, it depands on the exact formalization.
+  For example, though Examples \ref{ex:form-fake-coin1}
+  and \ref{ex:form-fake-coin2} both describe the same problem,
+  the choice of the experiment by the \emph{fixed} strategy is
+  different in the very first step.
+% TODO: SAt resolutions, ... ? (jine vlastni)
+\end{description}
+
+\subsection{Codemaker's strategy}
+
+The codemaker has the following strategy options.
+Note that none of them is guaranteed to maximize the
+  number of experiments of any codebreaker's strategy.
+
+\begin{description}
+\item[Max-num.] \texttt{-1 maxnum} \\
+  Select an outcome with largest $n_i$. This
+  corresponds to the \emph{min-num} strategy for codebreaker.
+\item[Fixed.] \texttt{-1 fixed} \\
+  Minimizes the number of fixed variables in the next step.
+\end{description}
+
+\subsection{Extensibility}
+
+If you want to analyze a new heuristics to selects experiments,
+  all you need to do is to implement a new function
+  in \texttt{strategy.h/strategy.cpp} file and add a corresponding entry
+  to the \texttt{...} table in \texttt{strategy.h}.
+A strategy function takes a list of sensible experiments as a parameter
+  and it should return the index of the selected one.
+
+If your strategy only \emph{maximizes} or \emph{minimizes}
+  some metrics on the experiments,
+  you can even use a template provided with a corresponding lambda function.
+As an example, we show the exact implementation of the \emph{Min-exp} strategy.
+For exact details, see the documentation in the file.
+
+\begin{lstlisting}[language=C++]
+uint breaker::exp_num(vec<Option>& options) {
+  return minimize([](Option& o){
+    auto models = o.GetNumOfModels();
+    int sumsq = 0;
+    for (uint i = 0; i < o.type().outcomes().size(); i++) {
+      sumsq += models[i] * models[i];
+    }
+    return (double)sumsq / o.GetTotalNumOfModels();
+  }, options);
+}
+\end{lstlisting}
 

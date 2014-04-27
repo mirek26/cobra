@@ -729,6 +729,47 @@
       \endverb
       \keyw{other}
     \endentry
+    \entry{picosat}{article}{}
+      \name{labelname}{1}{}{%
+        {{hash=22081d00e30965a89f413e528510617e}{Biere}{B\bibinitperiod}{Armin}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{1}{}{%
+        {{hash=22081d00e30965a89f413e528510617e}{Biere}{B\bibinitperiod}{Armin}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{22081d00e30965a89f413e528510617e}
+      \strng{fullhash}{22081d00e30965a89f413e528510617e}
+      \field{sortinit}{0}
+      \field{labeltitle}{PicoSAT Essentials.}
+      \field{journaltitle}{JSAT}
+      \field{number}{2-4}
+      \field{title}{PicoSAT Essentials.}
+      \field{volume}{4}
+      \field{year}{2008}
+      \field{pages}{75\bibrangedash 97}
+      \keyw{other}
+    \endentry
+    \entry{minisat}{inproceedings}{}
+      \name{labelname}{2}{}{%
+        {{hash=c254d2449168b3ebea3224a507fbb8e1}{Eén}{E\bibinitperiod}{Niklas}{N\bibinitperiod}{}{}{}{}}%
+        {{hash=90a42491362445c50029d6c98fa86526}{Sörensson}{S\bibinitperiod}{Niklas}{N\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=c254d2449168b3ebea3224a507fbb8e1}{Eén}{E\bibinitperiod}{Niklas}{N\bibinitperiod}{}{}{}{}}%
+        {{hash=90a42491362445c50029d6c98fa86526}{Sörensson}{S\bibinitperiod}{Niklas}{N\bibinitperiod}{}{}{}{}}%
+      }
+      \list{organization}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{9c2c60c804c08fd091e426a2d1918942}
+      \strng{fullhash}{9c2c60c804c08fd091e426a2d1918942}
+      \field{sortinit}{0}
+      \field{labeltitle}{An extensible SAT-solver}
+      \field{booktitle}{Theory and applications of satisfiability testing}
+      \field{title}{An extensible SAT-solver}
+      \field{year}{2004}
+      \field{pages}{502\bibrangedash 518}
+      \keyw{other}
+    \endentry
   \endsortlist
 \endrefsection
 \endinput

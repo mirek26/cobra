@@ -68,22 +68,38 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{32}{section*.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape SAT solving}{32}{section.4.4}
+\contentsline {section}{\numberline {4.4}\slshape Strategies}{32}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{32}{section*.31}
+\contentsline {subsection}{\rmfamily Codebreaker's strategy}{32}{section*.31}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{32}{section.4.5}
+\contentsline {subsection}{\rmfamily Codemaker's strategy}{33}{section*.32}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Extensibility}{32}{section.4.6}
+\contentsline {subsection}{\rmfamily Extensibility}{33}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{33}{section.4.7}
+\contentsline {section}{\numberline {4.5}\slshape SAT solving}{34}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{33}{section*.32}
+\contentsline {subsection}{\rmfamily Model counting}{35}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Compiler Requirements}{33}{section*.33}
+\contentsline {subsection}{\rmfamily PicoSat}{35}{section*.35}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{33}{section*.34}
+\contentsline {subsection}{\rmfamily MiniSat}{35}{section*.36}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{35}{chapter.5}
+\contentsline {subsection}{\rmfamily Simple solver}{36}{section*.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{37}{chapter.6}
+\contentsline {subsection}{\rmfamily Extensibility}{36}{section*.38}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Transformation to CNF}{36}{section*.39}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.6}\slshape Symmetry breaking}{37}{section.4.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{38}{section.4.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Programming Language and Style}{38}{section*.40}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Compiler Requirements}{38}{section*.41}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Unit testing}{38}{section*.42}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{39}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{41}{chapter.6}
