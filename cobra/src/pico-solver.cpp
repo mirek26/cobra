@@ -31,6 +31,10 @@ PicoSolver::PicoSolver(const vec<Variable*>& vars, Formula* restriction):
   if (restriction) AddConstraint(restriction);
 }
 
+PicoSolver::~PicoSolver() {
+  picosat_reset(picosat_);
+}
+
 //------------------------------------------------------------------------------
 // Adding constraints
 

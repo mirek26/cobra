@@ -32,6 +32,7 @@ class PicoSolver: public Solver {
 
  public:
   PicoSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
+  ~PicoSolver();
 
   virtual SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
