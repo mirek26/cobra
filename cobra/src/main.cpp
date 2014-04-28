@@ -167,8 +167,10 @@ void simulation_mode() {
     printf("%sOUTCOME: %s\n",
            color::semph,
            experiment.type().outcomes_names()[oid].c_str());
-    printf("  ->     %s\n\n%s",
-           outcome->pretty(true, &experiment.params()).c_str(),
+    auto knowledge = outcome->pretty(true, &experiment.params());
+    if (knowledge.length() > 200) knowledge = knowledge.substr(0, 200) + "...";
+    printf("  ->   %s\n\n%s",
+           knowledge.c_str(),
            color::snormal);
 
     // Check if solved.

@@ -4,7 +4,7 @@
 ifndef $(CC)
   CC = clang++
 endif
-CCFLAGS = -g -isystem tools/ -isystem include/ -isystem /opt/local/include -Wall -Wextra -pedantic -pthread -std=c++11
+CCFLAGS = -g -O3 -isystem tools/ -isystem include/ -isystem /opt/local/include -Wall -Wextra -pedantic -pthread -std=c++11
 LINKWITHSAT = -L tools/picosat -L tools/bliss -L tools/sharpSAT -l picosat -l bliss
 FLEX = flex
 BISON = bison -d

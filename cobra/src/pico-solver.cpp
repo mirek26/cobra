@@ -26,11 +26,8 @@ PicoSolver::PicoSolver(const vec<Variable*>& vars, Formula* restriction):
   // Reserve id's for original variables.
   for (uint i = 1; i < vars_.size(); i++) {
     picosat_inc_max_var(picosat_);
-    // TODO: try this
-    //picosat_set_more_important_lit(picosat_, i);
+    picosat_set_more_important_lit(picosat_, i);
   }
-  // TODO: try this
-  // picosat_set_global_default_phase(picosat_, false);
   if (restriction) AddConstraint(restriction);
 }
 
@@ -237,7 +234,6 @@ void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
     picosat_assume(picosat_, v);
     if (picosat_sat(picosat_, -1) == PICOSAT_SATISFIABLE) {
       if ((unsigned)var == vars_.size() - 1) {
-        //PrintAssignment();
         callback();
       }
       else {

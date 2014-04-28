@@ -38,12 +38,12 @@ uint breaker::interactive(vec<Option>& options) {
         experiment.index(),
         experiment.type().name().c_str(),
         experiment.type().game().ParamsToStr(experiment.params()).c_str());
-      // printf(" ] - M: ");
-      // for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-      //   printf("%i ", experiment.GetNumOfModels()[i]);
-      // printf("F: ");
-      // for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-      //   printf("%i ", experiment.GetNumOfFixedVars()[i]);
+      printf(" ] - M: ");
+      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
+        printf("%i ", experiment.GetNumOfModels()[i]);
+      printf("F: ");
+      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
+        printf("%i ", experiment.GetNumOfFixedVars()[i]);
       printf("\n");
     }
   }
@@ -64,13 +64,11 @@ uint maker::interactive(Option& option) {
   // Print options.
   printf("Select an outcome: \n");
   auto& type = option.type();
-  auto& params = option.params();
   for (uint i = 0; i < type.outcomes().size(); i++) {
     if (option.IsOutcomeSat(i)) printf("%i) ", i);
     else printf("-) ");
-    printf("%s - %s %s\n",
+    printf("%s %s\n",
       type.outcomes_names()[i].c_str(),
-      type.outcomes()[i]->pretty(true, &params).c_str(),
       option.IsOutcomeSat(i) ? "" : "(unsatisfiable)");
   }
 
