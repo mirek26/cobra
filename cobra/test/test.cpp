@@ -61,7 +61,7 @@ TEST(Tseitin, Exactly1b) {
   EXPECT_FALSE(s.Satisfiable());
 }
 
-TEST(Tseitin, ExactlyN) {
+TEST(Tseitin, Exactly3) {
   m.reset();
   m.game().declareVars({"a1", "a2", "a3"});
   PicoSolver s(m.game().vars(),
@@ -150,12 +150,29 @@ TYPED_TEST(SolverTest, ExactlyFixed) {
   EXPECT_EQ(2, s.GetNumOfFixedVars()); // x4 and x5 must be false.
 }
 
-TYPED_TEST(SolverTest, NumOfModels) {
+TYPED_TEST(SolverTest, NumOfModelsExactly2) {
   m.reset();
   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
   TypeParam s(m.game().vars(),
                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
-  EXPECT_EQ(10, s.NumOfModels());
+  EXPECT_EQ(10, s.NumOfModels()); // 5 choose 2
+}
+
+TYPED_TEST(SolverTest, NumOfModelsAtMost2) {
+  m.reset();
+  m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
+  TypeParam s(m.game().vars(),
+               Formula::Parse("AtMost-2(x1, x2, x3, x4, x5)"));
+  EXPECT_EQ(16, s.NumOfModels()); // 1 + 5 + 10
+}
+
+
+TYPED_TEST(SolverTest, NumOfModelsAtLeast2) {
+  m.reset();
+  m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
+  TypeParam s(m.game().vars(),
+               Formula::Parse("AtLeast-2(x1, x2, x3, x4, x5)"));
+  EXPECT_EQ(26, s.NumOfModels()); // 2^5 - 5 - 1
 }
 
 // TYPED_TEST(SolverTest, NumOfModelsSharpSat) {

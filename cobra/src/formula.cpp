@@ -41,21 +41,6 @@ string Mapping::pretty(bool, const vec<CharId>* params) {
   }
 }
 
-// Tseitin transformation of arbitrary formula to CNF
-// PicoSolver* Formula::ToCnf() {
-//   PicoSolver* r = new PicoSolver();
-//   TseitinTransformation(r, true);
-//   return r;
-// }
-
-// PicoSolver* Formula::ToCnf(vec<CharId>& param) {
-//   PicoSolver* r = new PicoSolver();
-//   r->set_build_for_params(&param);
-//   TseitinTransformation(r, true);
-//   r->set_build_for_params(nullptr);
-//   return r;
-// }
-
 // return the variable corresponding to the node during Tseitin transformation
 VarId Formula::tseitin_var(PicoSolver& cnf) {
   if (tseitin_var_ == 0) {
@@ -69,20 +54,20 @@ VarId Formula::tseitin_var(PicoSolver& cnf) {
  */
 
 void TseitinAnd(VarId thisVar, PicoSolver& cnf,
-                const vec<VarId>& list, uint offset,
+                const vec<VarId>& list, uint limit,
                 bool negate = false) {
   int neg = negate ? -1 : 1;
   // X <-> AND(A1, A2, ..)
   // 1. (X | !A1 | !A2 | ...)
   vec<VarId> first;
-  for (auto v = list.begin() + offset; v < list.end(); ++v) {
-    first.push_back(neg * -(*v));
+  for (uint i = 0; i < limit; i++) {
+    first.push_back(neg * -list[i]);
   }
   first.push_back(thisVar);
   cnf.AddClause(first);
   // 2. (A1 | !X) & (A2 | !X) & ...
-  for (auto v = list.begin() + offset; v < list.end(); ++v) {
-    cnf.AddClause({ -thisVar, neg * (*v) });
+  for (uint i = 0; i < limit; i++) {
+    cnf.AddClause({ -thisVar, neg * list[i] });
   }
 }
 
@@ -90,7 +75,7 @@ void AndOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   // if on top level, all childs must be true - just recurse down
   if (!top) {
     TseitinAnd(tseitin_var(cnf), cnf,
-               tseitin_children(cnf), 0);
+               tseitin_children(cnf), children_.size());
   }
   // recurse down
   for (auto& f: children_) {
@@ -171,25 +156,30 @@ void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   right_->TseitinTransformation(cnf, false);
 }
 
-// 'to' exclusively
 void TseitinNumerical(VarId thisVar, PicoSolver& cnf,
                       bool at_least, bool at_most, uint value,
-                      const vec<VarId>& children, uint offset) {
-  // X <-> ( A1 & T1 ) | ( !A1 & T2 )
-  // (X | !T1 | !A1) & (T1 | !X | !A1) & (A1 | X | !T2) & (A1 | T2 | !X)
-  if (value == children.size() - offset) {
-    if (at_least) TseitinAnd(thisVar, cnf, children, offset);
-  } else if (value == 0) {
-    if (at_most) TseitinAnd(thisVar, cnf, children, offset, true);
-  } else {
-    auto t1 = cnf.NewVarId(); // OP-(value-1) in the rest
-    auto t2 = cnf.NewVarId(); // OP-value in the rest
-    cnf.AddClause({ thisVar, -t1, -children[offset] });
-    cnf.AddClause({ -thisVar, t1, -children[offset] });
-    cnf.AddClause({ thisVar, -t2, children[offset] });
-    cnf.AddClause({ -thisVar, t2, children[offset] });
-    TseitinNumerical(t1, cnf, at_least, at_most, value - 1, children, offset + 1);
-    TseitinNumerical(t2, cnf, at_least, at_most, value, children, offset + 1);
+                      const vec<VarId>& children) {
+  auto n = children.size();
+  vec<vec<VarId>> vars(n + 1, vec<VarId>(value + 1, 0));
+  vars[n][value] = thisVar;
+  for (uint m = n; m > 0; m--) {
+    if (m <= value && vars[m][m] != 0 && at_least) {
+      assert(vars[m][m] != 0);
+      TseitinAnd(vars[m][m], cnf, children, m); // all others are true
+    }
+    for (uint l = 1; l <= value && l < m; l++) {
+      if (vars[m][l] == 0) continue;
+      if (vars[m-1][l] == 0) vars[m-1][l] = cnf.NewVarId();
+      if (vars[m-1][l-1] == 0) vars[m-1][l-1] = cnf.NewVarId();
+      // vars[m][l] <-> (children[m] & vars[m-1][l]) | (!children[m] & vars[m-1][l-1])
+      cnf.AddClause({ vars[m][l], -vars[m-1][l], children[m-1] });
+      cnf.AddClause({ -vars[m][l], vars[m-1][l], children[m-1] });
+      cnf.AddClause({ vars[m][l], -vars[m-1][l-1], -children[m-1] });
+      cnf.AddClause({ -vars[m][l], vars[m-1][l-1], -children[m-1] });
+    }
+    if (vars[m][0] != 0 && at_most) {
+      TseitinAnd(vars[m][0], cnf, children, m, true); // all others are false
+    }
   }
 }
 
@@ -198,7 +188,7 @@ void ExactlyOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
                    true, true, value_,
-                   tseitin_children(cnf), 0);
+                   tseitin_children(cnf));
   // recurse down
   for (auto& f: children_) {
     f->TseitinTransformation(cnf, false);
@@ -210,7 +200,7 @@ void AtLeastOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
                    true, false, value_,
-                   tseitin_children(cnf), 0);
+                   tseitin_children(cnf));
   // recurse down
   for (auto& f: children_) {
     f->TseitinTransformation(cnf, false);
@@ -222,7 +212,7 @@ void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
                    false, true, value_,
-                   tseitin_children(cnf), 0);
+                   tseitin_children(cnf));
   // recurse down
   for (auto& f: children_) {
     f->TseitinTransformation(cnf, false);
