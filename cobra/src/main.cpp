@@ -229,6 +229,8 @@ void analyze_mode() {
   fflush(stdout);
   // TODO: jeste bych mohl vypisovat nejake ETA, ale mozna neni potreba
   analyze(*solver, *graph, 1, max, sum, num);
+  delete solver;
+  delete graph;
   printf("\nWorst-case: %u\n", max);
   printf("Average-case: %.2f (%u)\n", (double)sum/models, sum);
 }
@@ -331,9 +333,9 @@ int main(int argc, char* argv[]) {
     }
 
     time_overview(t1);
+    m.deleteAll();
   } catch (TCLAP::ArgException &e) {
     std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
   }
-
   return 0;
 }

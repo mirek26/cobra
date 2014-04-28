@@ -286,6 +286,8 @@ void Experiment::GenParamsGraphFilter() {
   auto h = canonical->get_hash();
   if (gen_graphs_.count(h) > 0)
     return;
+  delete graph;
+  delete canonical;
   gen_graphs_[h] = params;
   gen_stats_.ph3++;
   gen_params_final_.insert(params);
