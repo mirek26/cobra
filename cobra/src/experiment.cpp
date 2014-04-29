@@ -51,8 +51,9 @@ void Option::ComputeFixedVars() {
   }
 }
 
-void Experiment::addOutcome(string name, Formula* outcome, bool last) {
-  outcomes_.push_back({ name, outcome, last });
+void Experiment::addOutcome(string name, Formula* outcome, bool final) {
+  if (final) final_outcome_ = outcomes_.size();
+  outcomes_.push_back({ name, outcome, final });
 }
 
 void Experiment::paramsDistinct(vec<uint>* list) {

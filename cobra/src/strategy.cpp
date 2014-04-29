@@ -114,7 +114,9 @@ uint maker::fixed(Option& option) {
 uint breaker::min_num(vec<Option>& options) {
   return minimize([](Option& o){
     auto models = o.GetNumOfModels();
-    return *(std::max_element(models.begin(), models.end()));
+    // prefer the experiment with a final outcome satisfiable
+    return *(std::max_element(models.begin(), models.end())) +
+           0.5*(o.IsOutcomeSat(o.type().final_outcome()));
   }, options);
 }
 
@@ -144,13 +146,19 @@ uint breaker::entropy(vec<Option>& options) {
 }
 
 uint breaker::parts(vec<Option>& options) {
-  return maximize(&Option::GetNumOfSatOutcomes, options);
+  return maximize([](Option& o) {
+    // prefer the experiment with a final outcome satisfiable
+    return o.GetNumOfSatOutcomes() +
+           0.5*(o.IsOutcomeSat(o.type().final_outcome()));
+  }, options);
 }
 
 uint breaker::fixed(vec<Option>& options) {
   return maximize([](Option& o){
     auto fixed = o.GetNumOfFixedVars();
-    return *std::min_element(fixed.begin(), fixed.end());
+    // prefer the experiment with a final outcome satisfiable
+    return *std::min_element(fixed.begin(), fixed.end()) +
+           0.1*(o.IsOutcomeSat(o.type().final_outcome()));
   }, options);
 }
 

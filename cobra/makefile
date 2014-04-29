@@ -60,7 +60,7 @@ $(GTEST_DIR)/test.o: $(GTEST_DIR)/test.cpp src/*.h $(GTEST_HEADERS)
 	$(CC) $(IGNFLAGS) $(CCFLAGS) -c $(GTEST_DIR)/test.cpp -o $@
 
 $(GTEST_DIR)/test: $(GTEST_DIR)/test.o $(OBJECTS) $(GTEST_DIR)/gtest_main.a
-	$(CC) $(IGNFLAGS) $^ $(LINKWITHSAT) -lpthread -ll -o $@
+	$(CC) $(IGNFLAGS) $^ $(LINKWITHSAT) -lpthread -o $@
 
 test: $(GTEST_DIR)/test
 	./test/test
