@@ -63,7 +63,7 @@ class Experiment {
   string name_;
   uint num_params_;
 
-  uint final_outcome_;
+  int final_outcome_;
   vec<Outcome> outcomes_;
 
   vec<set<MapId>> used_maps_;
@@ -95,7 +95,7 @@ class Experiment {
   string name() const { return name_; }
   Game& game() const { return game_; }
 
-  uint final_outcome() const { return final_outcome_; }
+  int final_outcome() const { return final_outcome_; }
   const vec<Outcome>& outcomes() const { return outcomes_; }
 
   uint num_params() { return num_params_; }

@@ -19,7 +19,7 @@ namespace {
   // This can save significant amount of time if the function evaluation
   // is time demanind (because of model counting, for example).
   uint maximize(std::function<double(Option&, double)> f, vec<Option>& options) {
-    int max = -std::numeric_limits<double>::max();
+    double max = -std::numeric_limits<double>::max();
     vec<Option>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
       auto cand = f(*it, max);
@@ -34,7 +34,7 @@ namespace {
 
   // Similar to the previous function, just minimizing value of f.
   uint minimize(std::function<double(Option&, double)> f, vec<Option>& options) {
-    int min = std::numeric_limits<double>::max();
+    double min = std::numeric_limits<double>::max();
     vec<Option>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
       auto cand = f(*it, min);
@@ -152,7 +152,9 @@ uint breaker::min_num(vec<Option>& options) {
       if (max > min) return max;        // cannot have less than min
     }
     // prefer the experiment with a final outcome satisfiable
-    return max - 0.5 * (o.IsSat(o.type().final_outcome()));
+    auto f = o.type().final_outcome();
+    if (f > -1 && o.IsSat(f)) return max - 0.5;
+    return max;
   }, options);
 }
 
@@ -183,28 +185,30 @@ uint breaker::entropy(vec<Option>& options) {
 
 uint breaker::parts(vec<Option>& options) {
   return maximize([](Option& o, double max) ->double {
-    uint outcomes = o.num_outcomes();
     uint sat = 0;
-    for (uint i = 0; i < outcomes; i++) {
+    for (uint i = 0; i < o.num_outcomes(); i++) {
       if (o.IsSat(i)) sat++;
-      if (outcomes - i + sat < max)
+      if (o.num_outcomes() - i + sat < max)
         return 0;        // cannot have more than max
     }
     // prefer the experiment with a final outcome satisfiable
-    return sat + 0.5 * (o.IsSat(o.type().final_outcome()));
+    auto f = o.type().final_outcome();
+    if (f > -1 && o.IsSat(f)) return sat + 0.5;
+    return sat;
   }, options);
 }
 
 uint breaker::fixed(vec<Option>& options) {
   return maximize([](Option& o, double max) ->double {
-    uint outcomes = o.num_outcomes();
     uint min = 0;
-    for (uint i = 0; i < outcomes; i++) {
+    for (uint i = 0; i < o.num_outcomes(); i++) {
       min = std::min(min, o.NumOfFixedVars(i));
       if (min < max) return min; // cannot have more than max
     }
     // prefer the experiment with a final outcome satisfiable
-    return min + 0.5 * (o.IsSat(o.type().final_outcome()));
+    auto f = o.type().final_outcome();
+    if (f > -1 && o.IsSat(f)) return min + 0.5;
+    return min;
   }, options);
 }
 

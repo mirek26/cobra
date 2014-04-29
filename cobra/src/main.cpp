@@ -256,7 +256,7 @@ void parse_args(int argc, char* argv[]) {
   ValueArg<string> backendArg(
     "b", "backend",
     "Specifies SAT solver that will be used. Default: picosat.", false,
-    "picosat", &backendConstraint);
+    "simple", &backendConstraint);
 
   vec<string> e_stgs, o_stgs;
   string e_man = "", o_man = "";
