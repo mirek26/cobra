@@ -47,10 +47,13 @@ def MAPPING(name, lst):
 def EXPERIMENT(name, num):
   __F.write("\nEXPERIMENT '{0}' {1}\n".format(name, num))
 
-def OUTCOME(name, formula):
+def OUTCOME(name, formula, final = True):
   input_assert(type(name) is str, "OUTCOME first argument must be a string.")
   input_assert(type(formula) is str, "OUTCOME second argument must be a string.")
-  __F.write("  OUTCOME '{0}' {1}\n".format(name, formula))
+  if final:
+    __F.write("  OUTCOME '{0}' {1}\n".format(name, formula))
+  else:
+    __F.write("  OUTCOMEX '{0}' {1}\n".format(name, formula))
 
 if __name__ == '__main__':
   __start = time.time()

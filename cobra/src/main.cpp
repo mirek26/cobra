@@ -81,7 +81,7 @@ void overview_mode() {
   uint branching = 0, num_exp = 0, nodes = 0;
   for (auto e: game.experiments()) {
     for (auto f: e->outcomes()) {
-      nodes += f->Size();
+      nodes += f.formula->Size();
     }
     if (e->outcomes().size() > branching) {
       branching = e->outcomes().size();
@@ -115,7 +115,8 @@ void overview_mode() {
   for (auto e: game.experiments()) {
     auto& params_all = e->GenParams(var_equiv);
     for (auto& params: params_all) {
-      auto f1 = new vec<Formula*>(e->outcomes().begin(), e->outcomes().end());
+      auto f1 = new vec<Formula*>();
+      for (auto o: e->outcomes()) f1->push_back(o.formula);
       auto f2 = m.get<ExactlyOperator>(1, f1);
       auto f3 = m.get<NotOperator>(f2);
 
@@ -166,15 +167,15 @@ void simulation_mode() {
     auto outcome = experiment.type().outcomes()[oid];
     printf("%sOUTCOME: %s\n",
            color::semph,
-           experiment.type().outcomes_names()[oid].c_str());
-    auto knowledge = outcome->pretty(true, &experiment.params());
+           outcome.name.c_str());
+    auto knowledge = outcome.formula->pretty(true, &experiment.params());
     if (knowledge.length() > 200) knowledge = knowledge.substr(0, 200) + "...";
     printf("  ->   %s\n\n%s",
            knowledge.c_str(),
            color::snormal);
 
     // Check if solved.
-    solver->AddConstraint(outcome, experiment.params());
+    solver->AddConstraint(outcome.formula, experiment.params());
     auto sat = solver->Satisfiable();
     assert(sat);
     auto assingment = solver->GetAssignment();
@@ -186,7 +187,7 @@ void simulation_mode() {
 
     // Prepare for another round.
     exp_num++;
-    outcome->AddToGraph(*knowledge_graph, &experiment.params());
+    outcome.formula->AddToGraph(*knowledge_graph, &experiment.params());
   }
   delete knowledge_graph;
 }
@@ -198,18 +199,19 @@ void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint&
   for (uint i = 0; i < experiment.type().outcomes().size(); i++) {
     solver.OpenContext();
     auto outcome = experiment.type().outcomes()[i];
-    solver.AddConstraint(outcome, experiment.params());
+    solver.AddConstraint(outcome.formula, experiment.params());
     bool sat = solver.Satisfiable(), one = false;
     if (sat) one = solver.OnlyOneModel();
     if (one) {
       num += 1;
       printf("\b\b\b\b\b%5u", num);
       fflush(stdout);
-      sum += depth;
-      max = std::max(max, depth);
+      auto finaldepth = outcome.last ? depth : depth + 1;
+      sum += finaldepth;
+      max = std::max(max, finaldepth);
     } else if (sat) {
       bliss::Digraph ngraph(graph);
-      outcome->AddToGraph(ngraph, &experiment.params());
+      outcome.formula->AddToGraph(ngraph, &experiment.params());
       analyze(solver, ngraph, depth + 1, max, sum, num);
     }
     solver.CloseContext();

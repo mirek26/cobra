@@ -39,5 +39,7 @@ for num_total in range(N + 1): # total number of pegs
                 formula[-1].add("!F%i$%i"%(q, p))
 
     if len(formula) > 0:
+      # this outcome can be the last one only if num_blacks == N
       OUTCOME("%i + %i"%(num_blacks, num_whites),
-               " | ".join(" & ".join(clause) for clause in formula))
+               " | ".join(" & ".join(clause) for clause in formula),
+               num_blacks == N)

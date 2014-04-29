@@ -68,7 +68,7 @@ uint maker::interactive(Option& option) {
     if (option.IsOutcomeSat(i)) printf("%i) ", i);
     else printf("-) ");
     printf("%s %s\n",
-      type.outcomes_names()[i].c_str(),
+      type.outcomes()[i].name.c_str(),
       option.IsOutcomeSat(i) ? "" : "(unsatisfiable)");
   }
 

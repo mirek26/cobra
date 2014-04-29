@@ -51,6 +51,7 @@
 %token T_PARAMS_DISTINCT
 %token T_PARAMS_SORTED
 %token T_OUTCOME
+%token T_OUTCOMEX
 
 %union {
   Formula* formula;
@@ -112,6 +113,9 @@ line :
     { m.last_experiment()->paramsSorted($2); }
   | T_OUTCOME T_STRING formula
     {  m.last_experiment()->addOutcome($2, $3);
+       free($2); }
+  | T_OUTCOMEX T_STRING formula
+    {  m.last_experiment()->addOutcome($2, $3, false);
        free($2); }
 
 variable_list :

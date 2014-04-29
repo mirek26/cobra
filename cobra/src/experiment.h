@@ -19,6 +19,12 @@ struct GenParamsStats {
   uint ph1 = 0, ph2 = 0, ph3 = 0;
 };
 
+struct Outcome {
+  string name;
+  Formula* formula;
+  bool last;
+};
+
 class Option {
   Solver& solver_;
   Experiment& type_;
@@ -82,8 +88,7 @@ class Experiment {
   string name_;
   uint num_params_;
 
-  vec<string> outcomes_names_;
-  vec<Formula*> outcomes_;
+  vec<Outcome> outcomes_;
 
   vec<set<MapId>> used_maps_;
   set<VarId> used_vars_;
@@ -112,13 +117,12 @@ class Experiment {
 
   string name() const { return name_; }
   Game& game() const { return game_; }
-  const vec<Formula*>& outcomes() const { return outcomes_; }
-  const vec<string>& outcomes_names() const { return outcomes_names_; }
+  const vec<Outcome>& outcomes() const { return outcomes_; }
 
   uint num_params() { return num_params_; }
 
   // Functions defining the experiment.
-  void addOutcome(string name, Formula* outcome);
+  void addOutcome(string name, Formula* outcome, bool last = true);
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
 

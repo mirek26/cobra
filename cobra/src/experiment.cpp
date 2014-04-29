@@ -22,7 +22,7 @@ void Option::ComputeSat() {
   sat_num_ = 0;
   for (uint i = 0; i < type_.outcomes().size(); i++) {
     solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i], params_);
+    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
     sat_[i] = solver_.Satisfiable();
     sat_num_ += sat_[i];
     solver_.CloseContext();
@@ -34,7 +34,7 @@ void Option::ComputeNumOfModels() {
   models_total_ = 0;
   for (uint i = 0; i < type_.outcomes().size(); i++) {
     solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i], params_);
+    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
     models_[i] = solver_.NumOfModels();
     models_total_ += models_[i];
     solver_.CloseContext();
@@ -45,15 +45,14 @@ void Option::ComputeFixedVars() {
   fixed_.resize(type_.outcomes().size());
   for (uint i = 0; i < type_.outcomes().size(); i++) {
     solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i], params_);
+    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
     fixed_[i] = solver_.GetNumOfFixedVars();
     solver_.CloseContext();
   }
 }
 
-void Experiment::addOutcome(string name, Formula* outcome) {
-  outcomes_names_.push_back(name);
-  outcomes_.push_back(outcome);
+void Experiment::addOutcome(string name, Formula* outcome, bool last) {
+  outcomes_.push_back({ name, outcome, last });
 }
 
 void Experiment::paramsDistinct(vec<uint>* list) {
@@ -103,7 +102,7 @@ void Experiment::Precompute() {
   // used_maps_, used_vars_
   used_maps_.resize(num_params_);
   for (auto out: outcomes_) {
-    PrecomputeUsed(out);
+    PrecomputeUsed(out.formula);
   }
 
   // interchangable
@@ -304,7 +303,7 @@ bliss::Digraph* Experiment::CreateGraphForParams(vec<uint>& groups,
   }
   // Construct graphs for outcome formulas.
   for (auto outcome: outcomes_) {
-    outcome->AddToGraph(*g, &params);
+    outcome.formula->AddToGraph(*g, &params);
   }
   return g;
 }

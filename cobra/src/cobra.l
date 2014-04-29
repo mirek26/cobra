@@ -59,6 +59,7 @@ char* str_dup_strip(char* str) {
 "PARAMS_DISTINCT" { return T_PARAMS_DISTINCT; }
 "PARAMS_SORTED" { return T_PARAMS_SORTED; }
 "OUTCOME"       { return T_OUTCOME; }
+"OUTCOMEX"      { return T_OUTCOMEX; }
 
  /* identifiers */
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }

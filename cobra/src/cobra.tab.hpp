@@ -59,7 +59,8 @@
      T_EXPERIMENT = 275,
      T_PARAMS_DISTINCT = 276,
      T_PARAMS_SORTED = 277,
-     T_OUTCOME = 278
+     T_OUTCOME = 278,
+     T_OUTCOMEX = 279
    };
 #endif
 /* Tokens.  */
@@ -84,13 +85,14 @@
 #define T_PARAMS_DISTINCT 276
 #define T_PARAMS_SORTED 277
 #define T_OUTCOME 278
+#define T_OUTCOMEX 279
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 55 "src/cobra.ypp"
+#line 56 "src/cobra.ypp"
 {
   Formula* formula;
   vec<Variable*>* variable_list;
@@ -101,7 +103,7 @@ typedef union YYSTYPE
   uint tint;
 }
 /* Line 1529 of yacc.c.  */
-#line 105 "src/cobra.tab.hpp"
+#line 107 "src/cobra.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
