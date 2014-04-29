@@ -14,18 +14,37 @@
 namespace strategy {
 
 namespace {
-  uint maximize(std::function<double(Option&)> f, vec<Option>& options) {
-    vec<double> values(options.size(), 0);
-    std::transform(options.begin(), options.end(), values.begin(), f);
-    auto min = std::max_element(values.begin(), values.end());
-    return std::distance(values.begin(), min);
+  // Helper function to select the experiment e with the largest f(e).
+  // First parameter of f is the experiment, second is the value of the best option found yet.
+  // This can save significant amount of time if the function evaluation
+  // is time demanind (because of model counting, for example).
+  uint maximize(std::function<double(Option&, double)> f, vec<Option>& options) {
+    int max = -std::numeric_limits<double>::max();
+    vec<Option>::iterator best = options.end();
+    for (auto it = options.begin(); it != options.end(); ++it) {
+      auto cand = f(*it, max);
+      if (cand > max) {
+        max = cand;
+        best = it;
+      }
+    }
+    assert(best != options.end());
+    return std::distance(options.begin(), best);
   }
 
-  uint minimize(std::function<double(Option&)> f, vec<Option>& options) {
-    vec<double> values(options.size(), 0);
-    std::transform(options.begin(), options.end(), values.begin(), f);
-    auto min = std::min_element(values.begin(), values.end());
-    return std::distance(values.begin(), min);
+  // Similar to the previous function, just minimizing value of f.
+  uint minimize(std::function<double(Option&, double)> f, vec<Option>& options) {
+    int min = std::numeric_limits<double>::max();
+    vec<Option>::iterator best = options.end();
+    for (auto it = options.begin(); it != options.end(); ++it) {
+      auto cand = f(*it, min);
+      if (cand < min) {
+        min = cand;
+        best = it;
+      }
+    }
+    assert(best != options.end());
+    return std::distance(options.begin(), best);
   }
 }
 
@@ -33,17 +52,17 @@ uint breaker::interactive(vec<Option>& options) {
   // Print options.
   printf("Select an experiment: \n");//%i: \n", exp_num++);
   for (auto& experiment: options) {
-    if (experiment.GetNumOfSatOutcomes() > 1) {
+    if (experiment.NumOfSat() > 1) {
       printf("%i) %s [ %s ] ",
         experiment.index(),
         experiment.type().name().c_str(),
         experiment.type().game().ParamsToStr(experiment.params()).c_str());
       printf(" ] - M: ");
-      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-        printf("%i ", experiment.GetNumOfModels()[i]);
+      for (uint i = 0; i < experiment.num_outcomes(); i++)
+        printf("%i ", experiment.NumOfModels(i));
       printf("F: ");
-      for (uint i = 0; i < experiment.type().outcomes().size(); i++)
-        printf("%i ", experiment.GetNumOfFixedVars()[i]);
+      for (uint i = 0; i < experiment.num_outcomes(); i++)
+        printf("%i ", experiment.NumOfFixedVars(i));
       printf("\n");
     }
   }
@@ -56,7 +75,7 @@ uint breaker::interactive(vec<Option>& options) {
     printf("> ");
     ok = readIntOrString(choice, str);
   } while (!ok || choice >= options.size() ||
-           options[choice].GetNumOfSatOutcomes() == 1);
+           options[choice].NumOfSat() == 1);
   return choice;
 }
 
@@ -65,11 +84,11 @@ uint maker::interactive(Option& option) {
   printf("Select an outcome: \n");
   auto& type = option.type();
   for (uint i = 0; i < type.outcomes().size(); i++) {
-    if (option.IsOutcomeSat(i)) printf("%i) ", i);
+    if (option.IsSat(i)) printf("%i) ", i);
     else printf("-) ");
     printf("%s %s\n",
       type.outcomes()[i].name.c_str(),
-      option.IsOutcomeSat(i) ? "" : "(unsatisfiable)");
+      option.IsSat(i) ? "" : "(unsatisfiable)");
   }
 
   // User prompt.
@@ -80,7 +99,7 @@ uint maker::interactive(Option& option) {
     printf("> ");
     ok = readIntOrString(choice, str);
   } while (!ok || choice >= type.outcomes().size() ||
-           !option.IsOutcomeSat(choice));
+           !option.IsSat(choice));
   return choice;
 }
 
@@ -90,75 +109,102 @@ uint breaker::random(vec<Option>& options) {
 
 uint maker::random(Option& option) {
   // Print options.
-  int p = rand() % option.GetNumOfSatOutcomes();
+  int p = rand() % option.NumOfSat();
   int i = -1;
   while (p >= 0) {
     i++;
-    if (option.IsOutcomeSat(i)) p--;
+    if (option.IsSat(i)) p--;
   }
   return i;
 }
 
 uint maker::max_num(Option& option) {
-  auto models = option.GetNumOfModels();
-  auto max = std::max_element(models.begin(), models.end());
-  return std::distance(models.begin(), max);
+  auto max = option.NumOfModels(0);
+  auto best = 0;
+  for (uint i = 1; i < option.num_outcomes(); i++) {
+    auto cand = option.NumOfModels(i);
+    if (cand > max) {
+      max = cand;
+      best = i;
+    }
+  }
+  return best;
 }
 
 uint maker::fixed(Option& option) {
-  auto fixed = option.GetNumOfFixedVars();
-  auto min = std::min_element(fixed.begin(), fixed.end());
-  return std::distance(fixed.begin(), min);
+  auto min = option.NumOfFixedVars(0);
+  auto best = 0;
+  for (uint i = 1; i < option.num_outcomes(); i++) {
+    auto cand = option.NumOfFixedVars(i);
+    if (cand > min) {
+      min = cand;
+      best = i;
+    }
+  }
+  return best;
 }
 
 uint breaker::min_num(vec<Option>& options) {
-  return minimize([](Option& o){
-    auto models = o.GetNumOfModels();
+  return minimize([](Option& o, double min)->double {
+    uint max = 0;
+    for (uint i = 0; i < o.num_outcomes(); i++) {
+      max = std::max(max, o.NumOfModels(i));
+      if (max > min) return max;        // cannot have less than min
+    }
     // prefer the experiment with a final outcome satisfiable
-    return *(std::max_element(models.begin(), models.end())) +
-           0.5*(o.IsOutcomeSat(o.type().final_outcome()));
+    return max - 0.5 * (o.IsSat(o.type().final_outcome()));
   }, options);
 }
 
 uint breaker::exp_num(vec<Option>& options) {
-  return minimize([](Option& o){
-    auto models = o.GetNumOfModels();
+  return minimize([](Option& o, double){
     int sumsq = 0;
-    for (uint i = 0; i < o.type().outcomes().size(); i++) {
-      auto v = models[i];
-      sumsq += v*v;
+    for (uint i = 0; i < o.num_outcomes(); i++) {
+      auto models  = o.NumOfModels(i);
+      sumsq += models * models;
     }
-    return (double)sumsq/o.GetTotalNumOfModels();
+    return (double)sumsq/o.TotalNumOfModels();
   }, options);
 }
 
 uint breaker::entropy(vec<Option>& options) {
-  return maximize([](Option& o){
-    auto models = o.GetNumOfModels();
-    int total = o.GetTotalNumOfModels();
+  return maximize([](Option& o, double){
+    int total = o.TotalNumOfModels();
     double value = 0;
-    for (uint i = 0; i < o.type().outcomes().size(); i++) {
-      double p = (double) models[i]/total;
-      value -= p * log2(p);
+    for (uint i = 0; i < o.num_outcomes(); i++) {
+      int models = o.NumOfModels(i);
+      double p = (double) models/total;
+      if (models > 0)
+        value -= p * log2(p);
     }
     return value;
   }, options);
 }
 
 uint breaker::parts(vec<Option>& options) {
-  return maximize([](Option& o) {
+  return maximize([](Option& o, double max) ->double {
+    uint outcomes = o.num_outcomes();
+    uint sat = 0;
+    for (uint i = 0; i < outcomes; i++) {
+      if (o.IsSat(i)) sat++;
+      if (outcomes - i + sat < max)
+        return 0;        // cannot have more than max
+    }
     // prefer the experiment with a final outcome satisfiable
-    return o.GetNumOfSatOutcomes() +
-           0.5*(o.IsOutcomeSat(o.type().final_outcome()));
+    return sat + 0.5 * (o.IsSat(o.type().final_outcome()));
   }, options);
 }
 
 uint breaker::fixed(vec<Option>& options) {
-  return maximize([](Option& o){
-    auto fixed = o.GetNumOfFixedVars();
+  return maximize([](Option& o, double max) ->double {
+    uint outcomes = o.num_outcomes();
+    uint min = 0;
+    for (uint i = 0; i < outcomes; i++) {
+      min = std::min(min, o.NumOfFixedVars(i));
+      if (min < max) return min; // cannot have more than max
+    }
     // prefer the experiment with a final outcome satisfiable
-    return *std::min_element(fixed.begin(), fixed.end()) +
-           0.1*(o.IsOutcomeSat(o.type().final_outcome()));
+    return min + 0.5 * (o.IsSat(o.type().final_outcome()));
   }, options);
 }
 

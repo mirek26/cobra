@@ -163,7 +163,7 @@ void simulation_mode() {
     // Choose and print an outcome
     uint oid = g_makerStg(experiment);
     assert(oid < experiment.type().outcomes().size());
-    assert(experiment.IsOutcomeSat(oid) == true);
+    assert(experiment.IsSat(oid) == true);
     auto outcome = experiment.type().outcomes()[oid];
     printf("%sOUTCOME: %s\n",
            color::semph,
@@ -195,7 +195,9 @@ void simulation_mode() {
 void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum, uint& num) {
   Game& game = m.game();
   auto options = game.GenerateExperiments(solver, graph);
-  auto experiment = options[g_breakerStg(options)];
+  auto x = g_breakerStg(options);
+  assert(x < options.size());
+  auto experiment = options[x];
   for (uint i = 0; i < experiment.type().outcomes().size(); i++) {
     solver.OpenContext();
     auto outcome = experiment.type().outcomes()[i];
@@ -234,7 +236,7 @@ void analyze_mode() {
   delete solver;
   delete graph;
   printf("\nWorst-case: %u\n", max);
-  printf("Average-case: %.2f (%u)\n", (double)sum/models, sum);
+  printf("Average-case: %.4f (%u/%u)\n", (double)sum/models, sum, models);
 }
 
 // Parse program arguments with TCLAP library.

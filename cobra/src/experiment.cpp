@@ -17,39 +17,66 @@
 
 extern Parser m;
 
-void Option::ComputeSat() {
-  sat_.resize(type_.outcomes().size());
-  sat_num_ = 0;
-  for (uint i = 0; i < type_.outcomes().size(); i++) {
-    solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
-    sat_[i] = solver_.Satisfiable();
-    sat_num_ += sat_[i];
-    solver_.CloseContext();
-  }
+Option::Option(Solver& solver, Experiment& e, vec<CharId> params, uint index):
+  solver_(solver),
+  type_(e),
+  params_(params),
+  index_(index) {
+  data_.resize(e.outcomes().size());
 }
 
-void Option::ComputeNumOfModels() {
-  models_.resize(type_.outcomes().size());
-  models_total_ = 0;
-  for (uint i = 0; i < type_.outcomes().size(); i++) {
+bool Option::IsSat(uint id) {
+  assert(id < data_.size());
+  if (!data_[id].sat_c) {
     solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
-    models_[i] = solver_.NumOfModels();
-    models_total_ += models_[i];
+    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
+    data_[id].sat = solver_.Satisfiable();
+    data_[id].sat_c = true;
     solver_.CloseContext();
   }
+  return data_[id].sat;
 }
 
-void Option::ComputeFixedVars() {
-  fixed_.resize(type_.outcomes().size());
-  for (uint i = 0; i < type_.outcomes().size(); i++) {
+uint Option::NumOfSat() {
+  uint total = 0;
+  for (uint i = 0; i < data_.size(); i++)
+    total += IsSat(i);
+  return total;
+}
+
+uint Option::NumOfModels(uint id) {
+  assert(id < data_.size());
+  if (!data_[id].models_c) {
     solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[i].formula, params_);
-    fixed_[i] = solver_.GetNumOfFixedVars();
+    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
+    data_[id].models = solver_.NumOfModels();
+    data_[id].models_c = true;
+    data_[id].sat = data_[id].models > 0;
+    data_[id].sat_c = true;
     solver_.CloseContext();
   }
+  return data_[id].models;
 }
+
+uint Option::TotalNumOfModels() {
+  uint total = 0;
+  for (uint i = 0; i < data_.size(); i++)
+    total += NumOfModels(i);
+  return total;
+}
+
+uint Option::NumOfFixedVars(uint id) {
+  assert(id < data_.size());
+  if (!data_[id].fixed_c) {
+    solver_.OpenContext();
+    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
+    data_[id].fixed = solver_.GetNumOfFixedVars();
+    data_[id].fixed_c = true;
+    solver_.CloseContext();
+  }
+  return data_[id].models;
+}
+
 
 void Experiment::addOutcome(string name, Formula* outcome, bool final) {
   if (final) final_outcome_ = outcomes_.size();

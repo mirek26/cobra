@@ -25,59 +25,34 @@ struct Outcome {
   bool last;
 };
 
+struct EOutcome {
+  bool sat_c = false, models_c = false, fixed_c = false;
+  bool sat;
+  int models;
+  int fixed;
+};
+
 class Option {
   Solver& solver_;
   Experiment& type_;
   vec<CharId> params_;
   uint index_;
 
-  vec<bool> sat_;
-  uint sat_num_;
-  vec<uint> models_;
-  uint models_total_;
-  vec<uint> fixed_;
+  vec<EOutcome> data_;
 
  public:
-  Option(Solver& solver, Experiment& e, vec<CharId> params, uint index):
-    solver_(solver),
-    type_(e),
-    params_(params),
-    index_(index) { }
+  Option(Solver& solver, Experiment& e, vec<CharId> params, uint index);
 
   Experiment& type() const { return type_; }
   const vec<CharId>& params() const { return params_; }
   uint index() const { return index_; }
+  uint num_outcomes() const { return data_.size(); }
 
-  uint GetNumOfSatOutcomes() {
-    if (sat_.empty()) ComputeSat();
-    return sat_num_;
-  }
-
-  bool IsOutcomeSat(uint id) {
-    if (sat_.empty()) ComputeSat();
-    assert(id < sat_.size());
-    return sat_[id];
-  }
-
-  vec<uint>& GetNumOfModels() {
-    if (models_.empty()) ComputeNumOfModels();
-    return models_;
-  }
-
-  uint GetTotalNumOfModels() {
-    if (models_.empty()) ComputeNumOfModels();
-    return models_total_;
-  }
-
-  vec<uint>& GetNumOfFixedVars() {
-    if (fixed_.empty()) ComputeFixedVars();
-    return fixed_;
-  }
-
- private:
-  void ComputeSat();
-  void ComputeNumOfModels();
-  void ComputeFixedVars();
+  bool IsSat(uint id);
+  uint NumOfSat();
+  uint NumOfModels(uint id);
+  uint TotalNumOfModels();
+  uint NumOfFixedVars(uint id);
 };
 
 
