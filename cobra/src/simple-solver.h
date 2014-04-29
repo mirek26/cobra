@@ -58,6 +58,8 @@ class SimpleSolver: public Solver {
 
  private:
 
+  bool TestSat(uint i);
+  void RemoveUntilSat(uint start);
   void Update();
 };
 

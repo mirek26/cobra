@@ -78,14 +78,37 @@ uint SimpleSolver::_GetNumOfFixedVars() {
   return f;
 }
 
+bool SimpleSolver::TestSat(uint i) {
+  assert(i < sat_.size());
+  bool ok = true;
+  for (auto& constr: constraints_) {
+    if (!constr.first->Satisfied(codes_[sat_[i]], constr.second)) {
+      ok = false;
+      break;
+    }
+  }
+  if (ok) return true;
+  if (!context_unsat_.empty())
+    context_unsat_.back().push_back(sat_[i]);
+  sat_[i] = sat_.back();
+  sat_.pop_back();
+  return false;
+}
+
+void SimpleSolver::RemoveUntilSat(uint start) {
+  while (sat_.size() > start and !TestSat(start))
+    // TestSat removes the unsat code from sat
+    ;
+}
+
 bool SimpleSolver::_Satisfiable() {
-  if (!ready_) Update();
+  RemoveUntilSat(0);
   return !sat_.empty();
 }
 
 bool SimpleSolver::_OnlyOneModel() {
-  assert(ready_);
-  assert(!sat_.empty());
+  assert(sat_.size() > 0);
+  RemoveUntilSat(1);
   return sat_.size() == 1;
 }
 
@@ -124,23 +147,8 @@ vec<vec<bool>> SimpleSolver::_GenerateModels() {
 }
 
 void SimpleSolver::Update() {
-  vec<uint> sat_now;
-  for (auto i: sat_) {
-    bool ok = true;
-    for (auto& constr: constraints_) {
-      if (!constr.first->Satisfied(codes_[i], constr.second)) {
-        ok = false;
-        break;
-      }
-    }
-    if (ok) {
-      sat_now.push_back(i);
-    } else if (!context_unsat_.empty()) {
-      auto& removed = context_unsat_.back();
-      removed.push_back(i);
-    }
-  }
-  sat_.swap(sat_now);
+  for (int i = sat_.size() - 1; i >= 0; i--)
+    TestSat(i);
   ready_ = true;
 }
 
