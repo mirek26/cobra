@@ -3994,6 +3994,18 @@ Graph::Graph(const unsigned int nof_vertices)
   sh = shs_flm;
 }
 
+Graph::Graph(const Graph& orig) {
+  vertices.resize(orig.get_nof_vertices());
+  for(unsigned int i = 0; i < orig.get_nof_vertices(); i++) {
+    const Vertex& v = orig.vertices[i];
+    change_color(i, v.color);
+    for (std::vector<unsigned int>::const_iterator ei = v.edges.begin();
+          ei != v.edges.end();
+          ei++)
+      add_edge(i, *ei);
+  }
+  set_splitting_heuristic(orig.sh);
+}
 
 Graph::~Graph()
 {

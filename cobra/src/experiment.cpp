@@ -281,57 +281,23 @@ void ExpGenerator::GenParamsBasicFilter() {
 
 void ExpGenerator::GenParamsGraphFilter() {
   bliss::Stats stats;
-  auto graph = curr_type_->CreateGraphForParams(history_, params_);
+  auto graph = bliss::Graph(*graph_);
+  for (auto outcome: curr_type_->outcomes()) {
+    outcome.formula->PropagateFixed(fixed_vars_, &params_);
+    outcome.formula->AddToGraph(graph, &params_, vertex_type::kOutcomeRoot);
+  }
+
   clock_t t1 = clock();
-  auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
+  auto canonical = graph.permute(graph.canonical_form(stats, nullptr, nullptr));
   game_.bliss_calls() += 1;
   game_.bliss_time() += clock() - t1;
-  // Graph output -> DOT file
-  // canonical->write_dot((game_.ParamsToStr(params, '_')+".dot").c_str());
-  // auto name = game_.ParamsToStr(params, '_');
-  // auto f = fopen(name.c_str(), "w");
-  // for (auto form: outcomes_)
-  //   fprintf(f, "%s\n", form->pretty(false, &params).c_str());
-  // fclose(f);
-  //
+
   auto h = canonical->get_hash();
-  delete graph;
+  if (graphs_.count(h) == 0) {
+    graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
+    graphs_[h] = params_;
+    stats_.ph3++;
+    params_final_.insert(params_);
+  }
   delete canonical;
-  if (graphs_.count(h) > 0)
-    return;
-  graphs_[h] = params_;
-  stats_.ph3++;
-  params_final_.insert(params_);
-}
-
-bliss::Graph* ExpType::CreateGraphForParams(const vec<EvalExp>& history,
-                                              const vec<CharId>& params) {
-  auto g = game_.CreateGraph();
-  for (auto e: game_.experiments()) {
-    for (auto& maps: e->used_maps_) {
-      for (auto v: maps) {
-        for (auto u: maps) {
-          if (v != u) {
-            for (uint i = 0; i < alph_; i++) {
-              auto v1 = game_.getMappingValue(u, i);
-              auto v2 = game_.getMappingValue(v, i);
-              g->add_edge(2*v1 - 2, 2*v2 - 2);
-            }
-          }
-        }
-      }
-    }
-  }
-  // Add outcome formulas, rooted with a node of type -2.
-  for (auto outcome: outcomes_) {
-    outcome.formula->AddToGraph(*g, &params, -2);
-  }
-
-  // Add accumulated knowledge, rooted with a node of type -1
-  game_.restriction()->AddToGraph(*g, nullptr, -1);
-  for (auto& e: history) {
-    e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*g, &e.exp.params(), -1);
-  }
-
-  return g;
 }

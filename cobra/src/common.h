@@ -35,6 +35,22 @@ template<typename T> using set = std::set<T>;
 template<typename T>
 struct identity { typedef T type; };
 
+namespace vertex_type {
+  const int
+    kOutcomeRoot = -2,
+    kKnowledgeRoot = -1,
+    kVariableId = 1,
+    kNotId = 2,
+    kImpliesId = 3,
+    kEquivalenceId = 4,
+    kAndId = 5,
+    kOrId = 6,
+    kMappingId = 7,
+    kAtLeastId = 8,
+    kAtMostId = 9,
+    kExactlyId = 10;
+}
+
 namespace color {
   extern const string head;
   extern const string emph;

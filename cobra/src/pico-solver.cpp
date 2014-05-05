@@ -132,6 +132,15 @@ bool PicoSolver::_MustBeFalse(VarId id) {
   return !_Satisfiable();
 }
 
+vec<VarId> PicoSolver::_GetFixedVars() {
+  vec<VarId> result;
+  for (uint id = 1; id < vars_.size(); id++) {
+    if (_MustBeTrue(id)) result.push_back(id);
+    if (_MustBeFalse(id)) result.push_back(-id);
+  }
+  return result;
+}
+
 uint PicoSolver::_GetNumOfFixedVars() {
   uint r = 0;
   for (uint id = 1; id < vars_.size(); id++) {

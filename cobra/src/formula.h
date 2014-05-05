@@ -48,19 +48,11 @@ class Formula {
    * used for Tseitin transformation
    */
   VarId tseitin_var_ = 0;
+  bool fixed_;
+  bool fixed_value_;
 
  public:
   const int kChildCount;
-  const int kVariableId = 1,
-            kNotId = 2,
-            kImpliesId = 3,
-            kEquivalenceId = 4,
-            kAndId = 5,
-            kOrId = 6,
-            kMappingId = 7,
-            kAtLeastId = 8,
-            kAtMostId = 9,
-            kExactlyId = 10;
 
   explicit Formula(int childCount)
       : kChildCount(childCount) { }
@@ -71,6 +63,8 @@ class Formula {
   virtual void set_child(uint nth, Formula* value) { assert(child(nth) == value); }
   virtual string name() = 0;
   virtual uint type_id() = 0;
+  bool fixed() const { return fixed_; }
+  bool fixed_value() const { return fixed_value_; }
 
   /* Returns true for variables or a negations of a variable, false otherwise.
    */
@@ -104,18 +98,11 @@ class Formula {
    */
   virtual void TseitinTransformation(PicoSolver& cnf, bool top) = 0;
 
-  /* Converts the formula to CNF using Tseitin transformation.
-   */
-  // PicoSolver* ToCnf();
-  // PicoSolver* ToCnf(vec<CharId>& param);
-
-  // virtual Formula* clone() = 0;
-
-  //Formula* Substitude(std::map<Variable*, Variable*>& table);
-
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) = 0;
   void AddToGraph(bliss::Graph& g,
-                  const vec<CharId>* params,
-                  int parent = -1);
+                          const vec<CharId>* params,
+                          int parent = -1);
+
 
   static Formula* Parse(string str);
 
@@ -136,8 +123,6 @@ class Formula {
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) = 0;
 };
-
-
 
 
 /******************************************************************************
@@ -223,7 +208,7 @@ class AndOperator: public NaryOperator {
   explicit AndOperator(vec<Formula*>* list)
       : NaryOperator(list) { }
 
-  virtual uint type_id() { return kAndId; }
+  virtual uint type_id() { return vertex_type::kAndId; }
   virtual string name() {
     return "AndOperator";
   }
@@ -237,6 +222,24 @@ class AndOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    bool fixed_all = true;
+    for (auto c: children_) {
+      c->PropagateFixed(fixed, params);
+      if (c->fixed() == true && c->fixed_value()== false) {
+        fixed_ = true;
+        fixed_value_ = false;
+        break;
+      }
+      fixed_all &= c->fixed();
+    }
+    if (fixed_all) {
+      fixed_ = true;
+      fixed_value_ = true;
+    }
+  }
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     for (uint i = 0; i < child_count(); ++i) {
@@ -258,7 +261,7 @@ class OrOperator: public NaryOperator {
   explicit OrOperator(vec<Formula*>* list)
      : NaryOperator(list) {}
 
-  virtual uint type_id() { return kOrId; }
+  virtual uint type_id() { return vertex_type::kOrId; }
   virtual string name() {
     return "OrOperator";
   }
@@ -273,6 +276,25 @@ class OrOperator: public NaryOperator {
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    bool fixed_all = true;
+    for (uint i = 0; i < child_count(); ++i) {
+      auto c = child(i);
+      c->PropagateFixed(fixed, params);
+      if (c->fixed() == true && c->fixed_value() == true) {
+        fixed_ = true;
+        fixed_value_ = true;
+        break;
+      }
+      fixed_all &= c->fixed();
+    }
+    if (fixed_all) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
+
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     for (uint i = 0; i < child_count(); ++i) {
       if (child(i)->Satisfied(model, params)) return true;
@@ -286,15 +308,17 @@ class OrOperator: public NaryOperator {
  */
 class AtLeastOperator: public NaryOperator {
   uint value_;
+  uint fixed_childs_;
 
  public:
   AtLeastOperator(uint value, vec<Formula*>* list)
       : NaryOperator(list),
-        value_(value) {
+        value_(value),
+        fixed_childs_(0) {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return kAtLeastId + 3*value_; }
+  virtual uint type_id() { return vertex_type::kAtLeastId + 3 * (value_ - fixed_childs_); }
   virtual string name() {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
@@ -308,6 +332,27 @@ class AtLeastOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    uint t = 0, f = 0;
+    for (auto c: children_) {
+      c->PropagateFixed(fixed, params);
+      if (c->fixed() == true) {
+        fixed_childs_ ++;
+        if (c->fixed_value()) t++;
+        else f++;
+      }
+    }
+    fixed_ = false;
+    fixed_childs_ = t;
+    if (t >= value_) {
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (f > child_count() - value_) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -324,15 +369,17 @@ class AtLeastOperator: public NaryOperator {
  */
 class AtMostOperator: public NaryOperator {
   uint value_;
+  uint fixed_childs_;
 
  public:
   AtMostOperator(uint value, vec<Formula*>* list)
       : NaryOperator(list),
-        value_(value) {
+        value_(value),
+        fixed_childs_(0) {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return kAtMostId + 3*value_; }
+  virtual uint type_id() { return vertex_type::kAtMostId + 3 * (value_- fixed_childs_); }
   virtual string name() {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
@@ -346,6 +393,27 @@ class AtMostOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    uint t = 0, f = 0;
+    for (auto c: children_) {
+      c->PropagateFixed(fixed, params);
+      if (c->fixed() == true) {
+        fixed_childs_++;
+        if (c->fixed_value()) t++;
+        else f++;
+      }
+    }
+    fixed_ = false;
+    fixed_childs_ = t;
+    if (f >= child_count() - value_) {
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (t > value_) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -361,15 +429,17 @@ class AtMostOperator: public NaryOperator {
  */
 class ExactlyOperator: public NaryOperator {
   uint value_;
+  uint fixed_childs_;
 
  public:
   ExactlyOperator(uint value, vec<Formula*>* list)
       : NaryOperator(list),
-        value_(value) {
+        value_(value),
+        fixed_childs_(0) {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return kExactlyId + 3*value_; }
+  virtual uint type_id() { return vertex_type::kExactlyId + 3 * (value_ - fixed_childs_); }
   virtual string name() {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
@@ -383,6 +453,26 @@ class ExactlyOperator: public NaryOperator {
   // }
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    uint t = 0, f = 0;
+    for (auto c: children_) {
+      c->PropagateFixed(fixed, params);
+      if (c->fixed() == true) {
+        if (c->fixed_value()) t++;
+        else f++;
+      }
+    }
+    fixed_ = false;
+    fixed_childs_ = t;
+    if (t + f == child_count() && t == value_) {
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (f > child_count() - value_ || t > value_) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     uint sat = 0;
@@ -406,7 +496,7 @@ class EquivalenceOperator: public Formula {
         left_(left),
         right_(right) { }
 
-  virtual uint type_id() { return kEquivalenceId; }
+  virtual uint type_id() { return vertex_type::kEquivalenceId; }
   virtual string name() {
     return "EquivalenceOperator";
   }
@@ -434,6 +524,16 @@ class EquivalenceOperator: public Formula {
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    left_->PropagateFixed(fixed, params);
+    right_->PropagateFixed(fixed, params);
+    if (left_->fixed() && right_->fixed()) {
+      fixed_ = true;
+      fixed_value_ = (left_->fixed_value()== right_->fixed_value());
+    }
+  }
+
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return left_->Satisfied(model, params) == right_->Satisfied(model, params);
   }
@@ -452,7 +552,7 @@ class ImpliesOperator: public Formula {
         left_(premise),
         right_(consequence) { }
 
-  virtual uint type_id() { return kImpliesId; }
+  virtual uint type_id() { return vertex_type::kImpliesId; }
   virtual string name() {
     return "ImpliesOperator";
   }
@@ -478,6 +578,23 @@ class ImpliesOperator: public Formula {
   //   return m.get<ImpliesOperator>(left_->clone(), right_->clone());
   // }
 
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    left_->PropagateFixed(fixed, params);
+    right_->PropagateFixed(fixed, params);
+    if (left_->fixed() && left_->fixed_value()== false) { // false -> ?
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (right_->fixed() && right_->fixed_value()== true) { // ? -> true
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (left_->fixed() && right_->fixed() &&  // false -> true
+               left_->fixed_value()== true && right_->fixed_value()== false) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
+
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
@@ -495,7 +612,7 @@ class NotOperator: public Formula {
       : Formula(1),
         child_(child) { }
 
-  virtual uint type_id() { return kNotId; }
+  virtual uint type_id() { return vertex_type::kNotId; }
   virtual string name() {
     return "NotOperator";
   }
@@ -528,6 +645,13 @@ class NotOperator: public Formula {
 
   virtual void TseitinTransformation(PicoSolver& cnf, bool top);
 
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    child_->PropagateFixed(fixed, params);
+    fixed_ = child_->fixed();
+    fixed_value_ = !child_->fixed_value();
+  }
+
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return !child_->Satisfied(model, params);
   }
@@ -549,7 +673,7 @@ class Mapping: public Formula {
   MapId mapping_id() { return mapping_id_; }
   uint param_id() { return param_id_; }
 
-  virtual uint type_id() { return kMappingId; }
+  virtual uint type_id() { return vertex_type::kMappingId; }
 
   virtual string pretty(bool = true, const vec<CharId>* params = nullptr);
 
@@ -582,6 +706,18 @@ class Mapping: public Formula {
     }
   }
 
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) {
+    fixed_ = false;
+    assert(params);
+    if (std::count(fixed.begin(), fixed.end(), getValue(*params))) {
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (std::count(fixed.begin(), fixed.end(), -getValue(*params))) {
+      fixed_ = true;
+      fixed_value_ = false;
+    }
+  }
+
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params) {
     return model[getValue(params)];
   }
@@ -601,7 +737,7 @@ class Variable: public Formula {
         ident_(ident)
   { }
 
-  virtual uint type_id() { return kVariableId; }
+  virtual uint type_id() { return vertex_type::kVariableId; }
 
   VarId id() { return id_; }
   void set_id(VarId value) {
@@ -650,6 +786,16 @@ class Variable: public Formula {
   virtual void TseitinTransformation(PicoSolver& cnf, bool top) {
     if (top) {
       cnf.AddClause({ id_ });
+    }
+  }
+
+  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>*) {
+    if (std::count(fixed.begin(), fixed.end(), id_)) {
+      fixed_ = true;
+      fixed_value_ = true;
+    } else if (std::count(fixed.begin(), fixed.end(), -id_)) {
+      fixed_ = true;
+      fixed_value_ = false;
     }
   }
 

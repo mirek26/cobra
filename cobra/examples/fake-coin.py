@@ -5,7 +5,7 @@
 N = 12
 srange = lambda s, n: [s + str(i) for i in range(1, n+1)]
 
-VARIABLES(["y"] + srange("x", N))
+VARIABLES(srange("x", N) + ["y"])
 RESTRICTION("Exactly-1(%s)" % ",".join(srange("x", N)))
 
 ALPHABET(srange("", N))

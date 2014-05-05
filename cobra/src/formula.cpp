@@ -223,6 +223,7 @@ void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
 void Formula::AddToGraph(bliss::Graph& g,
                          const vec<CharId>* params,
                          int parent) {
+  if (fixed_) return;
   if (parent < 0) {
     g.add_vertex(parent);
     parent = g.get_nof_vertices() - 1;
@@ -249,6 +250,7 @@ void Formula::AddToGraph(bliss::Graph& g,
     }
   } else {
     // create a new node for the operator and call recursively for children
+    // TODO: rewrite as member functions, simplify And/Or of 1 etc.
     auto id = g.get_nof_vertices();
     g.add_vertex(type_id());
     if (parent > 0)

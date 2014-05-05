@@ -633,6 +633,12 @@ public:
   Graph(const unsigned int N = 0);
 
   /**
+   * Copy constructor.
+   */
+  Graph(const Graph& orig);
+
+
+  /**
    * Destroy the graph.
    */
   ~Graph();

@@ -51,6 +51,14 @@ class Solver {
     return result;
   }
 
+  vec<VarId> GetFixedVars() {
+    auto t1 = clock();
+    auto result = _GetFixedVars();
+    stats().fixed_calls++;
+    stats().fixed_time += clock() - t1;
+    return result;
+  }
+
   uint GetNumOfFixedVars() {
     auto t1 = clock();
     auto result = _GetNumOfFixedVars();
@@ -100,6 +108,7 @@ class Solver {
 
   virtual bool _MustBeTrue(VarId id) = 0;
   virtual bool _MustBeFalse(VarId id) = 0;
+  virtual vec<VarId> _GetFixedVars() = 0;
   virtual uint _GetNumOfFixedVars() = 0;
   virtual bool _Satisfiable() = 0;
   virtual bool _OnlyOneModel() = 0;

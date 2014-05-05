@@ -135,9 +135,11 @@ class ExpGenerator {
   Solver& solver_;
   const vec<EvalExp>& history_;
 
+  vec<VarId> fixed_vars_;
   std::map<unsigned int, vec<CharId>> graphs_;
 
   GenParamsStats stats_;
+  bliss::Graph* graph_;
   vec<uint> var_groups_;
 
   uint curr_tid;
@@ -153,14 +155,35 @@ class ExpGenerator {
     solver_(solver),
     history_(history) {
     stats_ = GenParamsStats();
-    // prepare var_groups_
-    auto graph = game_.CreateGraph();
-    game_.restriction()->AddToGraph(*graph, nullptr);
-    for (auto& e: history_) {
-      e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*graph, &e.exp.params());
+    // Preprare symmetry Graph
+    graph_ = game.CreateGraph();
+    fixed_vars_ = solver.GetFixedVars();
+    game.restriction()->PropagateFixed(fixed_vars_, nullptr);
+    game.restriction()->AddToGraph(*graph_, nullptr, vertex_type::kKnowledgeRoot);
+    for (auto& e: history) {
+      auto formula = e.exp.type().outcomes()[e.outcome_id].formula;
+      formula->PropagateFixed(fixed_vars_, &e.exp.params());
+      formula->AddToGraph(*graph_, &e.exp.params());
     }
 
-    var_groups_ = game_.ComputeVarEquiv(solver_, *graph);
+    for (auto e: game.experiments()) {
+      for (auto& maps: e->used_maps_) {
+        for (auto v: maps) for (auto u: maps) {
+          if (v == u) continue;
+          for (uint i = 0; i < game.alphabet().size(); i++) {
+            auto v1 = game.getMappingValue(u, i);
+            auto v2 = game.getMappingValue(v, i);
+            graph_->add_edge(2*v1 - 2, 2*v2 - 2);
+          }
+        }
+      }
+    }
+
+    var_groups_ = game_.ComputeVarEquiv(solver_, *graph_);
+  }
+
+  ~ExpGenerator() {
+    delete graph_;
   }
 
   // Experiment Next();
@@ -176,7 +199,6 @@ class ExpGenerator {
       auto pre2 = stats_.ph2;
       auto pre3 = stats_.ph3;
 
-      graphs_.clear();
       GenParamsFill(0);
 
       //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);

@@ -69,6 +69,7 @@ class PicoSolver: public Solver {
  private:
   virtual bool _MustBeTrue(VarId id);
   virtual bool _MustBeFalse(VarId id);
+  virtual vec<VarId> _GetFixedVars();
   virtual uint _GetNumOfFixedVars();
   virtual bool _Satisfiable();
   virtual bool _OnlyOneModel();

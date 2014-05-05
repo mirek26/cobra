@@ -65,6 +65,10 @@ bool SimpleSolver::_MustBeFalse(VarId id) {
 }
 
 uint SimpleSolver::_GetNumOfFixedVars() {
+  return _GetFixedVars().size();
+}
+
+vec<VarId> SimpleSolver::_GetFixedVars() {
   if (!ready_) Update();
   vec<bool> canbe[2];
   canbe[0].resize(vars_.size());
@@ -72,10 +76,12 @@ uint SimpleSolver::_GetNumOfFixedVars() {
   for (auto x: sat_)
     for (uint i = 1; i < vars_.size(); i++)
       canbe[codes_[x][i]][i] = true;
-  uint f = 0;
-  for (uint i = 1; i < vars_.size(); i++)
-    if (!(canbe[0][i] && canbe[1][i])) f++;
-  return f;
+  vec<VarId> result;
+  for (uint i = 1; i < vars_.size(); i++) {
+    if (!canbe[0][i]) result.push_back(i);
+    if (!canbe[1][i]) result.push_back(-i);
+  }
+  return result;
 }
 
 bool SimpleSolver::TestSat(uint i) {
