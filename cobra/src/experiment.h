@@ -66,20 +66,13 @@ class ExpType {
   int final_outcome_;
   vec<Outcome> outcomes_;
 
+ public:
   vec<set<MapId>> used_maps_;
   set<VarId> used_vars_;
   vec<vec<bool>> interchangable_;
 
   vec<set<uint>> params_different_;
   vec<set<uint>> params_smaller_than_;
-
-  GenParamsStats gen_stats_;
-  vec<uint> gen_var_groups_;
-
-  set<vec<CharId>> gen_params_basic_;
-  set<vec<CharId>> gen_params_final_;
-  vec<CharId> gen_params_;
-  std::map<unsigned int, vec<CharId>> gen_graphs_;
 
  public:
   ExpType(Game& game, string name, uint num_params):
@@ -121,18 +114,12 @@ class ExpType {
     return total;
   }
 
+  bliss::Digraph* CreateGraphForParams(vec<uint>& groups,
+                                       vec<CharId>& params);
+
  private:
   // Computes used_maps_ and used_vars_.
   void PrecomputeUsed(Formula* f);
-
-  // Helper functions for parametrizations generation.
-  bool CharsEquiv(set<MapId>& maps, CharId a, CharId b) const;
-  void GenParamsFill(uint n);
-  void GenParamsBasicFilter();
-  void GenParamsGraphFilter();
-
-  bliss::Digraph* CreateGraphForParams(vec<uint>& groups,
-                                       vec<CharId>& params);
 };
 
 struct EvalExp {
@@ -150,7 +137,9 @@ class ExpGenerator {
 
   GenParamsStats stats_;
   vec<uint> var_groups_;
-  int curr_tid;
+
+  uint curr_tid;
+  ExpType* curr_type_;
 
   set<vec<CharId>> params_basic_;
   set<vec<CharId>> params_final_;
@@ -169,8 +158,6 @@ class ExpGenerator {
       e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*graph, &e.exp.params());
     }
     var_groups_ = game_.ComputeVarEquiv(solver_, *graph);
-
-    curr_tid = 0;
   }
 
   // Experiment Next();
@@ -178,13 +165,34 @@ class ExpGenerator {
   vec<Experiment> All() {
     vec<Experiment> result;
     for (auto t: game_.experiments()) {
-      auto& params_all = t->GenParams(var_groups_);
-      for (auto& params: params_all) {
+      curr_type_ = t;
+
+      params_.resize(t->num_params());
+      params_basic_.clear();
+      params_final_.clear();
+      auto pre2 = stats_.ph2;
+      auto pre3 = stats_.ph3;
+
+      graphs_.clear();
+      GenParamsFill(0);
+
+      //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+      assert(stats_.ph2 - pre2 == params_basic_.size());
+      assert(stats_.ph3 - pre3 == params_final_.size());
+
+      for (auto& params: params_final_) {
         result.push_back(Experiment(solver_, *t, params, result.size()));
       }
     }
     return result;
   }
+
+ private:
+  // Helper functions for parametrizations generation.
+  bool CharsEquiv(set<MapId>& maps, CharId a, CharId b) const;
+  void GenParamsFill(uint n);
+  void GenParamsBasicFilter();
+  void GenParamsGraphFilter();
 };
 
 

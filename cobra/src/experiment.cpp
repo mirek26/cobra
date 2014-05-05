@@ -162,54 +162,39 @@ void ExpType::Precompute() {
   }
 }
 
-bool ExpType::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
+bool ExpGenerator::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
   bool equiv = true;
   for (auto f: maps) {
-    if (gen_var_groups_[game_.getMappingValue(f, a)] !=
-        gen_var_groups_[game_.getMappingValue(f, b)]) {
+    if (var_groups_[game_.getMappingValue(f, a)] !=
+        var_groups_[game_.getMappingValue(f, b)]) {
       equiv = false;
     }
   }
   return equiv;
 }
 
-set<vec<CharId>>&
-ExpType::GenParams(vec<uint>& groups) {
-  gen_stats_ = GenParamsStats();
-  gen_var_groups_ = groups;
-  gen_params_.resize(num_params_);
-  gen_params_basic_.clear();
-  gen_params_final_.clear();
-  gen_graphs_.clear();
-  GenParamsFill(0);
-  //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
-  assert(gen_stats_.ph2 == gen_params_basic_.size());
-  assert(gen_stats_.ph3 == gen_params_final_.size());
-  return gen_params_final_;
-}
-
 // Recursive function that substitudes char at position n for all posibilities.
-void ExpType::GenParamsFill(uint n) {
+void ExpGenerator::GenParamsFill(uint n) {
   set<CharId> done;
-  for (CharId a = 0; a < alph_; a++) {
+  for (CharId a = 0; a < game_.alphabet().size(); a++) {
     bool valid = true;
     // Test compliance with PARAMS_DIFFERENT.
-    for (auto p: params_different_[n]) {
-      if (p < n && gen_params_[p] == a) valid = false;
+    for (auto p: curr_type_->params_different_[n]) {
+      if (p < n && params_[p] == a) valid = false;
     }
     if (!valid) continue;
     done.insert(a);
     // Test compliance with PARAMS_SORTED.
-    for (auto p: params_smaller_than_[n]) {
+    for (auto p: curr_type_->params_smaller_than_[n]) {
       assert(p < n);
-      if (gen_params_[p] > a) valid = false;
+      if (params_[p] > a) valid = false;
     }
     if (!valid) continue;
     // Test equivalence.
-    if (interchangable_[n][a]) {
+    if (curr_type_->interchangable_[n][a]) {
       for (auto b: done) {
         if (a == b) continue;
-        if (CharsEquiv(used_maps_[n], a, b)) {
+        if (CharsEquiv(curr_type_->used_maps_[n], a, b)) {
           valid = false;
           done.erase(a);  // there is an equivalent in done -> not needed
           break;
@@ -218,9 +203,9 @@ void ExpType::GenParamsFill(uint n) {
     }
     if (!valid) continue;
     // Recurse down.
-    gen_params_[n] = a;
-    if (n + 1 == num_params_) {
-      gen_stats_.ph1++;
+    params_[n] = a;
+    if (n + 1 == curr_type_->num_params()) {
+      stats_.ph1++;
       GenParamsBasicFilter();
     } else {
       GenParamsFill(n + 1);
@@ -228,41 +213,41 @@ void ExpType::GenParamsFill(uint n) {
   }
 }
 
-void ExpType::GenParamsBasicFilter() {
-  auto params = gen_params_;
+void ExpGenerator::GenParamsBasicFilter() {
   // Compute position partitioning according to the vars.
-  vec<uint> dfu(num_params_, 0);
-  for (uint i = 0; i < num_params_; i++) dfu[i] = i;
-  for (uint i = 0; i < num_params_; i++)
-    for (uint j = i + 1; j < num_params_; j++)
-      for (auto fi: used_maps_[i])
-        for (auto fj: used_maps_[j])
-          if (game_.getMappingValue(fi, params[i]) ==
-              game_.getMappingValue(fj, params[j])) {
+  auto num_params = curr_type_->num_params();
+  vec<uint> dfu(num_params, 0);
+  for (uint i = 0; i < num_params; i++) dfu[i] = i;
+  for (uint i = 0; i < num_params; i++)
+    for (uint j = i + 1; j < num_params; j++)
+      for (auto fi: curr_type_->used_maps_[i])
+        for (auto fj: curr_type_->used_maps_[j])
+          if (game_.getMappingValue(fi, params_[i]) ==
+              game_.getMappingValue(fj, params_[j])) {
             if (dfu[i] > dfu[j])
               dfu[i] = dfu[j];
             else
               dfu[j] = dfu[i];
           }
   // Compute canonical form of the parametrization.
-  for (uint n = 0; n < num_params_; n++) {
+  for (uint n = 0; n < num_params; n++) {
     if (dfu[n] != n) continue; // only for roots of components
-    CharId chr = params[n];
-    if (interchangable_[n][chr]) continue;
+    CharId chr = params_[n];
+    if (curr_type_->interchangable_[n][chr]) continue;
     // Precompute minimal set of positions such that...
     bool keep = false;
     set<MapId> maps;
     set<VarId> other_vars;
-    for (uint p = 0; p < num_params_; p++) {
+    for (uint p = 0; p < num_params; p++) {
       if (dfu[p] == n) {
-        if (params[p] != chr) keep = true;
-        for (auto f: used_maps_[p]) {
-          if (used_vars_.count(game_.getMappingValue(f, chr))) keep = true;
+        if (params_[p] != chr) keep = true;
+        for (auto f: curr_type_->used_maps_[p]) {
+          if (curr_type_->used_vars_.count(game_.getMappingValue(f, chr))) keep = true;
           maps.insert(f);
         }
       } else {
-        for (auto f: used_maps_[p]) {
-          other_vars.insert(game_.getMappingValue(f, params[p]));
+        for (auto f: curr_type_->used_maps_[p]) {
+          other_vars.insert(game_.getMappingValue(f, params_[p]));
         }
       }
     }
@@ -280,24 +265,23 @@ void ExpType::GenParamsBasicFilter() {
       }
       if (!keep) {
         // Substitude the whole group.
-        for (uint p = 0; p < num_params_; p++)
-          if (dfu[p] == n) params[p] = a;
+        for (uint p = 0; p < num_params; p++)
+          if (dfu[p] == n) params_[p] = a;
         break;
       }
     }
   }
   // If the canonical form is not yet present, add it.
-  if (gen_params_basic_.count(params) == 0) {
-    gen_params_basic_.insert(params);
-    gen_stats_.ph2++;
+  if (params_basic_.count(params_) == 0) {
+    params_basic_.insert(params_);
+    stats_.ph2++;
     GenParamsGraphFilter();
   }
 }
 
-void ExpType::GenParamsGraphFilter() {
-  auto& params = gen_params_;
+void ExpGenerator::GenParamsGraphFilter() {
   bliss::Stats stats;
-  auto graph = CreateGraphForParams(gen_var_groups_, params);
+  auto graph = curr_type_->CreateGraphForParams(var_groups_, params_);
   clock_t t1 = clock();
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
   game_.bliss_calls() += 1;
@@ -313,17 +297,33 @@ void ExpType::GenParamsGraphFilter() {
   auto h = canonical->get_hash();
   delete graph;
   delete canonical;
-  if (gen_graphs_.count(h) > 0)
+  if (graphs_.count(h) > 0)
     return;
-  gen_graphs_[h] = params;
-  gen_stats_.ph3++;
-  gen_params_final_.insert(params);
+  graphs_[h] = params_;
+  stats_.ph3++;
+  params_final_.insert(params_);
 }
 
 bliss::Digraph* ExpType::CreateGraphForParams(vec<uint>& groups,
-                                                 vec<CharId>& params) {
+                                              vec<CharId>& params) {
   auto g = game_.CreateGraph();
   // Change color of var vertices according to 'groups'.
+  // for (auto e: game_.experiments()) {
+  //   for (auto& maps: e->used_maps_) {
+  //     for (auto v: maps) {
+  //       for (auto u: maps) {
+  //         if (v != u) {
+  //           for (uint i = 0; i < alph_; i++) {
+  //             auto v1 = game_.getMappingValue(u, i);
+  //             auto v2 = game_.getMappingValue(v, i);
+  //             g->add_edge(2*v1 - 2, 2*v2 - 2);
+  //             g->add_edge(2*v2 - 2, 2*v1 - 2);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   for (uint id = 1; id < game_.vars().size(); id++) {
     uint group = std::numeric_limits<uint>::max() - groups[id];
     g->change_color(2*id - 2, group);
