@@ -1,0 +1,13 @@
+Thanks for using COBRA, The Code-breaking Game Analyzer.
+
+To compile it, make sure you have gcc 4.8 or higher, or clang 3.2 or higher.
+You will also need Python 2.7 or greater installed. If you are ready,
+run `make` from the command prompt.
+
+To use COBRA, type
+
+  ./cobra
+
+in the command prompt to see the basic usage.
+
+For more details, visit https://github.com/myreg/cobra.

@@ -1,5 +1,7 @@
 /*
- * Copyright 2014, Mirek Klimos <myreggg@gmail.com>
+ * Copyright (c) 2014, Miroslav Klimos <miroslav.klimos@gmail.com>
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
  */
 
 #include <vector>
@@ -294,7 +296,7 @@ void ExpGenerator::GenParamsGraphFilter() {
 
   auto h = canonical->get_hash();
   if (graphs_.count(h) == 0) {
-    graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
+    // graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
     graphs_[h] = params_;
     stats_.ph3++;
     params_final_.insert(params_);
