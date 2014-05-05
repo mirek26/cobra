@@ -12,15 +12,15 @@
 #define COBRA_GAME_H_
 
 class Formula;
-class Experiment;
+class ExpType;
 class AndOperator;
-class Option;
+class Experiment;
 
 class Game {
   vec<Variable*> vars_;
   std::map<string, VarId> vars_ids_;
   AndOperator* restriction_;
-  vec<Experiment*> experiments_;
+  vec<ExpType*> experiments_;
   vec<string> alphabet_;
 
   uint bliss_calls_;
@@ -58,8 +58,8 @@ class Game {
   MapId getMappingId(string);
   VarId getMappingValue(MapId, CharId);
 
-  Experiment* addExperiment(string name, uint num_params);
-  vec<Experiment*>& experiments() {  return experiments_;  }
+  ExpType* addExperiment(string name, uint num_params);
+  vec<ExpType*>& experiments() {  return experiments_;  }
 
   void PrintCode(vec<bool> code);
 
@@ -75,9 +75,6 @@ class Game {
 
   bliss::Digraph* CreateGraph();
   vec<uint> ComputeVarEquiv(Solver& solver, bliss::Digraph& graph);
-  vec<Option> GenerateExperiments(Solver& solver, bliss::Digraph& graph);
-
-
 
 };
 

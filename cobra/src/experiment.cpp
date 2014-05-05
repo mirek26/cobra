@@ -17,7 +17,7 @@
 
 extern Parser m;
 
-Option::Option(Solver& solver, Experiment& e, vec<CharId> params, uint index):
+Experiment::Experiment(Solver& solver, ExpType& e, vec<CharId> params, uint index):
   solver_(solver),
   type_(e),
   params_(params),
@@ -25,7 +25,7 @@ Option::Option(Solver& solver, Experiment& e, vec<CharId> params, uint index):
   data_.resize(e.outcomes().size());
 }
 
-bool Option::IsSat(uint id) {
+bool Experiment::IsSat(uint id) {
   assert(id < data_.size());
   if (!data_[id].sat_c) {
     solver_.OpenContext();
@@ -37,14 +37,14 @@ bool Option::IsSat(uint id) {
   return data_[id].sat;
 }
 
-uint Option::NumOfSat() {
+uint Experiment::NumOfSat() {
   uint total = 0;
   for (uint i = 0; i < data_.size(); i++)
     total += IsSat(i);
   return total;
 }
 
-uint Option::NumOfModels(uint id) {
+uint Experiment::NumOfModels(uint id) {
   assert(id < data_.size());
   if (!data_[id].models_c) {
     solver_.OpenContext();
@@ -58,14 +58,14 @@ uint Option::NumOfModels(uint id) {
   return data_[id].models;
 }
 
-uint Option::TotalNumOfModels() {
+uint Experiment::TotalNumOfModels() {
   uint total = 0;
   for (uint i = 0; i < data_.size(); i++)
     total += NumOfModels(i);
   return total;
 }
 
-uint Option::NumOfFixedVars(uint id) {
+uint Experiment::NumOfFixedVars(uint id) {
   assert(id < data_.size());
   if (!data_[id].fixed_c) {
     solver_.OpenContext();
@@ -78,12 +78,12 @@ uint Option::NumOfFixedVars(uint id) {
 }
 
 
-void Experiment::addOutcome(string name, Formula* outcome, bool final) {
+void ExpType::addOutcome(string name, Formula* outcome, bool final) {
   if (final) final_outcome_ = outcomes_.size();
   outcomes_.push_back({ name, outcome, final });
 }
 
-void Experiment::paramsDistinct(vec<uint>* list) {
+void ExpType::paramsDistinct(vec<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i <= num_params_,
@@ -98,7 +98,7 @@ void Experiment::paramsDistinct(vec<uint>* list) {
   delete list;
 }
 
-void Experiment::paramsSorted(vec<uint>* list) {
+void ExpType::paramsSorted(vec<uint>* list) {
   for(auto i = list->begin(); i != list->end(); ++i) {
     for(auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i < *j && *j <= num_params_,
@@ -110,7 +110,7 @@ void Experiment::paramsSorted(vec<uint>* list) {
   delete list;
 }
 
-void Experiment::PrecomputeUsed(Formula* f) {
+void ExpType::PrecomputeUsed(Formula* f) {
   assert(f);
   auto* mapping = dynamic_cast<Mapping*>(f);
   auto* variable = dynamic_cast<Variable*>(f);
@@ -126,7 +126,7 @@ void Experiment::PrecomputeUsed(Formula* f) {
   }
 }
 
-void Experiment::Precompute() {
+void ExpType::Precompute() {
   // used_maps_, used_vars_
   used_maps_.resize(num_params_);
   for (auto out: outcomes_) {
@@ -162,7 +162,7 @@ void Experiment::Precompute() {
   }
 }
 
-bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
+bool ExpType::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
   bool equiv = true;
   for (auto f: maps) {
     if (gen_var_groups_[game_.getMappingValue(f, a)] !=
@@ -174,7 +174,7 @@ bool Experiment::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
 }
 
 set<vec<CharId>>&
-Experiment::GenParams(vec<uint>& groups) {
+ExpType::GenParams(vec<uint>& groups) {
   gen_stats_ = GenParamsStats();
   gen_var_groups_ = groups;
   gen_params_.resize(num_params_);
@@ -189,7 +189,7 @@ Experiment::GenParams(vec<uint>& groups) {
 }
 
 // Recursive function that substitudes char at position n for all posibilities.
-void Experiment::GenParamsFill(uint n) {
+void ExpType::GenParamsFill(uint n) {
   set<CharId> done;
   for (CharId a = 0; a < alph_; a++) {
     bool valid = true;
@@ -228,7 +228,7 @@ void Experiment::GenParamsFill(uint n) {
   }
 }
 
-void Experiment::GenParamsBasicFilter() {
+void ExpType::GenParamsBasicFilter() {
   auto params = gen_params_;
   // Compute position partitioning according to the vars.
   vec<uint> dfu(num_params_, 0);
@@ -294,7 +294,7 @@ void Experiment::GenParamsBasicFilter() {
   }
 }
 
-void Experiment::GenParamsGraphFilter() {
+void ExpType::GenParamsGraphFilter() {
   auto& params = gen_params_;
   bliss::Stats stats;
   auto graph = CreateGraphForParams(gen_var_groups_, params);
@@ -320,7 +320,7 @@ void Experiment::GenParamsGraphFilter() {
   gen_params_final_.insert(params);
 }
 
-bliss::Digraph* Experiment::CreateGraphForParams(vec<uint>& groups,
+bliss::Digraph* ExpType::CreateGraphForParams(vec<uint>& groups,
                                                  vec<CharId>& params) {
   auto g = game_.CreateGraph();
   // Change color of var vertices according to 'groups'.

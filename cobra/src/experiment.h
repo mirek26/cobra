@@ -32,18 +32,18 @@ struct EOutcome {
   int fixed;
 };
 
-class Option {
+class Experiment {
   Solver& solver_;
-  Experiment& type_;
+  ExpType& type_;
   vec<CharId> params_;
   uint index_;
 
   vec<EOutcome> data_;
 
  public:
-  Option(Solver& solver, Experiment& e, vec<CharId> params, uint index);
+  Experiment(Solver& solver, ExpType& e, vec<CharId> params, uint index);
 
-  Experiment& type() const { return type_; }
+  ExpType& type() const { return type_; }
   const vec<CharId>& params() const { return params_; }
   uint index() const { return index_; }
   uint num_outcomes() const { return data_.size(); }
@@ -56,7 +56,7 @@ class Option {
 };
 
 
-class Experiment {
+class ExpType {
   Game& game_;
   uint alph_;
 
@@ -73,16 +73,16 @@ class Experiment {
   vec<set<uint>> params_different_;
   vec<set<uint>> params_smaller_than_;
 
-  // Helper fields for parametrization generation.
   GenParamsStats gen_stats_;
   vec<uint> gen_var_groups_;
+
   set<vec<CharId>> gen_params_basic_;
   set<vec<CharId>> gen_params_final_;
   vec<CharId> gen_params_;
   std::map<unsigned int, vec<CharId>> gen_graphs_;
 
  public:
-  Experiment(Game& game, string name, uint num_params):
+  ExpType(Game& game, string name, uint num_params):
       game_(game),
       name_(name),
       num_params_(num_params),
@@ -104,6 +104,7 @@ class Experiment {
   void addOutcome(string name, Formula* outcome, bool final = true);
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
+
 
   set<vec<CharId>>& GenParams(vec<uint>&);
   void Precompute();
@@ -132,7 +133,59 @@ class Experiment {
 
   bliss::Digraph* CreateGraphForParams(vec<uint>& groups,
                                        vec<CharId>& params);
-
 };
+
+struct EvalExp {
+  Experiment exp;
+  uint outcome_id;
+};
+
+
+class ExpGenerator {
+  Game& game_;
+  Solver& solver_;
+  const vec<EvalExp>& history_;
+
+  std::map<unsigned int, vec<CharId>> graphs_;
+
+  GenParamsStats stats_;
+  vec<uint> var_groups_;
+  int curr_tid;
+
+  set<vec<CharId>> params_basic_;
+  set<vec<CharId>> params_final_;
+  vec<CharId> params_;
+
+ public:
+  ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history):
+    game_(game),
+    solver_(solver),
+    history_(history) {
+    stats_ = GenParamsStats();
+    // prepare var_groups_
+    auto graph = game_.CreateGraph();
+    game_.restriction()->AddToGraph(*graph, nullptr);
+    for (auto& e: history_) {
+      e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*graph, &e.exp.params());
+    }
+    var_groups_ = game_.ComputeVarEquiv(solver_, *graph);
+
+    curr_tid = 0;
+  }
+
+  // Experiment Next();
+
+  vec<Experiment> All() {
+    vec<Experiment> result;
+    for (auto t: game_.experiments()) {
+      auto& params_all = t->GenParams(var_groups_);
+      for (auto& params: params_all) {
+        result.push_back(Experiment(solver_, *t, params, result.size()));
+      }
+    }
+    return result;
+  }
+};
+
 
 #endif  // COBRA_EXPERIMENT_H_

@@ -11,23 +11,23 @@
 
 namespace strategy {
   namespace breaker {
-    uint interactive(vec<Option>& options);
-    uint random(vec<Option>& options);
-    uint parts(vec<Option>& options);
-    uint min_num(vec<Option>& options);
-    uint entropy(vec<Option>& options);
-    uint exp_num(vec<Option>& options);
-    uint fixed(vec<Option>& options);
+    uint interactive(vec<Experiment>& options);
+    uint random(vec<Experiment>& options);
+    uint parts(vec<Experiment>& options);
+    uint min_num(vec<Experiment>& options);
+    uint entropy(vec<Experiment>& options);
+    uint exp_num(vec<Experiment>& options);
+    uint fixed(vec<Experiment>& options);
   }
 
   namespace maker {
-    uint interactive(Option& option);
-    uint random(Option& option);
-    uint max_num(Option& option);
-    uint fixed(Option& option);
+    uint interactive(Experiment& option);
+    uint random(Experiment& option);
+    uint max_num(Experiment& option);
+    uint fixed(Experiment& option);
   }
 
-  const std::map<string, std::pair<string, std::function<uint(vec<Option>&)>>>
+  const std::map<string, std::pair<string, std::function<uint(vec<Experiment>&)>>>
     breaker_strategies = {
     { "interactive",
     { "Asks the user which experiment to perform next.",
@@ -58,7 +58,7 @@ namespace strategy {
       breaker::fixed }},
     };
 
-  const std::map<string, std::pair<string, std::function<uint(Option&)>>>
+  const std::map<string, std::pair<string, std::function<uint(Experiment&)>>>
     maker_strategies = {
     { "interactive",
     { "Asks the user what the outcome of the experiment is.",

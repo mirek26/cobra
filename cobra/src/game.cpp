@@ -71,8 +71,8 @@ VarId Game::getMappingValue(MapId mapping, CharId a) {
   return mappings_[mapping][a];
 }
 
-Experiment* Game::addExperiment(string name, uint num_params) {
-  auto e = new Experiment(*this, name, num_params);
+ExpType* Game::addExperiment(string name, uint num_params) {
+  auto e = new ExpType(*this, name, num_params);
   experiments_.push_back(e);
   return e;
 }
@@ -152,22 +152,4 @@ vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
   }
 
   return var_equiv;
-}
-
-vec<Option> Game::GenerateExperiments(Solver& solver, bliss::Digraph& graph) {
-  auto var_equiv = ComputeVarEquiv(solver, graph);
-  // printf("Var equiv:\n");
-  // for (auto i: var_equiv) printf("%i ", i);
-  // printf("\n");
-
-  // Prepare list of all sensible experiments in this round.
-  vec<Option> options;
-  for (auto e: experiments_) {
-    auto& params_all = e->GenParams(var_equiv);
-    for (auto& params: params_all) {
-      options.push_back(Option(solver, *e, params, options.size()));
-    }
-  }
-  assert(options.size() > 0);
-  return options;
 }

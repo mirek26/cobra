@@ -1477,7 +1477,7 @@ yyreduce:
 
   case 13:
 #line 107 "src/cobra.ypp"
-    {  Experiment* e = m.game().addExperiment((yyvsp[(2) - (3)].tstr), (yyvsp[(3) - (3)].tint));
+    {  ExpType* e = m.game().addExperiment((yyvsp[(2) - (3)].tstr), (yyvsp[(3) - (3)].tint));
        m.set_last_experiment(e);
        free((yyvsp[(2) - (3)].tstr)); ;}
     break;

@@ -18,9 +18,9 @@ namespace {
   // First parameter of f is the experiment, second is the value of the best option found yet.
   // This can save significant amount of time if the function evaluation
   // is time demanind (because of model counting, for example).
-  uint maximize(std::function<double(Option&, double)> f, vec<Option>& options) {
+  uint maximize(std::function<double(Experiment&, double)> f, vec<Experiment>& options) {
     double max = -std::numeric_limits<double>::max();
-    vec<Option>::iterator best = options.end();
+    vec<Experiment>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
       auto cand = f(*it, max);
       if (cand > max) {
@@ -33,9 +33,9 @@ namespace {
   }
 
   // Similar to the previous function, just minimizing value of f.
-  uint minimize(std::function<double(Option&, double)> f, vec<Option>& options) {
+  uint minimize(std::function<double(Experiment&, double)> f, vec<Experiment>& options) {
     double min = std::numeric_limits<double>::max();
-    vec<Option>::iterator best = options.end();
+    vec<Experiment>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
       auto cand = f(*it, min);
       if (cand < min) {
@@ -48,7 +48,7 @@ namespace {
   }
 }
 
-uint breaker::interactive(vec<Option>& options) {
+uint breaker::interactive(vec<Experiment>& options) {
   // Print options.
   printf("Select an experiment: \n");//%i: \n", exp_num++);
   for (auto& experiment: options) {
@@ -79,7 +79,7 @@ uint breaker::interactive(vec<Option>& options) {
   return choice;
 }
 
-uint maker::interactive(Option& option) {
+uint maker::interactive(Experiment& option) {
   // Print options.
   printf("Select an outcome: \n");
   auto& type = option.type();
@@ -103,11 +103,11 @@ uint maker::interactive(Option& option) {
   return choice;
 }
 
-uint breaker::random(vec<Option>& options) {
+uint breaker::random(vec<Experiment>& options) {
   return rand() % options.size();
 }
 
-uint maker::random(Option& option) {
+uint maker::random(Experiment& option) {
   // Print options.
   int p = rand() % option.NumOfSat();
   int i = -1;
@@ -118,7 +118,7 @@ uint maker::random(Option& option) {
   return i;
 }
 
-uint maker::max_num(Option& option) {
+uint maker::max_num(Experiment& option) {
   auto max = option.NumOfModels(0);
   auto best = 0;
   for (uint i = 1; i < option.num_outcomes(); i++) {
@@ -131,7 +131,7 @@ uint maker::max_num(Option& option) {
   return best;
 }
 
-uint maker::fixed(Option& option) {
+uint maker::fixed(Experiment& option) {
   auto min = option.NumOfFixedVars(0);
   auto best = 0;
   for (uint i = 1; i < option.num_outcomes(); i++) {
@@ -144,8 +144,8 @@ uint maker::fixed(Option& option) {
   return best;
 }
 
-uint breaker::min_num(vec<Option>& options) {
-  return minimize([](Option& o, double min)->double {
+uint breaker::min_num(vec<Experiment>& options) {
+  return minimize([](Experiment& o, double min)->double {
     uint max = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       max = std::max(max, o.NumOfModels(i));
@@ -158,8 +158,8 @@ uint breaker::min_num(vec<Option>& options) {
   }, options);
 }
 
-uint breaker::exp_num(vec<Option>& options) {
-  return minimize([](Option& o, double){
+uint breaker::exp_num(vec<Experiment>& options) {
+  return minimize([](Experiment& o, double){
     int sumsq = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       auto models  = o.NumOfModels(i);
@@ -169,8 +169,8 @@ uint breaker::exp_num(vec<Option>& options) {
   }, options);
 }
 
-uint breaker::entropy(vec<Option>& options) {
-  return maximize([](Option& o, double){
+uint breaker::entropy(vec<Experiment>& options) {
+  return maximize([](Experiment& o, double){
     int total = o.TotalNumOfModels();
     double value = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
@@ -183,8 +183,8 @@ uint breaker::entropy(vec<Option>& options) {
   }, options);
 }
 
-uint breaker::parts(vec<Option>& options) {
-  return maximize([](Option& o, double max) ->double {
+uint breaker::parts(vec<Experiment>& options) {
+  return maximize([](Experiment& o, double max) ->double {
     uint sat = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       if (o.IsSat(i)) sat++;
@@ -198,8 +198,8 @@ uint breaker::parts(vec<Option>& options) {
   }, options);
 }
 
-uint breaker::fixed(vec<Option>& options) {
-  return maximize([](Option& o, double max) ->double {
+uint breaker::fixed(vec<Experiment>& options) {
+  return maximize([](Experiment& o, double max) ->double {
     uint min = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       min = std::min(min, o.NumOfFixedVars(i));

@@ -15,7 +15,7 @@
 class Formula;
 class Variable;
 class Formula;
-class Experiment;
+class ExpType;
 class Game;
 class PicoSolver;
 
@@ -39,7 +39,7 @@ class Parser {
 
   // auxiliary structures for parsing
   Formula* only_formula_;
-  Experiment* last_experiment_;
+  ExpType* last_experiment_;
 
   Game game_;
 
@@ -87,8 +87,8 @@ class Parser {
   Formula* only_formula() { return only_formula_; }
   void set_only_formula(Formula* f) { only_formula_ = f; }
 
-  Experiment* last_experiment() { return last_experiment_; }
-  void set_last_experiment(Experiment* e) { last_experiment_ = e; }
+  ExpType* last_experiment() { return last_experiment_; }
+  void set_last_experiment(ExpType* e) { last_experiment_ = e; }
 
  private:
   /* Generic template for a get method, which creates a new node.

@@ -104,7 +104,7 @@ line :
     {  m.game().addMapping($2, $3);
        free($2); }
   | T_EXPERIMENT T_STRING T_INT
-    {  Experiment* e = m.game().addExperiment($2, $3);
+    {  ExpType* e = m.game().addExperiment($2, $3);
        m.set_last_experiment(e);
        free($2); }
   | T_PARAMS_DISTINCT int_list

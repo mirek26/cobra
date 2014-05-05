@@ -25,8 +25,8 @@ extern "C" int yyparse();
 extern "C" FILE* yyin;
 extern Parser m;
 
-std::function<uint(vec<Option>&)> g_breakerStg;
-std::function<uint(Option&)> g_makerStg;
+std::function<uint(vec<Experiment>&)> g_breakerStg;
+std::function<uint(Experiment&)> g_makerStg;
 
 typedef struct Args{
   string filename;
@@ -69,8 +69,9 @@ void time_overview(clock_t start) {
 }
 
 void overview_mode() {
-  Game& game = m.game();
   print_head("GAME OVERVIEW");
+  Game& game = m.game();
+
   printf("Num of variables: %lu\n", game.vars().size());
   Solver* solver = get_solver(game.vars(), game.restriction());
   uint models = solver->NumOfModels();
@@ -108,30 +109,25 @@ void overview_mode() {
   fflush(stdout);
 
   auto t1 = clock();
-  game.Precompute();
-  auto knowledge_graph = game.CreateGraph();
-  game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-  auto var_equiv = game.ComputeVarEquiv(*solver, *knowledge_graph);
-  for (auto e: game.experiments()) {
-    auto& params_all = e->GenParams(var_equiv);
-    for (auto& params: params_all) {
-      auto f1 = new vec<Formula*>();
-      for (auto o: e->outcomes()) f1->push_back(o.formula);
-      auto f2 = m.get<ExactlyOperator>(1, f1);
-      auto f3 = m.get<NotOperator>(f2);
 
-      solver->OpenContext();
-      solver->AddConstraint(f3, params);
-      if (solver->Satisfiable()) {
-        printf("%s failed!%s\n", color::serror, color::snormal);
-        printf("EXPERIMENT: %s %s", e->name().c_str(), game.ParamsToStr(params).c_str());
-        printf("\nPROBLEMATIC ASSIGNMENT: \n");
-        solver->PrintAssignment();
-        printf("\n");
-        return;
-      }
-      solver->CloseContext();
+  ExpGenerator gen(game, *solver, vec<EvalExp>());
+  for (auto e: gen.All()) {
+    auto f1 = new vec<Formula*>();
+    for (auto o: e.type().outcomes()) f1->push_back(o.formula);
+    auto f2 = m.get<ExactlyOperator>(1, f1);
+    auto f3 = m.get<NotOperator>(f2);
+
+    solver->OpenContext();
+    solver->AddConstraint(f3, e.params());
+    if (solver->Satisfiable()) {
+      printf("%s failed!%s\n", color::serror, color::snormal);
+      printf("EXPERIMENT: %s %s", e.type().name().c_str(), game.ParamsToStr(e.params()).c_str());
+      printf("\nPROBLEMATIC ASSIGNMENT: \n");
+      solver->PrintAssignment();
+      printf("\n");
+      return;
     }
+    solver->CloseContext();
   }
 
   delete solver;
@@ -142,15 +138,13 @@ void overview_mode() {
 void simulation_mode() {
   print_head("SIMULATION");
   Game& game = m.game();
-  game.Precompute();
-  auto knowledge_graph = game.CreateGraph();
-  game.restriction()->AddToGraph(*knowledge_graph, nullptr);
-
   Solver* solver = get_solver(game.vars(), game.restriction());
 
   int exp_num = 1;
+  vec<EvalExp> process;
   while (true) {
-    auto options = game.GenerateExperiments(*solver, *knowledge_graph);
+    ExpGenerator gen(game, *solver, process);
+    auto options = gen.All();
 
     // Choose and print an experiment
     auto experiment = options[g_breakerStg(options)];
@@ -187,14 +181,16 @@ void simulation_mode() {
 
     // Prepare for another round.
     exp_num++;
-    outcome.formula->AddToGraph(*knowledge_graph, &experiment.params());
+    process.push_back({ experiment, oid });
   }
-  delete knowledge_graph;
+  delete solver;
 }
 
-void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint& sum, uint& num) {
+void analyze(Solver& solver, vec<EvalExp>& history,
+             uint depth, uint& max, uint& sum, uint& num) {
   Game& game = m.game();
-  auto options = game.GenerateExperiments(solver, graph);
+  ExpGenerator gen(game, solver, history);
+  auto options = gen.All();
   auto x = g_breakerStg(options);
   assert(x < options.size());
   auto experiment = options[x];
@@ -212,9 +208,9 @@ void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint&
       sum += finaldepth;
       max = std::max(max, finaldepth);
     } else if (sat) {
-      bliss::Digraph ngraph(graph);
-      outcome.formula->AddToGraph(ngraph, &experiment.params());
-      analyze(solver, ngraph, depth + 1, max, sum, num);
+      history.push_back({ experiment, i });
+      analyze(solver, history, depth + 1, max, sum, num);
+      history.pop_back();
     }
     solver.CloseContext();
   }
@@ -223,18 +219,15 @@ void analyze(Solver& solver, bliss::Digraph& graph, uint depth, uint& max, uint&
 void analyze_mode() {
   print_head("STRATEGY ANALYSIS");
   Game& game = m.game();
-  game.Precompute();
-  auto graph = game.CreateGraph();
-  game.restriction()->AddToGraph(*graph, nullptr);
   Solver* solver = get_solver(game.vars(), game.restriction());
+  vec<EvalExp> history;
   uint models = solver->NumOfModels();
   uint max = 0, sum = 0, num = 0;
   printf("Codes found (total %u):     0", models);
   fflush(stdout);
-  // TODO: jeste bych mohl vypisovat nejake ETA, ale mozna neni potreba
-  analyze(*solver, *graph, 1, max, sum, num);
+
+  analyze(*solver, history, 1, max, sum, num);
   delete solver;
-  delete graph;
   printf("\nWorst-case: %u\n", max);
   printf("Average-case: %.4f (%u/%u)\n", (double)sum/models, sum, models);
 }
@@ -323,6 +316,7 @@ int main(int argc, char* argv[]) {
 
     g_breakerStg = strategy::breaker_strategies.at(args.stg_experiment).second;
     g_makerStg = strategy::maker_strategies.at(args.stg_outcome).second;
+    m.game().Precompute();
 
     if (args.mode == "o" || args.mode == "overview") {
       overview_mode();
