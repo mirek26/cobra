@@ -219,9 +219,15 @@ void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void Formula::AddToGraph(bliss::Digraph& g,
+// For parent < -1, add a new root with type parent.
+void Formula::AddToGraph(bliss::Graph& g,
                          const vec<CharId>* params,
                          int parent) {
+  if (parent < 0) {
+    g.add_vertex(parent);
+    parent = g.get_nof_vertices() - 1;
+  }
+
   if (isLiteral()) {
     // just create an edge from parent to the variable
     assert(parent > 0);

@@ -113,7 +113,7 @@ class Formula {
 
   //Formula* Substitude(std::map<Variable*, Variable*>& table);
 
-  void AddToGraph(bliss::Digraph& g,
+  void AddToGraph(bliss::Graph& g,
                   const vec<CharId>* params,
                   int parent = -1);
 

@@ -98,19 +98,18 @@ void Game::Precompute() {
   }
 }
 
-bliss::Digraph* Game::CreateGraph() {
+bliss::Graph* Game::CreateGraph() {
   int new_id = 0;
   // Create the graph
-  auto g = new bliss::Digraph(0);
+  auto g = new bliss::Graph(0);
   // Add vertices for vars, create edge between a variable and its negation
   for (auto it = vars().begin() + 1; it != vars().end(); ++it) {
     g->add_vertex((*it)->type_id());
     g->add_vertex((*it)->type_id());
     g->add_edge(new_id, new_id + 1);
-    g->add_edge(new_id + 1, new_id);
     new_id += 2;
   }
-  g->set_splitting_heuristic(bliss::Digraph::shs_fsm);
+  g->set_splitting_heuristic(bliss::Graph::shs_fsm);
   return g;
 }
 
@@ -130,7 +129,7 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Digraph& graph) {
+vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Graph& graph) {
   bliss::Stats stats;
   auto var_count = vars_.size();
   vec<uint> var_equiv(var_count, 0);

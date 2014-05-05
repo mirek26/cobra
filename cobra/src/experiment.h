@@ -116,7 +116,7 @@ class ExpType {
     return total;
   }
 
-  bliss::Digraph* CreateGraphForParams(const vec<EvalExp>& history,
+  bliss::Graph* CreateGraphForParams(const vec<EvalExp>& history,
                                        const vec<CharId>& params);
 
  private:

@@ -73,8 +73,8 @@ class Game {
 
   void Precompute();
 
-  bliss::Digraph* CreateGraph();
-  vec<uint> ComputeVarEquiv(Solver& solver, bliss::Digraph& graph);
+  bliss::Graph* CreateGraph();
+  vec<uint> ComputeVarEquiv(Solver& solver, bliss::Graph& graph);
 
 };
 

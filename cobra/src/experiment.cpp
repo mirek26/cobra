@@ -304,7 +304,7 @@ void ExpGenerator::GenParamsGraphFilter() {
   params_final_.insert(params_);
 }
 
-bliss::Digraph* ExpType::CreateGraphForParams(const vec<EvalExp>& history,
+bliss::Graph* ExpType::CreateGraphForParams(const vec<EvalExp>& history,
                                               const vec<CharId>& params) {
   auto g = game_.CreateGraph();
   for (auto e: game_.experiments()) {
@@ -316,32 +316,21 @@ bliss::Digraph* ExpType::CreateGraphForParams(const vec<EvalExp>& history,
               auto v1 = game_.getMappingValue(u, i);
               auto v2 = game_.getMappingValue(v, i);
               g->add_edge(2*v1 - 2, 2*v2 - 2);
-              g->add_edge(2*v2 - 2, 2*v1 - 2);
             }
           }
         }
       }
     }
   }
-  // // Change color of var vertices according to 'groups'.
-  // for (uint id = 1; id < game_.vars().size(); id++) {
-  //   uint group = std::numeric_limits<uint>::max() - groups[id];
-  //   g->change_color(2*id - 2, group);
-  //   g->change_color(2*id - 1, group);
-  // }
-  // Construct graphs for outcome formulas.
+  // Add outcome formulas, rooted with a node of type -2.
   for (auto outcome: outcomes_) {
-    outcome.formula->AddToGraph(*g, &params);
+    outcome.formula->AddToGraph(*g, &params, -2);
   }
 
-  // add all formulas (rooted with type -1)
-  auto id = g->get_nof_vertices();
-  g->add_vertex(-1);
-  game_.restriction()->AddToGraph(*g, nullptr, id);
+  // Add accumulated knowledge, rooted with a node of type -1
+  game_.restriction()->AddToGraph(*g, nullptr, -1);
   for (auto& e: history) {
-    auto id = g->get_nof_vertices();
-    g->add_vertex(-1);
-    e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*g, &e.exp.params(), id);
+    e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*g, &e.exp.params(), -1);
   }
 
   return g;
