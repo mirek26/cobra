@@ -15,6 +15,8 @@
 #ifndef COBRA_EXPERIMENT_H_
 #define COBRA_EXPERIMENT_H_
 
+struct EvalExp;
+
 struct GenParamsStats {
   uint ph1 = 0, ph2 = 0, ph3 = 0;
 };
@@ -114,8 +116,8 @@ class ExpType {
     return total;
   }
 
-  bliss::Digraph* CreateGraphForParams(vec<uint>& groups,
-                                       vec<CharId>& params);
+  bliss::Digraph* CreateGraphForParams(const vec<EvalExp>& history,
+                                       const vec<CharId>& params);
 
  private:
   // Computes used_maps_ and used_vars_.
@@ -157,6 +159,7 @@ class ExpGenerator {
     for (auto& e: history_) {
       e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*graph, &e.exp.params());
     }
+
     var_groups_ = game_.ComputeVarEquiv(solver_, *graph);
   }
 

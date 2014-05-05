@@ -281,7 +281,7 @@ void ExpGenerator::GenParamsBasicFilter() {
 
 void ExpGenerator::GenParamsGraphFilter() {
   bliss::Stats stats;
-  auto graph = curr_type_->CreateGraphForParams(var_groups_, params_);
+  auto graph = curr_type_->CreateGraphForParams(history_, params_);
   clock_t t1 = clock();
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
   game_.bliss_calls() += 1;
@@ -304,34 +304,45 @@ void ExpGenerator::GenParamsGraphFilter() {
   params_final_.insert(params_);
 }
 
-bliss::Digraph* ExpType::CreateGraphForParams(vec<uint>& groups,
-                                              vec<CharId>& params) {
+bliss::Digraph* ExpType::CreateGraphForParams(const vec<EvalExp>& history,
+                                              const vec<CharId>& params) {
   auto g = game_.CreateGraph();
-  // Change color of var vertices according to 'groups'.
-  // for (auto e: game_.experiments()) {
-  //   for (auto& maps: e->used_maps_) {
-  //     for (auto v: maps) {
-  //       for (auto u: maps) {
-  //         if (v != u) {
-  //           for (uint i = 0; i < alph_; i++) {
-  //             auto v1 = game_.getMappingValue(u, i);
-  //             auto v2 = game_.getMappingValue(v, i);
-  //             g->add_edge(2*v1 - 2, 2*v2 - 2);
-  //             g->add_edge(2*v2 - 2, 2*v1 - 2);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-  for (uint id = 1; id < game_.vars().size(); id++) {
-    uint group = std::numeric_limits<uint>::max() - groups[id];
-    g->change_color(2*id - 2, group);
-    g->change_color(2*id - 1, group);
+  for (auto e: game_.experiments()) {
+    for (auto& maps: e->used_maps_) {
+      for (auto v: maps) {
+        for (auto u: maps) {
+          if (v != u) {
+            for (uint i = 0; i < alph_; i++) {
+              auto v1 = game_.getMappingValue(u, i);
+              auto v2 = game_.getMappingValue(v, i);
+              g->add_edge(2*v1 - 2, 2*v2 - 2);
+              g->add_edge(2*v2 - 2, 2*v1 - 2);
+            }
+          }
+        }
+      }
+    }
   }
+  // // Change color of var vertices according to 'groups'.
+  // for (uint id = 1; id < game_.vars().size(); id++) {
+  //   uint group = std::numeric_limits<uint>::max() - groups[id];
+  //   g->change_color(2*id - 2, group);
+  //   g->change_color(2*id - 1, group);
+  // }
   // Construct graphs for outcome formulas.
   for (auto outcome: outcomes_) {
     outcome.formula->AddToGraph(*g, &params);
   }
+
+  // add all formulas (rooted with type -1)
+  auto id = g->get_nof_vertices();
+  g->add_vertex(-1);
+  game_.restriction()->AddToGraph(*g, nullptr, id);
+  for (auto& e: history) {
+    auto id = g->get_nof_vertices();
+    g->add_vertex(-1);
+    e.exp.type().outcomes()[e.outcome_id].formula->AddToGraph(*g, &e.exp.params(), id);
+  }
+
   return g;
 }
