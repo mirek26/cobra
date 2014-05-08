@@ -1,7 +1,7 @@
 \input{header}
 
 \thesislang{en}
-\thesistitle{Algorithmic Analysis \\of Code Breaking Games}
+\thesistitle{Algorithmic Analysis \\of Code-Breaking Games}
 \thesissubtitle{Master's Thesis}
 \thesisstudent{Miroslav Klimoš}
 \thesiswoman{false}
@@ -11,7 +11,7 @@
 
 \hypersetup{
     unicode=true,
-    pdftitle={Algorithmic Analysis of Code Breaking Games},
+    pdftitle={Algorithmic Analysis of Code-Breaking Games},
     pdfauthor={Miroslav Klimoš},
     %pdfkeywords={Markov decision process}{optimal scheduler}{minimal scheduler},
     colorlinks=true,        % false: boxed links; true: colored links
@@ -67,27 +67,26 @@ counterfeit coin\\
 
 
 \begin{ThesisAbstract}
-% Markov decision processes provide us with a mathematical framework
-%   for modeling decision-making in randomized systems,
-%   where a scheduler controls the behavior of the system through the decisions.
-% Continuous-time Markov decision processes introduce
-%   exponentially distributed time delays on the transitions to the model.
-% Time-bounded reachability objective asks for a scheduler maximizing
-%   the probability of reaching a set of goal states in a given time limit.
+Code-breaking games are two-player games, in which the first selects
+  a code from a given set and the second strives to reveal it using a
+  minimal number of experiments.
+A prominent example is the board game of Mastermind,
+  where the code-breaker tries to guess a combination of colored pegs.
 
-% Methods for computing optimal and $\eps$-optimal schedulers
-%   are available but they do not take into consideration
-%   the size of representation of such schedulers.
-% Indeed, the resulting schedulers can be very large and their potential usage
-%   in embedded systems, for example, is questionable.
-% Hence, the thesis focuses on the size of schedulers and examines
-%   the problem of finding a minimal optimal ($\eps$-optimal) scheduler
-%   with respect to the time-bounded reachability.
+What strategy for experiment selection should the code-breaker use?
+Is it possible to compute a lower or upper bound for the number of experiments needed?
+Can we compute the optimal strategy?
+What is the performance of a given heuristics?
+Much research on the topic has been done but it usually focuses
+  on one particular game and few have been written about the games in general.
 
-% We propose an algorithm computing a minimal $\eps$-optimal scheduler
-%   for a given discrete-time system.
-% For continuous-time processes, we adopt the discretization technique
-%   to reduce the problem to the discrete-time case.
+We create a general model of code-breaking games based on propositional logic
+  and design a computer language for game specification.
+Most importantly, we develop a computer program for game analysis
+  and strategy synthesis.
+Using the tool, we can easily reproduce known results for Mastermind or
+  any other code-breaking game and we can quickly evaluate new ideas
+  for strategies.
 \end{ThesisAbstract}
 
 \MainMatter
