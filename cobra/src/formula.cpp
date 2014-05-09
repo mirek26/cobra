@@ -26,13 +26,54 @@ void Formula::dump(int indent) {
     printf("   ");
   }
   printf("%p: %s (%s %s)\n", (void*)this, name().c_str(), fixed_ ? "fixed" : "not fixed", fixed_value_ ? "1" : "0");
-  for (uint i = 0; i < child_count(); ++i) {
-    child(i)->dump(indent + 1);
-  }
+  for (auto c: children_)
+    c->dump(indent + 1);
 }
 
 Formula* Formula::neg() {
   return m.get<NotOperator>(this);
+}
+
+uint Formula::Size() const {
+  uint r = 1;
+  for (auto c: children_)
+    r += c->Size();
+  return r;
+}
+
+
+VarId Formula::tseitin_var(PicoSolver& cnf) {
+  if (tseitin_var_ == 0) {
+    tseitin_var_ = cnf.NewVarId();
+  }
+  return tseitin_var_;
+}
+
+vec<VarId> Formula::tseitin_children(PicoSolver& cnf) {
+  vec<VarId> vars(children_.size(), 0);
+  std::transform(children_.begin(), children_.end(), vars.begin(),
+    [&](Formula* f){
+      return f->tseitin_var(cnf);
+    });
+  return vars;
+}
+
+void Formula::ResetTseitinIds() {
+  tseitin_var_ = 0;
+  for (auto c: children_)
+    c->ResetTseitinIds();
+}
+
+string Formula::pretty_join(string sep, bool utf8,
+                            const vec<CharId>* params) {
+  if (children_.empty()) return "()";
+  string s = "(" + children_.front()->pretty(utf8, params);
+  for (auto it = std::next(children_.begin()); it != children_.end(); ++it) {
+    s += sep;
+    s += (*it)->pretty(utf8, params);
+  }
+  s += ")";
+  return s;
 }
 
 string Mapping::pretty(bool, const vec<CharId>* params) {
@@ -43,12 +84,243 @@ string Mapping::pretty(bool, const vec<CharId>* params) {
   }
 }
 
-// return the variable corresponding to the node during Tseitin transformation
-VarId Formula::tseitin_var(PicoSolver& cnf) {
-  if (tseitin_var_ == 0) {
-    tseitin_var_ = cnf.NewVarId();
+/*  Satisfied in a given model
+ *
+ */
+
+bool AndOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  for (auto c: children_) {
+    if (!c->Satisfied(model, params)) return false;
   }
-  return tseitin_var_;
+  return true;
+}
+
+bool OrOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  for (auto c: children_) {
+    if (c->Satisfied(model, params)) return true;
+  }
+  return false;
+}
+
+bool AtLeastOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  uint sat = 0;
+  for (auto c: children_) {
+    sat += c->Satisfied(model, params);
+    if (sat >= value_) return true;
+  }
+  return false;
+}
+
+bool AtMostOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  uint sat = 0;
+  for (auto c: children_) {
+    sat += c->Satisfied(model, params);
+  }
+  return sat <= value_;
+}
+
+bool ExactlyOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  uint sat = 0;
+  for (auto c: children_) {
+    sat += c->Satisfied(model, params);
+  }
+  return sat == value_;
+}
+
+bool EquivalenceOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  return children_[0]->Satisfied(model, params) ==
+         children_[1]->Satisfied(model, params);
+}
+
+bool ImpliesOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  return !children_[0]->Satisfied(model, params) ||
+          children_[1]->Satisfied(model, params);
+}
+
+bool NotOperator::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  return !children_[0]->Satisfied(model, params);
+}
+
+bool Mapping::Satisfied(const vec<bool>& model, const vec<CharId> params) {
+  return model[getValue(params)];
+}
+
+bool Variable::Satisfied(const vec<bool>& model, const vec<CharId>) {
+  assert((unsigned)id_ < model.size());
+  return model[id_];
+}
+
+/*  Fixed variable propagation
+ *
+ */
+
+void AndOperator::PropagateFixed(const vec<VarId>& fixed,
+                                 const vec<CharId>* params) {
+  fixed_ = false;
+  bool fixed_all = true;
+  non_fixed_childs_ = children_.size();
+  for (auto c: children_) {
+    c->PropagateFixed(fixed, params);
+    if (c->fixed() == true && c->fixed_value()== false) {
+      fixed_ = true;
+      fixed_value_ = false;
+      return;
+    }
+    fixed_all = fixed_all && c->fixed();
+    non_fixed_childs_ -= c->fixed();
+  }
+  if (fixed_all) {
+    fixed_ = true;
+    fixed_value_ = true;
+  }
+}
+
+void OrOperator::PropagateFixed(const vec<VarId>& fixed,
+                                const vec<CharId>* params) {
+  fixed_ = false;
+  bool fixed_all = true;
+  non_fixed_childs_ = children_.size();
+  for (auto c: children_) {
+    c->PropagateFixed(fixed, params);
+    if (c->fixed() == true && c->fixed_value() == true) {
+      fixed_ = true;
+      fixed_value_ = true;
+      return;
+    }
+    fixed_all = fixed_all && c->fixed();
+    non_fixed_childs_ -= c->fixed();
+  }
+  if (fixed_all) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+void AtLeastOperator::PropagateFixed(const vec<VarId>& fixed,
+                                     const vec<CharId>* params) {
+  uint t = 0, f = 0;
+  for (auto c: children_) {
+    c->PropagateFixed(fixed, params);
+    if (c->fixed() == true) {
+      if (c->fixed_value()) t++;
+      else f++;
+    }
+  }
+  fixed_ = false;
+  sat_childs_ = t;
+  if (t >= value_) {
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (f > children_.size() - value_) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+
+void AtMostOperator::PropagateFixed(const vec<VarId>& fixed,
+                                    const vec<CharId>* params) {
+  uint t = 0, f = 0;
+  for (auto c: children_) {
+    c->PropagateFixed(fixed, params);
+    if (c->fixed() == true) {
+      if (c->fixed_value()) t++;
+      else f++;
+    }
+  }
+  fixed_ = false;
+  sat_childs_ = t;
+  if (f >= children_.size() - value_) {
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (t > value_) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+void ExactlyOperator::PropagateFixed(const vec<VarId>& fixed,
+                                     const vec<CharId>* params) {
+  uint t = 0, f = 0;
+  for (auto c: children_) {
+    c->PropagateFixed(fixed, params);
+    if (c->fixed() == true) {
+      if (c->fixed_value()) t++;
+      else f++;
+    }
+  }
+  fixed_ = false;
+  sat_childs_ = t;
+  if (t + f == children_.size() && t == value_) {
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (f > children_.size() - value_ || t > value_) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+void EquivalenceOperator::PropagateFixed(const vec<VarId>& fixed,
+                                         const vec<CharId>* params) {
+  fixed_ = false;
+  children_[0]->PropagateFixed(fixed, params);
+  children_[1]->PropagateFixed(fixed, params);
+  if (children_[0]->fixed() && children_[1]->fixed()) {
+    fixed_ = true;
+    fixed_value_ = (children_[0]->fixed_value() ==
+                    children_[1]->fixed_value());
+  }
+}
+
+void ImpliesOperator::PropagateFixed(const vec<VarId>& fixed,
+                                     const vec<CharId>* params) {
+  fixed_ = false;
+  children_[0]->PropagateFixed(fixed, params);
+  children_[1]->PropagateFixed(fixed, params);
+  if (children_[0]->fixed() && children_[0]->fixed_value()== false) { // false -> ?
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (children_[1]->fixed() && children_[1]->fixed_value()== true) { // ? -> true
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (children_[0]->fixed() && children_[1]->fixed() &&  // false -> true
+             children_[0]->fixed_value()== true && children_[1]->fixed_value()== false) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+void NotOperator::PropagateFixed(const vec<VarId>& fixed,
+                                 const vec<CharId>* params) {
+  fixed_ = false;
+  children_[0]->PropagateFixed(fixed, params);
+  fixed_ = children_[0]->fixed();
+  fixed_value_ = !children_[0]->fixed_value();
+}
+
+void Mapping::PropagateFixed(const vec<VarId>& fixed,
+                             const vec<CharId>* params) {
+  fixed_ = false;
+  assert(params);
+  if (std::count(fixed.begin(), fixed.end(), getValue(*params))) {
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (std::count(fixed.begin(), fixed.end(), -getValue(*params))) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
+}
+
+void Variable::PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>*) {
+  fixed_ = false;
+  if (std::count(fixed.begin(), fixed.end(), id_)) {
+    fixed_ = true;
+    fixed_value_ = true;
+  } else if (std::count(fixed.begin(), fixed.end(), -id_)) {
+    fixed_ = true;
+    fixed_value_ = false;
+  }
 }
 
 /******************************************************************************
@@ -113,19 +385,19 @@ void NotOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   // X <-> (!Y)
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var(cnf);
-  auto childVar = child_->tseitin_var(cnf);
+  auto childVar = children_[0]->tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   if (!this->isLiteral()) {
     cnf.AddClause({ -thisVar, -childVar });
     cnf.AddClause({ thisVar, childVar });
-    child_->TseitinTransformation(cnf, false);
+    children_[0]->TseitinTransformation(cnf, false);
   }
 }
 
 void ImpliesOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
-  auto leftVar = left_->tseitin_var(cnf);
-  auto rightVar = right_->tseitin_var(cnf);
+  auto leftVar = children_[0]->tseitin_var(cnf);
+  auto rightVar = children_[1]->tseitin_var(cnf);
   if (top) {
     cnf.AddClause({ -leftVar, rightVar });
   } else {
@@ -135,14 +407,14 @@ void ImpliesOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
     cnf.AddClause({ leftVar, thisVar });
     cnf.AddClause({ -rightVar, thisVar });
   }
-  left_->TseitinTransformation(cnf, false);
-  right_->TseitinTransformation(cnf, false);
+  children_[0]->TseitinTransformation(cnf, false);
+  children_[1]->TseitinTransformation(cnf, false);
 }
 
 void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
-  auto leftVar = left_->tseitin_var(cnf);
-  auto rightVar = right_->tseitin_var(cnf);
+  auto leftVar = children_[0]->tseitin_var(cnf);
+  auto rightVar = children_[1]->tseitin_var(cnf);
   if (top) {
     cnf.AddClause({ -leftVar, rightVar });
     cnf.AddClause({ leftVar, -rightVar });
@@ -154,8 +426,8 @@ void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
     cnf.AddClause({ -thisVar, leftVar, -rightVar });
     cnf.AddClause({ thisVar, -leftVar, -rightVar });
   }
-  left_->TseitinTransformation(cnf, false);
-  right_->TseitinTransformation(cnf, false);
+  children_[0]->TseitinTransformation(cnf, false);
+  children_[1]->TseitinTransformation(cnf, false);
 }
 
 void TseitinNumerical(VarId thisVar, PicoSolver& cnf,
@@ -221,36 +493,86 @@ void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-// For parent < -1, add a new root with type parent.
+void Mapping::TseitinTransformation(PicoSolver& cnf, bool top) {
+  if (top) {
+    assert(cnf.build_for_params());
+    cnf.AddClause({ getValue(*cnf.build_for_params()) });
+  }
+}
+
+void Variable::TseitinTransformation(PicoSolver& cnf, bool top) {
+  if (top) {
+    cnf.AddClause({ id_ });
+  }
+}
+
+/*
+ * Add a formula tree to the symmetry graph.
+ */
+
+void Formula::AddToGraphRooted(bliss::Graph& g,
+                               const vec<CharId>* params,
+                               int root) {
+  if (fixed_) return;
+  g.add_vertex(root);
+  AddToGraph(g, params, g.get_nof_vertices() - 1);
+}
+
 void Formula::AddToGraph(bliss::Graph& g,
                          const vec<CharId>* params,
                          int parent) {
   if (fixed_) return;
-  if (parent < 0) {
-    g.add_vertex(parent);
-    parent = g.get_nof_vertices() - 1;
-  }
+  auto id = g.get_nof_vertices();
+  g.add_vertex(type_id());
+  if (parent > 0)
+    g.add_edge(parent, id);
+  for (auto c: children_)
+    c->AddToGraph(g, params, id);
+}
 
-  if (isLiteral() && !dynamic_cast<NotOperator*>(this)) {
-    // just create an edge from parent to the variable
-    assert(parent > 0);
-    auto map = dynamic_cast<Mapping*>(this);
-    auto var = dynamic_cast<Variable*>(this);
-    if (map) {
-      assert(params);
-      g.add_edge(parent, map->getValue(*params) - 1);
-    } else {
-      assert(var);
-      g.add_edge(parent, var->id() - 1);
-    }
-  } else {
-    // create a new node for the operator and call recursively for children
-    // TODO: rewrite as member functions, simplify And/Or of 1 etc.
-    auto id = g.get_nof_vertices();
+void AndOperator::AddToGraph(bliss::Graph& g,
+                         const vec<CharId>* params,
+                         int parent) {
+  if (fixed_) return;
+  uint id;
+  if (non_fixed_childs_ > 1) {
+    id = g.get_nof_vertices();
     g.add_vertex(type_id());
-    if (parent > 0)
-      g.add_edge(parent, id);
-    for (uint i = 0; i < child_count(); i++)
-      child(i)->AddToGraph(g, params, id);
+    if (parent > 0) g.add_edge(parent, id);
+  } else {
+    id = parent;
   }
+  for (auto c: children_)
+    c->AddToGraph(g, params, id);
+}
+
+void OrOperator::AddToGraph(bliss::Graph& g,
+                         const vec<CharId>* params,
+                         int parent) {
+  if (fixed_) return;
+  uint id;
+  if (non_fixed_childs_ > 1) {
+    id = g.get_nof_vertices();
+    g.add_vertex(type_id());
+    if (parent > 0) g.add_edge(parent, id);
+  } else {
+    id = parent;
+  }
+  for (auto c: children_)
+    c->AddToGraph(g, params, id);
+}
+
+void Mapping::AddToGraph(bliss::Graph& g,
+                         const vec<CharId>* params,
+                         int parent) {
+  assert(parent > 0);
+  assert(params);
+  g.add_edge(parent, getValue(*params) - 1);
+}
+
+void Variable::AddToGraph(bliss::Graph& g,
+                          const vec<CharId>* params,
+                          int parent) {
+  assert(parent > 0);
+  g.add_edge(parent, id_ - 1);
 }

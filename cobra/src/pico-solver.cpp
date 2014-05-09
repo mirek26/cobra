@@ -61,7 +61,7 @@ void PicoSolver::AddClause(const Clause& c) {
 
 void PicoSolver::AddConstraint(Formula* formula) {
   assert(formula);
-  formula->clearTseitinIds();
+  formula->ResetTseitinIds();
   formula->TseitinTransformation(*this, true);
 }
 

@@ -94,6 +94,14 @@ void Game::PrintCode(vec<bool> code) {
   printf("\n");
 }
 
+string Game::ParamsToStr(const vec<CharId>& params, char sep) {
+  string s = "";
+  for (auto a: params)
+    s += alphabet_[a] + sep;
+  s.erase(s.length()-1, 1);
+  return s;
+}
+
 void Game::Precompute() {
   for (auto e: experiments_) {
     e->Precompute();

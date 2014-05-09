@@ -64,14 +64,7 @@ class Game {
   vec<ExpType*>& experiments() {  return experiments_;  }
 
   void PrintCode(vec<bool> code);
-
-  string ParamsToStr(const vec<CharId>& params, char sep = ' '){
-    string s = "";
-    for (auto a: params)
-      s += alphabet_[a] + sep;
-    s.erase(s.length()-1, 1);
-    return s;
-  }
+  string ParamsToStr(const vec<CharId>& params, char sep = ' ');
 
   void Precompute();
 

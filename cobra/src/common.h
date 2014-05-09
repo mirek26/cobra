@@ -23,15 +23,14 @@ equiv - equivalence
 */
 
 // common types
-typedef unsigned int uint;
+typedef unsigned int uint; // TODO zkusit uint fast
 typedef unsigned char CharId;
-typedef int VarId; // must se signed, -1 denotes negation of var 1
+typedef int VarId; // VarId must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
 
-// type aliases for
+// type aliases for basic STL types
 typedef std::string string;
 template<typename T> using vec = std::vector<T>;
-//template<typename T> using set = std::unordered_set<T>;
 template<typename T> using set = std::set<T>;
 
 template<typename T>

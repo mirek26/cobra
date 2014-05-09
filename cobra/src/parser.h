@@ -104,16 +104,6 @@ class Parser {
     last_ = node;
     return node;
   }
-
-  /* Overloaded instance of get method for a Variable and string as the only
-   * argument for the constructor.
-   * If first looks into the variable map and creates a new one only if
-   * it isn't there yet. This ensures that we don't create more than one node
-   * for the same variable.
-   */
-  // Variable* get(identity<Variable>,
-  //               const string& ident);
-
 };
 
 #endif   // COBRA_PARSER_H

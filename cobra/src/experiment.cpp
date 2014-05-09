@@ -79,6 +79,15 @@ uint Experiment::NumOfFixedVars(uint id) {
   return data_[id].models;
 }
 
+ExpType::ExpType(Game& game, string name, uint num_params):
+    game_(game),
+    name_(name),
+    num_params_(num_params),
+    final_outcome_(-1) {
+  params_different_.resize(num_params);
+  params_smaller_than_.resize(num_params);
+  alph_ = game_.alphabet().size();
+}
 
 void ExpType::addOutcome(string name, Formula* outcome, bool final) {
   if (final) final_outcome_ = outcomes_.size();
@@ -112,6 +121,18 @@ void ExpType::paramsSorted(vec<uint>* list) {
   delete list;
 }
 
+uint64_t ExpType::NumberOfParametrizations() const {
+  uint64_t total = 1;
+  for (uint i = 0; i < num_params_; i++) {
+    int pos = alph_;
+    for (auto p: params_different_[i]) {
+      if (p < i) pos--;
+    }
+    total *= pos;
+  }
+  return total;
+}
+
 void ExpType::PrecomputeUsed(Formula* f) {
   assert(f);
   auto* mapping = dynamic_cast<Mapping*>(f);
@@ -123,8 +144,8 @@ void ExpType::PrecomputeUsed(Formula* f) {
   } else if (variable) {
     used_vars_.insert(variable->id());
   } else {
-    for (uint i = 0; i < f->child_count(); i++)
-      PrecomputeUsed(f->child(i));
+    for (auto c: f->children())
+      PrecomputeUsed(c);
   }
 }
 
@@ -162,6 +183,66 @@ void ExpType::Precompute() {
       //printf("%s %i %i -> %s\n", name_.c_str(), d, a, interchangable_[d][a] ? "true" : "false");
     }
   }
+}
+
+ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history):
+    game_(game),
+    solver_(solver),
+    history_(history) {
+  stats_ = GenParamsStats();
+  // Preprare symmetry Graph
+  graph_ = game.CreateGraph();
+  fixed_vars_ = solver.GetFixedVars();
+  for (auto id: fixed_vars_) {
+    graph_->change_color(abs(id) - 1, id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
+  }
+  game.restriction()->PropagateFixed(fixed_vars_, nullptr);
+  game.restriction()->AddToGraphRooted(*graph_, nullptr, vertex_type::kKnowledgeRoot);
+  for (auto& e: history) {
+    auto formula = e.exp.type().outcomes()[e.outcome_id].formula;
+    formula->PropagateFixed(fixed_vars_, &e.exp.params());
+    formula->AddToGraphRooted(*graph_, &e.exp.params(), vertex_type::kKnowledgeRoot);
+  }
+
+  for (auto e: game.experiments()) {
+    for (auto& maps: e->used_maps_) {
+      for (auto v: maps) for (auto u: maps) {
+        if (v == u) continue;
+        for (uint i = 0; i < game.alphabet().size(); i++) {
+          auto v1 = game.getMappingValue(u, i);
+          auto v2 = game.getMappingValue(v, i);
+          graph_->add_edge(v1 - 1, v2 - 1);
+        }
+      }
+    }
+  }
+
+  var_groups_ = game_.ComputeVarEquiv(solver_, *graph_);
+}
+
+
+vec<Experiment> ExpGenerator::All() {
+  vec<Experiment> result;
+  for (auto t: game_.experiments()) {
+    curr_type_ = t;
+
+    params_.resize(t->num_params());
+    params_basic_.clear();
+    params_final_.clear();
+    auto pre2 = stats_.ph2;
+    auto pre3 = stats_.ph3;
+
+    GenParamsFill(0);
+
+    //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+    assert(stats_.ph2 - pre2 == params_basic_.size());
+    assert(stats_.ph3 - pre3 == params_final_.size());
+
+    for (auto& params: params_final_) {
+      result.push_back(Experiment(solver_, *t, params, result.size()));
+    }
+  }
+  return result;
 }
 
 bool ExpGenerator::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
@@ -287,7 +368,7 @@ void ExpGenerator::GenParamsGraphFilter() {
   auto graph = bliss::Graph(*graph_);
   for (auto outcome: curr_type_->outcomes()) {
     outcome.formula->PropagateFixed(fixed_vars_, &params_);
-    outcome.formula->AddToGraph(graph, &params_, vertex_type::kOutcomeRoot);
+    outcome.formula->AddToGraphRooted(graph, &params_, vertex_type::kOutcomeRoot);
   }
 
   clock_t t1 = clock();

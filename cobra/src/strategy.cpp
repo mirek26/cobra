@@ -59,7 +59,7 @@ uint breaker::interactive(vec<Experiment>& options) {
         experiment.index(),
         experiment.type().name().c_str(),
         experiment.type().game().ParamsToStr(experiment.params()).c_str());
-      printf(" ] - M: ");
+      printf(" - M: ");
       for (uint i = 0; i < experiment.num_outcomes(); i++)
         printf("%i ", experiment.NumOfModels(i));
       printf("F: ");

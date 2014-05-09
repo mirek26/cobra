@@ -79,22 +79,12 @@ class ExpType {
   vec<set<uint>> params_smaller_than_;
 
  public:
-  ExpType(Game& game, string name, uint num_params):
-      game_(game),
-      name_(name),
-      num_params_(num_params),
-      final_outcome_(-1) {
-    params_different_.resize(num_params);
-    params_smaller_than_.resize(num_params);
-    alph_ = game_.alphabet().size();
-  }
+  ExpType(Game& game, string name, uint num_params);
 
   string name() const { return name_; }
   Game& game() const { return game_; }
-
   int final_outcome() const { return final_outcome_; }
   const vec<Outcome>& outcomes() const { return outcomes_; }
-
   uint num_params() { return num_params_; }
 
   // Functions defining the experiment.
@@ -102,24 +92,12 @@ class ExpType {
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
 
-
   set<vec<CharId>>& GenParams(vec<uint>&);
   void Precompute();
 
-  uint64_t NumberOfParametrizations() const {
-    uint64_t total = 1;
-    for (uint i = 0; i < num_params_; i++) {
-      int pos = alph_;
-      for (auto p: params_different_[i]) {
-        if (p < i) pos--;
-      }
-      total *= pos;
-    }
-    return total;
-  }
-
+  uint64_t NumberOfParametrizations() const;
   bliss::Graph* CreateGraphForParams(const vec<EvalExp>& history,
-                                       const vec<CharId>& params);
+                                     const vec<CharId>& params) const;
 
  private:
   // Computes used_maps_ and used_vars_.
@@ -152,70 +130,14 @@ class ExpGenerator {
   vec<CharId> params_;
 
  public:
-  ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history):
-    game_(game),
-    solver_(solver),
-    history_(history) {
-    stats_ = GenParamsStats();
-    // Preprare symmetry Graph
-    graph_ = game.CreateGraph();
-    fixed_vars_ = solver.GetFixedVars();
-    for (auto id: fixed_vars_) {
-      graph_->change_color(abs(id) - 1, id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
-    }
-    game.restriction()->PropagateFixed(fixed_vars_, nullptr);
-    game.restriction()->AddToGraph(*graph_, nullptr, vertex_type::kKnowledgeRoot);
-    for (auto& e: history) {
-      auto formula = e.exp.type().outcomes()[e.outcome_id].formula;
-      formula->PropagateFixed(fixed_vars_, &e.exp.params());
-      formula->AddToGraph(*graph_, &e.exp.params());
-    }
-
-    for (auto e: game.experiments()) {
-      for (auto& maps: e->used_maps_) {
-        for (auto v: maps) for (auto u: maps) {
-          if (v == u) continue;
-          for (uint i = 0; i < game.alphabet().size(); i++) {
-            auto v1 = game.getMappingValue(u, i);
-            auto v2 = game.getMappingValue(v, i);
-            graph_->add_edge(v1 - 1, v2 - 1);
-          }
-        }
-      }
-    }
-
-    var_groups_ = game_.ComputeVarEquiv(solver_, *graph_);
-  }
-
+  ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history);
   ~ExpGenerator() {
     delete graph_;
   }
 
+  // TODO: incremental generation
   // Experiment Next();
-
-  vec<Experiment> All() {
-    vec<Experiment> result;
-    for (auto t: game_.experiments()) {
-      curr_type_ = t;
-
-      params_.resize(t->num_params());
-      params_basic_.clear();
-      params_final_.clear();
-      auto pre2 = stats_.ph2;
-      auto pre3 = stats_.ph3;
-
-      GenParamsFill(0);
-
-      //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
-      assert(stats_.ph2 - pre2 == params_basic_.size());
-      assert(stats_.ph3 - pre3 == params_final_.size());
-
-      for (auto& params: params_final_) {
-        result.push_back(Experiment(solver_, *t, params, result.size()));
-      }
-    }
-    return result;
-  }
+  vec<Experiment> All();
 
  private:
   // Helper functions for parametrizations generation.
