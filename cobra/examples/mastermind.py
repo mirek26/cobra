@@ -4,7 +4,7 @@
 
 from itertools import permutations, combinations
 
-N = 3  # number of pegs
+N = 4  # number of pegs
 C = ['A', 'B', 'C', 'D', 'E', 'F'] # peg colors
 
 # x1_A tells whether the color of the first peg is A

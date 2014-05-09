@@ -39,18 +39,20 @@ struct identity { typedef T type; };
 
 namespace vertex_type {
   const int
-    kOutcomeRoot = -2,
     kKnowledgeRoot = -1,
-    kVariableId = 1,
-    kNotId = 2,
-    kImpliesId = 3,
-    kEquivalenceId = 4,
-    kAndId = 5,
-    kOrId = 6,
-    kMappingId = 7,
-    kAtLeastId = 8,
-    kAtMostId = 9,
-    kExactlyId = 10;
+    kOutcomeRoot = -2,
+    kVariableId = 3,
+    kTrueVar = 4,
+    kFalseVar = 5,
+    kNotId = 6,
+    kImpliesId = 10,
+    kEquivalenceId = 11,
+    kAndId = 12,
+    kOrId = 13,
+    kMappingId = 14,
+    kAtLeastId = 20,
+    kAtMostId = 21,
+    kExactlyId = 22;
 }
 
 namespace color {

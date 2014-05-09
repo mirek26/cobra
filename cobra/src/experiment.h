@@ -138,7 +138,7 @@ class ExpGenerator {
   const vec<EvalExp>& history_;
 
   vec<VarId> fixed_vars_;
-  std::map<unsigned int, vec<CharId>> graphs_;
+  std::map<unsigned int, std::pair<vec<CharId>, bool>> graphs_;
 
   GenParamsStats stats_;
   bliss::Graph* graph_;
@@ -160,6 +160,9 @@ class ExpGenerator {
     // Preprare symmetry Graph
     graph_ = game.CreateGraph();
     fixed_vars_ = solver.GetFixedVars();
+    for (auto id: fixed_vars_) {
+      graph_->change_color(abs(id) - 1, id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
+    }
     game.restriction()->PropagateFixed(fixed_vars_, nullptr);
     game.restriction()->AddToGraph(*graph_, nullptr, vertex_type::kKnowledgeRoot);
     for (auto& e: history) {
@@ -175,7 +178,7 @@ class ExpGenerator {
           for (uint i = 0; i < game.alphabet().size(); i++) {
             auto v1 = game.getMappingValue(u, i);
             auto v2 = game.getMappingValue(v, i);
-            graph_->add_edge(2*v1 - 2, 2*v2 - 2);
+            graph_->add_edge(v1 - 1, v2 - 1);
           }
         }
       }

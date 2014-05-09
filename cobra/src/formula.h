@@ -233,9 +233,9 @@ class AndOperator: public NaryOperator {
       if (c->fixed() == true && c->fixed_value()== false) {
         fixed_ = true;
         fixed_value_ = false;
-        break;
+        return;
       }
-      fixed_all &= c->fixed();
+      fixed_all = fixed_all && c->fixed();
     }
     if (fixed_all) {
       fixed_ = true;
@@ -287,9 +287,9 @@ class OrOperator: public NaryOperator {
       if (c->fixed() == true && c->fixed_value() == true) {
         fixed_ = true;
         fixed_value_ = true;
-        break;
+        return;
       }
-      fixed_all &= c->fixed();
+      fixed_all = fixed_all && c->fixed();
     }
     if (fixed_all) {
       fixed_ = true;
@@ -792,6 +792,7 @@ class Variable: public Formula {
   }
 
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>*) {
+    fixed_ = false;
     if (std::count(fixed.begin(), fixed.end(), id_)) {
       fixed_ = true;
       fixed_value_ = true;

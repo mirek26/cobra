@@ -25,7 +25,7 @@ void Formula::dump(int indent) {
   for (int i = 0; i < indent; ++i) {
     printf("   ");
   }
-  printf("%p: %s\n", (void*)this, name().c_str());
+  printf("%p: %s (%s %s)\n", (void*)this, name().c_str(), fixed_ ? "fixed" : "not fixed", fixed_value_ ? "1" : "0");
   for (uint i = 0; i < child_count(); ++i) {
     child(i)->dump(indent + 1);
   }
@@ -231,24 +231,17 @@ void Formula::AddToGraph(bliss::Graph& g,
     parent = g.get_nof_vertices() - 1;
   }
 
-  if (isLiteral()) {
+  if (isLiteral() && !dynamic_cast<NotOperator*>(this)) {
     // just create an edge from parent to the variable
     assert(parent > 0);
-    auto neg = false;
-    auto c = this;
-    // natahni hranu z parenta sem
-    if (dynamic_cast<NotOperator*>(c)) {
-      neg = true;
-      c = c->neg();
-    }
-    auto map = dynamic_cast<Mapping*>(c);
-    auto var = dynamic_cast<Variable*>(c);
+    auto map = dynamic_cast<Mapping*>(this);
+    auto var = dynamic_cast<Variable*>(this);
     if (map) {
       assert(params);
-      g.add_edge(parent, 2*map->getValue(*params) - 2 + neg);
+      g.add_edge(parent, map->getValue(*params) - 1);
     } else {
       assert(var);
-      g.add_edge(parent, 2*var->id() - 2 + neg);
+      g.add_edge(parent, var->id() - 1);
     }
   } else {
     // create a new node for the operator and call recursively for children

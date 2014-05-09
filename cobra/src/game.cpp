@@ -101,15 +101,11 @@ void Game::Precompute() {
 }
 
 bliss::Graph* Game::CreateGraph() {
-  int new_id = 0;
   // Create the graph
   auto g = new bliss::Graph(0);
   // Add vertices for vars, create edge between a variable and its negation
-  for (auto it = vars().begin() + 1; it != vars().end(); ++it) {
-    g->add_vertex((*it)->type_id());
-    g->add_vertex((*it)->type_id());
-    g->add_edge(new_id, new_id + 1);
-    new_id += 2;
+  for (uint i = 1; i < vars().size(); i++) {
+    g->add_vertex(vertex_type::kVariableId);
   }
   g->set_splitting_heuristic(bliss::Graph::shs_fsm);
   return g;

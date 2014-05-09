@@ -208,7 +208,8 @@ void ExpGenerator::GenParamsFill(uint n) {
     params_[n] = a;
     if (n + 1 == curr_type_->num_params()) {
       stats_.ph1++;
-      GenParamsBasicFilter();
+      //GenParamsBasicFilter();
+      GenParamsGraphFilter();
     } else {
       GenParamsFill(n + 1);
     }
@@ -295,11 +296,28 @@ void ExpGenerator::GenParamsGraphFilter() {
   game_.bliss_time() += clock() - t1;
 
   auto h = canonical->get_hash();
-  if (graphs_.count(h) == 0) {
-    // graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
-    graphs_[h] = params_;
+  if (graphs_.count(h) > 0 && graphs_[h].second) {
+    delete canonical;
+    return;
+  }
+
+  auto final = curr_type_->final_outcome();
+  auto finalsat = true;
+  if (final > -1) {
+    // TODO: optimize...
+    solver_.OpenContext();
+    solver_.AddConstraint(curr_type_->outcomes()[final].formula, params_);
+    finalsat = solver_.Satisfiable();
+    solver_.CloseContext();
+  }
+
+  if (graphs_.count(h) == 0 || finalsat) {
+    // TODO: proper hash map with graph comparison
+    //graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
+    graphs_[h] = make_pair(params_, finalsat);
     stats_.ph3++;
     params_final_.insert(params_);
   }
+
   delete canonical;
 }
