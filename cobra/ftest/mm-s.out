@@ -1,0 +1,71 @@
+
+[1;97m===== SIMULATION =====[0m
+Select an experiment: 
+0) guess [ A A A ]  - M: 8 0 12 0 0 6 0 0 1 F: 3 18 0 18 18 0 18 18 9 
+1) guess [ A A B ]  - M: 1 4 6 3 4 6 0 2 1 F: 9 3 1 5 1 0 18 5 9 
+2) guess [ A B C ]  - M: 0 0 3 6 6 6 2 3 1 F: 18 18 0 3 0 0 3 0 9 
+> [32mEXPERIMENT: guess A A A [0m
+Select an outcome: 
+0) 0 + 0 
+-) 0 + 1 (unsatisfiable)
+2) 1 + 0 
+-) 0 + 2 (unsatisfiable)
+-) 1 + 1 (unsatisfiable)
+5) 2 + 0 
+-) 0 + 3 (unsatisfiable)
+-) 1 + 2 (unsatisfiable)
+8) 3 + 0 
+> [32mOUTCOME: 0 + 0
+  ->   (¬x3A ∧ ¬x3A ∧ ¬x3A ∧ ¬x1A ∧ ¬x2A ∧ ¬x2A ∧ ¬x1A ∧ ¬x1A ∧ ¬x2A)
+
+[0mSelect an experiment: 
+1) guess [ A A B ]  - M: 1 3 4 0 0 0 0 0 0 F: 9 5 5 18 18 18 18 18 18 
+2) guess [ A B B ]  - M: 1 1 2 0 2 2 0 0 0 F: 9 9 5 18 5 7 18 18 18 
+3) guess [ A B C ]  - M: 0 0 2 2 2 2 0 0 0 F: 18 18 3 7 3 7 18 18 18 
+4) guess [ B B B ]  - M: 1 0 3 0 0 3 0 0 1 F: 9 18 3 18 18 3 18 18 9 
+5) guess [ B B C ]  - M: 0 0 1 1 0 3 0 2 1 F: 18 18 9 9 18 3 18 5 9 
+> [32mEXPERIMENT: guess A B C [0m
+Select an outcome: 
+-) 0 + 0 (unsatisfiable)
+-) 0 + 1 (unsatisfiable)
+2) 1 + 0 
+3) 0 + 2 
+4) 1 + 1 
+5) 2 + 0 
+-) 0 + 3 (unsatisfiable)
+-) 1 + 2 (unsatisfiable)
+-) 3 + 0 (unsatisfiable)
+> [32mOUTCOME: 1 + 1
+  ->   ((x1A ∧ x3B ∧ ¬x3C ∧ ¬x2B ∧ ¬x2C) ∨ (x1A ∧ x2C ∧ ¬x2B ∧ ¬x3C ∧ ¬x3B) ∨ (x3A ∧ x2B ∧ ¬x1C ∧ ¬x3C ∧ ¬x1A) ∨ (x1C ∧ x2B ∧ ¬x3A ∧ ¬x1A ∧ ¬x3C) ∨ (x2A �...
+
+[0mSelect an experiment: 
+1) guess [ A A B ]  - M: 0 1 1 0 0 0 0 0 0 F: 18 9 9 18 18 18 18 18 18 
+2) guess [ A A C ]  - M: 0 1 1 0 0 0 0 0 0 F: 18 9 9 18 18 18 18 18 18 
+3) guess [ A B B ]  - M: 0 1 0 0 0 1 0 0 0 F: 18 9 18 18 18 9 18 18 18 
+6) guess [ B A A ]  - M: 0 1 1 0 0 0 0 0 0 F: 18 9 9 18 18 18 18 18 18 
+7) guess [ B A B ]  - M: 0 0 1 0 1 0 0 0 0 F: 18 18 9 18 9 18 18 18 18 
+8) guess [ B A C ]  - M: 0 0 0 1 0 1 0 0 0 F: 18 18 18 9 18 9 18 18 18 
+9) guess [ B B A ]  - M: 0 0 1 0 1 0 0 0 0 F: 18 18 9 18 9 18 18 18 18 
+10) guess [ B B B ]  - M: 0 0 1 0 0 1 0 0 0 F: 18 18 9 18 18 9 18 18 18 
+11) guess [ B B C ]  - M: 0 0 0 0 0 1 0 1 0 F: 18 18 18 18 18 9 18 9 18 
+12) guess [ B C A ]  - M: 0 0 0 1 0 1 0 0 0 F: 18 18 18 9 18 9 18 18 18 
+13) guess [ B C B ]  - M: 0 0 0 0 0 1 0 1 0 F: 18 18 18 18 18 9 18 9 18 
+14) guess [ B C C ]  - M: 0 0 0 1 0 0 0 0 1 F: 18 18 18 9 18 18 18 18 9 
+> [32mEXPERIMENT: guess A A B [0m
+Select an outcome: 
+-) 0 + 0 (unsatisfiable)
+1) 0 + 1 
+2) 1 + 0 
+-) 0 + 2 (unsatisfiable)
+-) 1 + 1 (unsatisfiable)
+-) 2 + 0 (unsatisfiable)
+-) 0 + 3 (unsatisfiable)
+-) 1 + 2 (unsatisfiable)
+-) 3 + 0 (unsatisfiable)
+> [32mOUTCOME: 0 + 1
+  ->   ((¬x3B ∧ ¬x3A ∧ ¬x1B ∧ ¬x1A ∧ ¬x2A ∧ ¬x1A ∧ x2A) ∨ (x3A ∧ ¬x3B ∧ ¬x1B ∧ ¬x1A ∧ ¬x2A ∧ ¬x2B ∧ ¬x1A) ∨ (¬x3A ∧ ¬x3B ∧ ¬x2A ∧ ¬x1A ∧ ¬x2B ∧ x1A ∧ ...
+
+[0m[1;97mSOLVED in 3 experiments![0m
+TRUE: x1B x2C x3C 
+FALSE: x1A x1C x2A x2B x3A x3B 
+

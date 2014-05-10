@@ -75,6 +75,7 @@ if __name__ == '__main__':
   __F.close()
   __end = time.time()
   print "[%.2fs] (%s)" % (__end - __start, __filename)
+  sys.stdout.flush()
   if not os.path.isfile(__execname):
     print "cobra-backend not found; run 'make' first. "
     exit(0)

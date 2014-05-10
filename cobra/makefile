@@ -68,9 +68,23 @@ test: $(GTEST_DIR)/test
 test-clean:
 	rm -rf $(GTEST_DIR)/*.o $(GTEST_DIR)/*.a $(GTEST_DIR)/test
 
-.PHONY: test bison
+# functional tests
+
+ftest: cobra
+	@(export COBRA=`pwd`/cobra; cd ftest;\
+	for t in *.sh; do\
+	  printf $$t;\
+	  printf "... ";\
+	  ./$$t | grep -v 'time' | grep -v 'TIME' | \
+             grep -v 'Preprocessing' | grep -v 'Loading' > '.test.out';\
+	  diff .test.out `basename $$t .sh`.out;\
+	  if [ $$? -eq 0 ]; then echo "OK."; fi\
+  done)
+
 
 # clean
+.PHONY: test ftest bison
+
 clean:
 	rm -rf src/*.o $(EXEC)
 
