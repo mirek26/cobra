@@ -38,7 +38,7 @@ bool readIntOrString(uint& i, string& str) {
   std::cin >> str;
   if (std::cin.fail() || std::cin.eof()) {
     printf("\n(end of input)\n");
-    exit(0);
+    throw std::runtime_error("Unexpected end of file.");
   }
   try {
     i = std::stoi(str);

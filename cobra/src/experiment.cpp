@@ -76,7 +76,7 @@ uint Experiment::NumOfFixedVars(uint id) {
     data_[id].fixed_c = true;
     solver_.CloseContext();
   }
-  return data_[id].models;
+  return data_[id].fixed;
 }
 
 ExpType::ExpType(Game& game, string name, uint num_params):
@@ -216,7 +216,6 @@ ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& histo
       }
     }
   }
-
   var_groups_ = game_.ComputeVarEquiv(solver_, *graph_);
 }
 

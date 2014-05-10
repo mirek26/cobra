@@ -323,7 +323,9 @@ int main(int argc, char* argv[]) {
     if (args.mode == "o" || args.mode == "overview") {
       overview_mode();
     } else if (args.mode == "s" || args.mode == "simulation") {
-      simulation_mode();
+      try {
+        simulation_mode();
+      } catch (std::runtime_error&) { }
     } else if (args.mode == "a" || args.mode == "analysis") {
       if (args.stg_experiment == "interactive" || args.stg_experiment == "random") {
         printf("Cannot analyze strategy '%s'. \n", args.stg_experiment.c_str());

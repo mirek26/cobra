@@ -565,6 +565,7 @@ void OrOperator::AddToGraph(bliss::Graph& g,
 void Mapping::AddToGraph(bliss::Graph& g,
                          const vec<CharId>* params,
                          int parent) {
+  if (fixed_) return;
   assert(parent > 0);
   assert(params);
   g.add_edge(parent, getValue(*params) - 1);
@@ -573,6 +574,7 @@ void Mapping::AddToGraph(bliss::Graph& g,
 void Variable::AddToGraph(bliss::Graph& g,
                           const vec<CharId>* params,
                           int parent) {
+  if (fixed_) return;
   assert(parent > 0);
   g.add_edge(parent, id_ - 1);
 }

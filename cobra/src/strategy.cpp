@@ -52,7 +52,7 @@ namespace {
 
 uint breaker::interactive(vec<Experiment>& options) {
   // Print options.
-  printf("Select an experiment: \n");//%i: \n", exp_num++);
+  printf("Select an experiment: \n");
   for (auto& experiment: options) {
     if (experiment.NumOfSat() > 1) {
       printf("%i) %s [ %s ] ",

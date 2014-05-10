@@ -121,29 +121,24 @@ bliss::Graph* Game::CreateGraph() {
 
 void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   vec<int>& var_equiv = *((vec<int>*) equiv);
-  int d = -1;
-  for (uint i = 0; i < var_equiv.size()*2 - 2; i+=2) {
-    if (aut[i] <= i) continue;
-    if (aut[i+1] != aut[i]+1) return;
-    if (d > -1) return;
+  uint d = 0;
+  for (uint i = 1; i < var_equiv.size(); i++) {
+    if (aut[i - 1] <= i - 1) continue;
+    if (d > 0) return;
     d = i;
   }
-  uint v1 = aut[d]/2 + 1, v2 = d/2 + 1;
-  if (v1 < var_equiv.size()) {
-    auto min = var_equiv[v1] > var_equiv[v2] ? var_equiv[v2] : var_equiv[v1];
-    var_equiv[v1] = var_equiv[v2] = min;
+  if (d > 0 && aut[d - 1] + 1 < var_equiv.size()) {
+    uint v1 = d, v2 = aut[d - 1] + 1;
+    auto min = var_equiv[v2] > var_equiv[v1] ?
+                  var_equiv[v1] : var_equiv[v2];
+    var_equiv[v2] = var_equiv[v1] = min;
   }
 }
 
 vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Graph& graph) {
   bliss::Stats stats;
-  auto var_count = vars_.size();
-  vec<uint> var_equiv(var_count, 0);
-  // Assign label t/f to fixed vars, label others by their position
-  auto t = var_count, f = var_count;
-  for (uint i = 1; i < var_count; i++) {
-    if (solver.MustBeTrue(i)) var_equiv[i] = t;
-    else if (solver.MustBeFalse(i)) var_equiv[i] = f;
+  vec<uint> var_equiv(vars_.size(), 0);
+  for (uint i = 1; i < vars_.size(); i++) {
     var_equiv[i] = i;
   }
   clock_t t1 = clock();
@@ -152,9 +147,8 @@ vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Graph& graph) {
                            (void*)&var_equiv);
   bliss_calls_ += 1;
   bliss_time_ += clock() - t1;
-  for (uint i = 1; i < var_count; i++) {
+  for (uint i = 1; i < vars_.size(); i++) {
     var_equiv[i] = var_equiv[var_equiv[i]];
   }
-
   return var_equiv;
 }
