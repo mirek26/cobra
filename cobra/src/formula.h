@@ -13,7 +13,6 @@
 #include <bliss/graph.hh>
 #include "common.h"
 #include "parser.h"
-#include "pico-solver.h"
 
 #ifndef COBRA_FORMULA_H_
 #define COBRA_FORMULA_H_
@@ -23,6 +22,7 @@ class Variable;
 class OrOperator;
 class AndOperator;
 class NotOperator;
+class CnfSolver;
 
 extern Parser m;
 
@@ -77,7 +77,7 @@ class Formula {
    * If id of the variable is not assigned yet, a new id will be created.
    * Note that the value is valid only during an ongoing CNF conversion.
    */
-  virtual VarId tseitin_var(PicoSolver& cnf);
+  virtual VarId tseitin_var(CnfSolver& cnf);
 
   /**
    * Negates the formula. Equivalent to m.get<NotOperator>(this), except for
@@ -103,7 +103,7 @@ class Formula {
    * that are added to the vector 'clauses'. Recursively calls the same
    * on all children.
    */
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top) = 0;
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top) = 0;
 
   /**
    * Partially evaluates the formula if values of some variables are fixed.
@@ -156,7 +156,7 @@ class Formula {
   /**
    * Gets vector of results of tseitin_var() called on all children.
    */
-  vec<VarId> tseitin_children(PicoSolver& cnf);
+  vec<VarId> tseitin_children(CnfSolver& cnf);
 
   /**
    * Helper function for pretty. Calls pretty on childs and joins results with 'sep'.
@@ -215,7 +215,7 @@ class AndOperator: public NaryOperator {
     return pretty_join(utf8 ? " ∧ " : " & ", utf8, params);
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -247,7 +247,7 @@ class OrOperator: public NaryOperator {
     return pretty_join(utf8 ? " ∨ " : " | ", utf8, params);
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -279,7 +279,7 @@ class AtLeastOperator: public NaryOperator {
     return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -308,7 +308,7 @@ class AtMostOperator: public NaryOperator {
     return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -337,7 +337,7 @@ class ExactlyOperator: public NaryOperator {
     return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8, params);
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -366,7 +366,7 @@ class EquivalenceOperator: public Formula {
       ")";
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -398,7 +398,7 @@ class ImpliesOperator: public Formula {
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 };
 
 /**
@@ -419,7 +419,7 @@ class NotOperator: public Formula {
     return (utf8 ? "¬" : "!") + children_[0]->pretty(utf8, params);
   }
 
-  virtual VarId tseitin_var(PicoSolver& cnf) {
+  virtual VarId tseitin_var(CnfSolver& cnf) {
     if (isLiteral()) return -children_[0]->tseitin_var(cnf);
     else return Formula::tseitin_var(cnf);
   }
@@ -432,7 +432,7 @@ class NotOperator: public Formula {
     return children_[0]->isLiteral();
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -473,7 +473,7 @@ class Mapping: public Formula {
     return m.game().getMappingValue(mapping_id_, params[param_id_]);
   }
 
-  virtual VarId tseitin_var(PicoSolver& cnf) {
+  virtual VarId tseitin_var(CnfSolver& cnf) {
     assert(cnf.build_for_params());
     return getValue(*cnf.build_for_params());
   }
@@ -482,7 +482,7 @@ class Mapping: public Formula {
     return "Mapping " + pretty();
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
@@ -518,7 +518,7 @@ class Variable: public Formula {
     return "Variable " + pretty() + "(" + std::to_string(id_) +")";
   }
 
-  virtual VarId tseitin_var(PicoSolver&) {
+  virtual VarId tseitin_var(CnfSolver&) {
     return id_;
   }
 
@@ -526,7 +526,7 @@ class Variable: public Formula {
     return true;
   }
 
-  virtual void TseitinTransformation(PicoSolver& cnf, bool top);
+  virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
   virtual bool Satisfied(const vec<bool>& model, const vec<CharId>);
   virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>*);

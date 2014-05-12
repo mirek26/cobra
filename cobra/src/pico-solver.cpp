@@ -59,24 +59,6 @@ void PicoSolver::AddClause(const Clause& c) {
   picosat_add(picosat_, 0);
 }
 
-void PicoSolver::AddConstraint(Formula* formula) {
-  assert(formula);
-  formula->ResetTseitinIds();
-  formula->TseitinTransformation(*this, true);
-}
-
-void PicoSolver::AddConstraint(Formula* formula, const vec<CharId>& params) {
-  build_for_params_ = &params;
-  AddConstraint(formula);
-  build_for_params_ = nullptr;
-}
-
-void PicoSolver::AddConstraint(PicoSolver& cnf) {
-  for (auto& clause: cnf.clauses_) {
-    AddClause(clause);
-  }
-}
-
 //------------------------------------------------------------------------------
 // Pretty print
 
@@ -191,57 +173,20 @@ void PicoSolver::PrintAssignment() {
   printf("\n");
 }
 
-//------------------------------------------------------------------------------
-// Symmetry-breaking stuff
-
-// bool PicoSolver::ProbeEquivalence(const Clause& clause, VarId var1, VarId var2) {
-//   Clause test(clause);
-//   bool p1 = test.erase(var1);
-//   bool p2 = test.erase(var2);
-//   bool n1 = test.erase(-var1);
-//   bool n2 = test.erase(-var2);
-//   if (p1) test.insert(var2);
-//   if (p2) test.insert(var1);
-//   if (n1) test.insert(-var2);
-//   if (n2) test.insert(-var1);
-//   return clauses_.count(test);
-// }
-
-// // Compute 'syntactical' equivalence on variables with ids 1 - limit; how about semantical?
-// vec<int> PicoSolver::ComputeVariableEquivalence(VarId limit) {
-//   assert(context_.empty());
-//   vec<int> components(limit + 1, 0);
-//   int cid = 1;
-//   for (VarId i = 1; i <= limit; i++) {
-//     if (components[i] > 0) continue;
-//     components[i] = cid++;
-//     for (VarId j = i + 1; j <= limit; j++) {
-//       if (components[j] > 0) continue;
-//       bool equiv = true;
-//       for (auto& clause: clauses_) {
-//         equiv = equiv && ProbeEquivalence(clause, i, j);
-//         if (!equiv) break;
-//       }
-//       if (equiv) components[j] = components[i];
-//     }
+// uint PicoSolver::NumOfModelsSharpSat(){
+//   FILE* f = fopen(".nummodels", "w");
+//   WriteDimacs(f);
+//   fclose(f);
+//   int r = system("./tools/sharpSAT/Release/sharpSAT -q .nummodels > .nummodels-result");
+//   if (r != 0) {
+//     printf("Error: sharpSAT failed :-(\n");
+//     return 0;
 //   }
-//   return components;
+//   FILE* g = fopen(".nummodels-result", "r");
+//   uint k;
+//   fscanf(g, "%u", &k);
+//   return k;
 // }
-
-uint PicoSolver::NumOfModelsSharpSat(){
-  FILE* f = fopen(".nummodels", "w");
-  WriteDimacs(f);
-  fclose(f);
-  int r = system("./tools/sharpSAT/Release/sharpSAT -q .nummodels > .nummodels-result");
-  if (r != 0) {
-    printf("Error: sharpSAT failed :-(\n");
-    return 0;
-  }
-  FILE* g = fopen(".nummodels-result", "r");
-  uint k;
-  fscanf(g, "%u", &k);
-  return k;
-}
 
 void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
   assert(var > 0 && (unsigned)var < vars_.size());

@@ -5,4 +5,17 @@
  */
 
 #include "solver.h"
+#include "formula.h"
+
+void CnfSolver::AddConstraint(Formula* formula) {
+  assert(formula);
+  formula->ResetTseitinIds();
+  formula->TseitinTransformation(*this, true);
+}
+
+void CnfSolver::AddConstraint(Formula* formula, const vec<CharId>& params) {
+  build_for_params_ = &params;
+  AddConstraint(formula);
+  build_for_params_ = nullptr;
+}
 

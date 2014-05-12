@@ -19,7 +19,6 @@ class Variable;
 class Formula;
 class ExpType;
 class Game;
-class PicoSolver;
 
 class ParserException: public std::exception {
   string what_;

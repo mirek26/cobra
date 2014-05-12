@@ -8,59 +8,54 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <minisat/core/Solver.h>
 #include "common.h"
 #include "solver.h"
 
-extern "C" {
-  #include <picosat/picosat.h>
-}
-
-#ifndef COBRA_PICOSOLVER_H_
-#define COBRA_PICOSOLVER_H_
+#ifndef COBRA_MINISOLVER_H_
+#define COBRA_MINISOLVER_H_
 
 class Variable;
 class Formula;
 
 typedef set<VarId> Clause;
 
-class PicoSolver: public CnfSolver {
+class MiniSolver: public CnfSolver {
   static SolverStats stats_;
 
-  vec<Clause> clauses_;
-  PicoSAT* picosat_;
-  vec<int> context_;
+  //vec<Clause> clauses_;
+  Minisat::Solver minisat_;
+  Minisat::vec<Minisat::Lit> contexts_;
   const vec<Variable*>& vars_;
 
  public:
-  PicoSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
-  ~PicoSolver();
+  MiniSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
+  ~MiniSolver() { }
 
   SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
 
   void AddClause(vec<VarId>& list);
   void AddClause(std::initializer_list<VarId> list);
-  void AddClause(const set<VarId>& c);
 
   void OpenContext();
   void CloseContext();
 
-  void WriteDimacs(FILE* f) {
-    picosat_print(picosat_, f);
-  }
+  // void WriteDimacs(FILE* f) {
+  //   minisat_print(minisat_, f);
+  // }
 
   VarId NewVarId() {
-    assert(picosat_);
-    int k = picosat_inc_max_var(picosat_);
-    return k;
+    return minisat_.newVar(true, false) + 1;
+    // assert(minisat_);
+    // int k = minisat_inc_max_var(minisat_);
+    // return k;
   }
 
   vec<bool> GetAssignment();
   void PrintAssignment();
 
   // uint NumOfModelsSharpSat();
-
-  string pretty();
 
  private:
   bool _MustBeTrue(VarId id);
@@ -77,4 +72,4 @@ class PicoSolver: public CnfSolver {
   void ForAllModels(VarId var, std::function<void()> callback);
 };
 
-#endif   // COBRA_PICOSOLVER_H_
+#endif   // COBRA_MINISOLVER_H_

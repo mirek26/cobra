@@ -42,14 +42,14 @@ uint Formula::Size() const {
 }
 
 
-VarId Formula::tseitin_var(PicoSolver& cnf) {
+VarId Formula::tseitin_var(CnfSolver& cnf) {
   if (tseitin_var_ == 0) {
     tseitin_var_ = cnf.NewVarId();
   }
   return tseitin_var_;
 }
 
-vec<VarId> Formula::tseitin_children(PicoSolver& cnf) {
+vec<VarId> Formula::tseitin_children(CnfSolver& cnf) {
   vec<VarId> vars(children_.size(), 0);
   std::transform(children_.begin(), children_.end(), vars.begin(),
     [&](Formula* f){
@@ -327,7 +327,7 @@ void Variable::PropagateFixed(const vec<VarId>& fixed,
  * Tseitin transformation.
  */
 
-void TseitinAnd(VarId thisVar, PicoSolver& cnf,
+void TseitinAnd(VarId thisVar, CnfSolver& cnf,
                 const vec<VarId>& list, uint limit,
                 bool negate = false) {
   int neg = negate ? -1 : 1;
@@ -345,7 +345,7 @@ void TseitinAnd(VarId thisVar, PicoSolver& cnf,
   }
 }
 
-void AndOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void AndOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   // if on top level, all childs must be true - just recurse down
   if (!top) {
     TseitinAnd(tseitin_var(cnf), cnf,
@@ -357,7 +357,7 @@ void AndOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void OrOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void OrOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   vec<VarId> first;
   for (auto& f: children_) {
     first.push_back(f->tseitin_var(cnf));
@@ -381,7 +381,7 @@ void OrOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void NotOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void NotOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   // X <-> (!Y)
   // (!X | !Y) & (X | Y)
   auto thisVar = tseitin_var(cnf);
@@ -394,7 +394,7 @@ void NotOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void ImpliesOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void ImpliesOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   auto leftVar = children_[0]->tseitin_var(cnf);
   auto rightVar = children_[1]->tseitin_var(cnf);
@@ -411,7 +411,7 @@ void ImpliesOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   children_[1]->TseitinTransformation(cnf, false);
 }
 
-void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void EquivalenceOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   auto leftVar = children_[0]->tseitin_var(cnf);
   auto rightVar = children_[1]->tseitin_var(cnf);
@@ -430,7 +430,7 @@ void EquivalenceOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   children_[1]->TseitinTransformation(cnf, false);
 }
 
-void TseitinNumerical(VarId thisVar, PicoSolver& cnf,
+void TseitinNumerical(VarId thisVar, CnfSolver& cnf,
                       bool at_least, bool at_most, uint value,
                       const vec<VarId>& children) {
   auto n = children.size();
@@ -457,7 +457,7 @@ void TseitinNumerical(VarId thisVar, PicoSolver& cnf,
   }
 }
 
-void ExactlyOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void ExactlyOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
@@ -469,7 +469,7 @@ void ExactlyOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void AtLeastOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void AtLeastOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
@@ -481,7 +481,7 @@ void AtLeastOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
+void AtMostOperator::TseitinTransformation(CnfSolver& cnf, bool top) {
   auto thisVar = tseitin_var(cnf);
   if (top) cnf.AddClause({ thisVar });
   TseitinNumerical(thisVar, cnf,
@@ -493,14 +493,14 @@ void AtMostOperator::TseitinTransformation(PicoSolver& cnf, bool top) {
   }
 }
 
-void Mapping::TseitinTransformation(PicoSolver& cnf, bool top) {
+void Mapping::TseitinTransformation(CnfSolver& cnf, bool top) {
   if (top) {
     assert(cnf.build_for_params());
     cnf.AddClause({ getValue(*cnf.build_for_params()) });
   }
 }
 
-void Variable::TseitinTransformation(PicoSolver& cnf, bool top) {
+void Variable::TseitinTransformation(CnfSolver& cnf, bool top) {
   if (top) {
     cnf.AddClause({ id_ });
   }

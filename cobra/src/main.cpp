@@ -20,6 +20,7 @@
 #include "common.h"
 #include "parser.h"
 #include "strategy.h"
+#include "minisolver.h"
 #include "pico-solver.h"
 #include "simple-solver.h"
 
@@ -43,6 +44,8 @@ Args args;
 Solver* get_solver(const vec<Variable*>& vars, Formula* restriction = nullptr) {
   if (args.backend == "picosat") {
     return new PicoSolver(vars, restriction);
+  } else if (args.backend == "minisat") {
+    return new MiniSolver(vars, restriction);
   } else if (args.backend == "simple") {
     return new SimpleSolver(vars, restriction);
   }

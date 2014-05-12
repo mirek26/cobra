@@ -104,7 +104,6 @@ class Solver {
 
   virtual vec<bool> GetAssignment() = 0;
   virtual void PrintAssignment() = 0;
-  virtual string pretty() = 0;
 
  private:
 
@@ -117,6 +116,21 @@ class Solver {
   virtual uint _NumOfModels() = 0;
   virtual vec<vec<bool>> _GenerateModels() = 0;
 
+};
+
+class CnfSolver: public Solver {
+  const vec<CharId>* build_for_params_ = nullptr;
+
+ public:
+  const vec<CharId>* build_for_params() const { return build_for_params_; }
+
+  virtual void AddClause(vec<VarId>& list) = 0;
+  virtual void AddClause(std::initializer_list<VarId> list) = 0;
+  //virtual void AddClause(const set<VarId>& c) = 0;
+  virtual VarId NewVarId() = 0;
+
+  void AddConstraint(Formula* formula);
+  void AddConstraint(Formula* formula, const vec<CharId>& params);
 };
 
 #endif   // COBRA_SOLVER_H_
