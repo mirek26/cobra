@@ -21,18 +21,12 @@ extern "C" {
 class Variable;
 class Formula;
 
-typedef set<VarId> Clause;
-
 class PicoSolver: public CnfSolver {
   static SolverStats stats_;
-
-  vec<Clause> clauses_;
   PicoSAT* picosat_;
-  vec<int> context_;
-  const vec<Variable*>& vars_;
 
  public:
-  PicoSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
+  PicoSolver(uint var_count, Formula* restriction = nullptr);
   ~PicoSolver();
 
   SolverStats& stats() { return stats_; }
@@ -40,7 +34,6 @@ class PicoSolver: public CnfSolver {
 
   void AddClause(vec<VarId>& list);
   void AddClause(std::initializer_list<VarId> list);
-  void AddClause(const set<VarId>& c);
 
   void OpenContext();
   void CloseContext();
@@ -55,12 +48,9 @@ class PicoSolver: public CnfSolver {
     return k;
   }
 
-  vec<bool> GetAssignment();
-  void PrintAssignment();
+  vec<bool> GetModel();
 
   // uint NumOfModelsSharpSat();
-
-  string pretty();
 
  private:
   bool _MustBeTrue(VarId id);
@@ -68,11 +58,8 @@ class PicoSolver: public CnfSolver {
   vec<VarId> _GetFixedVars();
   uint _GetNumOfFixedVars();
   bool _Satisfiable();
-  bool _OnlyOneModel();
   uint _NumOfModels();
   vec<vec<bool>> _GenerateModels();
-
-  string pretty_clause(const Clause& clause);
 
   void ForAllModels(VarId var, std::function<void()> callback);
 };

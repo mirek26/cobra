@@ -17,6 +17,14 @@ class Variable;
 class Formula;
 class Solver;
 
+/**
+ * Storage for statistics about a SAT solver. There are 3 categories
+ * of operations:
+ *  - fixed (resolving fixed variables)
+ *  - sat (resolving satisfiability)
+ *  - models (model counting)
+ * For each category, we store number of calls and the total time.
+ */
 typedef struct SolverStats {
   clock_t fixed_time = 0;
   int fixed_calls = 0;
@@ -26,86 +34,108 @@ typedef struct SolverStats {
   int models_calls = 0;
 } SolverStats;
 
+/**
+ * Abstract class for a SAT solver.
+ * Most public functions are only time-measuring wrappers that only call
+ * their protected variant with "_" prefix. These protected functions
+ * are virtual and should be (re)implemented in a derived class.
+ */
 class Solver {
+ protected:
+  uint var_count_;
+
  public:
   virtual ~Solver() { }
+
+  /**
+   * Gets statistics about solver usage.
+   */
   virtual SolverStats& stats() = 0;
 
+  /**
+   * Adds a non-parametrized formula as a constraint.
+   */
   virtual void AddConstraint(Formula* formula) = 0;
+
+  /**
+   * Adds a parametrized formula as a constraint.
+   */
   virtual void AddConstraint(Formula* formula, const vec<CharId>& params) = 0;
 
+  /**
+   * Opens a new context. All constraints added in this context
+   * are attached to it and discared when the context is closed
+   * with 'CloseContext'. Contexts can be arbitrarily nested.
+   */
   virtual void OpenContext() = 0;
+
+  /**
+   * Closes a context opened by 'OpenContext'. All constraints added
+   * since the 'OpenContext' call are discarded.
+   */
   virtual void CloseContext() = 0;
 
-  bool MustBeTrue(VarId id) {
-    auto t1 = clock();
-    auto result = _MustBeTrue(id);
-    stats().fixed_calls++;
-    stats().fixed_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns true if and only if there is no valuation of the variables
+   * that satisfies current constraints and variable 'id' is false.
+   * Time-measuring wrapper.
+   */
+  bool MustBeTrue(VarId id);
 
-  bool MustBeFalse(VarId id) {
-    auto t1 = clock();
-    auto result = _MustBeFalse(id);
-    stats().fixed_calls++;
-    stats().fixed_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns true if and only if there is no valuation of the variables
+   * that satisfies current constraints and variable 'id' is true.
+   * Time-measuring wrapper.
+   */
+  bool MustBeFalse(VarId id);
 
-  vec<VarId> GetFixedVars() {
-    auto t1 = clock();
-    auto result = _GetFixedVars();
-    stats().fixed_calls++;
-    stats().fixed_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns a vector of variables that are fixed by current constraints,
+   * i.e. in all models of current constainsts, the variable has the same value.
+   * The resulting vector contains a variable's id, if it must be true, and
+   * its negation, if it must be false.
+   * Time-measuring wrapper.
+   */
+  vec<VarId> GetFixedVars();
 
-  uint GetNumOfFixedVars() {
-    auto t1 = clock();
-    auto result = _GetNumOfFixedVars();
-    stats().fixed_calls++;
-    stats().fixed_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns the number of variables that are fixed by current constraints
+   * (see GetFixedVars).
+   * Time-measuring wrapper.
+   */
+  uint GetNumOfFixedVars();
 
-  bool Satisfiable() {
-    auto t1 = clock();
-    auto result = _Satisfiable();
-    stats().sat_calls++;
-    stats().sat_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns true if and only if all current constraints can be satisfied.
+   * Time-measuring wrapper.
+   */
+  bool Satisfiable();
 
-  bool OnlyOneModel() {
-    // should be called right after Satisfiable
-    auto t1 = clock();
-    auto result = _OnlyOneModel();
-    stats().sat_calls++;
-    stats().sat_time += clock() - t1;
-    return result;
-  }
+  /**
+   * This can be called only right after a successful 'Satisfiable' call.
+   * Returns true if the current constraints have only one model.
+   * Time-measuring wrapper.
+   */
+  bool OnlyOneModel();
 
-  uint NumOfModels() {
-    auto t1 = clock();
-    auto result = _NumOfModels();
-    stats().models_calls++;
-    stats().models_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Returns the number of models of the current constraints.
+   * Time-measuring wrapper.
+   */
+  uint NumOfModels();
 
-  vec<vec<bool>> GenerateModels() {
-    auto t1 = clock();
-    auto result = _GenerateModels();
-    stats().models_calls++;
-    stats().models_time += clock() - t1;
-    return result;
-  }
+  /**
+   * Generates all models of the current constraints.
+   * Time-measuring wrapper.
+   */
+  vec<vec<bool>> GenerateModels();
 
-  virtual vec<bool> GetAssignment() = 0;
-  virtual void PrintAssignment() = 0;
+  /**
+   * Retrieves the model after a successful 'Satisfiable' call.
+   */
+  virtual vec<bool> GetModel() = 0;
 
- private:
+ protected:
 
   virtual bool _MustBeTrue(VarId id) = 0;
   virtual bool _MustBeFalse(VarId id) = 0;
@@ -115,22 +145,43 @@ class Solver {
   virtual bool _OnlyOneModel() = 0;
   virtual uint _NumOfModels() = 0;
   virtual vec<vec<bool>> _GenerateModels() = 0;
-
 };
 
+/**
+ * Abstract class for a SAT solver taking constraints in CNF form.
+ */
 class CnfSolver: public Solver {
   const vec<CharId>* build_for_params_ = nullptr;
 
  public:
+  /**
+   * Gets a parametrization for an ongoing Tseitin transformation,
+   * invalid otherwise.
+   */
   const vec<CharId>* build_for_params() const { return build_for_params_; }
 
+  /**
+   * Adds a clause (disjunction of given variables) as a constraint.
+   */
   virtual void AddClause(vec<VarId>& list) = 0;
   virtual void AddClause(std::initializer_list<VarId> list) = 0;
-  //virtual void AddClause(const set<VarId>& c) = 0;
-  virtual VarId NewVarId() = 0;
 
+  /**
+   * General constraints are added by Tseitin tranformation to CNF.
+   */
   void AddConstraint(Formula* formula);
   void AddConstraint(Formula* formula, const vec<CharId>& params);
+
+  /**
+   * Generic implementation of _OnlyOneModel by adding a clause
+   * that excludes the current model.
+   */
+  virtual bool _OnlyOneModel();
+
+  /**
+   * Gets an id of a fresh variable, needed during Tseitin tranformation.
+   */
+  virtual VarId NewVarId() = 0;
 };
 
 #endif   // COBRA_SOLVER_H_

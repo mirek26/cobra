@@ -113,7 +113,6 @@ struct EvalExp {
 class ExpGenerator {
   Game& game_;
   Solver& solver_;
-  const vec<EvalExp>& history_;
 
   vec<VarId> fixed_vars_;
   std::map<unsigned int, std::pair<vec<CharId>, bool>> graphs_;
@@ -122,7 +121,6 @@ class ExpGenerator {
   bliss::Graph* graph_;
   vec<uint> var_groups_;
 
-  uint curr_tid;
   ExpType* curr_type_;
 
   set<vec<CharId>> params_basic_;

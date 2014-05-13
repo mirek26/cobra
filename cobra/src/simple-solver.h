@@ -20,7 +20,6 @@ class Formula;
 class SimpleSolver: public Solver {
   static SolverStats stats_;
 
-  const vec<Variable*>& vars_;
   Formula* restriction_;
 
   vec<std::pair<Formula*, vec<CharId>>> constraints_;
@@ -32,32 +31,31 @@ class SimpleSolver: public Solver {
   bool ready_;
 
  public:
-  SimpleSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
+  SimpleSolver(uint var_count, Formula* restriction = nullptr);
 
-  virtual SolverStats& stats() { return stats_; }
+  SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
 
-  virtual void AddConstraint(Formula* formula);
-  virtual void AddConstraint(Formula* formula, const vec<CharId>& params);
+  void AddConstraint(Formula* formula);
+  void AddConstraint(Formula* formula, const vec<CharId>& params);
 
-  virtual void OpenContext();
-  virtual void CloseContext();
+  void OpenContext();
+  void CloseContext();
 
-  virtual bool _MustBeTrue(VarId id);
-  virtual bool _MustBeFalse(VarId id);
-  virtual vec<VarId> _GetFixedVars();
-  virtual uint _GetNumOfFixedVars();
+  bool _MustBeTrue(VarId id);
+  bool _MustBeFalse(VarId id);
+  vec<VarId> _GetFixedVars();
+  uint _GetNumOfFixedVars();
 
-  virtual bool _Satisfiable();
-  virtual bool _OnlyOneModel();
+  bool _Satisfiable();
+  bool _OnlyOneModel();
 
-  virtual vec<bool> GetAssignment();
-  virtual void PrintAssignment();
+  vec<bool> GetModel();
 
-  virtual uint _NumOfModels();
-  virtual vec<vec<bool>> _GenerateModels();
+  uint _NumOfModels();
+  vec<vec<bool>> _GenerateModels();
 
-  virtual string pretty();
+  string pretty();
 
  private:
 

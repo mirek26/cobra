@@ -19,10 +19,10 @@
 
 SolverStats MiniSolver::stats_ = SolverStats();
 
-MiniSolver::MiniSolver(const vec<Variable*>& vars, Formula* restriction):
-    vars_(vars) {
+MiniSolver::MiniSolver(uint var_count, Formula* restriction) {
+  var_count_ = var_count;
   // Reserve id's for original variables.
-  for (uint i = 1; i < vars_.size(); i++) {
+  for (uint i = 1; i < var_count_; i++) {
     auto x = minisat_.newVar(true, true);
     assert(static_cast<uint>(x) + 1 == i);
   }
@@ -84,7 +84,7 @@ bool MiniSolver::_MustBeFalse(VarId id) {
 
 vec<VarId> MiniSolver::_GetFixedVars() {
   vec<VarId> result;
-  for (uint id = 1; id < vars_.size(); id++) {
+  for (uint id = 1; id < var_count_; id++) {
     if (_MustBeTrue(id)) result.push_back(id);
     if (_MustBeFalse(id)) result.push_back(-id);
   }
@@ -93,7 +93,7 @@ vec<VarId> MiniSolver::_GetFixedVars() {
 
 uint MiniSolver::_GetNumOfFixedVars() {
   uint r = 0;
-  for (uint id = 1; id < vars_.size(); id++) {
+  for (uint id = 1; id < var_count_; id++) {
     r += _MustBeTrue(id);
     r += _MustBeFalse(id);
   }
@@ -105,47 +105,21 @@ bool MiniSolver::_Satisfiable() {
   return r;
 }
 
-bool MiniSolver::_OnlyOneModel() {
-  _Satisfiable();
-  vec<bool> ass = GetAssignment();
-  OpenContext();
-
-  vec<VarId> clause;
-  for (uint id = 1; id < vars_.size(); id++) {
-    clause.push_back(id * (ass[id] ? -1 : 1));
-  }
-  AddClause(clause);
-
-  auto s = _Satisfiable();
-  CloseContext();
-  return !s;
-}
-
-vec<bool> MiniSolver::GetAssignment() {
-  vec<bool> result(vars_.size(), false);
-  for (uint id = 1; id < vars_.size(); id++) {
+vec<bool> MiniSolver::GetModel() {
+  vec<bool> result(var_count_, false);
+  for (uint id = 1; id < var_count_; id++) {
     if (Minisat::toInt(minisat_.modelValue(id - 1)) == 1) result[id] = true;
   }
   return result;
 }
 
-void MiniSolver::PrintAssignment() {
-  vec<int> trueVar;
-  vec<int> falseVar;
-  printf("ASS :");
-  for (uint id = 0; id < vars_.size(); id++) {
-    printf("%i ", Minisat::toInt(minisat_.modelValue(id)));
-  }
-  printf("\n");
-}
-
 void MiniSolver::ForAllModels(VarId var, std::function<void()> callback){
-  assert(var > 0 && (unsigned)var < vars_.size());
+  assert(var > 0 && (unsigned)var < var_count_);
   for (auto v: std::initializer_list<Minisat::Lit>(
         {Minisat::mkLit(var - 1, true), Minisat::mkLit(var - 1, false)})) {
     contexts_.push(v);
     if (_Satisfiable()) {
-      if ((unsigned)var == vars_.size() - 1) {
+      if ((unsigned)var == var_count_ - 1) {
         callback();
       } else {
         ForAllModels(var + 1, callback);
@@ -164,7 +138,7 @@ uint MiniSolver::_NumOfModels() {
 vec<vec<bool>> MiniSolver::_GenerateModels() {
   vec<vec<bool>> models;
   ForAllModels(1, [&](){
-    models.push_back(GetAssignment());
+    models.push_back(GetModel());
   });
   return models;
 }

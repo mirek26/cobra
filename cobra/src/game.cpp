@@ -79,21 +79,6 @@ ExpType* Game::addExperiment(string name, uint num_params) {
   return e;
 }
 
-void Game::PrintCode(vec<bool> code) {
-  vec<int> trueVar;
-  vec<int> falseVar;
-  assert(code.size() == vars_.size());
-  for (uint id = 1; id < vars_.size(); id++) {
-    if (code[id] == 1) trueVar.push_back(id);
-    else falseVar.push_back(id);
-  }
-  printf("TRUE: ");
-  for (auto s: trueVar) printf("%s ", vars_[s]->ident().c_str());
-  printf("\nFALSE: ");
-  for (auto s: falseVar) printf("%s ", vars_[s]->ident().c_str());
-  printf("\n");
-}
-
 string Game::ParamsToStr(const vec<CharId>& params, char sep) {
   string s = "";
   for (auto a: params)
@@ -135,7 +120,7 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Graph& graph) {
+vec<uint> Game::ComputeVarEquiv(bliss::Graph& graph) {
   bliss::Stats stats;
   vec<uint> var_equiv(vars_.size(), 0);
   for (uint i = 1; i < vars_.size(); i++) {
@@ -151,4 +136,14 @@ vec<uint> Game::ComputeVarEquiv(Solver& solver, bliss::Graph& graph) {
     var_equiv[i] = var_equiv[var_equiv[i]];
   }
   return var_equiv;
+}
+
+void Game::PrintModel(vec<bool> model) {
+  printf("TRUE: ");
+  for (uint id = 1; id < vars_.size(); id++)
+    if (model[id]) printf("%s ", vars_[id]->ident().c_str());
+  printf("\nFALSE: ");
+  for (uint id = 1; id < vars_.size(); id++)
+    if (!model[id]) printf("%s ", vars_[id]->ident().c_str());
+  printf("\n");
 }

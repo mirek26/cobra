@@ -92,7 +92,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 56 "src/cobra.ypp"
+#line 58 "src/cobra.ypp"
 {
   Formula* formula;
   vec<Variable*>* variable_list;

@@ -8,7 +8,7 @@
 #include <vector>
 #include <bliss/graph.hh>
 #include "common.h"
-#include "pico-solver.h"
+#include "picosolver.h"
 
 #ifndef COBRA_GAME_H_
 #define COBRA_GAME_H_
@@ -63,13 +63,13 @@ class Game {
   ExpType* addExperiment(string name, uint num_params);
   vec<ExpType*>& experiments() {  return experiments_;  }
 
-  void PrintCode(vec<bool> code);
+  void PrintModel(vec<bool> model);
   string ParamsToStr(const vec<CharId>& params, char sep = ' ');
 
   void Precompute();
 
   bliss::Graph* CreateGraph();
-  vec<uint> ComputeVarEquiv(Solver& solver, bliss::Graph& graph);
+  vec<uint> ComputeVarEquiv(bliss::Graph& graph);
 
 };
 

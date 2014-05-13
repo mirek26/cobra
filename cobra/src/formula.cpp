@@ -572,7 +572,7 @@ void Mapping::AddToGraph(bliss::Graph& g,
 }
 
 void Variable::AddToGraph(bliss::Graph& g,
-                          const vec<CharId>* params,
+                          const vec<CharId>*,
                           int parent) {
   if (fixed_) return;
   assert(parent > 0);

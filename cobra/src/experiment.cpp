@@ -187,8 +187,7 @@ void ExpType::Precompute() {
 
 ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history):
     game_(game),
-    solver_(solver),
-    history_(history) {
+    solver_(solver) {
   stats_ = GenParamsStats();
   // Preprare symmetry Graph
   graph_ = game.CreateGraph();
@@ -216,7 +215,7 @@ ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& histo
       }
     }
   }
-  var_groups_ = game_.ComputeVarEquiv(solver_, *graph_);
+  var_groups_ = game_.ComputeVarEquiv(*graph_);
 }
 
 

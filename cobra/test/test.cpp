@@ -2,7 +2,7 @@
 #include <initializer_list>
 #include "include/gtest/gtest.h"
 #include "../src/formula.h"
-#include "../src/pico-solver.h"
+#include "../src/picosolver.h"
 #include "../src/minisolver.h"
 #include "../src/simple-solver.h"
 #include "../src/parser.h"
@@ -32,16 +32,16 @@ TEST(Tseitin, Basic) {
   m.reset();
   m.game().declareVars({"x", "y"});
   auto f = Formula::Parse("!(And(Or(x&!y, y&!x)))");
-  PicoSolver s1(m.game().vars(), f);
+  PicoSolver s1(m.game().vars().size(), f);
   // EXPECT_EQ(2, s1.NumOfModels());
-  // PicoSolver s2(m.game().vars(), f);
+  // PicoSolver s2(m.game().vars().size(), f);
   // EXPECT_EQ(2, s2.NumOfModels());
 }
 
 TEST(Tseitin, Exactly0) {
   m.reset();
   m.game().declareVars({"a1", "a2", "a3"});
-  PicoSolver s(m.game().vars(),
+  PicoSolver s(m.game().vars().size(),
                Formula::Parse("!((!a1 & !a2 & !a3) <-> Exactly-0(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -49,7 +49,7 @@ TEST(Tseitin, Exactly0) {
 TEST(Tseitin, Exactly1) {
   m.reset();
   m.game().declareVars({"a1", "a2", "a3"});
-  PicoSolver s(m.game().vars(),
+  PicoSolver s(m.game().vars().size(),
                Formula::Parse("!((a1&!a2&!a3 | !a1&a2&!a3 | !a1&!a2&a3) <-> Exactly-1(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -57,7 +57,7 @@ TEST(Tseitin, Exactly1) {
 TEST(Tseitin, Exactly1b) {
   m.reset();
   m.game().declareVars({"a", "b"});
-  PicoSolver s(m.game().vars(),
+  PicoSolver s(m.game().vars().size(),
                Formula::Parse("Exactly-1(a, a|b, b)"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -65,7 +65,7 @@ TEST(Tseitin, Exactly1b) {
 TEST(Tseitin, Exactly3) {
   m.reset();
   m.game().declareVars({"a1", "a2", "a3"});
-  PicoSolver s(m.game().vars(),
+  PicoSolver s(m.game().vars().size(),
                Formula::Parse("!((a1 & a2 & a3) <-> Exactly-3(a1, a2, a3))"));
   EXPECT_FALSE(s.Satisfiable());
 }
@@ -73,7 +73,7 @@ TEST(Tseitin, Exactly3) {
 TEST(SolverTest, Exactly1) {
   m.reset();
   m.game().declareVars({"a1", "a2", "a3"});
-  PicoSolver s(m.game().vars(), Formula::Parse("Exactly-1(a1, a2, a3)"));
+  PicoSolver s(m.game().vars().size(), Formula::Parse("Exactly-1(a1, a2, a3)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("a2 <-> a3"));
   EXPECT_TRUE(s.Satisfiable());
@@ -94,7 +94,7 @@ class SolverTest : public testing::Test {
 TYPED_TEST(SolverTest, BasicSatisfiability) {
   m.reset();
   m.game().declareVars({"a", "b", "c", "d"});
-  TypeParam s(m.game().vars(), Formula::Parse("a -> b"));
+  TypeParam s(m.game().vars().size(), Formula::Parse("a -> b"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("c -> d"));
   EXPECT_TRUE(s.Satisfiable());
@@ -107,7 +107,7 @@ TYPED_TEST(SolverTest, BasicSatisfiability) {
 TYPED_TEST(SolverTest, OtherSatisfiability) {
   m.reset();
   m.game().declareVars({"x", "a", "b", "c", "d"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("a&!b&!c&!d | !a&b&!c&!d | !a&!b&c&!d | !a&!b&!c&d"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("(x & a) | (!x & b)"));
@@ -116,12 +116,12 @@ TYPED_TEST(SolverTest, OtherSatisfiability) {
   EXPECT_TRUE(s.Satisfiable());
 }
 
-TYPED_TEST(SolverTest, GetAssignment) {
+TYPED_TEST(SolverTest, GetModel) {
   m.reset();
   m.game().declareVars({"a", "b", "c"});
-  TypeParam s(m.game().vars(), Formula::Parse("a & !b"));
+  TypeParam s(m.game().vars().size(), Formula::Parse("a & !b"));
   EXPECT_TRUE(s.Satisfiable());
-  vec<bool> x = s.GetAssignment();
+  vec<bool> x = s.GetModel();
   EXPECT_EQ(4, x.size());
   EXPECT_TRUE(x[1]);
   EXPECT_FALSE(x[2]);
@@ -130,7 +130,7 @@ TYPED_TEST(SolverTest, GetAssignment) {
 TYPED_TEST(SolverTest, MustBeTrueFalse) {
   m.reset();
   m.game().declareVars({"a", "b"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("(a -> b) & a"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_TRUE(s.MustBeTrue(1));
@@ -142,7 +142,7 @@ TYPED_TEST(SolverTest, MustBeTrueFalse) {
 TYPED_TEST(SolverTest, OnlyOneModel) {
   m.reset();
   m.game().declareVars({"a", "b"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("a -> b"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_FALSE(s.OnlyOneModel());
@@ -154,7 +154,7 @@ TYPED_TEST(SolverTest, OnlyOneModel) {
 TYPED_TEST(SolverTest, ExactlyFixed) {
   m.reset();
   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
   EXPECT_TRUE(s.Satisfiable());
   s.AddConstraint(Formula::Parse("AtLeast-2(x1, x2, x3)"));
@@ -165,7 +165,7 @@ TYPED_TEST(SolverTest, ExactlyFixed) {
 TYPED_TEST(SolverTest, NumOfModelsExactly2) {
   m.reset();
   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
   EXPECT_EQ(10, s.NumOfModels()); // 5 choose 2
 }
@@ -173,7 +173,7 @@ TYPED_TEST(SolverTest, NumOfModelsExactly2) {
 TYPED_TEST(SolverTest, NumOfModelsAtMost2) {
   m.reset();
   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("AtMost-2(x1, x2, x3, x4, x5)"));
   EXPECT_EQ(16, s.NumOfModels()); // 1 + 5 + 10
 }
@@ -182,7 +182,7 @@ TYPED_TEST(SolverTest, NumOfModelsAtMost2) {
 TYPED_TEST(SolverTest, NumOfModelsAtLeast2) {
   m.reset();
   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("AtLeast-2(x1, x2, x3, x4, x5)"));
   EXPECT_EQ(26, s.NumOfModels()); // 2^5 - 5 - 1
 }
@@ -190,7 +190,7 @@ TYPED_TEST(SolverTest, NumOfModelsAtLeast2) {
 // TYPED_TEST(SolverTest, NumOfModelsSharpSat) {
 //   m.reset();
 //   m.game().declareVars({"x1", "x2", "x3", "x4", "x5"});
-//   TypeParam s(m.game().vars(),
+//   TypeParam s(m.game().vars().size(),
 //                Formula::Parse("Exactly-2(x1, x2, x3, x4, x5)"));
 //   EXPECT_EQ(10, s.NumOfModelsSharpSat());
 // }
@@ -201,7 +201,7 @@ TYPED_TEST(SolverTest, NumOfModelsAtLeast2) {
 TYPED_TEST(SolverTest, Context) {
   m.reset();
   m.game().declareVars({"a", "b", "c", "d"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("(a -> b) & (c -> d) & (!b | !d)"));
   EXPECT_TRUE(s.Satisfiable());
   EXPECT_EQ(5, s.NumOfModels());
@@ -215,7 +215,7 @@ TYPED_TEST(SolverTest, Context) {
 TYPED_TEST(SolverTest, NestedContext) {
   m.reset();
   m.game().declareVars({"a", "b", "c", "d"});
-  TypeParam s(m.game().vars(),
+  TypeParam s(m.game().vars().size(),
                Formula::Parse("a | b"));
   // EXPECT_EQ("(a | b)", s.pretty());
   EXPECT_EQ(12, s.NumOfModels()); // a|b -> 3 * 2^2

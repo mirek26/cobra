@@ -21,7 +21,7 @@
 #include "parser.h"
 #include "strategy.h"
 #include "minisolver.h"
-#include "pico-solver.h"
+#include "picosolver.h"
 #include "simple-solver.h"
 
 extern "C" int yyparse();
@@ -41,13 +41,13 @@ typedef struct Args{
 
 Args args;
 
-Solver* get_solver(const vec<Variable*>& vars, Formula* restriction = nullptr) {
+Solver* get_solver(uint var_count, Formula* restriction = nullptr) {
   if (args.backend == "picosat") {
-    return new PicoSolver(vars, restriction);
+    return new PicoSolver(var_count, restriction);
   } else if (args.backend == "minisat") {
-    return new MiniSolver(vars, restriction);
+    return new MiniSolver(var_count, restriction);
   } else if (args.backend == "simple") {
-    return new SimpleSolver(vars, restriction);
+    return new SimpleSolver(var_count, restriction);
   }
   assert(false);
 }
@@ -78,7 +78,7 @@ void overview_mode() {
   Game& game = m.game();
 
   printf("Num of variables: %lu\n", game.vars().size());
-  Solver* solver = get_solver(game.vars(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.restriction());
   uint models = solver->NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
@@ -128,7 +128,7 @@ void overview_mode() {
       printf("%s failed!%s\n", color::serror, color::snormal);
       printf("EXPERIMENT: %s %s", e.type().name().c_str(), game.ParamsToStr(e.params()).c_str());
       printf("\nPROBLEMATIC ASSIGNMENT: \n");
-      solver->PrintAssignment();
+      game.PrintModel(solver->GetModel());
       printf("\n");
       return;
     }
@@ -143,7 +143,7 @@ void overview_mode() {
 void simulation_mode() {
   print_head("SIMULATION");
   Game& game = m.game();
-  Solver* solver = get_solver(game.vars(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.restriction());
 
   int exp_num = 1;
   vec<EvalExp> process;
@@ -177,10 +177,10 @@ void simulation_mode() {
     solver->AddConstraint(outcome.formula, experiment.params());
     auto sat = solver->Satisfiable();
     assert(sat);
-    auto assingment = solver->GetAssignment();
+    auto model = solver->GetModel();
     if (solver->OnlyOneModel()) {
       printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
-      game.PrintCode(assingment);
+      game.PrintModel(model);
       break;
     }
 
@@ -224,7 +224,7 @@ void analyze(Solver& solver, vec<EvalExp>& history,
 void analyze_mode() {
   print_head("STRATEGY ANALYSIS");
   Game& game = m.game();
-  Solver* solver = get_solver(game.vars(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.restriction());
   vec<EvalExp> history;
   uint models = solver->NumOfModels();
   uint max = 0, sum = 0, num = 0;

@@ -30,7 +30,7 @@
 %token T_INT
 %token T_STRING
 
-/* order of precedence from
+/* Order of precedence from
  * http://en.wikipedia.org/wiki/Logical_connective#Order_of_precedence
  */
 %right T_EQUIV
@@ -81,7 +81,7 @@
 
 start :
     code
-  | formula
+  | formula    // hack to parse a formula only (for testing purposes)
     {  m.set_only_formula($1);  }
 
 ident :
@@ -193,6 +193,6 @@ formula_list:
 %%
 
 void yyerror(const char *error) {
-  printf("\n%d: %s at %s\n", yylineno, error, yytext);
+  printf("\nPARSE ERROR at line %d: %s at %s\n", yylineno, error, yytext);
   exit(EXIT_FAILURE);
 }

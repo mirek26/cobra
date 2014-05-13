@@ -6,15 +6,15 @@
 
 #include "formula.h"
 #include "simple-solver.h"
-#include "pico-solver.h"
+#include "picosolver.h"
 
 SolverStats SimpleSolver::stats_ = SolverStats();
 
-SimpleSolver::SimpleSolver(const vec<Variable*>& vars,
+SimpleSolver::SimpleSolver(uint var_count,
                            Formula* restriction) :
-    vars_(vars),
     restriction_(restriction) {
-  PicoSolver sat(vars, restriction);
+  var_count_ = var_count;
+  PicoSolver sat(var_count, restriction);
   codes_ = sat.GenerateModels();
   for (uint i = 0; i < codes_.size(); i++) {
     sat_.push_back(i);
@@ -73,13 +73,13 @@ uint SimpleSolver::_GetNumOfFixedVars() {
 vec<VarId> SimpleSolver::_GetFixedVars() {
   if (!ready_) Update();
   vec<bool> canbe[2];
-  canbe[0].resize(vars_.size());
-  canbe[1].resize(vars_.size());
+  canbe[0].resize(var_count_);
+  canbe[1].resize(var_count_);
   for (auto x: sat_)
-    for (uint i = 1; i < vars_.size(); i++)
+    for (uint i = 1; i < var_count_; i++)
       canbe[codes_[x][i]][i] = true;
   vec<VarId> result;
-  for (uint i = 1; i < vars_.size(); i++) {
+  for (uint i = 1; i < var_count_; i++) {
     if (!canbe[0][i]) result.push_back(i);
     if (!canbe[1][i]) result.push_back(-i);
   }
@@ -120,25 +120,9 @@ bool SimpleSolver::_OnlyOneModel() {
   return sat_.size() == 1;
 }
 
-vec<bool> SimpleSolver::GetAssignment() {
+vec<bool> SimpleSolver::GetModel() {
   assert(!sat_.empty());
   return codes_[sat_[0]];
-}
-
-void SimpleSolver::PrintAssignment() {
-  assert(!sat_.empty());
-  auto& a = codes_[sat_[0]];
-  vec<int> trueVar;
-  vec<int> falseVar;
-  for (uint id = 1; id < vars_.size(); id++) {
-    if (a[id]) trueVar.push_back(id);
-    else falseVar.push_back(id);
-  }
-  printf("TRUE: ");
-  for (auto s: trueVar) printf("%s ", vars_[s]->ident().c_str());
-  printf("\nFALSE: ");
-  for (auto s: falseVar) printf("%s ", vars_[s]->ident().c_str());
-  printf("\n");
 }
 
 uint SimpleSolver::_NumOfModels() {

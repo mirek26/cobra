@@ -23,13 +23,11 @@ typedef set<VarId> Clause;
 class MiniSolver: public CnfSolver {
   static SolverStats stats_;
 
-  //vec<Clause> clauses_;
   Minisat::Solver minisat_;
   Minisat::vec<Minisat::Lit> contexts_;
-  const vec<Variable*>& vars_;
 
  public:
-  MiniSolver(const vec<Variable*>& vars, Formula* restriction = nullptr);
+  MiniSolver(uint var_count, Formula* restriction = nullptr);
   ~MiniSolver() { }
 
   SolverStats& stats() { return stats_; }
@@ -52,8 +50,7 @@ class MiniSolver: public CnfSolver {
     // return k;
   }
 
-  vec<bool> GetAssignment();
-  void PrintAssignment();
+  vec<bool> GetModel();
 
   // uint NumOfModelsSharpSat();
 
@@ -63,7 +60,6 @@ class MiniSolver: public CnfSolver {
   vec<VarId> _GetFixedVars();
   uint _GetNumOfFixedVars();
   bool _Satisfiable();
-  bool _OnlyOneModel();
   uint _NumOfModels();
   vec<vec<bool>> _GenerateModels();
 
