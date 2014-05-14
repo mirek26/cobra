@@ -8,18 +8,20 @@
 #include <map>
 #include <exception>
 #include <cassert>
+#include <string>
+#include <set>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
-
-#include "common.h"
-#include "formula.h"
-#include "game.h"
-#include "parser.h"
-#include "experiment.h"
+#include "./common.h"
+#include "./formula.h"
+#include "./game.h"
+#include "./parser.h"
+#include "./experiment.h"
 
 extern Parser m;
 
-Experiment::Experiment(Solver& solver, ExpType& e, vec<CharId> params, uint index):
+Experiment::Experiment(Solver& solver, const ExpType& e,
+                       vec<CharId> params, uint index):
   solver_(solver),
   type_(e),
   params_(params),
@@ -79,8 +81,8 @@ uint Experiment::NumOfFixedVars(uint id) {
   return data_[id].fixed;
 }
 
-ExpType::ExpType(Game& game, string name, uint num_params):
-    game_(game),
+ExpType::ExpType(const Game& game, string name, uint num_params)
+  : game_(game),
     name_(name),
     num_params_(num_params),
     final_outcome_(-1) {
@@ -95,8 +97,8 @@ void ExpType::addOutcome(string name, Formula* outcome, bool final) {
 }
 
 void ExpType::paramsDistinct(vec<uint>* list) {
-  for(auto i = list->begin(); i != list->end(); ++i) {
-    for(auto j = i + 1; j != list->end(); ++j) {
+  for (auto i = list->begin(); i != list->end(); ++i) {
+    for (auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i <= num_params_,
         "Invalid parameter id in PARAMS_DISTINCT.");
       m.input_assert(*j > 0 && *j <= num_params_,
@@ -110,8 +112,8 @@ void ExpType::paramsDistinct(vec<uint>* list) {
 }
 
 void ExpType::paramsSorted(vec<uint>* list) {
-  for(auto i = list->begin(); i != list->end(); ++i) {
-    for(auto j = i + 1; j != list->end(); ++j) {
+  for (auto i = list->begin(); i != list->end(); ++i) {
+    for (auto j = i + 1; j != list->end(); ++j) {
       m.input_assert(*i > 0 && *i < *j && *j <= num_params_,
         "Invalid parameter id or invalid order in PARAMS_SORTED.");
       // params are internally indexed from 0, that's why *i - 1
@@ -125,7 +127,7 @@ uint64_t ExpType::NumberOfParametrizations() const {
   uint64_t total = 1;
   for (uint i = 0; i < num_params_; i++) {
     int pos = alph_;
-    for (auto p: params_different_[i]) {
+    for (auto p : params_different_[i]) {
       if (p < i) pos--;
     }
     total *= pos;
@@ -138,13 +140,13 @@ void ExpType::PrecomputeUsed(Formula* f) {
   auto* mapping = dynamic_cast<Mapping*>(f);
   auto* variable = dynamic_cast<Variable*>(f);
   if (mapping) {
-    //printf("%i %i\n", mapping->param_id(), num_params_);
+    // printf("%i %i\n", mapping->param_id(), num_params_);
     assert(mapping->param_id() < num_params_);
     used_maps_[mapping->param_id()].insert(mapping->mapping_id());
   } else if (variable) {
     used_vars_.insert(variable->id());
   } else {
-    for (auto c: f->children())
+    for (auto c : f->children())
       PrecomputeUsed(c);
   }
 }
@@ -152,7 +154,7 @@ void ExpType::PrecomputeUsed(Formula* f) {
 void ExpType::Precompute() {
   // used_maps_, used_vars_
   used_maps_.resize(num_params_);
-  for (auto out: outcomes_) {
+  for (auto out : outcomes_) {
     PrecomputeUsed(out.formula);
   }
 
@@ -163,7 +165,7 @@ void ExpType::Precompute() {
     for (CharId a = 0; a < alph_; a++) {
       interchangable_[d][a] = true;
       set<int> vars;
-      for (auto& f: used_maps_[d]) {
+      for (auto& f : used_maps_[d]) {
         auto var = game_.getMappingValue(f, a);
         vars.insert(var);
         if (used_vars_.count(var) > 0) interchangable_[d][a] = false;
@@ -174,38 +176,43 @@ void ExpType::Precompute() {
           // check that _b_ can be at _e_, given that _a_ is at _d_
           if (a == b && params_different_[e].count(d) > 0) continue;
           if (a >= b && params_smaller_than_[e].count(d) > 0) continue;
-          for (auto f: used_maps_[e]) {
+          for (auto f : used_maps_[e]) {
             if (vars.count(game_.getMappingValue(f, b)) > 0)
               interchangable_[d][a] = false;
           }
         }
       }
-      //printf("%s %i %i -> %s\n", name_.c_str(), d, a, interchangable_[d][a] ? "true" : "false");
+      // printf("%s %i %i -> %s\n", name_.c_str(), d, a, interchangable_[d][a] ?
+      //  "true" : "false");
     }
   }
 }
 
-ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history):
-    game_(game),
+ExpGenerator::ExpGenerator(const Game& game, Solver& solver,
+                           const vec<EvalExp>& history)
+  : game_(game),
     solver_(solver) {
   stats_ = GenParamsStats();
   // Preprare symmetry Graph
   graph_ = game.CreateGraph();
   fixed_vars_ = solver.GetFixedVars();
-  for (auto id: fixed_vars_) {
-    graph_->change_color(abs(id) - 1, id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
+  for (auto id : fixed_vars_) {
+    graph_->change_color(abs(id) - 1,
+              id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
   }
   game.restriction()->PropagateFixed(fixed_vars_, nullptr);
-  game.restriction()->AddToGraphRooted(*graph_, nullptr, vertex_type::kKnowledgeRoot);
-  for (auto& e: history) {
+  game.restriction()->AddToGraphRooted(*graph_, nullptr,
+                                       vertex_type::kKnowledgeRoot);
+  for (auto& e : history) {
     auto formula = e.exp.type().outcomes()[e.outcome_id].formula;
     formula->PropagateFixed(fixed_vars_, &e.exp.params());
-    formula->AddToGraphRooted(*graph_, &e.exp.params(), vertex_type::kKnowledgeRoot);
+    formula->AddToGraphRooted(*graph_, &e.exp.params(),
+                              vertex_type::kKnowledgeRoot);
   }
 
-  for (auto e: game.experiments()) {
-    for (auto& maps: e->used_maps_) {
-      for (auto v: maps) for (auto u: maps) {
+  for (auto e : game.experiments()) {
+    for (auto& maps : e->used_maps_) {
+      for (auto v : maps) for (auto u : maps) {
         if (v == u) continue;
         for (uint i = 0; i < game.alphabet().size(); i++) {
           auto v1 = game.getMappingValue(u, i);
@@ -221,7 +228,7 @@ ExpGenerator::ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& histo
 
 vec<Experiment> ExpGenerator::All() {
   vec<Experiment> result;
-  for (auto t: game_.experiments()) {
+  for (auto t : game_.experiments()) {
     curr_type_ = t;
 
     params_.resize(t->num_params());
@@ -232,20 +239,22 @@ vec<Experiment> ExpGenerator::All() {
 
     GenParamsFill(0);
 
-    //printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1, gen_stats_.ph2, gen_stats_.ph3);
+    // printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1,
+    //    gen_stats_.ph2, gen_stats_.ph3);
     assert(stats_.ph2 - pre2 == params_basic_.size());
     assert(stats_.ph3 - pre3 == params_final_.size());
 
-    for (auto& params: params_final_) {
+    for (auto& params : params_final_) {
       result.push_back(Experiment(solver_, *t, params, result.size()));
     }
   }
   return result;
 }
 
-bool ExpGenerator::CharsEquiv(set<MapId>& maps, CharId a, CharId b) const {
+bool ExpGenerator::CharsEquiv(const set<MapId>& maps,
+                              CharId a, CharId b) const {
   bool equiv = true;
-  for (auto f: maps) {
+  for (auto f : maps) {
     if (var_groups_[game_.getMappingValue(f, a)] !=
         var_groups_[game_.getMappingValue(f, b)]) {
       equiv = false;
@@ -260,20 +269,20 @@ void ExpGenerator::GenParamsFill(uint n) {
   for (CharId a = 0; a < game_.alphabet().size(); a++) {
     bool valid = true;
     // Test compliance with PARAMS_DIFFERENT.
-    for (auto p: curr_type_->params_different_[n]) {
+    for (auto p : curr_type_->params_different_[n]) {
       if (p < n && params_[p] == a) valid = false;
     }
     if (!valid) continue;
     done.insert(a);
     // Test compliance with PARAMS_SORTED.
-    for (auto p: curr_type_->params_smaller_than_[n]) {
+    for (auto p : curr_type_->params_smaller_than_[n]) {
       assert(p < n);
       if (params_[p] > a) valid = false;
     }
     if (!valid) continue;
     // Test equivalence.
     if (curr_type_->interchangable_[n][a]) {
-      for (auto b: done) {
+      for (auto b : done) {
         if (a == b) continue;
         if (CharsEquiv(curr_type_->used_maps_[n], a, b)) {
           valid = false;
@@ -302,8 +311,8 @@ void ExpGenerator::GenParamsBasicFilter() {
   for (uint i = 0; i < num_params; i++) dfu[i] = i;
   for (uint i = 0; i < num_params; i++)
     for (uint j = i + 1; j < num_params; j++)
-      for (auto fi: curr_type_->used_maps_[i])
-        for (auto fj: curr_type_->used_maps_[j])
+      for (auto fi : curr_type_->used_maps_[i])
+        for (auto fj : curr_type_->used_maps_[j])
           if (game_.getMappingValue(fi, params_[i]) ==
               game_.getMappingValue(fj, params_[j])) {
             if (dfu[i] > dfu[j])
@@ -313,7 +322,7 @@ void ExpGenerator::GenParamsBasicFilter() {
           }
   // Compute canonical form of the parametrization.
   for (uint n = 0; n < num_params; n++) {
-    if (dfu[n] != n) continue; // only for roots of components
+    if (dfu[n] != n) continue;  // only for roots of components
     CharId chr = params_[n];
     if (curr_type_->interchangable_[n][chr]) continue;
     // Precompute minimal set of positions such that...
@@ -323,12 +332,13 @@ void ExpGenerator::GenParamsBasicFilter() {
     for (uint p = 0; p < num_params; p++) {
       if (dfu[p] == n) {
         if (params_[p] != chr) keep = true;
-        for (auto f: curr_type_->used_maps_[p]) {
-          if (curr_type_->used_vars_.count(game_.getMappingValue(f, chr))) keep = true;
+        for (auto f : curr_type_->used_maps_[p]) {
+          if (curr_type_->used_vars_.count(game_.getMappingValue(f, chr)))
+            keep = true;
           maps.insert(f);
         }
       } else {
-        for (auto f: curr_type_->used_maps_[p]) {
+        for (auto f : curr_type_->used_maps_[p]) {
           other_vars.insert(game_.getMappingValue(f, params_[p]));
         }
       }
@@ -341,7 +351,7 @@ void ExpGenerator::GenParamsBasicFilter() {
       if (!CharsEquiv(maps, a, chr)) continue;
       // Doesn't it indroduce conflicting vars?
       keep = false;
-      for (auto f: maps) {
+      for (auto f : maps) {
         VarId var = game_.getMappingValue(f, a);
         if (other_vars.count(var)) keep = true;
       }
@@ -364,15 +374,16 @@ void ExpGenerator::GenParamsBasicFilter() {
 void ExpGenerator::GenParamsGraphFilter() {
   bliss::Stats stats;
   auto graph = bliss::Graph(*graph_);
-  for (auto outcome: curr_type_->outcomes()) {
+  for (auto outcome : curr_type_->outcomes()) {
     outcome.formula->PropagateFixed(fixed_vars_, &params_);
-    outcome.formula->AddToGraphRooted(graph, &params_, vertex_type::kOutcomeRoot);
+    outcome.formula->AddToGraphRooted(graph, &params_,
+                                      vertex_type::kOutcomeRoot);
   }
 
   clock_t t1 = clock();
   auto canonical = graph.permute(graph.canonical_form(stats, nullptr, nullptr));
-  game_.bliss_calls() += 1;
-  game_.bliss_time() += clock() - t1;
+  Game::bliss_calls += 1;
+  Game::bliss_time += clock() - t1;
 
   auto h = canonical->get_hash();
   if (graphs_.count(h) > 0 && graphs_[h].second) {
@@ -392,7 +403,7 @@ void ExpGenerator::GenParamsGraphFilter() {
 
   if (graphs_.count(h) == 0 || finalsat) {
     // TODO: proper hash map with graph comparison
-    //graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
+    // graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
     graphs_[h] = make_pair(params_, finalsat);
     stats_.ph3++;
     params_final_.insert(params_);

@@ -6,14 +6,14 @@
 #include <cassert>
 #include <string>
 #include <vector>
-#include <unordered_set>
 #include <set>
+#include <unordered_set>
 #include <algorithm>
 #include <functional>
 #include <iostream>
 
-#ifndef COBRA_COMMON_H_
-#define COBRA_COMMON_H_
+#ifndef COBRA_SRC_COMMON_H_
+#define COBRA_SRC_COMMON_H_
 
 /*
 var(s) - variable(s)
@@ -23,9 +23,9 @@ equiv - equivalence
 */
 
 // common types
-typedef unsigned int uint; // TODO zkusit uint fast
+typedef unsigned int uint;  // TODO(myreg): zkusit uint fast
 typedef unsigned char CharId;
-typedef int VarId; // VarId must se signed, -1 denotes negation of var 1
+typedef int VarId;  // VarId must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
 
 // type aliases for basic STL types
@@ -52,7 +52,7 @@ namespace vertex_type {
     kAtLeastId = 20,
     kAtMostId = 21,
     kExactlyId = 22;
-}
+}  // namespace vertex_type
 
 namespace color {
   extern const string head;
@@ -66,10 +66,10 @@ namespace color {
 }
 
 template<class T>
-void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> action, int offset = 0);
-
-template<class T>
-void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> action, int offset) {
+void for_all_combinations(int k,
+                          const vec<T>& list,
+                          std::function<void(vec<T>)> action,
+                          int offset = 0) {
   assert(k >= 0);
   static vec<T> combination;
   if (k == 0) {
@@ -84,7 +84,7 @@ void for_all_combinations(int k, vec<T>& list, std::function<void(vec<T>)> actio
 }
 
 template<class T, class R>
-void transform(vec<T>& from, vec<R>& to, std::function<R(T)>& fun) {
+void transform(const vec<T>& from, const vec<R>& to, std::function<R(T)>& fun) {
   to.resize(from.size());
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
@@ -93,4 +93,4 @@ vec<string> split(string s);
 bool readIntOrString(uint& i, string& str);
 double toSeconds(clock_t time);
 
-#endif  // COBRA_COMMON_H_
+#endif  // COBRA_SRC_COMMON_H_

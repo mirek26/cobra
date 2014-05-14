@@ -8,10 +8,10 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "common.h"
+#include "./common.h"
 
-#ifndef COBRA_SOLVER_H_
-#define COBRA_SOLVER_H_
+#ifndef COBRA_SRC_SOLVER_H_
+#define COBRA_SRC_SOLVER_H_
 
 class Variable;
 class Formula;
@@ -136,7 +136,6 @@ class Solver {
   virtual vec<bool> GetModel() = 0;
 
  protected:
-
   virtual bool _MustBeTrue(VarId id) = 0;
   virtual bool _MustBeFalse(VarId id) = 0;
   virtual vec<VarId> _GetFixedVars() = 0;
@@ -163,7 +162,7 @@ class CnfSolver: public Solver {
   /**
    * Adds a clause (disjunction of given variables) as a constraint.
    */
-  virtual void AddClause(vec<VarId>& list) = 0;
+  virtual void AddClause(const vec<VarId>& list) = 0;
   virtual void AddClause(std::initializer_list<VarId> list) = 0;
 
   /**
@@ -184,4 +183,4 @@ class CnfSolver: public Solver {
   virtual VarId NewVarId() = 0;
 };
 
-#endif   // COBRA_SOLVER_H_
+#endif  // COBRA_SRC_SOLVER_H_

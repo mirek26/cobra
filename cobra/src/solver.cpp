@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#include "solver.h"
-#include "formula.h"
+#include "./solver.h"
+#include "./formula.h"
 
 // Time-measuring wrappers
 

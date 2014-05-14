@@ -11,11 +11,11 @@
 #include <string>
 #include <initializer_list>
 #include <bliss/graph.hh>
-#include "common.h"
-#include "parser.h"
+#include "./common.h"
+#include "./parser.h"
 
-#ifndef COBRA_FORMULA_H_
-#define COBRA_FORMULA_H_
+#ifndef COBRA_SRC_FORMULA_H_
+#define COBRA_SRC_FORMULA_H_
 
 class Formula;
 class Variable;
@@ -30,7 +30,7 @@ extern Parser m;
  * Base class for representation of a parametrized propositional formula
  * as a tree. Derived classes are:
  *  - Variable - represents a propositional variable; has no childs.
- *  - Mapping - defined mapping applied on a parameter, e.g. f($1); has no childs.
+ *  - Mapping - defined mapping applied on a parameter, e.g. f($1); no childs.
  *  - NotOperator - negation of any other formula
  *  - ImpliesOperator - logical implication (binary)
  *  - EquivalenceOperator - logical equivalence (binary, symmetric)
@@ -62,7 +62,7 @@ class Formula {
    */
   const vec<Formula*>& children() const { return children_; }
 
-  virtual uint type_id() = 0; // TODO: remove
+  virtual uint type_id() = 0;
 
   bool fixed() const { return fixed_; }
   bool fixed_value() const { return fixed_value_; }
@@ -73,7 +73,7 @@ class Formula {
   virtual bool isLiteral() { return false; }
 
   /**
-   * Gets id of the variable used for this node during the transformation to CNF.
+   * Gets id of the variable used for this node during the CNF  transformation.
    * If id of the variable is not assigned yet, a new id will be created.
    * Note that the value is valid only during an ongoing CNF conversion.
    */
@@ -111,7 +111,8 @@ class Formula {
    * of fixed variables. The set of fixed variables should be output
    * of GetFixedVars() method of a SAT solver.
    */
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params) = 0;
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params) = 0;
 
    /**
    * Adds the formula structure to a symmetry graph. The formula is simplified
@@ -159,7 +160,8 @@ class Formula {
   vec<VarId> tseitin_children(CnfSolver& cnf);
 
   /**
-   * Helper function for pretty. Calls pretty on childs and joins results with 'sep'.
+   * Helper function for pretty.
+   * Calls pretty on childs and joins results with 'sep'.
    */
   string pretty_join(string sep, bool utf8, const vec<CharId>* params);
 };
@@ -217,8 +219,10 @@ class AndOperator: public NaryOperator {
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
   virtual void AddToGraph(bliss::Graph& g,
                           const vec<CharId>* params,
                           int parent = -1);
@@ -249,8 +253,10 @@ class OrOperator: public NaryOperator {
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
   virtual void AddToGraph(bliss::Graph& g,
                           const vec<CharId>* params,
                           int parent = -1);
@@ -270,19 +276,25 @@ class AtLeastOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return vertex_type::kAtLeastId + 3 * (value_ - sat_childs_); }
+  virtual uint type_id() {
+    return vertex_type::kAtLeastId + 3 * (value_ - sat_childs_);
+  }
+
   virtual string name() {
     return "AtLeastOperator(" + std::to_string(value_) + ")";
   }
 
   virtual string pretty(bool utf8 = true, const vec<CharId>* params = nullptr) {
-    return "AtLeast-" + std::to_string(value_) + pretty_join(", ", utf8, params);
+    return "AtLeast-" + std::to_string(value_) +
+            pretty_join(", ", utf8, params);
   }
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 };
 
 /**
@@ -299,19 +311,25 @@ class AtMostOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return vertex_type::kAtMostId + 3 * (value_- sat_childs_); }
+  virtual uint type_id() {
+    return vertex_type::kAtMostId + 3 * (value_- sat_childs_);
+  }
+
   virtual string name() {
     return "AtMostOperator(" + std::to_string(value_) + ")";
   }
 
   virtual string pretty(bool utf8 = true, const vec<CharId>* params = nullptr) {
-    return "AtMost-" + std::to_string(value_) + pretty_join(", ", utf8, params);
+    return "AtMost-" + std::to_string(value_)
+             + pretty_join(", ", utf8, params);
   }
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 };
 
 /**
@@ -328,19 +346,25 @@ class ExactlyOperator: public NaryOperator {
     assert(value <= children_.size());
   }
 
-  virtual uint type_id() { return vertex_type::kExactlyId + 3 * (value_ - sat_childs_); }
+  virtual uint type_id() {
+    return vertex_type::kExactlyId + 3 * (value_ - sat_childs_);
+  }
+
   virtual string name() {
     return "ExactlyOperator(" + std::to_string(value_) + ")";
   }
 
   virtual string pretty(bool utf8 = true, const vec<CharId>* params = nullptr) {
-    return "Exactly-" + std::to_string(value_) + pretty_join(", ", utf8, params);
+    return "Exactly-" + std::to_string(value_)
+             + pretty_join(", ", utf8, params);
   }
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 };
 
 /**
@@ -368,8 +392,10 @@ class EquivalenceOperator: public Formula {
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 };
 
 /**
@@ -395,9 +421,11 @@ class ImpliesOperator: public Formula {
       ")";
   }
 
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 };
 
@@ -420,8 +448,10 @@ class NotOperator: public Formula {
   }
 
   virtual VarId tseitin_var(CnfSolver& cnf) {
-    if (isLiteral()) return -children_[0]->tseitin_var(cnf);
-    else return Formula::tseitin_var(cnf);
+    if (isLiteral())
+      return -children_[0]->tseitin_var(cnf);
+    else
+      return Formula::tseitin_var(cnf);
   }
 
   virtual Formula* neg() {
@@ -434,8 +464,10 @@ class NotOperator: public Formula {
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
 };
 
 /**
@@ -450,7 +482,7 @@ class Mapping: public Formula {
   Mapping(string ident, MapId mapping_id, uint param_id)
       : ident_(ident),
         mapping_id_(mapping_id),
-        param_id_(param_id - 1) { // params are internally indexed from 0
+        param_id_(param_id - 1) {  // params are internally indexed from 0
   }
 
   MapId mapping_id() { return mapping_id_; }
@@ -484,8 +516,10 @@ class Mapping: public Formula {
 
   virtual void TseitinTransformation(CnfSolver& cnf, bool top);
 
-  virtual bool Satisfied(const vec<bool>& model, const vec<CharId> params);
-  virtual void PropagateFixed(const vec<VarId>& fixed, const vec<CharId>* params);
+  virtual bool Satisfied(const vec<bool>& model,
+                         const vec<CharId> params);
+  virtual void PropagateFixed(const vec<VarId>& fixed,
+                              const vec<CharId>* params);
   virtual void AddToGraph(bliss::Graph& g,
                           const vec<CharId>* params,
                           int parent = -1);
@@ -499,7 +533,6 @@ class Variable: public Formula {
   VarId id_;
 
  public:
-
   explicit Variable(string ident)
       : ident_(ident) { }
 
@@ -535,4 +568,4 @@ class Variable: public Formula {
                           int parent = -1);
 };
 
-#endif  // COBRA_FORMULA_H_
+#endif  // COBRA_SRC_FORMULA_H_

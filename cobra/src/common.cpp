@@ -8,8 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-
-#include "common.h"
+#include "./common.h"
 
 namespace color {
   const string head = "\033[1;97m";
@@ -48,5 +47,5 @@ bool readIntOrString(uint& i, string& str) {
 }
 
 double toSeconds(clock_t time) {
-  return double(time)/CLOCKS_PER_SEC;
+  return static_cast<double>(time)/CLOCKS_PER_SEC;
 }

@@ -4,9 +4,10 @@
  * found in the LICENSE file.
  */
 
-#include "formula.h"
-#include "simple-solver.h"
-#include "picosolver.h"
+#include <string>
+#include "./formula.h"
+#include "./simple-solver.h"
+#include "./picosolver.h"
 
 SolverStats SimpleSolver::stats_ = SolverStats();
 
@@ -54,14 +55,14 @@ void SimpleSolver::CloseContext() {
 
 bool SimpleSolver::_MustBeTrue(VarId id) {
   if (!ready_) Update();
-  for (auto& x: sat_)
+  for (auto& x : sat_)
     if (!codes_[x][id]) return false;
   return true;
 }
 
 bool SimpleSolver::_MustBeFalse(VarId id) {
   if (!ready_) Update();
-  for (auto& x: sat_)
+  for (auto& x : sat_)
     if (codes_[x][id]) return false;
   return true;
 }
@@ -75,7 +76,7 @@ vec<VarId> SimpleSolver::_GetFixedVars() {
   vec<bool> canbe[2];
   canbe[0].resize(var_count_);
   canbe[1].resize(var_count_);
-  for (auto x: sat_)
+  for (auto x : sat_)
     for (uint i = 1; i < var_count_; i++)
       canbe[codes_[x][i]][i] = true;
   vec<VarId> result;
@@ -89,7 +90,7 @@ vec<VarId> SimpleSolver::_GetFixedVars() {
 bool SimpleSolver::TestSat(uint i) {
   assert(i < sat_.size());
   bool ok = true;
-  for (auto& constr: constraints_) {
+  for (auto& constr : constraints_) {
     if (!constr.first->Satisfied(codes_[sat_[i]], constr.second)) {
       ok = false;
       break;
@@ -104,9 +105,9 @@ bool SimpleSolver::TestSat(uint i) {
 }
 
 void SimpleSolver::RemoveUntilSat(uint start) {
-  while (sat_.size() > start and !TestSat(start))
+  while (sat_.size() > start && !TestSat(start))
     // TestSat removes the unsat code from sat
-    ;
+    {}
 }
 
 bool SimpleSolver::_Satisfiable() {
@@ -133,7 +134,7 @@ uint SimpleSolver::_NumOfModels() {
 vec<vec<bool>> SimpleSolver::_GenerateModels() {
   if (!ready_) Update();
   vec<vec<bool>> result;
-  for (auto x: sat_)
+  for (auto x : sat_)
     result.push_back(codes_[x]);
   return result;
 }
@@ -146,7 +147,7 @@ void SimpleSolver::Update() {
 
 string SimpleSolver::pretty() {
   string s = restriction_->pretty(false) + " & ";
-  for (auto& c: constraints_) {
+  for (auto& c : constraints_) {
     s += c.first->pretty(false, &c.second) + " & ";
   }
   s.erase(s.length()-3, 3);

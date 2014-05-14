@@ -9,11 +9,11 @@
 #include <map>
 #include <set>
 #include <minisat/core/Solver.h>
-#include "common.h"
-#include "solver.h"
+#include "./common.h"
+#include "./solver.h"
 
-#ifndef COBRA_MINISOLVER_H_
-#define COBRA_MINISOLVER_H_
+#ifndef COBRA_SRC_MINISOLVER_H_
+#define COBRA_SRC_MINISOLVER_H_
 
 class Variable;
 class Formula;
@@ -33,7 +33,7 @@ class MiniSolver: public CnfSolver {
   SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
 
-  void AddClause(vec<VarId>& list);
+  void AddClause(const vec<VarId>& list);
   void AddClause(std::initializer_list<VarId> list);
 
   void OpenContext();
@@ -63,9 +63,7 @@ class MiniSolver: public CnfSolver {
   uint _NumOfModels();
   vec<vec<bool>> _GenerateModels();
 
-  string pretty_clause(const Clause& clause);
-
   void ForAllModels(VarId var, std::function<void()> callback);
 };
 
-#endif   // COBRA_MINISOLVER_H_
+#endif  // COBRA_SRC_MINISOLVER_H_

@@ -4,19 +4,19 @@
  * found in the LICENSE file.
  */
 
-#include <cassert>
-#include <vector>
-#include <map>
-#include <set>
-#include "common.h"
-#include "solver.h"
-
 extern "C" {
   #include <picosat/picosat.h>
 }
 
-#ifndef COBRA_PICOSOLVER_H_
-#define COBRA_PICOSOLVER_H_
+#include <cassert>
+#include <vector>
+#include <map>
+#include <set>
+#include "./common.h"
+#include "./solver.h"
+
+#ifndef COBRA_SRC_PICOSOLVER_H_
+#define COBRA_SRC_PICOSOLVER_H_
 
 class Variable;
 class Formula;
@@ -32,7 +32,7 @@ class PicoSolver: public CnfSolver {
   SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }
 
-  void AddClause(vec<VarId>& list);
+  void AddClause(const vec<VarId>& list);
   void AddClause(std::initializer_list<VarId> list);
 
   void OpenContext();
@@ -64,4 +64,4 @@ class PicoSolver: public CnfSolver {
   void ForAllModels(VarId var, std::function<void()> callback);
 };
 
-#endif   // COBRA_PICOSOLVER_H_
+#endif  // COBRA_SRC_PICOSOLVER_H_

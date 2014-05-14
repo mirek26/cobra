@@ -5,11 +5,16 @@
  */
 
 #include <map>
-#include "formula.h"
-#include "game.h"
-#include "experiment.h"
-#include "common.h"
-#include "parser.h"
+#include <utility>
+#include <string>
+#include "./formula.h"
+#include "./game.h"
+#include "./experiment.h"
+#include "./common.h"
+#include "./parser.h"
+
+#ifndef COBRA_SRC_STRATEGY_H_
+#define COBRA_SRC_STRATEGY_H_
 
 namespace strategy {
   namespace breaker {
@@ -29,7 +34,8 @@ namespace strategy {
     uint fixed(Experiment& option);
   }
 
-  const std::map<string, std::pair<string, std::function<uint(vec<Experiment>&)>>>
+  const std::map<string,
+                 std::pair<string, std::function<uint(vec<Experiment>&)>>>
     breaker_strategies = {
     { "interactive",
     { "Asks the user which experiment to perform next.",
@@ -78,4 +84,6 @@ namespace strategy {
     { "Minimizes the number of fixed variables.",
       maker::fixed }} };
 
-}
+}  // namespace strategy
+
+#endif  // COBRA_SRC_STRATEGY_H_

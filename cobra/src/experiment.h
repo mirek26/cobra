@@ -6,16 +6,19 @@
 
 #include <cassert>
 #include <cmath>
-#include <vector>
-#include <map>
 #include <exception>
-#include "common.h"
-#include "formula.h"
-#include "game.h"
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 #include <bliss/graph.hh>
+#include "./common.h"
+#include "./formula.h"
+#include "./game.h"
 
-#ifndef COBRA_EXPERIMENT_H_
-#define COBRA_EXPERIMENT_H_
+#ifndef COBRA_SRC_EXPERIMENT_H_
+#define COBRA_SRC_EXPERIMENT_H_
 
 struct EvalExp;
 
@@ -38,16 +41,17 @@ struct EOutcome {
 
 class Experiment {
   Solver& solver_;
-  ExpType& type_;
+  const ExpType& type_;
   vec<CharId> params_;
   uint index_;
 
   vec<EOutcome> data_;
 
  public:
-  Experiment(Solver& solver, ExpType& e, vec<CharId> params, uint index);
+  Experiment(Solver& solver, const ExpType& e,
+             vec<CharId> params, uint index);
 
-  ExpType& type() const { return type_; }
+  const ExpType& type() const { return type_; }
   const vec<CharId>& params() const { return params_; }
   uint index() const { return index_; }
   uint num_outcomes() const { return data_.size(); }
@@ -61,7 +65,7 @@ class Experiment {
 
 
 class ExpType {
-  Game& game_;
+  const Game& game_;
   uint alph_;
 
   string name_;
@@ -79,10 +83,10 @@ class ExpType {
   vec<set<uint>> params_smaller_than_;
 
  public:
-  ExpType(Game& game, string name, uint num_params);
+  ExpType(const Game& game, string name, uint num_params);
 
   string name() const { return name_; }
-  Game& game() const { return game_; }
+  const Game& game() const { return game_; }
   int final_outcome() const { return final_outcome_; }
   const vec<Outcome>& outcomes() const { return outcomes_; }
   uint num_params() { return num_params_; }
@@ -111,7 +115,7 @@ struct EvalExp {
 
 
 class ExpGenerator {
-  Game& game_;
+  const Game& game_;
   Solver& solver_;
 
   vec<VarId> fixed_vars_;
@@ -128,7 +132,7 @@ class ExpGenerator {
   vec<CharId> params_;
 
  public:
-  ExpGenerator(Game& game, Solver& solver, const vec<EvalExp>& history);
+  ExpGenerator(const Game& game, Solver& solver, const vec<EvalExp>& history);
   ~ExpGenerator() {
     delete graph_;
   }
@@ -139,11 +143,10 @@ class ExpGenerator {
 
  private:
   // Helper functions for parametrizations generation.
-  bool CharsEquiv(set<MapId>& maps, CharId a, CharId b) const;
+  bool CharsEquiv(const set<MapId>& maps, CharId a, CharId b) const;
   void GenParamsFill(uint n);
   void GenParamsBasicFilter();
   void GenParamsGraphFilter();
 };
 
-
-#endif  // COBRA_EXPERIMENT_H_
+#endif  // COBRA_SRC_EXPERIMENT_H_

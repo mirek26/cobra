@@ -3,6 +3,9 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#include "./minisolver.h"
+
 #include <cstdio>
 #include <cassert>
 #include <algorithm>
@@ -10,12 +13,10 @@
 #include <vector>
 #include <map>
 #include <set>
-
-#include "formula.h"
-#include "common.h"
-
 #include <minisat/core/Solver.h>
-#include "minisolver.h"
+#include "./formula.h"
+#include "./common.h"
+
 
 SolverStats MiniSolver::stats_ = SolverStats();
 
@@ -32,11 +33,11 @@ MiniSolver::MiniSolver(uint var_count, Formula* restriction) {
 //------------------------------------------------------------------------------
 // Adding constraints
 
-void MiniSolver::AddClause(vec<VarId>& list) {
+void MiniSolver::AddClause(const vec<VarId>& list) {
   Minisat::vec<Minisat::Lit> v;
   for (int i = 0; i < contexts_.size(); i++)
     v.push(~contexts_[i]);
-  for (auto var: list)
+  for (auto var : list)
     v.push(Minisat::mkLit(abs(var) - 1, var > 0));
   minisat_.addClause(v);
 }
@@ -45,7 +46,7 @@ void MiniSolver::AddClause(std::initializer_list<VarId> list) {
   Minisat::vec<Minisat::Lit> v;
   for (int i = 0; i < contexts_.size(); i++)
     v.push(~contexts_[i]);
-  for (auto var: list)
+  for (auto var : list)
     v.push(Minisat::mkLit(abs(var) - 1, var > 0));
   minisat_.addClause(v);
 }
@@ -113,9 +114,9 @@ vec<bool> MiniSolver::GetModel() {
   return result;
 }
 
-void MiniSolver::ForAllModels(VarId var, std::function<void()> callback){
+void MiniSolver::ForAllModels(VarId var, std::function<void()> callback) {
   assert(var > 0 && (unsigned)var < var_count_);
-  for (auto v: std::initializer_list<Minisat::Lit>(
+  for (auto v : std::initializer_list<Minisat::Lit>(
         {Minisat::mkLit(var - 1, true), Minisat::mkLit(var - 1, false)})) {
     contexts_.push(v);
     if (_Satisfiable()) {
@@ -131,13 +132,13 @@ void MiniSolver::ForAllModels(VarId var, std::function<void()> callback){
 
 uint MiniSolver::_NumOfModels() {
   uint k = 0;
-  ForAllModels(1, [&](){ k++; });
+  ForAllModels(1, [&]() { k++; });
   return k;
 }
 
 vec<vec<bool>> MiniSolver::_GenerateModels() {
   vec<vec<bool>> models;
-  ForAllModels(1, [&](){
+  ForAllModels(1, [&]() {
     models.push_back(GetModel());
   });
   return models;

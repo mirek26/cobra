@@ -3,6 +3,13 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#include "./picosolver.h"
+
+extern "C" {
+  #include <picosat/picosat.h>
+}
+
 #include <cstdio>
 #include <cassert>
 #include <algorithm>
@@ -10,15 +17,8 @@
 #include <vector>
 #include <map>
 #include <set>
-
-#include "formula.h"
-#include "common.h"
-
-extern "C" {
-  #include <picosat/picosat.h>
-}
-
-#include "picosolver.h"
+#include "./formula.h"
+#include "./common.h"
 
 SolverStats PicoSolver::stats_ = SolverStats();
 
@@ -40,8 +40,8 @@ PicoSolver::~PicoSolver() {
 //------------------------------------------------------------------------------
 // Adding constraints
 
-void PicoSolver::AddClause(vec<VarId>& list) {
-  for (auto l: list) {
+void PicoSolver::AddClause(const vec<VarId>& list) {
+  for (auto l : list) {
     assert(l != 0);
     picosat_add(picosat_, l);
   }
@@ -49,7 +49,7 @@ void PicoSolver::AddClause(vec<VarId>& list) {
 }
 
 void PicoSolver::AddClause(std::initializer_list<VarId> list) {
-  for (auto l: list) {
+  for (auto l : list) {
     assert(l != 0);
     picosat_add(picosat_, l);
   }
@@ -117,7 +117,8 @@ vec<bool> PicoSolver::GetModel() {
 //   FILE* f = fopen(".nummodels", "w");
 //   WriteDimacs(f);
 //   fclose(f);
-//   int r = system("./tools/sharpSAT/Release/sharpSAT -q .nummodels > .nummodels-result");
+//   int r = system("./tools/sharpSAT/Release/sharpSAT -q"
+//        " .nummodels > .nummodels-result");
 //   if (r != 0) {
 //     printf("Error: sharpSAT failed :-(\n");
 //     return 0;
@@ -128,15 +129,14 @@ vec<bool> PicoSolver::GetModel() {
 //   return k;
 // }
 
-void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
+void PicoSolver::ForAllModels(VarId var, std::function<void()> callback) {
   assert(var > 0 && (unsigned)var < var_count_);
-  for (VarId v: std::initializer_list<VarId>({var, -var})) {
+  for (VarId v : std::initializer_list<VarId>({var, -var})) {
     picosat_assume(picosat_, v);
     if (picosat_sat(picosat_, -1) == PICOSAT_SATISFIABLE) {
       if ((unsigned)var == var_count_ - 1) {
         callback();
-      }
-      else {
+      } else {
         picosat_push(picosat_);
         picosat_add(picosat_, v);
         picosat_add(picosat_, 0);
@@ -149,13 +149,13 @@ void PicoSolver::ForAllModels(VarId var, std::function<void()> callback){
 
 uint PicoSolver::_NumOfModels() {
   uint k = 0;
-  ForAllModels(1, [&](){ k++; });
+  ForAllModels(1, [&]() { k++; });
   return k;
 }
 
 vec<vec<bool>> PicoSolver::_GenerateModels() {
   vec<vec<bool>> models;
-  ForAllModels(1, [&](){
+  ForAllModels(1, [&]() {
     vec<bool> n(var_count_, false);
     for (uint id = 1; id < var_count_; id++) {
       if (picosat_deref(picosat_, id) == 1) n[id] = true;

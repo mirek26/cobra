@@ -4,23 +4,29 @@
  * found in the LICENSE file.
  */
 
-#include <cmath>
-#include "formula.h"
-#include "game.h"
-#include "experiment.h"
-#include "common.h"
-#include "parser.h"
+#include "./strategy.h"
 
-#include "strategy.h"
+#include <cmath>
+#include <limits>
+#include <string>
+#include <algorithm>
+
+#include "./formula.h"
+#include "./game.h"
+#include "./experiment.h"
+#include "./common.h"
+#include "./parser.h"
 
 namespace strategy {
 
 namespace {
   // Helper function to select the experiment e with the largest f(e).
-  // First parameter of f is the experiment, second is the value of the best option found yet.
+  // First parameter of f is the experiment, second is the value of the
+  // best option found yet.
   // This can save significant amount of time if the function evaluation
   // is time demanind (because of model counting, for example).
-  uint maximize(std::function<double(Experiment&, double)> f, vec<Experiment>& options) {
+  uint maximize(std::function<double(Experiment&, double)> f,
+                vec<Experiment>& options) {
     double max = -std::numeric_limits<double>::max();
     vec<Experiment>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
@@ -35,7 +41,8 @@ namespace {
   }
 
   // Similar to the previous function, just minimizing value of f.
-  uint minimize(std::function<double(Experiment&, double)> f, vec<Experiment>& options) {
+  uint minimize(std::function<double(Experiment&, double)> f,
+                vec<Experiment>& options) {
     double min = std::numeric_limits<double>::max();
     vec<Experiment>::iterator best = options.end();
     for (auto it = options.begin(); it != options.end(); ++it) {
@@ -48,12 +55,12 @@ namespace {
     assert(best != options.end());
     return std::distance(options.begin(), best);
   }
-}
+} // namespace
 
 uint breaker::interactive(vec<Experiment>& options) {
   // Print options.
   printf("Select an experiment: \n");
-  for (auto& experiment: options) {
+  for (auto& experiment : options) {
     if (experiment.NumOfSat() > 1) {
       printf("%i) %s [ %s ] ",
         experiment.index(),
@@ -86,8 +93,10 @@ uint maker::interactive(Experiment& option) {
   printf("Select an outcome: \n");
   auto& type = option.type();
   for (uint i = 0; i < type.outcomes().size(); i++) {
-    if (option.IsSat(i)) printf("%i) ", i);
-    else printf("-) ");
+    if (option.IsSat(i))
+      printf("%i) ", i);
+    else
+      printf("-) ");
     printf("%s %s\n",
       type.outcomes()[i].name.c_str(),
       option.IsSat(i) ? "" : "(unsatisfiable)");
@@ -161,23 +170,23 @@ uint breaker::min_num(vec<Experiment>& options) {
 }
 
 uint breaker::exp_num(vec<Experiment>& options) {
-  return minimize([](Experiment& o, double){
+  return minimize([](Experiment& o, double) {
     int sumsq = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       auto models  = o.NumOfModels(i);
       sumsq += models * models;
     }
-    return (double)sumsq/o.TotalNumOfModels();
+    return static_cast<double>(sumsq)/o.TotalNumOfModels();
   }, options);
 }
 
 uint breaker::entropy(vec<Experiment>& options) {
-  return maximize([](Experiment& o, double){
+  return maximize([](Experiment& o, double) {
     int total = o.TotalNumOfModels();
     double value = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       int models = o.NumOfModels(i);
-      double p = (double) models/total;
+      double p = static_cast<double>(models)/total;
       if (models > 0)
         value -= p * log2(p);
     }
@@ -205,7 +214,7 @@ uint breaker::fixed(vec<Experiment>& options) {
     uint min = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       min = std::min(min, o.NumOfFixedVars(i));
-      if (min < max) return min; // cannot have more than max
+      if (min < max) return min;  // cannot have more than max
     }
     // prefer the experiment with a final outcome satisfiable
     auto f = o.type().final_outcome();
@@ -214,4 +223,4 @@ uint breaker::fixed(vec<Experiment>& options) {
   }, options);
 }
 
-}
+}  // namespace strategy

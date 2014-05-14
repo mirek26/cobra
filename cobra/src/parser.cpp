@@ -4,19 +4,18 @@
  * found in the LICENSE file.
  */
 
+#include "./parser.h"
+
 #include <vector>
 #include <map>
-#include "formula.h"
-#include "game.h"
-
-#include "parser.h"
+#include "./formula.h"
+#include "./game.h"
 
 Parser m;
 
-void Parser::deleteAll(){
-  for (auto& n: nodes_) delete n;
+void Parser::deleteAll() {
+  for (auto& n : nodes_) delete n;
   nodes_.clear();
-
 }
 
 // Overloaded insance of get method for a Variable.

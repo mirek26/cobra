@@ -5,13 +5,18 @@
  */
 
 #include <vector>
+#include <string>
 #include <map>
-#include "parser.h"
-#include "formula.h"
-#include "experiment.h"
-#include "game.h"
+#include "./parser.h"
+#include "./formula.h"
+#include "./experiment.h"
+#include "./game.h"
 
 extern Parser m;
+
+
+uint Game::bliss_calls = 0;
+clock_t Game::bliss_time = 0;
 
 Game::Game() {
   restriction_ = m.get<AndOperator>();
@@ -25,27 +30,27 @@ void Game::declareVar(Variable* var) {
 }
 
 void Game::declareVars(vec<Variable*>* list) {
-  for (auto var: *list)
+  for (auto var : *list)
     declareVar(var);
   delete list;
 }
 
 void Game::declareVars(std::initializer_list<string> list) {
-  for (auto x: list)
+  for (auto x : list)
     declareVar(m.get<Variable>(x));
 }
 
-Variable* Game::getVarByName(string name) {
+Variable* Game::getVarByName(string name) const {
   m.input_assert(vars_ids_.count(name) > 0,
     "Undefined prepositional variable '" + name + "'.");
-  return vars_[vars_ids_[name]];
+  return vars_[vars_ids_.at(name)];
 }
 
 void Game::addRestriction(Formula* f) {
   restriction_->addChild(f);
 }
 
-Formula* Game::restriction() {
+Formula* Game::restriction() const {
   return restriction_;
 }
 
@@ -55,19 +60,19 @@ MapId Game::addMapping(string ident, vec<Variable*>* vars) {
   int new_id = mappings_.size();
   mappings_ids_[ident] = new_id;
   mappings_.push_back(vec<VarId>());
-  for (auto v: *vars) {
+  for (auto v : *vars) {
     mappings_.back().push_back(getVarByName(v->ident())->id());
   }
   return new_id;
 }
 
-MapId Game::getMappingId(string ident) {
+MapId Game::getMappingId(string ident) const {
   m.input_assert(mappings_ids_.count(ident) > 0,
     "Undefined mapping '" + ident + "'.");
-  return mappings_ids_[ident];
+  return mappings_ids_.at(ident);
 }
 
-VarId Game::getMappingValue(MapId mapping, CharId a) {
+VarId Game::getMappingValue(MapId mapping, CharId a) const {
   assert(mapping < mappings_.size());
   assert(a < alphabet_.size());
   return mappings_[mapping][a];
@@ -79,21 +84,21 @@ ExpType* Game::addExperiment(string name, uint num_params) {
   return e;
 }
 
-string Game::ParamsToStr(const vec<CharId>& params, char sep) {
+string Game::ParamsToStr(const vec<CharId>& params, char sep) const {
   string s = "";
-  for (auto a: params)
+  for (auto a : params)
     s += alphabet_[a] + sep;
   s.erase(s.length()-1, 1);
   return s;
 }
 
 void Game::Precompute() {
-  for (auto e: experiments_) {
+  for (auto e : experiments_) {
     e->Precompute();
   }
 }
 
-bliss::Graph* Game::CreateGraph() {
+bliss::Graph* Game::CreateGraph() const {
   // Create the graph
   auto g = new bliss::Graph(0);
   // Add vertices for vars, create edge between a variable and its negation
@@ -120,7 +125,7 @@ void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
   }
 }
 
-vec<uint> Game::ComputeVarEquiv(bliss::Graph& graph) {
+vec<uint> Game::ComputeVarEquiv(bliss::Graph& graph) const {
   bliss::Stats stats;
   vec<uint> var_equiv(vars_.size(), 0);
   for (uint i = 1; i < vars_.size(); i++) {
@@ -129,16 +134,16 @@ vec<uint> Game::ComputeVarEquiv(bliss::Graph& graph) {
   clock_t t1 = clock();
   graph.find_automorphisms(stats,
                            ComputeVarEquiv_NewGenerator,
-                           (void*)&var_equiv);
-  bliss_calls_ += 1;
-  bliss_time_ += clock() - t1;
+                           reinterpret_cast<void*>(&var_equiv));
+  bliss_calls += 1;
+  bliss_time += clock() - t1;
   for (uint i = 1; i < vars_.size(); i++) {
     var_equiv[i] = var_equiv[var_equiv[i]];
   }
   return var_equiv;
 }
 
-void Game::PrintModel(vec<bool> model) {
+void Game::PrintModel(vec<bool> model) const {
   printf("TRUE: ");
   for (uint id = 1; id < vars_.size(); id++)
     if (model[id]) printf("%s ", vars_[id]->ident().c_str());

@@ -7,12 +7,14 @@
 #include <cassert>
 #include <vector>
 #include <map>
+#include <utility>
+#include <string>
 #include <set>
-#include "common.h"
-#include "solver.h"
+#include "./common.h"
+#include "./solver.h"
 
-#ifndef COBRA_SOLVER_SIMPLE_H_
-#define COBRA_SOLVER_SIMPLE_H_
+#ifndef COBRA_SRC_SIMPLE_SOLVER_H_
+#define COBRA_SRC_SIMPLE_SOLVER_H_
 
 class Variable;
 class Formula;
@@ -58,10 +60,9 @@ class SimpleSolver: public Solver {
   string pretty();
 
  private:
-
   bool TestSat(uint i);
   void RemoveUntilSat(uint start);
   void Update();
 };
 
-#endif   // COBRA_SOLVER_SIMPLE_H_
+#endif  // COBRA_SRC_SIMPLE_SOLVER_H_

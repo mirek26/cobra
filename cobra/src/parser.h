@@ -8,11 +8,12 @@
 #include <map>
 #include <exception>
 #include <cassert>
-#include "common.h"
-#include "game.h"
+#include <string>
+#include "./common.h"
+#include "./game.h"
 
-#ifndef COBRA_PARSER_H
-#define COBRA_PARSER_H
+#ifndef COBRA_SRC_PARSER_H_
+#define COBRA_SRC_PARSER_H_
 
 class Formula;
 class Variable;
@@ -45,7 +46,8 @@ class Parser {
   Game game_;
 
  public:
-  /* Create a new node of type T; call the constructor with parameters ts.
+  /**
+   * Creates a new node of type T; call the constructor with parameters ts.
    * This just calls a private get method with the itenity<T> as the first argument,
    * which can be easily overloaded for different types (e.g., for Variable and string).
    */
@@ -59,14 +61,23 @@ class Parser {
     return get(identity<T>(), l);
   }
 
+  /**
+   * Asserts something about input during semantical analysis.
+   */
   void input_assert(bool value, string error_message) {
     if (!value) {
       throw ParserException(error_message);
     }
   }
 
+  /**
+   * Frees all created nodes.
+   */
   void deleteAll();
 
+  /**
+   * Resets the game. For debugging purposes only.
+   */
   void reset() {
     Game g;
     game_ = g;
@@ -92,7 +103,8 @@ class Parser {
   void set_last_experiment(ExpType* e) { last_experiment_ = e; }
 
  private:
-  /* Generic template for a get method, which creates a new node.
+  /**
+   * Generic template for a get method, which creates a new node.
    * It just calls the constructor with given parameters (ts) and stores the
    * created object to nodes_ vector.
    */
@@ -105,4 +117,4 @@ class Parser {
   }
 };
 
-#endif   // COBRA_PARSER_H
+#endif  // COBRA_SRC_PARSER_H_

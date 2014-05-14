@@ -3,26 +3,27 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+#include <sys/stat.h>
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
 #include <set>
-#include <iostream>
+#include <string>
+#include <algorithm>
 #include <cmath>
 #include <ctime>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
 #include <tclap/CmdLine.h>
-#include <sys/stat.h>
-#include "formula.h"
-#include "game.h"
-#include "experiment.h"
-#include "common.h"
-#include "parser.h"
-#include "strategy.h"
-#include "minisolver.h"
-#include "picosolver.h"
-#include "simple-solver.h"
+#include "./formula.h"
+#include "./game.h"
+#include "./experiment.h"
+#include "./common.h"
+#include "./parser.h"
+#include "./strategy.h"
+#include "./minisolver.h"
+#include "./picosolver.h"
+#include "./simple-solver.h"
 
 extern "C" int yyparse();
 extern "C" FILE* yyin;
@@ -31,7 +32,7 @@ extern Parser m;
 std::function<uint(vec<Experiment>&)> g_breakerStg;
 std::function<uint(Experiment&)> g_makerStg;
 
-typedef struct Args{
+typedef struct Args {
   string filename;
   string mode;
   string backend;
@@ -60,14 +61,16 @@ void time_overview(clock_t start) {
   print_head("TIME OVERVIEW");
   printf("Total time: %.2fs\n", toSeconds(clock() - start));
   printf("Bliss (calls/time): %u/%.2fs\n",
-         m.game().bliss_calls(), toSeconds(m.game().bliss_time()));
+         Game::bliss_calls, toSeconds(Game::bliss_time));
   auto s1 = PicoSolver::s_stats();
-  printf("PicoSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
+  printf(
+    "PicoSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s1.sat_calls, toSeconds(s1.sat_time),
     s1.fixed_calls, toSeconds(s1.fixed_time),
     s1.models_calls, toSeconds(s1.models_time));
   auto s2 = SimpleSolver::s_stats();
-  printf("SimpleSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
+  printf(
+    "SimpleSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s2.sat_calls, toSeconds(s2.sat_time),
     s2.fixed_calls, toSeconds(s2.fixed_time),
     s2.models_calls, toSeconds(s2.models_time));
@@ -85,8 +88,8 @@ void overview_mode() {
   struct stat file_st;
   stat(args.filename.c_str(), &file_st);
   uint branching = 0, num_exp = 0, nodes = 0;
-  for (auto e: game.experiments()) {
-    for (auto f: e->outcomes()) {
+  for (auto e : game.experiments()) {
+    for (auto f : e->outcomes()) {
       nodes += f.formula->Size();
     }
     if (e->outcomes().size() > branching) {
@@ -104,7 +107,7 @@ void overview_mode() {
   printf("Alphabet size: %lu\n", game.alphabet().size());
   printf("Total num of experiments: %u\n", num_exp);
   printf("Avg num of parametrizations per type: %.2f\n",
-         (float)num_exp/game.experiments().size());
+         static_cast<float>(num_exp) / game.experiments().size());
   printf("Maximal branching: %u\n", branching);
   double d = log(models)/log(branching);
   printf("Trivial lower bound (expected): %.2f\n", d);
@@ -116,9 +119,9 @@ void overview_mode() {
   auto t1 = clock();
 
   ExpGenerator gen(game, *solver, vec<EvalExp>());
-  for (auto e: gen.All()) {
+  for (auto e : gen.All()) {
     auto f1 = new vec<Formula*>();
-    for (auto o: e.type().outcomes()) f1->push_back(o.formula);
+    for (auto o : e.type().outcomes()) f1->push_back(o.formula);
     auto f2 = m.get<ExactlyOperator>(1, f1);
     auto f3 = m.get<NotOperator>(f2);
 
@@ -126,7 +129,8 @@ void overview_mode() {
     solver->AddConstraint(f3, e.params());
     if (solver->Satisfiable()) {
       printf("%s failed!%s\n", color::serror, color::snormal);
-      printf("EXPERIMENT: %s %s", e.type().name().c_str(), game.ParamsToStr(e.params()).c_str());
+      printf("EXPERIMENT: %s %s",
+             e.type().name().c_str(), game.ParamsToStr(e.params()).c_str());
       printf("\nPROBLEMATIC ASSIGNMENT: \n");
       game.PrintModel(solver->GetModel());
       printf("\n");
@@ -137,7 +141,7 @@ void overview_mode() {
 
   delete solver;
   auto t2 = clock();
-  printf("ok [%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
+  printf("ok [%.2fs]\n", static_cast<double>(t2 - t1)/CLOCKS_PER_SEC);
 }
 
 void simulation_mode() {
@@ -179,7 +183,8 @@ void simulation_mode() {
     assert(sat);
     auto model = solver->GetModel();
     if (solver->OnlyOneModel()) {
-      printf("%sSOLVED in %i experiments!%s\n", color::shead, exp_num, color::snormal);
+      printf("%sSOLVED in %i experiments!%s\n",
+             color::shead, exp_num, color::snormal);
       game.PrintModel(model);
       break;
     }
@@ -234,7 +239,8 @@ void analyze_mode() {
   analyze(*solver, history, 1, max, sum, num);
   delete solver;
   printf("\nWorst-case: %u\n", max);
-  printf("Average-case: %.4f (%u/%u)\n", (double)sum/models, sum, models);
+  printf("Average-case: %.4f (%u/%u)\n",
+         static_cast<double>(sum)/models, sum, models);
 }
 
 // Parse program arguments with TCLAP library.
@@ -242,7 +248,8 @@ void parse_args(int argc, char* argv[]) {
   using namespace TCLAP;
   CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
 
-  vec<string> modes = { "o", "overview", "s", "simulation", "a", "analysis", "o", "optimal" };
+  vec<string> modes = { "o", "overview", "s", "simulation",
+                        "a", "analysis", "o", "optimal" };
   ValuesConstraint<string> modeConstraint(modes);
   ValueArg<string> modeArg(
     "m", "mode",
@@ -258,23 +265,25 @@ void parse_args(int argc, char* argv[]) {
 
   vec<string> e_stgs, o_stgs;
   string e_man = "", o_man = "";
-  for (auto s: strategy::breaker_strategies) {
+  for (auto s : strategy::breaker_strategies) {
     e_stgs.push_back(s.first);
     e_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
-  for (auto s: strategy::maker_strategies) {
+  for (auto s : strategy::maker_strategies) {
     o_stgs.push_back(s.first);
     o_man += color::emph + s.first + ": " + color::normal + s.second.first;
   }
   ValuesConstraint<string> o_constr(o_stgs);
   ValueArg<string> o_arg(
     "o", "codemaker",
-    "Strategy that selects an outcome, played by the codemaker. Default: interactive." + o_man, false,
+    "Strategy that selects an outcome, played by the codemaker. "
+    "Default: interactive." + o_man, false,
     "interactive", &o_constr);
   ValuesConstraint<string> e_constr(e_stgs);
   ValueArg<string> e_arg(
     "e", "codebreaker",
-    "Strategy that selects an experiment, played by the codebreaker. Default: interactive." + e_man, false,
+    "Strategy that selects an experiment, played by the codebreaker. "
+    "Default: interactive." + e_man, false,
     "interactive", &e_constr);
 
 
@@ -316,7 +325,7 @@ int main(int argc, char* argv[]) {
     }
     fclose (yyin);
     auto t2 = clock();
-    printf("[%.2fs]\n", double(t2 - t1)/CLOCKS_PER_SEC);
+    printf("[%.2fs]\n", static_cast<double>(t2 - t1)/CLOCKS_PER_SEC);
     t1 = clock();
 
     g_breakerStg = strategy::breaker_strategies.at(args.stg_experiment).second;
@@ -330,7 +339,8 @@ int main(int argc, char* argv[]) {
         simulation_mode();
       } catch (std::runtime_error&) { }
     } else if (args.mode == "a" || args.mode == "analysis") {
-      if (args.stg_experiment == "interactive" || args.stg_experiment == "random") {
+      if (args.stg_experiment == "interactive" ||
+          args.stg_experiment == "random") {
         printf("Cannot analyze strategy '%s'. \n", args.stg_experiment.c_str());
         exit(EXIT_FAILURE);
       }
@@ -339,8 +349,8 @@ int main(int argc, char* argv[]) {
 
     time_overview(t1);
     m.deleteAll();
-  } catch (TCLAP::ArgException &e) {
-    std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
+  } catch (const TCLAP::ArgException &e) {
+    printf("Error: %s for arg %s.\n", e.error().c_str(), e.argId().c_str());
   }
   return 0;
 }
