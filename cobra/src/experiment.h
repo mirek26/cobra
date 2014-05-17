@@ -29,7 +29,7 @@ struct GenParamsStats {
 struct Outcome {
   string name;
   Formula* formula;
-  bool last;
+  bool final;
 };
 
 struct EOutcome {
@@ -40,8 +40,8 @@ struct EOutcome {
 };
 
 class Experiment {
-  Solver& solver_;
-  const ExpType& type_;
+  Solver* solver_;
+  const ExpType* type_;
   vec<CharId> params_;
   uint index_;
 
@@ -51,7 +51,7 @@ class Experiment {
   Experiment(Solver& solver, const ExpType& e,
              vec<CharId> params, uint index);
 
-  const ExpType& type() const { return type_; }
+  const ExpType& type() const { return *type_; }
   const vec<CharId>& params() const { return params_; }
   uint index() const { return index_; }
   uint num_outcomes() const { return data_.size(); }
@@ -60,7 +60,10 @@ class Experiment {
   uint NumOfSat();
   uint NumOfModels(uint id);
   uint TotalNumOfModels();
+  uint MaxNumOfModels();
   uint NumOfFixedVars(uint id);
+
+  string pretty();
 };
 
 

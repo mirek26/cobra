@@ -22,8 +22,8 @@ extern Parser m;
 
 Experiment::Experiment(Solver& solver, const ExpType& e,
                        vec<CharId> params, uint index):
-  solver_(solver),
-  type_(e),
+  solver_(&solver),
+  type_(&e),
   params_(params),
   index_(index) {
   data_.resize(e.outcomes().size());
@@ -32,11 +32,11 @@ Experiment::Experiment(Solver& solver, const ExpType& e,
 bool Experiment::IsSat(uint id) {
   assert(id < data_.size());
   if (!data_[id].sat_c) {
-    solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
-    data_[id].sat = solver_.Satisfiable();
+    solver_->OpenContext();
+    solver_->AddConstraint(type_->outcomes()[id].formula, params_);
+    data_[id].sat = solver_->Satisfiable();
     data_[id].sat_c = true;
-    solver_.CloseContext();
+    solver_->CloseContext();
   }
   return data_[id].sat;
 }
@@ -51,13 +51,13 @@ uint Experiment::NumOfSat() {
 uint Experiment::NumOfModels(uint id) {
   assert(id < data_.size());
   if (!data_[id].models_c) {
-    solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
-    data_[id].models = solver_.NumOfModels();
+    solver_->OpenContext();
+    solver_->AddConstraint(type_->outcomes()[id].formula, params_);
+    data_[id].models = solver_->NumOfModels();
     data_[id].models_c = true;
     data_[id].sat = data_[id].models > 0;
     data_[id].sat_c = true;
-    solver_.CloseContext();
+    solver_->CloseContext();
   }
   return data_[id].models;
 }
@@ -69,16 +69,27 @@ uint Experiment::TotalNumOfModels() {
   return total;
 }
 
+uint Experiment::MaxNumOfModels() {
+  uint max = 0;
+  for (uint i = 0; i < data_.size(); i++)
+    max = std::max(max, NumOfModels(i));
+  return max;
+}
+
 uint Experiment::NumOfFixedVars(uint id) {
   assert(id < data_.size());
   if (!data_[id].fixed_c) {
-    solver_.OpenContext();
-    solver_.AddConstraint(type_.outcomes()[id].formula, params_);
-    data_[id].fixed = solver_.GetNumOfFixedVars();
+    solver_->OpenContext();
+    solver_->AddConstraint(type_->outcomes()[id].formula, params_);
+    data_[id].fixed = solver_->GetNumOfFixedVars();
     data_[id].fixed_c = true;
-    solver_.CloseContext();
+    solver_->CloseContext();
   }
   return data_[id].fixed;
+}
+
+string Experiment::pretty() {
+    return type().name() + " " + type().game().ParamsToStr(params_);
 }
 
 ExpType::ExpType(const Game& game, string name, uint num_params)
@@ -94,6 +105,9 @@ ExpType::ExpType(const Game& game, string name, uint num_params)
 void ExpType::addOutcome(string name, Formula* outcome, bool final) {
   if (final) final_outcome_ = outcomes_.size();
   outcomes_.push_back({ name, outcome, final });
+  uint final_count = 0;
+  for (auto o : outcomes_) final_count += o.final;
+  if (final_count > 1) final_outcome_ = -1;
 }
 
 void ExpType::paramsDistinct(vec<uint>* list) {

@@ -119,7 +119,7 @@ void overview_mode() {
   auto t1 = clock();
 
   ExpGenerator gen(game, *solver, vec<EvalExp>());
-  for (auto e : gen.All()) {
+  for (auto& e : gen.All()) {
     auto f1 = new vec<Formula*>();
     for (auto o : e.type().outcomes()) f1->push_back(o.formula);
     auto f2 = m.get<ExactlyOperator>(1, f1);
@@ -156,7 +156,7 @@ void simulation_mode() {
     auto options = gen.All();
 
     // Choose and print an experiment
-    auto experiment = options[g_breakerStg(options)];
+    auto& experiment = options[g_breakerStg(options)];
     printf("%sEXPERIMENT: %s %s %s\n",
            color::semph,
            experiment.type().name().c_str(),
@@ -196,6 +196,95 @@ void simulation_mode() {
   delete solver;
 }
 
+double optimum(Solver& solver, vec<EvalExp>& history,
+               double opt) {
+  ExpGenerator gen(m.game(), solver, history);
+  vec<Experiment> options = gen.All();
+
+  // Lower bound check
+  auto models = solver.NumOfModels();
+  if (models == 1) {
+    assert(!history.empty());
+    auto last = history.back();
+    auto final_out = last.exp.type().final_outcome();
+    if (final_out == -1 || static_cast<int>(last.outcome_id) == final_out)
+      return 0;
+    else
+      return 1;
+  }
+
+  // TODO: projit, najít max parts s final sat, vyradit sat 1
+  int last = -1;
+  uint maxparts = 0;
+  for (uint i = 0; i < options.size(); i++) {
+    auto parts = options[i].NumOfSat();
+    maxparts = std::max(maxparts, parts);
+    if (parts == models) {  // this solves the game -> check for FINAL todo: projit vsechny s parts=models
+      last = i;
+      auto final_out = options[i].type().final_outcome();
+      if (final_out == -1 || options[i].IsSat(final_out)) break;
+    }
+    if (parts == 1) {
+      options[i] = options.back();
+      options.pop_back();
+      i--;
+    }
+  }
+  if (last > -1) {
+    auto final_out = options[last].type().final_outcome();
+    if (final_out == -1) return 1;
+    else if (not options[last].IsSat(final_out)) return 2;
+    else return 2 - (static_cast<double>(1) / models);
+  }
+
+  double d = log(models)/log(maxparts);
+  if (d > opt) return opt; // non-perspective branch
+
+  // Sort according to the 'minnum' stg
+  assert(!options.empty());
+  std::sort(options.begin(), options.end(), [](Experiment& a, Experiment& b) {
+    return a.MaxNumOfModels() < b.MaxNumOfModels();
+  });
+  // printf("FIRST: %s (%u)\n", options[0].pretty().c_str(), options[0].MaxNumOfModels());
+
+  // Recurse down
+  Experiment* nej = nullptr;
+  for (auto& e : options) {
+    double val = 0;
+    for (uint i = 0; i < e.type().outcomes().size(); i++) {
+      if (!e.IsSat(i)) continue;
+      solver.OpenContext();
+      auto outcome = e.type().outcomes()[i];
+      solver.AddConstraint(outcome.formula, e.params());
+      history.push_back({ e, i });
+      val += (1 + optimum(solver, history, opt)) * solver.NumOfModels();
+      history.pop_back();
+      solver.CloseContext();
+    }
+    val /= models;
+    if (val < opt) {
+      opt = val;
+      nej = &e;
+    }
+  }
+  if (!nej) return opt;
+  // printf("\n---\n");
+  // for (auto e : history) {
+  //   printf("%s : %i\n", e.exp.pretty().c_str(), e.outcome_id);
+  // }
+  // printf(">>> %s (%.2f)\n", nej->pretty().c_str(), opt);
+  return opt;
+}
+
+void optimal_mode() {
+  print_head("AVERAGE-CASE OPTIMAL STRATEGY");
+  Game& game = m.game();
+  Solver* solver = get_solver(game.vars().size(), game.restriction());
+  vec<EvalExp> history;
+  auto r = optimum(*solver, history, 5);
+  printf("Average-case expected optimum: %.2f\n", r);
+}
+
 void analyze(Solver& solver, vec<EvalExp>& history,
              uint depth, uint& max, uint& sum, uint& num) {
   Game& game = m.game();
@@ -214,7 +303,7 @@ void analyze(Solver& solver, vec<EvalExp>& history,
       num += 1;
       printf("\b\b\b\b\b%5u", num);
       fflush(stdout);
-      auto finaldepth = outcome.last ? depth : depth + 1;
+      auto finaldepth = outcome.final ? depth : depth + 1;
       sum += finaldepth;
       max = std::max(max, finaldepth);
     } else if (sat) {
@@ -248,15 +337,15 @@ void parse_args(int argc, char* argv[]) {
   using namespace TCLAP;
   CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
 
-  vec<string> modes = { "o", "overview", "s", "simulation",
+  vec<string> modes = { "d", "s", "simulation",
                         "a", "analysis", "o", "optimal" };
   ValuesConstraint<string> modeConstraint(modes);
   ValueArg<string> modeArg(
     "m", "mode",
-    "Mode of operation. Default: overview.", false,
-    "o", &modeConstraint);
+    "Mode of operation. Overview mode is default (d).", false,
+    "d", &modeConstraint);
 
-  vec<string> backends = { "picosat", "simple" };
+  vec<string> backends = { "picosat", "minisat", "simple" };
   ValuesConstraint<string> backendConstraint(backends);
   ValueArg<string> backendArg(
     "b", "backend",
@@ -332,7 +421,7 @@ int main(int argc, char* argv[]) {
     g_makerStg = strategy::maker_strategies.at(args.stg_outcome).second;
     m.game().Precompute();
 
-    if (args.mode == "o" || args.mode == "overview") {
+    if (args.mode == "d") {
       overview_mode();
     } else if (args.mode == "s" || args.mode == "simulation") {
       try {
@@ -345,6 +434,8 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
       }
       analyze_mode();
+    } else if (args.mode == "o" || args.mode == "optimal") {
+      optimal_mode();
     }
 
     time_overview(t1);

@@ -86,8 +86,11 @@ ExpType* Game::addExperiment(string name, uint num_params) {
 
 string Game::ParamsToStr(const vec<CharId>& params, char sep) const {
   string s = "";
-  for (auto a : params)
+  if (params.empty()) return "NO PARAMS";
+  for (auto a : params) {
+    assert(a < alphabet_.size());
     s += alphabet_[a] + sep;
+  }
   s.erase(s.length()-1, 1);
   return s;
 }
