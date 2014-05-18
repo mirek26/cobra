@@ -30,74 +30,78 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.2}\slshape Formal definition}{15}{section.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}\slshape Strategies}{20}{section.3.3}
+\contentsline {subsection}{\rmfamily Course of the game}{18}{section*.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Non-adaptive strategies}{21}{section*.19}
+\contentsline {subsection}{\rmfamily Examples}{18}{section*.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Memory-less strategies}{22}{section*.20}
+\contentsline {section}{\numberline {3.3}\slshape Strategies}{21}{section.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{24}{section.3.4}
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{23}{section*.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{26}{section.3.5}
+\contentsline {subsection}{\rmfamily Memory-less strategies}{23}{section*.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{26}{section*.21}
+\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{25}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{26}{section*.22}
+\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{27}{section.3.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{26}{section*.23}
+\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{27}{section*.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Comparison}{26}{section*.24}
+\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{27}{section*.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{27}{chapter.4}
+\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{27}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}\slshape Input language}{27}{section.4.1}
+\contentsline {subsection}{\rmfamily Comparison}{27}{section*.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{27}{section*.25}
+\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{29}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{29}{section*.26}
+\contentsline {section}{\numberline {4.1}\slshape Input language}{29}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{30}{section.4.2}
+\contentsline {subsection}{\rmfamily Low-level language}{29}{section*.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{31}{section.4.3}
+\contentsline {subsection}{\rmfamily Python preprocessing}{31}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{31}{section*.28}
+\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{32}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{32}{section*.30}
+\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{33}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{33}{section*.31}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{33}{section*.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{33}{section*.32}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{34}{section*.32}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape Strategies}{33}{section.4.4}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{35}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Codebreaker's strategy}{33}{section*.33}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{35}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Codemaker's strategy}{34}{section*.34}
+\contentsline {section}{\numberline {4.4}\slshape Strategies}{35}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Extensibility}{34}{section*.35}
+\contentsline {subsection}{\rmfamily Codebreaker's strategy}{35}{section*.35}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape SAT solving}{34}{section.4.5}
+\contentsline {subsection}{\rmfamily Codemaker's strategy}{36}{section*.36}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{37}{section*.39}
+\contentsline {subsection}{\rmfamily Extensibility}{36}{section*.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{37}{section*.40}
+\contentsline {section}{\numberline {4.5}\slshape SAT solving}{36}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{37}{section*.41}
+\contentsline {subsection}{\rmfamily PicoSat}{39}{section*.41}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Extensibility}{38}{section*.42}
+\contentsline {subsection}{\rmfamily MiniSat}{39}{section*.42}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{38}{section*.43}
+\contentsline {subsection}{\rmfamily Simple solver}{39}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Symmetry breaking}{39}{section.4.6}
+\contentsline {subsection}{\rmfamily Extensibility}{40}{section*.44}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{39}{section.4.7}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{40}{section*.45}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{39}{section*.44}
+\contentsline {section}{\numberline {4.6}\slshape Symmetry breaking}{41}{section.4.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{39}{section*.45}
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{41}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{40}{section*.46}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{41}{section*.46}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{41}{chapter.5}
+\contentsline {subsection}{\rmfamily Requirements}{41}{section*.47}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{43}{chapter.6}
+\contentsline {subsection}{\rmfamily Unit testing}{42}{section*.48}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{43}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{45}{chapter.6}

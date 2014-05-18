@@ -110,6 +110,10 @@
 \theoremstyle{definition}
 \newshadedtheorem{definition}{Definition}[chapter]
 \newtheorem{example}{Example}[chapter]
+\newcommand\xqed[1]{%
+  \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+  \quad\hbox{#1}}
+\newcommand\eqed{\xqed{$\blacklozenge$}}
 
 \theoremstyle{plain}
 \newtheorem{problem}{Problem}[chapter]

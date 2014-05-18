@@ -1,8 +1,16 @@
 \chapter{Formal model}
 
+In this chapter, we formally define code-breaking games
+  within the framework of propositional logic,
+  where we represent the secret code as a valuation
+  of propositional variables.
+We discuss various strategies for code-breaking games and
+  define a concept of experiment equivalence,
+  which is fundamental for strategy synthesis and analysis.
+
 \section{Notation and Terminology}
-Let $\Form_\Var$ be the set of all prepositional formulas over
-  the set of variables $\Var$;
+Let $\Form_\Var$ denote the set of all prepositional formulas over
+  the set of variables $\Var$ and let
   $\Val_\Var$ be the set of all valuations (boolean interpretation)
   of variables $\Var$.
 Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
@@ -11,7 +19,6 @@ Formulas $\form_0, \form_1 \in \Form_\Var$ are (semantically) equivalent,
 We say that \emph{$\val$ is a model of $\form$}
   or that \emph{$\val$ satisfies $\form$}
   if $\val(\form) = 1$.
-
 
 For a formula $\form\in\Form_\Var$, let
   $\numval_\Var{\form} = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
@@ -26,6 +33,9 @@ The set of all permutations of a set $\Var$ (bijections $\Var->\Var$)
   is denoted by $\Perm_\Var$ and
   $\idperm_\Var$ is the identity permutation.
 
+% něco na *, hranaté závorky
+% partition, trivial partition, discrete partition
+
 %-------------------------------------------------------------------------------
 % DEF: CODE BREAKING GAME
 \section{Formal definition}
@@ -39,90 +49,162 @@ The set of all permutations of a set $\Var$ (bijections $\Var->\Var$)
 % The codebreaker strives to reveal the code in minimal number of experiments.
 % ... (introduction)
 
-In this section, we formally define Code Breaking Games
-  within the framework of propositional logic,
-  where we represent the secret code as a valuation
-  of propositional variables.
-The game is represented as a \emph{set of variables},
+A game can be represented by a \emph{set of variables},
   \emph{initial restriction} (a formula that is guaranteed to be satisfied),
-  and a set of \emph{possible experiments}.
-A finite set of possible \emph{outcomes} is associated with each experiment.
-Outcome is a propositional formula that represents the partial information,
-  which the codebreaker can gain from the experiment.
+  and a set of \emph{allowed experiments}.
+An experiment is defined by the set of possible outcomes in which it can result.
+The outcomes are specified in the form of a propositional formula that
+  represents the partial information
+  which the codebreaker gains if the experiment results in the outcome.
 
-The number of experiments is typically very large
-  (such as 36894 for the Counterfeit-coin Problem \ref{prob-coins})
-  but most of them have same structure and yield similar outcomes.
-Therefore we opt for a compact representation of an experiment as a pair
-  (type of experiment, parametrization), where parametrization is a string
-  over a defined alphabet.
+The number of experiments in a code-breaking game is typically very large.
+For example, in the counterfeit-coin problem defined in the previous chapter,
+  experiments correspond to combinations of coins you put on the pans of the
+  balance scale.
+It can be calculated that there are 36894 combinations for 12 coins.
+However, most of them have same structure and yield similar outcomes.
+
+We want to have a game representation as compact as possible,
+  so we allow \emph{parametrized experiments},
+  where parametrization is a fixed-length string over a defined alphabet.
 This whole idea is formalized below.
 
-\begin{definition}[Code Breaking Game] \label{def:game}
-A \emph{Code Breaking Game} is a septuple
-  $\game = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$, where
+\pagebreak
+\begin{definition}[Code-breaking game] \label{def:game}
+A \emph{code-breaking game} is a quintuple
+  $\game = (\Var, \init, \Sigma, F, \Expt)$, where
   \begin{itemize}
   \item $\Var$ is a finite set of propositional variables,
   \item $\init \in \Form_\Var$ is a satisfiable propositional formula,
-  \item $\Expt$ is a finite set of types of experiments,
+  %\item $\Expt$ is a finite set of types of experiments,
   \item $\Sigma$ is a finite alphabet,
-  \item $\Exp \subseteq \Expt \times \Sigma^\star$
-    is an \emph{experiment} relation, and
-  \item $F$ is a finite collection of functions of type $\Sigma -> \Var$,
-  \item $\outcome: \Expt -> 2^{\PForm_{\Var,F,\Sigma}}$ is an
-  \emph{outcome function} such that $\outcome(\expt)$ is finite
-  for any $\expt\in\Expt$. Definition of $\PForm$ follows
-   (\autoref{def-pform}).
+  \item $F$ is a collection of mappings of type $\Sigma -> \Var$,
+  \item $\Expt$ is a set of \emph{parametrized experiments}, defined below.
+  % \item $\Exp \subseteq \Expt \times \Sigma^\star$
+  %   is an \emph{experiment} relation, and
+  % \item $F$ is a finite collection of functions of type $\Sigma -> \Var$,
+  % \item $\outcome: \Expt -> 2^{\PForm_{\Var,F,\Sigma}}$ is an
+  % \emph{outcome function} such that $\outcome(\expt)$ is finite
+  % for any $\expt\in\Expt$. Definition of $\PForm$ follows
+  %  (\autoref{def-pform}).
   \end{itemize}
 \end{definition}
 
+\begin{definition}[Parametrized experiment] \label{def:game}
+A \emph{parametrized experiment} for a game $\game = (\Var, \init, \Sigma, F, \Expt)$
+is a triple
+  $\expt = (n, P, \outcome)$, where
+  \begin{itemize}
+  \item $n$ is the number of parameters of the experiment,
+  \item $P$ is a partition of the set $\{1, ..., n\}$,
+  \item $\outcome$ is a set of parametrized formulas, defined below.
+  \end{itemize}
+If $k$ and $l$ are in the same set in partition $P$, then $k$-th and
+$l$-the parameter must be different.
+We denote by $n_t$, $P_t$, and $\outcome_t$ the components of
+  a parametrized experiment $t\in\Expt$.
+\end{definition}
+
 \begin{definition}[Parametrized formula] \label{def-pform}
-A set of \emph{parametrized formulas} $\PForm_{\Var,F,\Sigma}$ is a set of
+A set of \emph{parametrized formulas} for a parametrized experiment
+$t$ of a game $\game = (\Var, \init, \Sigma, F, \Expt)$
+  is the set of
   all strings $\pform$ generated by the following grammar:
-  $$ \pform ::= x \| f(\$n) \| \pform \circ \pform \| \neg \pform,$$
-  where $x\in\Var$, $f\in F$, $n \in\Nset$,
+  $$ \pform ::= x \| f(\$k) \| \pform \circ \pform \| \neg \pform,$$
+  where $x\in\Var$, $f\in F$, $1<= k <= n_t$,
   and $\circ\in\{\wedge, \vee, ==>\}$.
-By $\pform(\param)$ we denote application of
-  a parametrization $\param\in\Sigma^\star$
-  on a formula $\pform$,
+The special symbol $\$k$ in $f(\$k)$ is used to denote the $k$-th parameter.
+\end{definition}
+
+The set $\Exp$ of all experiments in the game $\game$ is given by
+\[
+  \Exp =
+     \big\{ (\expt, \param) \| t\in\Expt,\; \param \in\Sigma^{n_t},\;
+     \forall x,y<={n_t}:\; P_t(x)=P_t(y) ==> \param[x] \not= \param[y] \big\}
+\]
+
+An experiment $e\in\Exp$ is thus a pair $(t, p)$.
+We call the first component, $t$, \emph{type of the experiment},
+ and the second, $p$, its \emph{parametrization}.
+
+Let $e = (t, p)\in\Exp$ be an experiment,
+  and $\pform\in\outcome_t$ a parametrized formula.
+By $\pform(\param)$ we denote the application of
+  the parametrization $\param$ on $\pform$,
   which is defined recursively on the structure of $\pform$
   in the following way:
 \begin{align}
 (x)(\param) &= x, \\
-(f(\$n))(\param) &= f(\param[n]),\\
-(\pform_1\circ\pform_2)(\param) &= \pform_1(\param) \circ \pform_2(\param),\\
+(f(\$k))(\param) &= f(\param[k]),\\
+/(\pform_1\circ\pform_2)(\param) &= \pform_1(\param) \circ \pform_2(\param),\\
 (\neg\pform)(\param) &= \neg(\pform(\param)).
 \end{align}
-\end{definition}
-
-We use the special symbol $\$$ in $f(\$n)$ so that $n$ cannot be mistaken for
-  the argument of $f$, which is $n$-th symbol of the parametrization.
-Note that if $f(\$n)$ appears in $\pform$ and $|\param|<n$, then
-  $\pform(\param)$ is undefined.
 
 For the sake of simplicity, let us denote the set of possible outcomes for
   an experiment $\exp = (\expt, \param) \in \Exp$ by
-  $\outcome(\exp) = \{ \pform(\param) \| \pform\in\outcome(\expt)\}$.
+  $\outcome(\exp) = \{ \pform(\param) \| \pform\in\outcome_\expt\}$.
 
-The compact representation with parametrized formulas does not restrict
-  the class of games that can fit this definition.
-If no two experiments
-  can be united under the same type, every experiment can have its own type and
-  allow only one possible parametrization.
+\begin{example}
+Consider the counterfeit coin problem for 4 coins.
+
+The counterfeit coin and its relative weight to others can be encoded
+  as a valuation of variables $x_1, x_2, x_3, x_4$ and $y$,
+  $v(x_i)$ being 1 if and only if the $i$-th coin is counterfeit and
+  $y$ determining its relative weight
+  ($v(i) = 0$ meaning lighter, $v(i) = 1$ meaning heavier).
+The initial constraint $\init$ should capture the constraint that exactly one
+  coin if counterfeit.
+Therefore, let $\init$ be $\exactlyk{1}(x_1, x_2, x_3, x_4)$.
+
+The experiments are parametrized by the coins on the pans of the balance scale.
+Let $\Sigma = \{1, 2, 3, 4\}$ and $F = \{ f_x \}$ where $f_x$
+maps $i$ to the corresponding variable $x_i$.
+
+The first parametrized experiment $t$ is weighing one coin against one.
+We need two parameters ($n_t = 2$),
+  the first determining the coin on the left pan,
+  the second determining the coin on the right pan, which must differ
+  ($P_t$ is the trivial partition).
+
+If the left pan is lighter, it is either the case that the
+  coin on the left is underweight ($\$1 \wedge \neg y$)
+  or the coin on the right is overweight ($\$2 \wedge y$).
+If the right pan is lighter, we get symmetrical knowledge
+  $(\$1\wedge y) \vee (\$2\wedge\neg y)$.
+If both sides weigh the same, the counterfeit coins is not present on either pan
+  and we can conclude $\neg \$1 \wedge \neg \$2$.
+To sum it up,
+  \[
+  t = \left(2,\; \big\{\{1,2\}\big\},\; \big\{
+    (\$1\wedge \neg y) \vee (\$2\wedge y), \;
+    (\$1\wedge y) \vee (\$2\wedge\neg y), \;
+    \neg \$1 \wedge \neg \$2
+    \big\}\right).
+  \]
+
+The second parametrized experiment is weighing two coins against two.
+There are $4$ parameters, they must be pairwise distinct and the outcome
+  formulas can be constructed analogically. \eqed
+\end{example}
+
+
+Note that the compact representation with parametrized experiments
+  does not restrict the class of games that can fit \autoref{def:game}.
+There can always be a parametrized experiment with no parameters for
+  each actual experiment.
 
 \begin{definition}[Solving process]
-An \emph{evaluated experiment} is a pair $(e, \form)$
-  such that $\form\in\outcome(e)$.
+An \emph{evaluated experiment} is a pair $(e, \form)$,
+  where $e\in\Exp$ and $\form\in\outcome(e)$.
 Let us denote the set of evaluated experiments by $\Omega$.
 
 A \emph{solving process} is a finite or infinite sequence
   of evaluated experiments.
 \end{definition}
 
-For simplicity, we omit the brackets around the pairs and write
-  \[
-  \proc = \exp_1, \form_1, \exp_2, \form_2, ...
-  \]
+Let $\proc$ be a solving process.
+For simplicity, we omit brackets around the pairs and write
+  $\proc = \exp_1, \form_1, \exp_2, \form_2, ...$.
 Let
 \begin{itemize}
 \item $|\proc|$ denote the length of the sequence,
@@ -130,15 +212,17 @@ Let
 \item $\proc[k] = \form_k$ denote the $k$-th outcome,
 \item $\proc[1..k] = \exp_1, \form_1, ..., \exp_k, \form_k$ denote the prefix of length $k$, and
 \item $\aknow{\proc}{k} = \init \wedge \form_1 \wedge ... \wedge \form_k$
-  denote the accrued knowledge after the first $k$ experiments
+  denote the accumulated knowledge after the first $k$ experiments
   (including the initial restriction $\init$). For finite $\proc$,
-  let $\tknow{\proc} = \aknow{\proc}{|\proc|}$ be the overall accrued knowledge.
+  let $\tknow{\proc} = \aknow{\proc}{|\proc|}$ be the overall accumulated knowledge.
 \end{itemize}
 
 We denote by $\Vals = \{ \val\in\Val_\Var \| \val(\init) = 1 \}$ the set
   of valuations that satisfy $\init$ and
   by $\Formr = \{ \tknow{\proc} \| \proc\in\Omega^* \}$ the set of
   \emph{reachable formulas}.
+
+\subsection{Course of the game}
 
 Let us now describe the course of the game in the defined terms.
 First, the codemaker choose a valuation $\val$ from $\Vals$.
@@ -168,12 +252,20 @@ A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
 \end{equation}
 \end{definition}
 
-As the semantics of non-well-formed games is unclear,
-  we focus only on well-formed games and, be default,
+In the sequel, we focus only on well-formed games and, by default,
   we suppose a game to be well-formed if not stated otherwise.
 
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM
+\subsection{Examples}
+In the rest of this section, we show two ways of defining the counterfeit coin
+  problem and two ways of defining Mastermind.
+We do not provide formal definition of other code-breaking games
+  presented in \autoref{ch:games},
+  however, a computer language for game specification
+  that is based on this formalism is introduced in \autoref{ch:cobra},
+  and specifications of all the code-breaking games
+  in this language can be found in \autoref{app:games}.
 
 \begin{example}[Fake-coin problem] \label{ex:form-fake-coin1}
 Fake-coin problem with $n$ coins, one of which is fake, can be formalized as
@@ -184,8 +276,8 @@ $\mathcal{F}_n = (\Var, \init, \Expt, \Sigma, \Exp, F, \outcome)$.
 \item
 $\Var = \{x_1, x_2, ..., x_n, y\}$, \\
 $\init = \exactlyk{1}\{x_1, ..., x_n\}$. \\
-Intuitively, variable $x_i$ tells weather the coin $i$ is fake.
-Variable $y$ tells weather it is lighter or heavier.
+Intuitively, variable $x_i$ tells whether the coin $i$ is fake.
+Variable $y$ tells whether it is lighter or heavier.
 Formula $\init$ says that exactly one coin is fake.
 
 \item
@@ -208,7 +300,7 @@ $\outcome(w_m) = $ \vspace{-3mm}
 \end{align*}
 There are 3 possible outcomes of every experiment.
 First, the right side is heavier. This happens if the fake coin is lighter and it appears in the first half of the parametrization, or if it is heavier and it appears in the second half. Second, analogously, the left side is heavier.
-Third, the weights are balanced if the fake coin do not participate in the experiment.
+Third, the weights are balanced if the fake coin do not participate in the experiment. \eqed
 \end{itemize}
 \end{example}
 
@@ -235,7 +327,7 @@ $F = \{ f_x, f_y \}$, where $f_x(i) = x_i$ and $f_y(i) = y_i$ for $1 <= i <= n$,
 \outcome(w_m) = \big\{ & (f_x(\$1) \vee ... \vee f_x(\$m)) \vee (f_y(\$m+1) \vee ... \vee f_y(\$2m)), & \\
 & (f_y(\$1) \vee ... \vee f_y(\$m)) \vee (f_x(\$m+1) \vee ... \vee f_x(\$2m)), & \\
 & \neg (f_x(\$1) \vee ... \vee f_x(\$2m) \vee f_y(\$1) \vee ... \vee f_y(\$2m)) \big\}. &
-\end{flalign*}
+\end{flalign*} \eqed
 \end{itemize}
 \end{example}
 
@@ -332,7 +424,7 @@ For example, for $n = 4$ the result of $\textrm{Outcome}(1, 1)$ starts with
   \neg f_2(\$2) \wedge f_3(\$3)) \vee ...,$
 \end{scriptsize}
 
-and contains 24 clauses at the top level with 144 literals in total.
+and contains 24 clauses at the top level with 144 literals in total. \eqed
 \end{example}
 
 %-------------------------------------------------------------------------------
@@ -380,15 +472,8 @@ Indeed, we get $k$ markers for color $j$
   $\atleast{i}(x_{1,j},...,x_{n,j})$ are satisfied for $i <= k$.
 Note that since the number of pegs of each color is fixed by the type and we
   do not care about the exact positions, this part of the formula
-  is not parametrized.
-
+  is not parametrized. \eqed
 \end{example}
-
-We do not provide the formal definition of other Code breaking Games presented in
-  \autoref{ch:games}.
-However, a computer language for game specification
-  that is based on this formalism is introduced in \autoref{ch:cobra}, and
-  definition of all the games in this language can be found in \autoref{app:games}.
 
 %-------------------------------------------------------------------------------
 % DEF: STRATEGY
@@ -469,7 +554,7 @@ This would be a contradiction with $k = \lenmax{\stg}$ and, therefore,
   \qed
 \end{proof}
 
-\begin{lemma} \label{lma:accruedknowledge}
+\begin{lemma} \label{lma:accumulatedknowledge}
 Let $\stg$ be a strategy and let $\val_1, \val_2 \in\Vals$.
 If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
   then $\procstg{\stg}{\val_1}[1..k] = \procstg{\stg}{\val_2}[1..k]$.
@@ -514,7 +599,7 @@ Then $\stg(\proc) = \tau(|\proc|)$.
 
 Non-adaptive strategies corresponds to the well studied problems of
   static mastermind and
-  non-adaptive strategies for the coutnerfeit coin problem \ref{} \ref{}.
+  non-adaptive strategies for the counterfeit coin problem \ref{} \ref{}.
 We mention them here just to show the possibility of formulating these problems
   in our framework but we do not study them any further.
 
@@ -603,7 +688,7 @@ Take $l_1, l_2$ as the largest numbers such that
   $\stgknow{\stg_{i-1}}{v_1}{l_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{l_2}$.
 Since $v_1$ satisfies $\stgknow{\stg_{i-1}}{v_2}{l_2}\equiv\form_i$,
   then $\procstg{\stg_{i-1}}{v_2}[1..l_2] = \procstg{\stg_{i-1}}{v_1}[1..l_2]$
-  by \autoref{lma:accruedknowledge}.
+  by \autoref{lma:accumulatedknowledge}.
 The same holds for $l_1$ which means that $l_1 = l_2$ and
   $\procstg{\stg_{i-1}}{v_1}(l_1) = \procstg{\stg_{i-1}}{v_1}(l_2)$, which
   proves that the definition of $\stg_i$ is independent of the exact choices
