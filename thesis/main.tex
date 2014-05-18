@@ -26,6 +26,7 @@
 \begin{document}
 \input{macros}
 
+
 \FrontMatter
 \setlength{\parindent}{0pt}
 \ThesisTitlePage
@@ -67,26 +68,28 @@ counterfeit coin\\
 
 
 \begin{ThesisAbstract}
-Code-breaking games are two-player games, in which the first selects
-  a code from a given set and the second strives to reveal it using a
+Code-breaking games are two-player games in which the first player selects
+  a code from a given set and the second player strives to reveal it using a
   minimal number of experiments.
-A prominent example is the board game of Mastermind,
-  where the code-breaker tries to guess a combination of colored pegs.
+A prominent example of a code-breaking game is the board game of Mastermind,
+  where the code-breaker tries to guess a combination of coloured pegs.
 
 What strategy for experiment selection should the code-breaker use?
 Is it possible to compute a lower or upper bound for the number of experiments needed?
 Can we compute the optimal strategy?
 What is the performance of a given heuristics?
 Much research on the topic has been done but it usually focuses
-  on one particular game and few have been written about the games in general.
+  on one particular game and few has been written about code-breaking
+  games in general.
 
-We create a general model of code-breaking games based on propositional logic
+In this work, we create a general model of code-breaking games
+  based on propositional logic
   and design a computer language for game specification.
 Most importantly, we develop a computer program for game analysis
   and strategy synthesis.
 Using the tool, we can easily reproduce known results for Mastermind or
   any other code-breaking game and we can quickly evaluate new ideas
-  for strategies.
+  for heuristics.
 \end{ThesisAbstract}
 
 \MainMatter
@@ -108,8 +111,9 @@ Using the tool, we can easily reproduce known results for Mastermind or
 \input{conclusions}
 
 \pagestyle{plain}
-\printbibheading
-\printbibliography[keyword=cc,heading=subbibliography,title={Counterfeit Coin}]
-\printbibliography[keyword=mm,heading=subbibliography,title={Mastermind}]
-\printbibliography[keyword=other,heading=subbibliography,title={Other}]
+%\printbibheading
+\printbibliography
+% \printbibliography[keyword=cc,heading=subbibliography,title={Counterfeit Coin}]
+% \printbibliography[keyword=mm,heading=subbibliography,title={Mastermind}]
+% \printbibliography[keyword=other,heading=subbibliography,title={Other}]
 \end{document}

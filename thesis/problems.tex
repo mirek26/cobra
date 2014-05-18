@@ -8,7 +8,7 @@ We briefly summarize related research for each game, discuss
   its variations and applications and give a list of
   references.
 
-Our goal in this work is neither to answer the research questions nor
+Our goal in this work is neither to answer the research questions, nor
   to study possible generalizations.
 We aim to create a general formalism and a computer language which could
   be used to describe arbitrary code-breaking game, if possible.
@@ -25,7 +25,7 @@ This chapter provides an overview of what we had in mind
   \includegraphics[width=0.23\textwidth]{pictures/scales.pdf}
   \vspace{-5mm}
   \end{center}
-  \caption{Balance scales (illustrative image)\protect\footnotemark.}
+  \caption{Balance scale (illustrative image)\protect\footnotemark.}
   \vspace{-10mm}
 \end{wrapfigure}
 \footnotetext{Image adopted from
@@ -33,10 +33,10 @@ This chapter provides an overview of what we had in mind
   under CC0 1.0 License.}
 
 The problem of finding a counterfeit coin among regular coins in the fewest
-  number of weighings on a pair of scales balance is a folklore of
+  number of weighings on a balance scale is a folklore of
   recreational mathematics.
 
-In all problems of this kind, you can use the scales only to weigh the coins.
+In all problems of this kind, you can only use the scale to weigh the coins.
 You put some coins on the left pan, the same number of coins on the right pan
   and get one of the 3 possible outcomes.
 Either both the sides weigh the same (denoted ``='')
@@ -45,30 +45,31 @@ Either both the sides weigh the same (denoted ``='')
 The standard, easiest version can be formulated as follows.
 
 \begin{problem}[The nine coin problem] \label{pr:coins9}
-You are given $n >= 3$ (typically 9) coins, all expect one have the same weight.
+You are given $n >= 3$ (typically 9) coins, all except one having the same weight.
 The counterfeit coin is known to be lighter.
-Determine the coin in the minimal number of weighings.
+Identify the counterfeit coin in minimal number of weighings.
 \end{problem}
 
 This problem is very easy as one can use \emph{ternary search} algorithm.
 In short, we divide the coins into thirds, put one third against another
-  on scales.
-If both sides weigh the same, the counterfeit coin must be in the last third,
-  otherwise it must be in the lighter third.
-In this way, the size of the search space reduces by a factor of 3 in each step,
-  which is clearly optimal.
+  on the scale.
+If both pans weigh the same, the counterfeit coin must be in the last third,
+  otherwise it must be on the lighter pan.
+In this way, the size of the search space is reduced
+  by a factor of 3 in each step, which is optimal.
 
-In 1940s, a more complicated version was introduced by Grossman\cite{coins-grossman1945}.
+In 1940s, more complicated version was introduced by Grossman\cite{coins-grossman1945}.
 
 %whether the counterfeit coin is underweight or overweight
-\begin{problem}[The Twelve Coin Problem] \label{pr:coins12}
-You are given $n >= 3$ (typically 12) coins, exactly one of which is counterfeit,
-  but it is not known if it is heavier or lighter.
-Determine the unique coin and its weight relative to others
-  in the minimal number of weighings.
+\begin{problem}[The twelve coin problem] \label{pr:coins12}
+You are given $n >= 3$ (typically 12) coins, all except one having the same weight.
+It is not known whether the counterfeit coin is heavier or lighter.
+Identify the counterfeit coin and its weight relative to others
+  in minimal number of weighings.
 \end{problem}
 
-The optimal solution for $n=12$ requires 3 weighings and one of the optimal
+The optimal solution for $n=12$ requires 3 weighings.
+One of the optimal
   strategies is shown in \autoref{fig:coins12tree} as a decision tree.
 
 \begin{figure}[h]
@@ -87,8 +88,8 @@ Thus a solution of a problem is usually formulated as a theorem like the
   following one.
 
 \begin{theorem}[Dyson, \cite{coins-dyson1946}]\label{th:coins12}
-There exists a scheme that determines the counterfeit coin and
-  its type in \autoref{pr:coins12} with $w$ weighings,
+There exists a strategy that identifies the counterfeit coin and
+  its type as described in \autoref{pr:coins12} with $w$ weighings,
   if and only if
   \[ 3 <= n <=\frac{3^w - 3}{2}. \]
 \end{theorem}
@@ -100,12 +101,12 @@ We show a scheme for $n = \frac{1}{2}(3^w - 3)$.
 
 Let us number the coins from $1$ to $n$.
 To a coin number $i$, we assign
-  two labels from $\{0,1,2\}^w$ -- those corresponding the numbers
+  two labels from $\{0,1,2\}^w$ -- those corresponding to the numbers
   $i$ and $3^w - 1 - i$ in ternary form.
 Notice that all possible labels are used exactly once, except for $0^w, 1^w$
   and $2^w$, which were not assigned to any coin.
-The labeling has the property that you can
-  get one label of a coin from the other by substituting $0$ by $2$ and $2$ by $0$.
+The labelling has the property that you can
+  get one label of a coin from another by substituting $0$ by $2$ and $2$ by $0$.
 
 A label is called ``clockwise'' if the first change of digit in it is
 the change from $0$ to $1$, from $1$ to $2$, or from $2$ to $0$.
@@ -141,18 +142,18 @@ The solution of the problem is therefore the coin with the label $a_1a_2...a_w$
 \label{fig:coins12scheme}
 \end{figure}
 
-The case $n < \frac{1}{2}(3^w - 3)$ can be done similarly with some modifications
-  to the labeling.
+The case $n < \frac{1}{2}(3^w - 3)$ can be solved similarly with some modifications
+  to the labelling.
 However, the scheme makes use of a genuine coin that was discovered in the first
   weighing and, therefore, the following experiments depend on the outcome of
   the first.
-Finally, the proof that the coin cannot be detected for
-  $n > \frac{1}{2}(3^w - 3)$ can be done using information theory.\qed
+Finally, the proof that the coin cannot be identified for
+  $n > \frac{1}{2}(3^w - 3)$ can be carried out using information theory.\qed
 \end{proof}
 
 \subsection{Generalizations and related research}
 
-Naturally, the problem was generalized in various ways and
+Naturally, the problem has been generalized in various ways and
   studied by many authors.
 In ``Coin-Weighing Problems''\cite{coins-cwproblems1995}, Guy and Nowakovski
   gave a great overview of the research in the area until 1990s
@@ -171,15 +172,15 @@ We list the most interesting variations and generalizations below.
   First, a variation of \autoref{pr:coins9} with 2 or 3 counterfeit coins
    was studied\cite{coins-2fakes}\cite{coins-3fakes},
   then with $m$ counterfeit coins in general\cite{coins-mfakes}.
-  Some authors studied the problem for unknown number of counterfeit coins
-  \cite{coins-unknownfakes},
+  Some authors studied the problem for unknown number of
+  counterfeit coins\cite{coins-unknownfakes},
   or for \emph{at most} $m$ counterfeit coins\cite{coins-atmostfakes}.
 \item[Additional regular coin(s).]
   In some cases, it may help if you are given an additional coin (or more coins),
     which is guaranteed not to be counterfeit.
   For example, for $n = 13$ in \autoref{pr:coins12}, you need 4 weighings.
   However, if you are given this one extra coin, you can determine the
-    solve in just 3 weighings\cite{coins-dyson1946}.
+    solution in just 3 weighings\cite{coins-dyson1946}.
 \item[Non-adaptive strategies.]
   In this popular variation of the problem you have to announce all experiments
     in advance and then just collect the result.
@@ -187,7 +188,7 @@ We list the most interesting variations and generalizations below.
   Notice that the scheme constructed in the proof of \autoref{th:coins12} for
   $n = \frac{1}{2}(3^w - w)$ is indeed non-adaptive.
   However, the original proof uses an adaptive scheme for a smaller $n$.
-  This was later fixed, showing that there always exists an optimal scheme for
+  This was later updated, showing that there always exists an optimal scheme for
   \autoref{pr:coins12} which is non-adaptive\cite{coins-nonadaptive}.
 \item[Unreliable balance.]
   This generalization introduces the possibility that
@@ -197,11 +198,12 @@ We list the most interesting variations and generalizations below.
   It was applied on the counterfeit coin problem (\autoref{pr:coins9} variant)
   in \cite{coins-unreliable} with at most one erroneous outcome or in
   \cite{coins-unreliable2} with two.
-\item[Multi-arm balance.]
-  In this variation, your balance has $k$ arms. You put the same number of coins
-  on every arm and you get either the information that all
-  weigh the same or which arm is lighter or heavier
-  than others\cite{coins-multiplearm}.
+\item[Multi-pan balance scale.]
+  In this variation, your balance scale has $k$ pans.
+  You put the same number of coins on every pan and
+    you get either the information that all
+    weigh the same or which arm is lighter or heavier
+    than others\cite{coins-multiplearm}.
 \item[Parallel weighing.]
   In this generalization, you have 2 (or $k$, in general)
     balance scales, you can weigh different coins on
@@ -214,37 +216,22 @@ We list the most interesting variations and generalizations below.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mastermind}
 
-\emph{Mastermind} is a classical code-breaking board game for 2 players,
+\emph{Mastermind} is a classic code-breaking board game for 2 players,
   invented by Mordecai Meirowitz in 1970.
 One player has the role of a \emph{codemaker} and the other of a \emph{codebreaker}.
-First, the codemaker chooses a secret code of $n$ colored pegs.
+First, the codemaker chooses a secret code of $n$ coloured pegs.
 Then a codebreaker tries to reveal the code by making guesses.
 The codemaker evaluates the guesses using black and white markers.
 Black markers correspond to positions at which the code and the guess matches,
-  a white marker means that some color appears both in the code and in the guess,
+  a white marker means that some colour appears both in the code and in the guess,
   but at different positions.
 The markers in the answer are not ordered, so the codebreaker does not know,
   which marker correspond to which peg in the guess.
-Codebreaker's aim is to find out the code with minimal number of guesses.
+Codebreaker's aim is to find out the code in minimal number of guesses.
 
-\begin{wrapfigure}{r}{0.32\textwidth}
-  \vspace{-10mm}
-  \begin{center}
-  \includegraphics[width=0.25\textwidth]{pictures/mastermind.png}
-  \vspace{-5mm}
-  \end{center}
-  \caption{Mastermind game (illustrative image)\protect\footnotemark.}
-  \vspace{10mm}
-  \begin{center}
-  \includegraphics[width=0.25\textwidth]{pictures/mastermind-matching.png}
-  \end{center}
-  \caption{Guess evaluation by maximal matching.}
-\end{wrapfigure}
-\footnotetext{Image adopted from \url{http://commons.wikimedia.org/wiki/File:Mastermind\_beispiel.svg}, by Thomas Steiner under GFDL.}
-
-More formally, let $C$ be a set of colors of size $c$.
+More formally, let $C$ be a set of colours of size $c$.
 Define a distance $d : C^n\times C^n -> \Nseto\times\Nseto$
-  of two color sequences by $d(u, v) = (b, w)$, where
+  of two colour sequences by $d(u, v) = (b, w)$, where
 \[
 b = |\{ i \in\Nset \| u[i] = v[i] \}|
 \]
@@ -262,6 +249,15 @@ Therefore, if the codebreaker have guessed $g_1, g_2, ..., g_k$ and the results
   \{ u\in C^n \| \forall i<=k.\; d(u, g_i) = (b_i,w_i)\}.
   \]
 
+\begin{wrapfigure}{r}{0.32\textwidth}
+  \vspace{-5mm}
+  \begin{center}
+  \includegraphics[width=0.25\textwidth]{pictures/mastermind-matching.png}
+  \end{center}
+  \caption{Guess evaluation by maximal matching.}
+  \vspace{-5mm}
+\end{wrapfigure}
+
 Another way of looking at the guess evaluation is using
   \emph{maximal matching} of the pegs in the code $h$ and the guess $g$.
 A matching is a set of pair-wise non-adjacent edges between
@@ -270,7 +266,7 @@ A matching is a set of pair-wise non-adjacent edges between
 Let $M$ be a maximal matching such that
 
 \begin{enumerate}
-\item an edge connects only pegs of the same color, i.e. if $((0,i),(1,i))\in M$, then $h[i] = g[j]$, and
+\item an edge connects only pegs of the same colour, i.e. if $((0,i),(1,i))\in M$, then $h[i] = g[j]$, and
 \item if $h[i] = g[i]$ then $((0,i),(1,i))\in M$.
 \end{enumerate}
 
@@ -312,6 +308,11 @@ Much later, Kooi\cite{mm-mostparts} came up with a simple strategy that
   maximizes the number of possible responses by the codemaker,
   which is computationally easier and performs better that the previous two.
 
+Using a backtracking algorithm, Koyama and Lai\cite{mm-exp-opt} found
+  the optimal strategy for the expected case, which requires $4.34$
+  guesses on average.
+The comparison of the described strategies is shown in \autoref{tbl:one-step}.
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
@@ -327,35 +328,30 @@ Exp-case optimal & AABC & 4.340 & 6 \\ \hline
 \end{center}
 \end{table}
 
-Using a backtracking algorithm, Koyama and Lai \cite{mm-exp-opt} found
-  the optimal strategy for the expected case, which requires $4.34$
-  guesses on average.
-The comparison of the described strategies is shown in \autoref{tbl:one-step}.
-
-Apart from \emph{one-step look-ahead} policies, which are, in general,
+Apart from \emph{one-step look-ahead} strategies, which are, in general,
   computationally intensive and do not scale well for bigger $n$ or $c$,
-  other approaches were suggested.
-Many authors tried to apply genetics algorithms
+  other approaches has been suggested.
+Many authors tried to apply genetic algorithms
   (see \cite{mm-ga} for an exhaustive overview and references therein),
-  other analyzed various heuristic methods (e.g. \cite{mm-heuristic}).
+  other analysed various heuristic methods (e.g. \cite{mm-heuristic}).
 
 \subsection{Variations and applications}
 
 \begin{description}
 \item[Bulls and Cows]
 is an old game with a principle very similar to Mastermind.
-The only difference is that it uses digits instead of colors and does not allow repetitions.
+The only difference is that it uses digits instead of colours and does not allow repetitions.
 Slovesnov wrote an exhaustive analysis of the problem, see \cite{bullsandcows}.
 
 
 \item[Static mastermind] is a variation of the game in which all guesses
-  must be made at one go.
+  must be made in one go.
 The codebreaker prepares a set of guesses,
   then the codemakers evaluates all of them as usual and
   the codebreaker must determine the code from the outcomes.
 This variation was introduced by Chvátal\cite{mm-chvatal} and
-  partially solved (for $n<=4$) by Goddard \cite{mm-static},
-  proving that for $4$ pegs and $k$ colors,
+  partially solved (for $n<=4$) by Goddard\cite{mm-static},
+  proving that for $4$ pegs and $k$ colours,
   the optimal strategy uses $k-1$ guesses.
 Note that this corresponds to so-called \emph{non-adaptive} strategies
   for the Counterfeit Coin problem.
@@ -365,7 +361,7 @@ Note that this corresponds to so-called \emph{non-adaptive} strategies
   is a variation without white markers, i.e.
   you make guesses and the only information you get is the
   number of positions at which your guess is correct.
-This problem was already studied by Erdős \cite{erdos-two}, who gave some
+This problem was already studied by Erdős\cite{erdos-two}, who gave some
   asymptotic results about the worst-case number of guesses.
 Later, this problem found an application in genetics with a need of
   methods to select a subset of genotyped individuals for phenotyping
@@ -374,8 +370,8 @@ Later, this problem found an application in genetics with a need of
 \item[Extended Mastermind] was introduced by Focardi and Luccio,
   who showed that it is strictly related to cracking bank PINs for accessing ATMs
   by so-called \emph{decimalization attacks}\cite{mm-pins}.
-In this variation, a guess is not just a sequence of colors, but a sequence of
-  sets of colors. For example, if we have six colors $\{A, B, C, D, E, F\}$
+In this variation, a guess is not just a sequence of colours, but a sequence of
+  sets of colours. For example, if we have six colours $\{A, B, C, D, E, F\}$
   and the code is $AECA$,
   you can make a guess $\{A\}, \{C,D,E\}, \{A,B\}, \{F\}$, which
   will be awarded two black markers (for the first two positions)
@@ -434,7 +430,7 @@ The marbles interact with rays in three ways:
 A few examples are shown in \autoref{fig:blackbox-rules}.
 The first image shows cases in which the ray hits the marble,
   the second shows rays deflected multiple times, emerging from
-  the box in a different place, and the third demonstrates
+  the box at a different place, and the third demonstrates
   the two cases in which reflection happens.
 
 Note that if the game is played with 5 or more marbles,
@@ -446,29 +442,29 @@ Note that if the game is played with 5 or more marbles,
 Although Black Box is an interesting example of a code breaking game,
   there are configurations for which the codebreaker has to fire a ray from
   all positions to discover the marbles
-  (and, for $5$ or more marbles, it may be even impossible),
+  (and, for $5$ or more marbles, it may even be impossible),
   which makes the game uninteresting from a research point of view.
 
 However, the game has become a popular puzzle for children and
-  its principle was used in other board games such as \emph{Laser maze}\cite{lasermaze}.
+  its principle has been used in other board games such as \emph{Laser maze}\cite{lasermaze}.
 
 \subsection{Code 777}
 
 During the board game named \emph{Code 777}, players sit in a circle,
-  each drawing three cards in the beginning.
-Players must not look at their own cards but they put them in a rack in front of them
-  so that all other players can see them.
-Each card has one of seven colors and contains a number from one to seven.
+  each drawing three cards at the beginning.
+Players must not look at their own cards but they put them to a rack in front of them
+  so that other players can see them.
+Each card has one of seven colours and contains a number from one to seven.
 The goal of the game is to determine which cards you have, using questions like
  ``Do you see more yellow sevens or blue fives?'', which the others answer\cite{code777}.
 
 We can reformulate this as a code-breaking game, in which a player
   receives some cards, each having several attributes, each of which can have
   multiple values.
-A players goal is determine his cards using questions
+A player's goal is to determine his cards using questions
   like ``Do I have more [A] or [B]'', where [A] and [B] are conditions on
   any subset of attributes.
-For example, if the attributes are number, color, and shape, one can ask
+For example, if the attributes are number, colour, and shape, one can ask
   ``Do I have more triangles or green twos?''.
 
 \subsection{Bags of Gold}
@@ -477,25 +473,27 @@ Imagine you have 10 bags of gold coins and
   you know that all coins in one bag are the same.
 You were tipped off that some of the bags may contain counterfeit coins,
   which weigh 9 grams instead of 10 but are indistinguishable otherwise.
+Suppose all coins in one bag are the same.
 You have a digital scale that can show you exact weight of a set of coins.
 How to find out which bags contain counterfeit coin in
   the minimal number of weighings?
 Suppose there is a sufficient number of coins in each bag.
 
-In the old version of this riddle, the scale has unlimited capacity and
+In the original version of this riddle, the scale has unlimited capacity and
   there is only one bag of counterfeit coins.
-In that case, the secret can be determined in only one experiment.
+In that case, the secret can be determined in a single experiment.
 You take one coin from the first bag, two coins from the second and so on up to
   10 coins from the last.
 You put all those 55 coins on the scale and, if they are all good,
   they weigh 550 grams.
 If the weight is by $x$ grams lower, you know that there are $x$ counterfeit
-  coins in your set and, therefore, it is the $x$-th bag.
+  coins in your set and, therefore,
+  the $x$-th bag is the one with counterfeit coins.
 
 The game gets more interesting if the capacity of the scale is limited, or
   if we have more bags and the number of coins in them is limited.
-A special case, in which each bag contains only one coin is
+A special case, in which each bag contains a single coin is
   studied in \cite{erdos-two}, and is shown to be similar to the
   string matching problem (Mastermind with black-markers only).
 Otherwise, the game lives only in a form of a logic puzzle and,
-  to the best of our knowledge, no general results have been made.
+  to the best of our knowledge, no general results have been found.
