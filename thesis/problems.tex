@@ -214,7 +214,7 @@ We list the most interesting variations and generalizations below.
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Mastermind}
+\section{Mastermind} \label{sec:mm}
 
 \emph{Mastermind} is a classic code-breaking board game for 2 players,
   invented by Mordecai Meirowitz in 1970.
@@ -258,22 +258,25 @@ Therefore, if the codebreaker have guessed $g_1, g_2, ..., g_k$ and the results
   \vspace{-5mm}
 \end{wrapfigure}
 
+\newcommand{\incode}[1]{#1^\bullet}
+\newcommand{\inguess}[1]{#1_\bullet}
+
 Another way of looking at the guess evaluation is using
   \emph{maximal matching} of the pegs in the code $h$ and the guess $g$.
 A matching is a set of pair-wise non-adjacent edges between
-  pegs in the code (represented by $(0,i)$ for $1<=i<=n$) and
-  pegs in the guess (represented by $(1,i)$ for $1<=i<=n$).
+  the pegs in the guess (represented by $\inguess{i}$ for $1<=i<=n$) and
+  the pegs in the code (represented by $\incode{i}$ for $1<=i<=n$).
 Let $M$ be a maximal matching such that
 
 \begin{enumerate}
-\item an edge connects only pegs of the same colour, i.e. if $((0,i),(1,i))\in M$, then $h[i] = g[j]$, and
-\item if $h[i] = g[i]$ then $((0,i),(1,i))\in M$.
+\item an edge connects only pegs of the same colour, i.e. if $(\inguess{i},\incode{j})\in M$, then $h[i] = g[j]$, and
+\item if $h[i] = g[i]$ then $(\inguess{i},\incode{i})\in M$.
 \end{enumerate}
 
 Maximal means that no edge can be added without breaking one of the conditions.
 The edges in $M$ correspond to the markers in the response,
-  a marker being black if and only if the corresponding edge connects $(0,i)$
-  with $(1,i)$ for some $i$.
+  a marker being black if and only if the corresponding edge connects $\inguess{i}$
+  with $\incode{i}$ for some $i$.
 
 \subsection{Known results and related research}
 

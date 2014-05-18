@@ -32,7 +32,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Course of the game}{20}{section*.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Examples}{20}{section*.21}
+\contentsline {subsection}{\rmfamily Examples}{21}{section*.21}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.3}\slshape Strategies}{23}{section.3.3}
 \defcounter {refsection}{0}\relax 
@@ -40,17 +40,19 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Memory-less strategies}{25}{section*.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}\slshape Symmetries in Code Braking Games}{27}{section.3.4}
+\contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{27}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}\slshape Symmetry Breaking}{29}{section.3.5}
+\contentsline {section}{\numberline {3.5}\slshape Symmetries in code-breaking games}{27}{section.3.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{29}{section*.24}
+\contentsline {section}{\numberline {3.6}\slshape Symmetry Breaking}{30}{section.3.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{29}{section*.25}
+\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{30}{section*.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{29}{section*.26}
+\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{30}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Comparison}{29}{section*.27}
+\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{30}{section*.26}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Comparison}{30}{section*.27}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{31}{chapter.4}
 \defcounter {refsection}{0}\relax 
@@ -105,3 +107,5 @@
 \contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{45}{chapter.5}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {6}\bfseries Conclusions}{47}{chapter.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Appendix \numberline {A}\bfseries Specifications of sample games}{53}{Appendix.1.A}

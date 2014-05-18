@@ -15,69 +15,65 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {example}{{Example}{3.{4}}{}}{19}{example.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{5}}{Solving process}}{19}{definition.3.5}
+\contentsline {definition}{{Definition}{3.{5}}{Solving process}}{20}{definition.3.5}
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{{Definition}{3.{6}}{Well-formed game}}{20}{definition.3.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{7}}{Fake-coin problem}}{21}{example.3.7}
+\contentsline {example}{{Example}{3.{7}}{The counterfeit coin problem}}{21}{example.3.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{8}}{Fake-coin problem, alternative}}{21}{example.3.8}
+\contentsline {example}{{Example}{3.{8}}{Mastermind}}{22}{example.3.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{9}}{Mastermind}}{22}{example.3.9}
+\contentsline {definition}{{Definition}{3.{9}}{Strategy}}{23}{definition.3.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{10}}{Mastermind (alternative)}}{23}{example.3.10}
+\contentsline {definition}{{Definition}{3.{10}}{Optimal strategy}}{24}{definition.3.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{11}}{Strategy}}{23}{definition.3.11}
-\defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{12}}{Optimal strategy}}{24}{definition.3.12}
-\defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{13}}{}}{24}{lemma.3.13}
+\contentsline {lemma}{{Lemma}{3.{11}}{}}{24}{lemma.3.11}
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{2}{}}{24}{proof.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{14}}{}}{24}{lemma.3.14}
+\contentsline {lemma}{{Lemma}{3.{12}}{}}{24}{lemma.3.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{3}{}}{25}{proof.3}
+\contentsline {proof}{{\proofname }{3}{}}{24}{proof.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{15}}{}}{25}{example.3.15}
+\contentsline {example}{{Example}{3.{13}}{}}{25}{example.3.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{16}}{Non-adaptive strategy}}{25}{definition.3.16}
+\contentsline {definition}{{Definition}{3.{14}}{Non-adaptive strategy}}{25}{definition.3.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{17}}{Memory-less strategy}}{25}{definition.3.17}
+\contentsline {definition}{{Definition}{3.{15}}{Memory-less strategy}}{26}{definition.3.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{18}}{}}{25}{lemma.3.18}
+\contentsline {lemma}{{Lemma}{3.{16}}{}}{26}{lemma.3.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{4}{}}{25}{proof.4}
+\contentsline {proof}{{\proofname }{4}{}}{26}{proof.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{19}}{}}{26}{lemma.3.19}
+\contentsline {theorem}{{Theorem}{3.{17}}{}}{26}{theorem.3.17}
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{5}{}}{26}{proof.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{20}}{Greedy strategy}}{26}{definition.3.20}
+\contentsline {definition}{{Definition}{3.{18}}{One-step look-ahead strategy}}{27}{definition.3.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{21}}{}}{27}{lemma.3.21}
+\contentsline {lemma}{{Lemma}{3.{19}}{}}{27}{lemma.3.19}
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{6}{}}{27}{proof.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{22}}{}}{27}{example.3.22}
+\contentsline {example}{{Example}{3.{20}}{}}{27}{example.3.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{23}}{Symmetric experiment}}{27}{definition.3.23}
+\contentsline {definition}{{Definition}{3.{21}}{Symmetric experiment}}{28}{definition.3.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{24}}{Symmetry group}}{27}{definition.3.24}
+\contentsline {definition}{{Definition}{3.{22}}{Symmetry group}}{28}{definition.3.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{25}}{Consistent strategy}}{28}{definition.3.25}
+\contentsline {definition}{{Definition}{3.{23}}{Consistent strategy}}{28}{definition.3.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{26}}{}}{28}{lemma.3.26}
+\contentsline {lemma}{{Lemma}{3.{24}}{}}{28}{lemma.3.24}
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{7}{}}{28}{proof.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{27}}{Experiment equivalence}}{28}{definition.3.27}
+\contentsline {definition}{{Definition}{3.{25}}{Experiment equivalence}}{29}{definition.3.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{{Theorem}{3.{28}}{}}{28}{theorem.3.28}
+\contentsline {theorem}{{Theorem}{3.{26}}{}}{29}{theorem.3.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{8}{}}{28}{proof.8}
+\contentsline {proof}{{\proofname }{8}{}}{29}{proof.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {corollary}{{Corollary}{3.{29}}{}}{29}{corollary.3.29}
+\contentsline {corollary}{{Corollary}{3.{27}}{}}{29}{corollary.3.27}
 \defcounter {refsection}{0}\relax 
 \contentsline {example}{{Example}{4.{1}}{}}{33}{example.4.1}
 \defcounter {refsection}{0}\relax 
