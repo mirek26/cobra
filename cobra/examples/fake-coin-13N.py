@@ -6,8 +6,8 @@ N = 13
 srange = lambda s, n: [s + str(i) for i in range(1, n+1)]
 
 VARIABLES(["y"] + srange("x", N))
-RESTRICTION("Exactly-1(%s)" % ",".join(srange("x", N)))
-RESTRICTION("!x1")
+CONSTRAINT("Exactly-1(%s)" % ",".join(srange("x", N)))
+CONSTRAINT("!x1")
 
 ALPHABET(srange("", N))
 MAPPING("X", ["x"+str(i) for i in range(1, N + 1)])

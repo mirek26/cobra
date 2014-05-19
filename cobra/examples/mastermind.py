@@ -12,7 +12,7 @@ VARIABLES(["x%i%s"%(n,c) for n in range(1, N + 1) for c in C])
 ALPHABET(C)
 
 for n in range(1, N+1):
-  RESTRICTION("Exactly-1(%s)" % (",".join("x%i%s"%(n,c) for c in C)))
+  CONSTRAINT("Exactly-1(%s)" % (",".join("x%i%s"%(n,c) for c in C)))
   MAPPING("F%i"%n, ["x%i%s"%(n,c) for c in C])
 
 EXPERIMENT("guess", N)

@@ -80,7 +80,7 @@
      T_EXACTLY = 269,
      T_VARIABLE = 270,
      T_VARIABLES = 271,
-     T_RESTRICTION = 272,
+     T_CONSTRAINT = 272,
      T_ALPHABET = 273,
      T_MAPPING = 274,
      T_EXPERIMENT = 275,
@@ -105,7 +105,7 @@
 #define T_EXACTLY 269
 #define T_VARIABLE 270
 #define T_VARIABLES 271
-#define T_RESTRICTION 272
+#define T_CONSTRAINT 272
 #define T_ALPHABET 273
 #define T_MAPPING 274
 #define T_EXPERIMENT 275
@@ -500,7 +500,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "T_IDENT", "T_INT", "T_STRING",
   "T_EQUIV", "T_IMPLIES", "T_IMPLIED", "T_OR", "T_AND", "T_NOT",
   "T_ATLEAST", "T_ATMOST", "T_EXACTLY", "T_VARIABLE", "T_VARIABLES",
-  "T_RESTRICTION", "T_ALPHABET", "T_MAPPING", "T_EXPERIMENT",
+  "T_CONSTRAINT", "T_ALPHABET", "T_MAPPING", "T_EXPERIMENT",
   "T_PARAMS_DISTINCT", "T_PARAMS_SORTED", "T_OUTCOME", "T_OUTCOMEX", "','",
   "'('", "')'", "'-'", "'$'", "$accept", "start", "ident", "code", "line",
   "variable_list", "string_list", "int_list", "formula", "formula_list", 0
@@ -1461,7 +1461,7 @@ yyreduce:
 
   case 10:
 #line 102 "src/cobra.ypp"
-    {  m.game().addRestriction((yyvsp[(2) - (2)].formula));  ;}
+    {  m.game().addConstraint((yyvsp[(2) - (2)].formula));  ;}
     break;
 
   case 11:

@@ -222,8 +222,8 @@ ExpGenerator::ExpGenerator(const Game& game, Solver& solver,
     graph_->change_color(abs(id) - 1,
               id < 0 ? vertex_type::kFalseVar : vertex_type::kTrueVar);
   }
-  game.restriction()->PropagateFixed(fixed_vars_, nullptr);
-  game.restriction()->AddToGraphRooted(*graph_, nullptr,
+  game.constraint()->PropagateFixed(fixed_vars_, nullptr);
+  game.constraint()->AddToGraphRooted(*graph_, nullptr,
                                        vertex_type::kKnowledgeRoot);
   for (auto& e : history) {
     auto formula = e.exp.type().outcomes()[e.outcome_id].formula;

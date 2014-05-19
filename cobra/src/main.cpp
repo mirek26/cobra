@@ -42,13 +42,13 @@ typedef struct Args {
 
 Args args;
 
-Solver* get_solver(uint var_count, Formula* restriction = nullptr) {
+Solver* get_solver(uint var_count, Formula* constraint = nullptr) {
   if (args.backend == "picosat") {
-    return new PicoSolver(var_count, restriction);
+    return new PicoSolver(var_count, constraint);
   } else if (args.backend == "minisat") {
-    return new MiniSolver(var_count, restriction);
+    return new MiniSolver(var_count, constraint);
   } else if (args.backend == "simple") {
-    return new SimpleSolver(var_count, restriction);
+    return new SimpleSolver(var_count, constraint);
   }
   assert(false);
 }
@@ -81,7 +81,7 @@ void overview_mode() {
   Game& game = m.game();
 
   printf("Num of variables: %lu\n", game.vars().size());
-  Solver* solver = get_solver(game.vars().size(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.constraint());
   uint models = solver->NumOfModels();
   printf("Num of possible codes: %u\n\n", models);
 
@@ -147,7 +147,7 @@ void overview_mode() {
 void simulation_mode() {
   print_head("SIMULATION");
   Game& game = m.game();
-  Solver* solver = get_solver(game.vars().size(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.constraint());
 
   int exp_num = 1;
   vec<EvalExp> process;
@@ -279,7 +279,7 @@ double optimum(Solver& solver, vec<EvalExp>& history,
 void optimal_mode() {
   print_head("AVERAGE-CASE OPTIMAL STRATEGY");
   Game& game = m.game();
-  Solver* solver = get_solver(game.vars().size(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.constraint());
   vec<EvalExp> history;
   auto r = optimum(*solver, history, 5);
   printf("Average-case expected optimum: %.2f\n", r);
@@ -318,7 +318,7 @@ void analyze(Solver& solver, vec<EvalExp>& history,
 void analyze_mode() {
   print_head("STRATEGY ANALYSIS");
   Game& game = m.game();
-  Solver* solver = get_solver(game.vars().size(), game.restriction());
+  Solver* solver = get_solver(game.vars().size(), game.constraint());
   vec<EvalExp> history;
   uint models = solver->NumOfModels();
   uint max = 0, sum = 0, num = 0;

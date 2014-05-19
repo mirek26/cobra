@@ -19,7 +19,7 @@ uint Game::bliss_calls = 0;
 clock_t Game::bliss_time = 0;
 
 Game::Game() {
-  restriction_ = m.get<AndOperator>();
+  constraint_ = m.get<AndOperator>();
   vars_.push_back(nullptr);
 }
 
@@ -46,12 +46,12 @@ Variable* Game::getVarByName(string name) const {
   return vars_[vars_ids_.at(name)];
 }
 
-void Game::addRestriction(Formula* f) {
-  restriction_->addChild(f);
+void Game::addConstraint(Formula* f) {
+  constraint_->addChild(f);
 }
 
-Formula* Game::restriction() const {
-  return restriction_;
+Formula* Game::constraint() const {
+  return constraint_;
 }
 
 MapId Game::addMapping(string ident, vec<Variable*>* vars) {

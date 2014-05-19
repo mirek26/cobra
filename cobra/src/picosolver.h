@@ -26,7 +26,7 @@ class PicoSolver: public CnfSolver {
   PicoSAT* picosat_;
 
  public:
-  PicoSolver(uint var_count, Formula* restriction = nullptr);
+  PicoSolver(uint var_count, Formula* constraint = nullptr);
   ~PicoSolver();
 
   SolverStats& stats() { return stats_; }

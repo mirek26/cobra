@@ -46,7 +46,7 @@
 
 %token T_VARIABLE
 %token T_VARIABLES
-%token T_RESTRICTION
+%token T_CONSTRAINT
 %token T_ALPHABET
 %token T_MAPPING
 %token T_EXPERIMENT
@@ -98,8 +98,8 @@ line :
        free($2); }
   | T_VARIABLES variable_list
     {  m.game().declareVars($2);  }
-  | T_RESTRICTION formula
-    {  m.game().addRestriction($2);  }
+  | T_CONSTRAINT formula
+    {  m.game().addConstraint($2);  }
   | T_ALPHABET string_list
     {  m.game().setAlphabet($2); }
   | T_MAPPING T_STRING variable_list

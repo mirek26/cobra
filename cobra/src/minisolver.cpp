@@ -20,14 +20,14 @@
 
 SolverStats MiniSolver::stats_ = SolverStats();
 
-MiniSolver::MiniSolver(uint var_count, Formula* restriction) {
+MiniSolver::MiniSolver(uint var_count, Formula* constraint) {
   var_count_ = var_count;
   // Reserve id's for original variables.
   for (uint i = 1; i < var_count_; i++) {
     auto x = minisat_.newVar(true, true);
     assert(static_cast<uint>(x) + 1 == i);
   }
-  if (restriction) AddConstraint(restriction);
+  if (constraint) AddConstraint(constraint);
 }
 
 //------------------------------------------------------------------------------

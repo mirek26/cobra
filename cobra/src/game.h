@@ -23,7 +23,7 @@ class Experiment;
 class Game {
   vec<Variable*> vars_;
   std::map<string, VarId> vars_ids_;
-  AndOperator* restriction_;
+  AndOperator* constraint_;
   vec<ExpType*> experiments_;
   vec<string> alphabet_;
 
@@ -45,8 +45,8 @@ class Game {
 
   Variable* getVarByName(string) const;
 
-  void addRestriction(Formula* f);
-  Formula* restriction() const;
+  void addConstraint(Formula* f);
+  Formula* constraint() const;
 
   void setAlphabet(vec<string>* alphabet) {
     assert(alphabet_.empty());

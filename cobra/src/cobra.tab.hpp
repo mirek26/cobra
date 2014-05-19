@@ -53,7 +53,7 @@
      T_EXACTLY = 269,
      T_VARIABLE = 270,
      T_VARIABLES = 271,
-     T_RESTRICTION = 272,
+     T_CONSTRAINT = 272,
      T_ALPHABET = 273,
      T_MAPPING = 274,
      T_EXPERIMENT = 275,
@@ -78,7 +78,7 @@
 #define T_EXACTLY 269
 #define T_VARIABLE 270
 #define T_VARIABLES 271
-#define T_RESTRICTION 272
+#define T_CONSTRAINT 272
 #define T_ALPHABET 273
 #define T_MAPPING 274
 #define T_EXPERIMENT 275

@@ -27,7 +27,7 @@ class MiniSolver: public CnfSolver {
   Minisat::vec<Minisat::Lit> contexts_;
 
  public:
-  MiniSolver(uint var_count, Formula* restriction = nullptr);
+  MiniSolver(uint var_count, Formula* constraint = nullptr);
   ~MiniSolver() { }
 
   SolverStats& stats() { return stats_; }

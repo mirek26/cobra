@@ -126,7 +126,7 @@ def get_formula(states):
 ############################ GAME description ##################################
 vars = ["x%i%i"%(x, y) for x in range(1, N+1) for y in range(1, N+1)]
 VARIABLES(vars)
-RESTRICTION("Exactly-%i(%s)"%(M, ",".join(vars)))
+CONSTRAINT("Exactly-%i(%s)"%(M, ",".join(vars)))
 
 for s in all_starts:
   EXPERIMENT("ray from %i, %i"%(s[0], s[1]), 0)

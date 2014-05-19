@@ -21,9 +21,9 @@ def VARIABLES(lst):
   input_assert(all(type(x) is str for x in lst), "VARIABLES argument must be a list of strings.")
   __F.write("VARIABLES {0}\n".format(",".join(lst)))
 
-def RESTRICTION(s):
-  input_assert(type(s) is str, "RESTRICTION argument must be a string (formula).")
-  __F.write("RESTRICTION {0}\n".format(s))
+def CONSTRAINT(s):
+  input_assert(type(s) is str, "CONSTRAINT argument must be a string (formula).")
+  __F.write("CONSTRAINT {0}\n".format(s))
 
 def ALPHABET(lst):
   input_assert(type(lst) is list, "ALPHABET argument must be a list of strings.")

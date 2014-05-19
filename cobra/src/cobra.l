@@ -52,7 +52,7 @@ char* str_dup_strip(char* str) {
 
 "VARIABLE"      { return T_VARIABLE; }
 "VARIABLES"     { return T_VARIABLES; }
-"RESTRICTION"   { return T_RESTRICTION; }
+"CONSTRAINT"   { return T_CONSTRAINT; }
 "ALPHABET"      { return T_ALPHABET; }
 "MAPPING"       { return T_MAPPING; }
 "EXPERIMENT"    { return T_EXPERIMENT; }

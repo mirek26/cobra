@@ -23,7 +23,7 @@ def generate_helper(n, i):
 
 # x1 tells whether the first bag contains fake coins
 VARIABLES(["x%i"%i for i in range(N)] + ["f"])
-RESTRICTION("!f")
+CONSTRAINT("!f")
 ALPHABET([str(x) for x in range(N)] + ['-'])
 MAPPING("X", ["x%i"%i for i in range(N)] + ["f"])
 

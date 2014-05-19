@@ -12,10 +12,10 @@
 SolverStats SimpleSolver::stats_ = SolverStats();
 
 SimpleSolver::SimpleSolver(uint var_count,
-                           Formula* restriction) :
-    restriction_(restriction) {
+                           Formula* constraint) :
+    constraint_(constraint) {
   var_count_ = var_count;
-  PicoSolver sat(var_count, restriction);
+  PicoSolver sat(var_count, constraint);
   codes_ = sat.GenerateModels();
   for (uint i = 0; i < codes_.size(); i++) {
     sat_.push_back(i);
@@ -146,7 +146,7 @@ void SimpleSolver::Update() {
 }
 
 string SimpleSolver::pretty() {
-  string s = restriction_->pretty(false) + " & ";
+  string s = constraint_->pretty(false) + " & ";
   for (auto& c : constraints_) {
     s += c.first->pretty(false, &c.second) + " & ";
   }

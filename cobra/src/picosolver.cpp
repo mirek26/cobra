@@ -22,7 +22,7 @@ extern "C" {
 
 SolverStats PicoSolver::stats_ = SolverStats();
 
-PicoSolver::PicoSolver(uint var_count, Formula* restriction) {
+PicoSolver::PicoSolver(uint var_count, Formula* constraint) {
   var_count_ = var_count;
   picosat_ = picosat_init();
   // Reserve id's for original variables.
@@ -30,7 +30,7 @@ PicoSolver::PicoSolver(uint var_count, Formula* restriction) {
     picosat_inc_max_var(picosat_);
     picosat_set_more_important_lit(picosat_, i);
   }
-  if (restriction) AddConstraint(restriction);
+  if (constraint) AddConstraint(constraint);
 }
 
 PicoSolver::~PicoSolver() {

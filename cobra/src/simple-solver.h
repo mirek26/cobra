@@ -22,7 +22,7 @@ class Formula;
 class SimpleSolver: public Solver {
   static SolverStats stats_;
 
-  Formula* restriction_;
+  Formula* constraint_;
 
   vec<std::pair<Formula*, vec<CharId>>> constraints_;
   vec<int> contexts_;
@@ -33,7 +33,7 @@ class SimpleSolver: public Solver {
   bool ready_;
 
  public:
-  SimpleSolver(uint var_count, Formula* restriction = nullptr);
+  SimpleSolver(uint var_count, Formula* constraint = nullptr);
 
   SolverStats& stats() { return stats_; }
   static SolverStats& s_stats() { return stats_; }

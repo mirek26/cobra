@@ -13,7 +13,7 @@ ALPHABET(V)
 for n in range(N):
   for a in A:
     VARIABLES(["c%i%s%s"%(n, a, v) for v in V])
-    RESTRICTION("Exactly-1(%s)"%",".join("c%i%s%s"%(n,a,v) for v in V))
+    CONSTRAINT("Exactly-1(%s)"%",".join("c%i%s%s"%(n,a,v) for v in V))
     MAPPING("X%i%s"%(n, a), ["c%i%s%s"%(n, a, v) for v in V])
 
 for selected in product([0,1], repeat=2*len(A)):
