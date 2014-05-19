@@ -378,21 +378,11 @@ Let $N$ denote the number of possible codes in the current state,
 
 \begin{description}
 \item[Min-num.] \texttt{-e minnum} \\
-  Minimizes the worst-case number of remaining codes
-  in the next step, i.e. selects experiment with minimal $\max_i n_i$.
-  For Mastermind, this was suggested by Knuth\cite{mm-knuth}.
+  
 \item[Min-exp.]  \texttt{-e minexp} \\
-   Minimizes the expected number of remaining codes
-  in the next step, i.e. minimize $\sum_in_i^2/N$.
-  For Mastermind, this was suggested by Irwing\cite{mm-expnum}.
 \item[Entropy.] \texttt{-e entropy} \\
-  Maximizes the entropy of numbers of remaining codes,
-  i.e. maximizes $-log(k_i)\cdot k_i$, where $k_i=n_i/N$.
-  For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
 \item[Most-parts.] \texttt{-e parts} \\
-  Maximizes the number of possible outcomes,
-  i.e. maximize $\# i. (n_i > 0)$.
-  For Mastermind, this was suggested by Kooi\cite{mm-mostparts}.
+  
 \item[Fixed.] \texttt{-e fixed} \\
   Maximize the number of fixed variables
   in the next step.

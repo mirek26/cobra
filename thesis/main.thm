@@ -49,32 +49,30 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{5}{}}{26}{proof.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{18}}{One-step look-ahead strategy}}{27}{definition.3.18}
+\contentsline {example}{{Example}{3.{18}}{}}{27}{example.3.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{19}}{}}{27}{lemma.3.19}
+\contentsline {definition}{{Definition}{3.{19}}{One-step look-ahead strategy}}{27}{definition.3.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{6}{}}{27}{proof.6}
+\contentsline {example}{{Example}{3.{20}}{}}{29}{example.3.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{20}}{}}{27}{example.3.20}
+\contentsline {definition}{{Definition}{3.{21}}{Symmetric experiment}}{29}{definition.3.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{21}}{Symmetric experiment}}{28}{definition.3.21}
+\contentsline {definition}{{Definition}{3.{22}}{Symmetry group}}{29}{definition.3.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{22}}{Symmetry group}}{28}{definition.3.22}
+\contentsline {definition}{{Definition}{3.{23}}{Consistent strategy}}{29}{definition.3.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{23}}{Consistent strategy}}{28}{definition.3.23}
+\contentsline {lemma}{{Lemma}{3.{24}}{}}{30}{lemma.3.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{24}}{}}{28}{lemma.3.24}
+\contentsline {proof}{{\proofname }{6}{}}{30}{proof.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{7}{}}{28}{proof.7}
+\contentsline {definition}{{Definition}{3.{25}}{Experiment equivalence}}{30}{definition.3.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{25}}{Experiment equivalence}}{29}{definition.3.25}
+\contentsline {theorem}{{Theorem}{3.{26}}{}}{30}{theorem.3.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{{Theorem}{3.{26}}{}}{29}{theorem.3.26}
+\contentsline {proof}{{\proofname }{7}{}}{30}{proof.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{8}{}}{29}{proof.8}
+\contentsline {corollary}{{Corollary}{3.{27}}{}}{31}{corollary.3.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {corollary}{{Corollary}{3.{27}}{}}{29}{corollary.3.27}
+\contentsline {example}{{Example}{4.{1}}{}}{35}{example.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{4.{1}}{}}{33}{example.4.1}
-\defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{4.{2}}{}}{34}{example.4.2}
+\contentsline {example}{{Example}{4.{2}}{}}{36}{example.4.2}

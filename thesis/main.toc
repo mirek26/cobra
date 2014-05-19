@@ -42,70 +42,70 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{27}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}\slshape Symmetries in code-breaking games}{27}{section.3.5}
+\contentsline {section}{\numberline {3.5}\slshape Symmetries in code-breaking games}{29}{section.3.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.6}\slshape Symmetry Breaking}{30}{section.3.6}
+\contentsline {section}{\numberline {3.6}\slshape Symmetry Breaking}{31}{section.3.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{30}{section*.24}
+\contentsline {subsection}{\rmfamily Phase 1 - Interchangeble symbols}{31}{section*.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{30}{section*.25}
+\contentsline {subsection}{\rmfamily Phase 2 - Canonical Form of parametrization}{31}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{30}{section*.26}
+\contentsline {subsection}{\rmfamily Phase 3 - Canonical Form of formula graph}{31}{section*.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Comparison}{30}{section*.27}
+\contentsline {subsection}{\rmfamily Comparison}{31}{section*.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{31}{chapter.4}
+\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{33}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}\slshape Input language}{31}{section.4.1}
+\contentsline {section}{\numberline {4.1}\slshape Input language}{33}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{31}{section*.28}
+\contentsline {subsection}{\rmfamily Low-level language}{33}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{33}{section*.29}
+\contentsline {subsection}{\rmfamily Python preprocessing}{35}{section*.29}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{34}{section.4.2}
+\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{36}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{35}{section.4.3}
+\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{37}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{35}{section*.31}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{37}{section*.31}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{36}{section*.33}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{38}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{37}{section*.34}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{39}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{37}{section*.35}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{39}{section*.35}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape Strategies}{37}{section.4.4}
+\contentsline {section}{\numberline {4.4}\slshape Strategies}{39}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Codebreaker's strategy}{37}{section*.36}
+\contentsline {subsection}{\rmfamily Codebreaker's strategy}{39}{section*.36}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Codemaker's strategy}{38}{section*.37}
+\contentsline {subsection}{\rmfamily Codemaker's strategy}{40}{section*.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Extensibility}{38}{section*.38}
+\contentsline {subsection}{\rmfamily Extensibility}{40}{section*.38}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape SAT solving}{38}{section.4.5}
+\contentsline {section}{\numberline {4.5}\slshape SAT solving}{40}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{41}{section*.42}
+\contentsline {subsection}{\rmfamily PicoSat}{42}{section*.42}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{41}{section*.43}
+\contentsline {subsection}{\rmfamily MiniSat}{43}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{41}{section*.44}
+\contentsline {subsection}{\rmfamily Simple solver}{43}{section*.44}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Extensibility}{42}{section*.45}
+\contentsline {subsection}{\rmfamily Extensibility}{43}{section*.45}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{42}{section*.46}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{44}{section*.46}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Symmetry breaking}{43}{section.4.6}
+\contentsline {section}{\numberline {4.6}\slshape Symmetry breaking}{45}{section.4.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{43}{section.4.7}
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{45}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{43}{section*.47}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{45}{section*.47}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{43}{section*.48}
+\contentsline {subsection}{\rmfamily Requirements}{45}{section*.48}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{44}{section*.49}
+\contentsline {subsection}{\rmfamily Unit testing}{46}{section*.49}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{45}{chapter.5}
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{47}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{47}{chapter.6}
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{49}{chapter.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Appendix \numberline {A}\bfseries Specifications of sample games}{53}{Appendix.1.A}
+\contentsline {chapter}{Appendix \numberline {A}\bfseries Specifications of sample games}{55}{Appendix.1.A}
