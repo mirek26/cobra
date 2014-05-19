@@ -5,6 +5,7 @@
  */
 
 #include <vector>
+#include <unordered_map>
 #include <map>
 #include <exception>
 #include <cassert>
@@ -39,6 +40,13 @@ bool Experiment::IsSat(uint id) {
     solver_->CloseContext();
   }
   return data_[id].sat;
+}
+
+bool Experiment::IsFinalSat() {
+  if (type_->final_outcome() == -1)
+    return true;
+  else
+    return IsSat(type_->final_outcome());
 }
 
 uint Experiment::NumOfSat() {
@@ -239,30 +247,26 @@ ExpGenerator::ExpGenerator(const Game& game, Solver& solver,
   var_groups_ = game_.ComputeVarEquiv(*graph_);
 }
 
+ExpGenerator::~ExpGenerator() {
+  delete graph_;
+  for (auto& g : graphs_) {
+    delete g.first;
+  }
+}
 
 vec<Experiment> ExpGenerator::All() {
-  vec<Experiment> result;
   for (auto t : game_.experiments()) {
     curr_type_ = t;
 
     params_.resize(t->num_params());
-    params_basic_.clear();
-    params_final_.clear();
-    auto pre2 = stats_.ph2;
-    auto pre3 = stats_.ph3;
-
+    // params_basic_.clear();
+    // auto pre2 = stats_.ph2;
     GenParamsFill(0);
-
     // printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1,
     //    gen_stats_.ph2, gen_stats_.ph3);
-    assert(stats_.ph2 - pre2 == params_basic_.size());
-    assert(stats_.ph3 - pre3 == params_final_.size());
-
-    for (auto& params : params_final_) {
-      result.push_back(Experiment(solver_, *t, params, result.size()));
-    }
+    // assert(stats_.ph2 - pre2 == params_basic_.size());
   }
-  return result;
+  return experiments_;
 }
 
 bool ExpGenerator::CharsEquiv(const set<MapId>& maps,
@@ -318,72 +322,72 @@ void ExpGenerator::GenParamsFill(uint n) {
   }
 }
 
-void ExpGenerator::GenParamsBasicFilter() {
-  // Compute position partitioning according to the vars.
-  auto num_params = curr_type_->num_params();
-  vec<uint> dfu(num_params, 0);
-  for (uint i = 0; i < num_params; i++) dfu[i] = i;
-  for (uint i = 0; i < num_params; i++)
-    for (uint j = i + 1; j < num_params; j++)
-      for (auto fi : curr_type_->used_maps_[i])
-        for (auto fj : curr_type_->used_maps_[j])
-          if (game_.getMappingValue(fi, params_[i]) ==
-              game_.getMappingValue(fj, params_[j])) {
-            if (dfu[i] > dfu[j])
-              dfu[i] = dfu[j];
-            else
-              dfu[j] = dfu[i];
-          }
-  // Compute canonical form of the parametrization.
-  for (uint n = 0; n < num_params; n++) {
-    if (dfu[n] != n) continue;  // only for roots of components
-    CharId chr = params_[n];
-    if (curr_type_->interchangable_[n][chr]) continue;
-    // Precompute minimal set of positions such that...
-    bool keep = false;
-    set<MapId> maps;
-    set<VarId> other_vars;
-    for (uint p = 0; p < num_params; p++) {
-      if (dfu[p] == n) {
-        if (params_[p] != chr) keep = true;
-        for (auto f : curr_type_->used_maps_[p]) {
-          if (curr_type_->used_vars_.count(game_.getMappingValue(f, chr)))
-            keep = true;
-          maps.insert(f);
-        }
-      } else {
-        for (auto f : curr_type_->used_maps_[p]) {
-          other_vars.insert(game_.getMappingValue(f, params_[p]));
-        }
-      }
-    }
-    if (keep) continue;
-    keep = true;
-    // Try substituing the whole group with other char (from 0).
-    for (CharId a = 0; a < chr; a++) {
-      // Is it equivalent?
-      if (!CharsEquiv(maps, a, chr)) continue;
-      // Doesn't it indroduce conflicting vars?
-      keep = false;
-      for (auto f : maps) {
-        VarId var = game_.getMappingValue(f, a);
-        if (other_vars.count(var)) keep = true;
-      }
-      if (!keep) {
-        // Substitude the whole group.
-        for (uint p = 0; p < num_params; p++)
-          if (dfu[p] == n) params_[p] = a;
-        break;
-      }
-    }
-  }
-  // If the canonical form is not yet present, add it.
-  if (params_basic_.count(params_) == 0) {
-    params_basic_.insert(params_);
-    stats_.ph2++;
-    GenParamsGraphFilter();
-  }
-}
+// void ExpGenerator::GenParamsBasicFilter() {
+//   // Compute position partitioning according to the vars.
+//   auto num_params = curr_type_->num_params();
+//   vec<uint> dfu(num_params, 0);
+//   for (uint i = 0; i < num_params; i++) dfu[i] = i;
+//   for (uint i = 0; i < num_params; i++)
+//     for (uint j = i + 1; j < num_params; j++)
+//       for (auto fi : curr_type_->used_maps_[i])
+//         for (auto fj : curr_type_->used_maps_[j])
+//           if (game_.getMappingValue(fi, params_[i]) ==
+//               game_.getMappingValue(fj, params_[j])) {
+//             if (dfu[i] > dfu[j])
+//               dfu[i] = dfu[j];
+//             else
+//               dfu[j] = dfu[i];
+//           }
+//   // Compute canonical form of the parametrization.
+//   for (uint n = 0; n < num_params; n++) {
+//     if (dfu[n] != n) continue;  // only for roots of components
+//     CharId chr = params_[n];
+//     if (curr_type_->interchangable_[n][chr]) continue;
+//     // Precompute minimal set of positions such that...
+//     bool keep = false;
+//     set<MapId> maps;
+//     set<VarId> other_vars;
+//     for (uint p = 0; p < num_params; p++) {
+//       if (dfu[p] == n) {
+//         if (params_[p] != chr) keep = true;
+//         for (auto f : curr_type_->used_maps_[p]) {
+//           if (curr_type_->used_vars_.count(game_.getMappingValue(f, chr)))
+//             keep = true;
+//           maps.insert(f);
+//         }
+//       } else {
+//         for (auto f : curr_type_->used_maps_[p]) {
+//           other_vars.insert(game_.getMappingValue(f, params_[p]));
+//         }
+//       }
+//     }
+//     if (keep) continue;
+//     keep = true;
+//     // Try substituing the whole group with other char (from 0).
+//     for (CharId a = 0; a < chr; a++) {
+//       // Is it equivalent?
+//       if (!CharsEquiv(maps, a, chr)) continue;
+//       // Doesn't it indroduce conflicting vars?
+//       keep = false;
+//       for (auto f : maps) {
+//         VarId var = game_.getMappingValue(f, a);
+//         if (other_vars.count(var)) keep = true;
+//       }
+//       if (!keep) {
+//         // Substitude the whole group.
+//         for (uint p = 0; p < num_params; p++)
+//           if (dfu[p] == n) params_[p] = a;
+//         break;
+//       }
+//     }
+//   }
+//   // If the canonical form is not yet present, add it.
+//   if (params_basic_.count(params_) == 0) {
+//     params_basic_.insert(params_);
+//     stats_.ph2++;
+//     GenParamsGraphFilter();
+//   }
+// }
 
 void ExpGenerator::GenParamsGraphFilter() {
   bliss::Stats stats;
@@ -399,29 +403,20 @@ void ExpGenerator::GenParamsGraphFilter() {
   Game::bliss_calls += 1;
   Game::bliss_time += clock() - t1;
 
-  auto h = canonical->get_hash();
-  if (graphs_.count(h) > 0 && graphs_[h].second) {
+  if (graphs_.count(canonical) > 0 &&
+      experiments_[graphs_[canonical]].IsFinalSat()) {
     delete canonical;
     return;
   }
 
-  auto final = curr_type_->final_outcome();
-  auto finalsat = true;
-  if (final > -1) {
-    // TODO: optimize...
-    solver_.OpenContext();
-    solver_.AddConstraint(curr_type_->outcomes()[final].formula, params_);
-    finalsat = solver_.Satisfiable();
-    solver_.CloseContext();
-  }
-
-  if (graphs_.count(h) == 0 || finalsat) {
-    // TODO: proper hash map with graph comparison
-    // graph.write_dot((game_.ParamsToStr(params_, '_')+".dot").c_str());
-    graphs_[h] = make_pair(params_, finalsat);
+  Experiment e(solver_, *curr_type_, params_, experiments_.size());
+  if (graphs_.count(canonical) == 0) {
+    graphs_[canonical] = experiments_.size();
+    experiments_.push_back(e);
     stats_.ph3++;
-    params_final_.insert(params_);
+  } else if (e.IsFinalSat()) {
+    experiments_[graphs_[canonical]] = e;
+  } else {
+    delete canonical;
   }
-
-  delete canonical;
 }

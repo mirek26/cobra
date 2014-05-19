@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <exception>
+#include <unordered_map>
 #include <map>
 #include <set>
 #include <string>
@@ -56,6 +57,7 @@ class Experiment {
   uint index() const { return index_; }
   uint num_outcomes() const { return data_.size(); }
 
+  bool IsFinalSat();
   bool IsSat(uint id);
   uint NumOfSat();
   uint NumOfModels(uint id);
@@ -117,12 +119,26 @@ struct EvalExp {
 };
 
 
+class GraphHash {
+public:
+  size_t operator()(bliss::Graph* g) const {
+    return g->get_hash();
+  }
+};
+
+struct GraphEquals : std::binary_function<bliss::Graph*, bliss::Graph*, bool> {
+  result_type operator()(first_argument_type lhs, second_argument_type rhs) const {
+    return lhs->cmp(*rhs) == 0;
+  }
+};
+
 class ExpGenerator {
   const Game& game_;
   Solver& solver_;
 
   vec<VarId> fixed_vars_;
-  std::map<unsigned int, std::pair<vec<CharId>, bool>> graphs_;
+
+  std::unordered_map<bliss::Graph*, uint, GraphHash, GraphEquals> graphs_;
 
   GenParamsStats stats_;
   bliss::Graph* graph_;
@@ -130,15 +146,14 @@ class ExpGenerator {
 
   ExpType* curr_type_;
 
-  set<vec<CharId>> params_basic_;
-  set<vec<CharId>> params_final_;
+  //set<vec<CharId>> params_basic_;
   vec<CharId> params_;
+
+  vec<Experiment> experiments_;
 
  public:
   ExpGenerator(const Game& game, Solver& solver, const vec<EvalExp>& history);
-  ~ExpGenerator() {
-    delete graph_;
-  }
+  ~ExpGenerator();
 
   // TODO: incremental generation
   // Experiment Next();
