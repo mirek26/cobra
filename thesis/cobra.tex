@@ -24,7 +24,9 @@ This website also serves as a homepage of the project, and contains
 
 COBRA is available under \emph{BSD 3-Clause License}\footnote{\url{http://opensource.org/licenses/BSD-3-Clause}},
   text of which is a part of source codes.
-\TODO{Jak je to s licenci Picosatu a tak? Zminit tady.}
+The tool is dependent on external tools, namely Picosat, Minisat and Bliss.
+Picosat and Minisat are available under \emph{MIT License};
+Bliss is available under \emph{GNU GPL v3}.
 
 \section{Input language} \label{sec:lng}
 
@@ -60,8 +62,8 @@ The input file is parsed by lines, each of which must have one of the forms
     Declares a variable with a given identifier. \\
 \textsc{Variables} \symb{ident-list} &
     Declares variables with given identifiers. \\
-\textsc{Restriction} \symb{formula} &
-    Defines the initial restriction $\init$. \\
+\textsc{Constraint} \symb{formula} &
+    Defines the initial constraint $\init$. \\
 \textsc{Alphabet} \symb{string-list} &
     Defines the parametrization alphabet $\Sigma$. \\
 \textsc{Mapping} \symb{ident} \symb{ident-list} &
@@ -125,7 +127,7 @@ The first part, \symb{ident$_2$}, must be an identifier of a defined mapping,
 \TODO{Running example.}
 \begin{lstlisting}
 VARIABLES y, x1, x2, x3, x4
-RESTRICTION Exactly-1(x1, x2, x3, x4)
+CONSTRAINT Exactly-1(x1, x2, x3, x4)
 ALPHABET '1', '2', '3', '4'
 MAPPING X x1, x2, x3, x4
 
@@ -148,7 +150,7 @@ The exact LALR grammar used can be found in $\texttt{cobra.ypp}$ file
 Although the low-level language is sufficient for our purposes,
   it is not very user-friendly and
   simple changes in a game may require extensive changes in the input file.
-For exapmle, if you want to change the number of coins in the Counterfeit Coin problem,
+For example, if you want to change the number of coins in the Counterfeit Coin problem,
   it would be nice to change only one number in the input
   but now you have to change many lines and create or delete some experiment sections.
 The situation is even worse in Mastermind, in which the outcome formulas are
@@ -162,7 +164,7 @@ As the demands may significantly differ for different games,
   a popular and intuitive scripting language, instead.
 
 The input can now be an arbitrary Python file with calls to extra functions
-\textsc{Variable}, \textsc{Variables}, \textsc{Restriction}, \textsc{Alphabet},
+\textsc{Variable}, \textsc{Variables}, \textsc{Constraint}, \textsc{Alphabet},
 \textsc{Mapping}, \textsc{Experiment}, \textsc{Params-distinct} and \textsc{Outcome},
 which map directly to the constructs in the low-level language.
 
@@ -177,7 +179,7 @@ Types of their parameters are listed below.
  \multicolumn{1}{c}{\textbf{Function}} & \textbf{Type of x} & \textbf{Type of y} \\\hline
 \textsc{Variable}(x) & string & - \\
 \textsc{Variables}(x) & list of strings & -\\
-\textsc{Restriction}(x) & formula (as a string)& -\\
+\textsc{Constraint}(x) & formula (as a string)& -\\
 \textsc{Alphabet}(x) & list of strings & -\\
 \textsc{Mapping}(x, y) & string & list of strings\\
 \textsc{Experiment}(x, y) & string & integer \\
@@ -193,7 +195,7 @@ based on \autoref{ex:cc1}, follows.
 N = 12
 x_vars = ["x" + str(i) for i in range(N)]
 VARIABLES(["y"] + x_vars)
-RESTRICTION("Exactly-1(%s)" % ",".join(x_vars))
+CONSTRAINT("Exactly-1(%s)" % ",".join(x_vars))
 ALPHABET([str(i) for i in range(N)])
 MAPPING("X", x_vars)
 
@@ -329,9 +331,36 @@ and evaluates experiment but a player who chooses the outcomes
 of experiments as they come according to his will.
 The only condition is that the outcomes are consistent.
 
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|p{7cm}|} \hline
+COBRA specification & Strategy \\\hline
+ \texttt{-e max-models} & Maximal number of models \\
+\texttt{-e exp-models} & Expected number of models \\
+\texttt{-e ent-models} & Entropy of the number of models \\
+\texttt{-e parts} & Number of satisfiable outcomes \\
+\texttt{-e min-fixed} & Minimal number of fixed variables \\
+\texttt{-e exp-fixed} & Expected number of fixed variables \\\hline
+\end{tabular}
+\caption{Supported one-step look-ahead strategies for the codebreaker.} \label{tbl:stge}
+\end{center}
+\end{table}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|p{7cm}|} \hline
+COBRA specification & Strategy \\\hline
+ \texttt{-o models} & Select an outcome with maximal number of models. \\
+\texttt{-o fixed} & Select an outcome with minimal number of fixed variables. \\\hline
+\end{tabular}
+\caption{Supported strategies for the codemaker.} \label{tbl:stgo}
+\end{center}
+\end{table}
+
 Implemented strategies for both codebreaker and codemaker
-  are described in the next section and mostly correspond to strategies
-  that can be found in the literature on Mastermind.
+  are listed in \autoref{tbl:stge} and \autoref{tbl:stgo}.
+All one-step look-ahead strategies presented in \autoref{sec:oslas}
+  are available.
 Apart from these, the tool supports two extra options for both players,
   \textbf{interactive} and \textbf{random},
   which are not strategies in the sense of \autoref{def:strategy}.
@@ -361,80 +390,16 @@ The default values for both players are interactive,
 This makes the tool compute worst-case number of experiments and
 average-case number of experiments for a given codebreaker's strategy.
 
-\TODO{pseudocode?}
+Options for the strategy are the same as in the simulation mode and
+can be found in \autoref{tbl:stge}.
+
+The algorithm for this task has been described in \autoref{sec:expeq}.
 
 \subsection{Optimal strategy mode [o, optimal]}
-\TODO{...}
 
+In this mode the tool computes either the worst-case optimal,
+  or the average-case optimal strategy for the given code-breaking game.
 
-\section{Strategies}
+The backtracking algorithm has been described in \autoref{sec:expeq}.
 
-\subsection{Codebreaker's strategy}
-
-We support the following one-step look-ahead strategies for the codebreaker.
-Let $N$ denote the number of possible codes in the current state,
-  and for a fixed experiment, let $n_i$ denote the number of possible codes
-  for which the experiment results in outcome $i$.
-
-\begin{description}
-\item[Min-num.] \texttt{-e minnum} \\
-  
-\item[Min-exp.]  \texttt{-e minexp} \\
-\item[Entropy.] \texttt{-e entropy} \\
-\item[Most-parts.] \texttt{-e parts} \\
-  
-\item[Fixed.] \texttt{-e fixed} \\
-  Maximize the number of fixed variables
-  in the next step.
-  This is specific to propositional logic representation of a code-breaking game.
-  Further, it depends on the exact formalization.
-  For example, \autoref{ex:cc1}
-  shows two different formalizations of the same problem but
-  the choice of the experiment by the \emph{fixed} strategy is
-  different in the very first step.
-% TODO: SAt resolutions, ... ? (jine vlastni)
-\end{description}
-
-\subsection{Codemaker's strategy}
-
-The codemaker has the following strategy options.
-Note that none of them is guaranteed to maximize the
-  number of experiments of any codebreaker's strategy.
-
-\begin{description}
-\item[Max-num.] \texttt{-o maxnum} \\
-  Select an outcome with largest $n_i$. This
-  corresponds to the \emph{min-num} strategy for codebreaker.
-\item[Fixed.] \texttt{-o fixed} \\
-  Minimizes the number of fixed variables in the next step.
-\end{description}
-
-\subsection{Extensibility}
-
-If you want to analyze a new heuristics to selects experiments,
-  all you need to do is to implement a new function
-  in \texttt{strategy.h/strategy.cpp} file and add a corresponding entry
-  to the \texttt{...} table in \texttt{strategy.h}.
-A strategy function takes a list of sensible experiments as an argument
-  and it returns the index of the selected one.
-
-If your strategy only \emph{maximizes} or \emph{minimizes}
-  some metrics on the experiments,
-  you can use a provided template with a corresponding lambda function.
-We demonstrate this possibility with a code snippet of
-  the exact implementation of the \emph{Min-exp} strategy below.
-For exact details, see the documentation in the file.
-
-\begin{lstlisting}[language=C++]
-uint breaker::exp_num(vec<Option>& options) {
-  return minimize([](Option& o){
-    auto models = o.GetNumOfModels();
-    int sumsq = 0;
-    for (uint i = 0; i < o.type().outcomes().size(); i++) {
-      sumsq += models[i] * models[i];
-    }
-    return (double)sumsq / o.GetTotalNumOfModels();
-  }, options);
-}
-\end{lstlisting}
 

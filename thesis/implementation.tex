@@ -149,23 +149,11 @@ This class implements the context opening and closing in the way described above
 We include a special SAT solver, called \texttt{SimpleSolver} to show that
   the usage of a proper SAT solver in this application is justifiable.
 Simple solver uses another SAT backend (Picosat) to generate all
-  models of the initial restriction $\init$ (or of the first constraint, in general).
+  models of the initial constraint $\init$ (or of the first constraint, in general).
 Later satisfiability questions with additional constraint are
   resolved by going though all possible codes (assignments) and
   checking that the constraints are satisfied.
 Model counting and the other functions are implemented similarly.
-
-\subsection{Extensibility}
-If you want to try another SAT solver, alter the algorithm for model counting,
-  or test any other modification,
-  you can implement your own solver class that inherits from \texttt{Solver} and
-  implements all the necessary methods.
-
-Check the \texttt{solver.h} file and the documentation therein
-  for the information about the exact functions required.
-Further, you need to to include the file with your class in
-  \texttt{main.cpp} and add a new case
-  into the \texttt{get\_solver} function in this file.
 
 \subsection{Transformation to CNF}
 
@@ -234,6 +222,46 @@ Although this is not polynomial in the size of the input
 
 \section{Symmetry breaking}
 \TODO{Bliss, vs saucy vs nauty}
+
+\section{Modularity and extensibility}
+
+If you want to analyze a new heuristics to selects experiments,
+  all you need to do is to implement a new function
+  in \texttt{strategy.h/strategy.cpp} file and add a corresponding entry
+  to the \texttt{...} table in \texttt{strategy.h}.
+A strategy function takes a list of sensible experiments as an argument
+  and it returns the index of the selected one.
+
+If your strategy only \emph{maximizes} or \emph{minimizes}
+  some metrics on the experiments,
+  you can use a provided template with a corresponding lambda function.
+We demonstrate this possibility with a code snippet of
+  the exact implementation of the \emph{Min-exp} strategy below.
+For exact details, see the documentation in the file.
+
+\begin{lstlisting}[language=C++]
+uint breaker::exp_num(vec<Option>& options) {
+  return minimize([](Option& o){
+    auto models = o.GetNumOfModels();
+    int sumsq = 0;
+    for (uint i = 0; i < o.type().outcomes().size(); i++) {
+      sumsq += models[i] * models[i];
+    }
+    return (double)sumsq / o.GetTotalNumOfModels();
+  }, options);
+}
+\end{lstlisting}
+
+If you want to try another SAT solver, alter the algorithm for model counting,
+  or test any other modification,
+  you can implement your own solver class that inherits from \texttt{Solver} and
+  implements all the necessary methods.
+
+Check the \texttt{solver.h} file and the documentation therein
+  for the information about the exact functions required.
+Further, you need to to include the file with your class in
+  \texttt{main.cpp} and add a new case
+  into the \texttt{get\_solver} function in this file.
 
 \section{Implementation details}
 

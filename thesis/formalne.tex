@@ -1,4 +1,4 @@
-\chapter{Formal model}
+\chapter{Code-breaking game model}
 
 In this chapter, we formally define code-breaking games
   within the framework of propositional logic,
@@ -8,7 +8,7 @@ We discuss various strategies for code-breaking games and
   define a concept of experiment equivalence,
   which is fundamental for strategy synthesis and analysis.
 
-\section{Notation and Terminology}
+\section{Notation and terminology}
 Let $\Form_\Var$ denote the set of propositional formulas over
   the set of variables $\Var$ and let
   $\Val_\Var$ be the set of valuations (boolean interpretations)
@@ -49,7 +49,7 @@ Let $P(x)$ be the cell containing $x$,
 
 %-------------------------------------------------------------------------------
 % DEF: CODE BREAKING GAME
-\section{Formal definition}
+\section{Basic definitions}
 
 A code-breaking game can be represented by a \emph{set of variables},
   \emph{initial constraint} (a formula that is guaranteed to be satisfied),
@@ -455,5 +455,4 @@ contains 24 clauses at the top level with 192 literals in total.\eqed
 \end{example}
 
 \input{strategies}
-\input{game-symmetries}
-\input{symmetry-breaking}
+\input{exp-equiv}

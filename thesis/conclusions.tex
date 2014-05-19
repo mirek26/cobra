@@ -6,16 +6,16 @@ Experiment equivalence was introduced and we proved that
   equivalent experiments can be neglected during the analysis of the game.
 We suggested an algorithm for equivalence testing based on graph isomorphism.
 
-Further, a computer language for game specification was suggested,
+A computer language for game specification was suggested,
   and we developed a computer tool COBRA for code-breaking game analysis,
   which is able to perform various tasks with the game.
 
 Using the tool, we can reproduce some known results and easily examine
-  new strategies.
+  new strategies or heuristics for experiment selection.
 We provided experimental results and evaluated performances of
-  common one-step look-ahead strategies in other games than Mastermind.
-We also suggested new strategies based on our model of the game,
-  mostly on the number of fixed variables, and analysed their performance.
+  several one-step look-ahead strategies in other games than Mastermind.
+We also suggested new strategies based on the number of fixed variables,
+  and analysed their performance.
 
 There are many interesting things to try in our framework,
   which were, however, beyond the scope of the thesis.
@@ -23,15 +23,51 @@ In the next paragraphs, we present a few suggestion for future work.
 
 Our model of a code-breaking games is general,
   the are many ways to extend it further.
-Experiments price.
-Limited number of experiments of a type.
+Numerous possibilities arise with if we allowing different experiment prices.
+Imagine a Mastermind with a unit cost of a guess and another
+  experiment that directly tells
+  you a colour at a specified position.
+What price must the new experiment have so that
+  it is worth using it?
 
-One-step look-ahead co koukaj dál
+Similarly, it may be interesting to limit
+  the number of experiments of a type.
+In the previous case, how would you play if you can
+  perform the new experiment only once?
 
-Randomized strategies
+One-step look-ahead strategies provide us a simple heuristics to select experiments.
+However, if the value of some experiments is the same,
+  they select the first experiment according to some order.
+In fact, the most-parts strategy for Mastermind with 4 pegs and 6 colours
+  performs really well in the average case
+  only due to a ``lucky'' choice in the first step.
+Experiments AABC and ABCD have both 14 satisfiable outcome
+  but the strategy chooses AABC because it is lexicographically smaller.
+It would be very interesting to considered \emph{randomized strategies}
+  in which the experiment would be selected out of the experiment
+  with the best value with uniform distribution.
+We do not dare guess what function would prove the best in that case.
 
+Look-ahead strategies can also be naturally extended to more than one step.
+This would lead to the \emph{minimax algorithm} applied on the tree of
+  possible outcomes and experiments in the next steps.
+Evaluation of such strategies would be much more computational demanding.
+Would their performance be significantly better?
 
-It would be also nice to try other approaches in our framework.
-Many were suggested for Mastermind but can be applied in the general case as well.
-In particular, genetic algorithms proved to be very useful for bigger problems
+Completely different approaches for strategy synthesis
+  were suggested for Mastermind.
+In particular, genetic algorithm
+  proved to be very useful for bigger problems
   as they scale much better than the backtracking approach.
+How to generalize these approaches to our model?
+
+Finally, SAT solvers proved useful only when the number
+  of possible codes is large enough.
+If the number of models of a formula is small, simple approach based
+  on model enumeration is much faster.
+Can we benefit from a hybrid approach of
+  using a SAT solver in the first steps and
+  switching to the simple solver when the number of possibilities shrinks?
+
+These are interesting research questions that remain open.
+We hope that they will lead to further research of this area.
