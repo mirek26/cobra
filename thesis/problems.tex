@@ -321,7 +321,7 @@ The comparison of the described strategies is shown in \autoref{tbl:one-step}.
 \begin{tabular}{|l|c|c|c|}
 \hline Strategy & First guess & Expected-case & Worst-case \\ \hline
 Maximal num. & AABB & 4.476 & 5 \\ \hline
-Expected num. & AABC & 4.395 & 6 \\ \hline
+Expected num. & AABC & 4.395/4.602\footnotemark & 6 \\ \hline
 Entropy & ABCD & 4.416 & 6 \\ \hline
 Most parts & AABC & 4.373 & 6 \\ \hline
 Exp-case optimal & AABC & 4.340 & 6 \\ \hline
@@ -330,6 +330,15 @@ Exp-case optimal & AABC & 4.340 & 6 \\ \hline
 \label{tbl:one-step}
 \end{center}
 \end{table}
+\footnotetext{Irwing's paper reports 4.395 as the expected number
+ of experiments of this strategy.
+ However, he states that his strategy selects the first two experiments
+ on the basis of the expected number of models and the rest is done by
+ exhaustive search.
+ We were not able to reproduce this result and the
+ paper contains several other irreproducible results,
+ which has been already pointed out in \cite{mm-mostparts}.
+ The number reported by our tool when using this strategy only is 4.602.}
 
 Apart from \emph{one-step look-ahead} strategies, which are, in general,
   computationally intensive and do not scale well for bigger $n$ or $c$,
