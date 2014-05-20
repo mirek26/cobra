@@ -44,37 +44,39 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.5}\slshape Experiment equivalence}{29}{section.3.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.6}\slshape Optimal strategy synthesis}{30}{section.3.6}
+\contentsline {subsection}{\rmfamily Algorithm for experiment equivalence}{31}{section*.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.6}\slshape Optimal strategy synthesis}{31}{section.3.6}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{33}{chapter.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.1}\slshape Input language}{33}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{33}{section*.24}
+\contentsline {subsection}{\rmfamily Low-level language}{33}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{35}{section*.25}
+\contentsline {subsection}{\rmfamily Python preprocessing}{35}{section*.26}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{36}{section.4.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.3}\slshape Modes of operation}{37}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{37}{section*.27}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{37}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{38}{section*.29}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{38}{section*.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{39}{section*.32}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{39}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{39}{section*.33}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{39}{section*.34}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.4}\slshape SAT solving}{39}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{42}{section*.37}
+\contentsline {subsection}{\rmfamily PicoSat}{42}{section*.38}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{42}{section*.38}
+\contentsline {subsection}{\rmfamily MiniSat}{42}{section*.39}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{42}{section*.39}
+\contentsline {subsection}{\rmfamily Simple solver}{42}{section*.40}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{43}{section*.40}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{43}{section*.41}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{44}{section.4.5}
 \defcounter {refsection}{0}\relax 
@@ -82,14 +84,12 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.7}\slshape Implementation details}{44}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{44}{section*.41}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{44}{section*.42}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{45}{section*.42}
+\contentsline {subsection}{\rmfamily Requirements}{45}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{45}{section*.43}
+\contentsline {subsection}{\rmfamily Unit testing}{45}{section*.44}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{47}{chapter.5}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {6}\bfseries Conclusions}{49}{chapter.6}
-\defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Appendix \numberline {A}\bfseries Specifications of sample games}{55}{Appendix.1.A}

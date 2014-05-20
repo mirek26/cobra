@@ -291,16 +291,16 @@ In this mode, the tool prints basic information about the loaded game, such as
 It also performs a \emph{well-formed} check, i.e. verifies that the
   specified game is well-formed according to \autoref{def:wellformed}.
 
-Verification that an experiment with outcomes $\formx_1,...\formx_k$ is well-formed
-  can be done by verifying that $\init->\exactlyk{1}(\formx_1, ..., \formx_k)$
+Algorithm for the verification follows directly from \autoref{lma:well-formed}.
+We generate all non-equivalent experiments in the first round
+  and for each of them, we verify that
+  $\init->\exactlyk{1}(\formx_1, ..., \formx_k)$,
+  where $\formx_1,...\formx_k$ are the outcomes of the formula,
   is a tautology.
-We negate the formula, pass it to a SAT solver, ask for satisfiability and expect a negative result.
+This can be done by negating the formula,
+  passing it to a SAT solver, asking for satisfiability
+  and expecting a negative result.
 
-Verification that the game is well-formed is done by
-  generating possible non-equivalent experiments for the first round
-  and verifying that all of them are well-formed.
-This is enough thanks to \autoref{lma:exp-wellformed}
-\TODO{Lemma: pokud jsou experimenty ekviv a jeden je well-formed, je i druhy well-formed.}
 If a problem is found, the tool outputs an assignment and an experiment
   for which no outcome, or more that one outcome, is satisfied.
 

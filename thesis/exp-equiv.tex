@@ -1,22 +1,26 @@
 \section{Experiment equivalence} \label{sec:expeq}
 
-\TODO{Motivace motivace motivace. Chci uvazovat mene experimentu.
-Vyhodnocovani one-step look ahead strategies se mi urychli}
+During the analysis of code-breaking games,
+  we repeatedly need to select the next experiment.
+When we analyse a strategy, we must prepare a list of experiments
+  for the strategy to choose from and
+  during the optimal strategy synthesis,
+  we need to try all possible experiments, finish the game with the gained knowledge,
+  and then select the optimal one.
 
-The number of possible parametrizations of
-  a type of experiment is typically very large,
-  which makes the analysis a game much harder.
-For example, consider the counterfeit-coin problem (\ref{prob-coins})
-  and the experiment of weighting 4 coins against 4 coins.
-There is $\frac{1}{2}\cdot {12 \choose 4}\cdot{8 \choose 4} = 17325$
- possible combinations for parametrization, but
- in the initial state (i.e. with no knowledge except for the initial constraint),
- all of them are equivalent -- they will give us the same information regardless of symmetries.
+The set of all experiments is typically very large and not all experiments
+  have to be considered.
+For example, in the counterfeit-coin problem (\ref{prob-coins}),
+  there is a parametrized experiment of weighting 4 coins against 4 coins,
+  which has $\frac{1}{2}\cdot {12 \choose 4}\cdot{8 \choose 4} = 17325$
+ possible parametrizations.
+However, in the initial state
+  (i.e. with no knowledge except for the initial constraint),
+  all of them are equivalent -- they give us
+  the same information regardless of symmetries.
 
 In this section, we formally define equivalence of two experiments
  and show that we can neglect all but one experiment in each equivalence class.
-Further, we present several lemmas that will form the basis of
- our symmetry breaking algorithms in the Chapter \ref{chapter-cobra}.
 
 \begin{definition}[Symmetric experiment]
 For an experiment $\exp = (\expt, \param)$ and a permutation $\perm\in\Perm_\Var$,
@@ -33,7 +37,7 @@ We define a \emph{symmetry group} $\symg$ as
   there exists a $\perm$-symmetric experiment $\exp^\perm$.
 \end{definition}
 
-\begin{definition}[Experiment equivalence]
+\begin{definition}[Experiment equivalence] \label{def:expeq}
 An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $\form$,
   written $\exp_1\expeq{\form}\exp_2$,
   if and only if there exists a permutation $\perm\in\symg$ such that
@@ -41,13 +45,72 @@ An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $
    \{ (\form\wedge\formx)^\perm \| \formx\in\outcome(\exp_2) \} $.
 \end{definition}
 
-\TODO{Th: Pokud je f nezávislá na symetrii,
-  tak při vyhodnocování one-step look-ahead strategy stačí brát
-  minimální experimenty v daném uspořádání.}
+The following theorem gives us a right to neglect equivalent experiments
+  during analysis of a one-step look-ahead strategy.
 
-\TODO{Example. Možná running example. Možná Mastermind první krok.}.
+\begin{theorem}
+Let $f: 2^\Formr ->\Rset$ be a function such that
+$f(\formset) = f(\{\form^\pi \| \form\in\formset\})$ for any permutation
+$\pi\in\Perm_\Var$. Let $<$ be a total order of experiments $E$.
+Let $\stg$ be a one-step look-ahead strategy with respect to $f$ and $<$, and
+let $\form$ be a formula.
+Suppose there are experiment $e_1$, $e_2$ such that $e_1\expeq{\form}e_2$ and $e_1<=e_2$.
+Then $\stg(\form) \not= e_2$.
+\end{theorem}
 
-\TODO{Jak generovat neekvivalentní exp.}
+\begin{proof}
+If follows directly from \autoref{def:expeq} and the property of $f$ that
+$f(\{\form\wedge\formx\| \formx\in\outcome(e_1)\}) =
+ f(\{\form\wedge\formx\| \formx\in\outcome(e_2)\})$.
+Since $e_1 < e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
+\end{proof}
+
+\begin{example}
+\TODO{Running example. Ukázka symetrického experimentu, jaká je symgrupa.
+Jaké experimenty jsou ekvivalentní vzhledem k nějaké formuli (= v prvním kroku)}
+12 =, 3124 je ekviv 43. \eqed
+\end{example}
+
+Experiment equivalence can be used in the verification
+  of the well-formed property of a game.
+
+\begin{lemma} \label{lma:well-formed}
+  Let $S\subseteq E$ be a subset of experiments
+  such that for every $e\in E$, there exists $e'\in S$
+   such that $e\expeq{\init}e'$.
+  If the formula $\init ==> \exactlyk{1}(\outcome(e'))$ is a tautology for
+  all $e'\in S$, then the game is well-formed.
+\end{lemma}
+
+\begin{proof}
+To get a contradiction, suppose the game is not well formed, i.e.
+  there is $e\in E$ and $v \in \Vals$ such that the number of
+  formulas in $\outcome(e)$ satisfied by $v$ is not equal one.
+
+If $e\in S$, the formula $\init ==> \exactlyk{1}(\outcome(e'))$ is not
+  satisfied by $v$. Contradiction.
+
+Otherwise, there exists $e'\in S$ such that $e\expeq{\init}e'$, i.e.
+  there exists $\perm\in\Perm_\Var$ such that
+$\{ \init\wedge\formx \| \formx\in\outcome(e) \} =
+ \{ (\init\wedge\formx)^\perm \| \formx\in\outcome(e') \}$.
+Since $\init ==> \exactlyk{1}(\outcome(e'))$ is a tautology,
+  the permutated formula
+  $\init^\perm ==> \exactlyk{1}(\formx^\perm \| \formx\in\outcome(e'))$
+  is a tautology as well.
+Therefore, exactly one formula from the set
+ $ \{ (\init\wedge\formx)^\perm \| \formx\in\outcome(e') \}$
+ is satisfiable and the same holds for
+  $\{ \init\wedge\formx \| \formx\in\outcome(e) \}$,
+ which implies that
+ $\init ==> \exactlyk{1}(\outcome(e))$
+ is a tautology. \qed
+\end{proof}
+
+
+\subsection{Algorithm for experiment equivalence}
+In the rest of the section, we suggest an algorithm that decides
+  whether two given experiments are equivalent with respect to a given formula.
 
 \TODO{Konstrukce základního grafu}
 
@@ -57,7 +120,9 @@ An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $
 
 \TODO{Th: pokud jsou grafy isomorfní, pak jsou experimenty ekvivalentní.}
 
-\TODO{Running example.}
+\begin{example}
+\TODO{Running example. Ukázka základního grafu. Ukázka grafu pro stejnou formuli jak minule. } \eqed
+\end{example}
 
 \TODO{Algoritmus v pseudokódu.}
 

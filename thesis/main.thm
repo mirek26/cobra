@@ -61,17 +61,29 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{{Definition}{3.{23}}{Experiment equivalence}}{30}{definition.3.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{24}}{Consistent strategy}}{30}{definition.3.24}
-\defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{25}}{}}{30}{lemma.3.25}
+\contentsline {theorem}{{Theorem}{3.{24}}{}}{30}{theorem.3.24}
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{6}{}}{30}{proof.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{{Theorem}{3.{26}}{}}{31}{theorem.3.26}
+\contentsline {example}{{Example}{3.{25}}{}}{30}{example.3.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{7}{}}{31}{proof.7}
+\contentsline {lemma}{{Lemma}{3.{26}}{}}{30}{lemma.3.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {corollary}{{Corollary}{3.{27}}{}}{31}{corollary.3.27}
+\contentsline {proof}{{\proofname }{7}{}}{30}{proof.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{3.{27}}{}}{31}{example.3.27}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{{Definition}{3.{28}}{Consistent strategy}}{31}{definition.3.28}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{3.{29}}{}}{31}{lemma.3.29}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{8}{}}{31}{proof.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {theorem}{{Theorem}{3.{30}}{}}{32}{theorem.3.30}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{9}{}}{32}{proof.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {corollary}{{Corollary}{3.{31}}{}}{32}{corollary.3.31}
 \defcounter {refsection}{0}\relax 
 \contentsline {example}{{Example}{4.{1}}{}}{35}{example.4.1}
 \defcounter {refsection}{0}\relax 
