@@ -1,9 +1,12 @@
-#CC = g++-mp-4.9 -fdiagnostics-color=auto
-#CC = clang++
-#CC = g++
-ifndef $(CC)
+# CC = g++
+
+ifndef CC
   CC = clang++
 endif
+ifeq ($(CC),cc)
+  CC = clang++
+endif
+
 CCFLAGS = -g -O3 -isystem tools/ -isystem tools/minisat -isystem include/ -isystem /opt/local/include -Wall -Wextra -pedantic -pthread -std=c++11
 LINKWITHSAT = -L tools/picosat -L tools/bliss -L tools/minisat/core -l picosat -l bliss -l minisat
 FLEX = flex
@@ -14,10 +17,11 @@ EXEC = cobra-backend
 SOURCES = $(filter-out src/main.cpp, $(wildcard src/*.cpp))
 OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
-default: cobra
+default: cobra 
 cobra: $(OBJECTS) src/main.o
-	@$(MAKE) -C tools/bliss
-	@$(MAKE) -C tools/picosat
+	@if [[ ! -f tools/bliss/libbliss.a ]]; then echo "Compiling BLISS..."; $(MAKE) -C tools/bliss; fi
+	@if [[ ! -f tools/picosat/libpicosat.a ]]; then echo "Compiling PICOSAT"; $(MAKE) -C tools/picosat; fi
+	@if [[ ! -f tools/minisat/core/libminisat.a ]]; then echo "Compiling MINISAT"; $(MAKE) libr -C tools/minisat/core; fi
 	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 
 # parser
