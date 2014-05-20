@@ -242,14 +242,18 @@ double optimum(Solver& solver, vec<EvalExp>& history,
 
   // Sort according to the 'minnum' stg
   assert(!options.empty());
-  std::sort(options.begin(), options.end(), [](Experiment& a, Experiment& b) {
-    return a.MaxNumOfModels() < b.MaxNumOfModels();
+  vec<uint> sorted;
+  sorted.resize(options.size());
+  for (uint i = 0; i < options.size(); i++) sorted[i] = i;
+  std::sort(sorted.begin(), sorted.end(), [&](const int a, const int b) {
+    return options[a].MaxNumOfModels() < options[b].MaxNumOfModels();
   });
   // printf("FIRST: %s (%u)\n", options[0].pretty().c_str(), options[0].MaxNumOfModels());
 
   // Recurse down
   Experiment* nej = nullptr;
-  for (auto& e : options) {
+  for (auto i : sorted) {
+    auto& e = options[i];
     double val = 0;
     for (uint i = 0; i < e.type().outcomes().size(); i++) {
       if (!e.IsSat(i)) continue;
