@@ -18,7 +18,7 @@ params = lambda s, n0, n1: ",".join(s + "$" + str(i) for i in range(n0, n1+1))
 
 for m in range(1, N//2 + 1):
   # weighting m coins agains m coins
-  EXPERIMENT("weighting" + str(m), 2*m)
+  EXPERIMENT("weighing" + str(m), 2*m)
   PARAMS_DISTINCT(range(1, 2*m + 1))
   PARAMS_SORTED(range(1, m + 1))
   PARAMS_SORTED(range(m+1, 2*m + 1))

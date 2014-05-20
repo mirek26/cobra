@@ -20,8 +20,10 @@ for num_total in range(N + 1): # total number of pegs
   for num_blacks in range(num_total + 1): # number of black pegs
     num_whites = num_total - num_blacks
     formula = []
+    # select B
     for blacks in combinations(range(1, N+1), num_blacks):
       remaining = set(range(1, N+1)) - set(blacks)
+      # select W
       for whites in combinations(remaining, num_whites):
         for whitesfor_c in combinations(remaining, num_whites):
           for whitesfor in permutations(whitesfor_c):

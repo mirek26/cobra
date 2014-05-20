@@ -1,8 +1,8 @@
 #
-# FAKE-COIN problem model for COBRA
+# The counterfeit coin problem model for COBRA.
 #
 
-N = 12
+N = 12  # number of coins
 srange = lambda s, n: [s + str(i) for i in range(1, n+1)]
 
 VARIABLES(srange("x", N) + ["y"])
