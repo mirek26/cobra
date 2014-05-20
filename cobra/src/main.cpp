@@ -162,6 +162,13 @@ void simulation_mode() {
            experiment.type().name().c_str(),
            game.ParamsToStr(experiment.params()).c_str(),
            color::snormal);
+    if (process.size() > 0 &&
+        &experiment.type() == &process.back().exp.type() &&
+        experiment.params() == process.back().exp.params()) {
+      printf("%sNOT SOLVED! (%i experiments)%s\n",
+             color::shead, exp_num, color::snormal);
+      break;
+    }
 
     // Choose and print an outcome
     uint oid = g_makerStg(experiment);
@@ -182,7 +189,8 @@ void simulation_mode() {
     auto sat = solver->Satisfiable();
     assert(sat);
     auto model = solver->GetModel();
-    if (solver->OnlyOneModel()) {
+    int final = experiment.type().final_outcome();
+    if (solver->OnlyOneModel() && (final == -1 || final == static_cast<int>(oid))) {
       printf("%sSOLVED in %i experiments!%s\n",
              color::shead, exp_num, color::snormal);
       game.PrintModel(model);
