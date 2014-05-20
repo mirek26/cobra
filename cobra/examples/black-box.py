@@ -2,8 +2,8 @@
 # BLOCK-BOX model for COBRA
 #
 
-N = 8 # size of the grid
-M = 4 # number of marbles
+N = 6 # size of the grid
+M = 3 # number of marbles
 
 ############### HELPER CODE for generation of possible paths ###################
 # Constants
@@ -101,14 +101,19 @@ def start_from(s):
   ends = dict([e, []] for e in all_ends)
   ends['hit'] = []
   # special cases - immediate reflections
-  state[y-dx][x-dy].val = MARBLE
-  path_end(x - dx, y - dy)
-  state[y+dx][x+dy].val = MARBLE
-  path_end(x - dx, y - dy)
-  state[y+dx][x+dy].val = NOTHING
-  state[y-dx][x-dy].val = NOTHING
+  oldm, oldp = state[y-dx][x-dy].val, state[y+dx][x+dy].val
+  if state[y-dx][x-dy].val != NOTHING:
+    state[y-dx][x-dy].val = MARBLE
+    path_end(x - dx, y - dy)
+    state[y-dx][x-dy].val = NOTHING
+  if state[y+dx][x+dy].val != NOTHING:
+    state[y+dx][x+dy].val = MARBLE
+    path_end(x - dx, y - dy)
+    state[y+dx][x+dy].val = NOTHING
   # all other cases
   generate_paths(start)
+  # reinstate the original state
+  state[y-dx][x-dy].val, state[y+dx][x+dy].val = oldm, oldp
 
 def get_formula(states):
   disj = []
@@ -129,7 +134,7 @@ VARIABLES(vars)
 CONSTRAINT("Exactly-%i(%s)"%(M, ",".join(vars)))
 
 for s in all_starts:
-  EXPERIMENT("ray from %i, %i"%(s[0], s[1]), 0)
+  EXPERIMENT("ray from %i, %i"%(s[0]-s[2], s[1]-s[3]), 0)
   start_from(s)
   if len(ends['hit']) > 0:
     OUTCOME("Hit", get_formula(ends['hit']))

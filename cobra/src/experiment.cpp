@@ -284,6 +284,11 @@ bool ExpGenerator::CharsEquiv(const set<MapId>& maps,
 // Recursive function that substitudes char at position n for all posibilities.
 void ExpGenerator::GenParamsFill(uint n) {
   set<CharId> done;
+  if (n == curr_type_->num_params()) {
+    stats_.ph1++;
+    GenParamsGraphFilter();
+    return;
+  }
   for (CharId a = 0; a < game_.alphabet().size(); a++) {
     bool valid = true;
     // Test compliance with PARAMS_DIFFERENT.
@@ -312,13 +317,7 @@ void ExpGenerator::GenParamsFill(uint n) {
     if (!valid) continue;
     // Recurse down.
     params_[n] = a;
-    if (n + 1 == curr_type_->num_params()) {
-      stats_.ph1++;
-      //GenParamsBasicFilter();
-      GenParamsGraphFilter();
-    } else {
-      GenParamsFill(n + 1);
-    }
+    GenParamsFill(n + 1);
   }
 }
 

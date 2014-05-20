@@ -4,17 +4,30 @@
 
 N = 3 # number of cards
 A = ('a','b') # attributes
-V = [str(x) for x in range(7)]  # values
+V = [str(x) for x in range(3)]  # values
 
 from itertools import product, compress
 
 ALPHABET(V)
 
 for n in range(N):
-  for a in A:
-    VARIABLES(["c%i%s%s"%(n, a, v) for v in V])
-    CONSTRAINT("Exactly-1(%s)"%",".join("c%i%s%s"%(n,a,v) for v in V))
-    MAPPING("X%i%s"%(n, a), ["c%i%s%s"%(n, a, v) for v in V])
+  for a in range(len(A)):
+    VARIABLES(["c%i%s%s"%(n, A[a], v) for v in V])
+    if n != 0:
+      # add a constraint that card n is lexicographically smaller than n-1
+      alleq = " & ".join("(c%i%s%s<->c%i%s%s)"%(n,A[i],v,n-1,A[i],v)
+                         for i in range(a) for v in V)
+      conj = []
+      for v in range(len(V)):
+        prev = "|".join("c%i%s%s"%(n,A[a],V[w]) for w in range(v)) # one of previous values
+        if prev: prev = prev + " | "
+        conj.append("(%s(c%i%s%s->c%i%s%s))"%(prev,n-1,A[a],V[v],n,A[a],V[v]));
+      greater = " & ".join(conj)
+      CONSTRAINT("(%s) -> (%s)"%(alleq, greater) if alleq else greater)
+
+    CONSTRAINT("Exactly-1(%s)"%",".join("c%i%s%s"%(n,A[a],v) for v in V))
+    MAPPING("X%i%s"%(n, A[a]), ["c%i%s%s"%(n, A[a], v) for v in V])
+
 
 for selected in product([0,1], repeat=2*len(A)):
   if not (any(selected[:len(A)]) and any(selected[len(A):])):
