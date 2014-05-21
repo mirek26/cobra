@@ -68,12 +68,18 @@ void time_overview(clock_t start) {
     s1.sat_calls, toSeconds(s1.sat_time),
     s1.fixed_calls, toSeconds(s1.fixed_time),
     s1.models_calls, toSeconds(s1.models_time));
-  auto s2 = SimpleSolver::s_stats();
+  auto s2 = MiniSolver::s_stats();
   printf(
-    "SimpleSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
+    "MiniSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
     s2.sat_calls, toSeconds(s2.sat_time),
     s2.fixed_calls, toSeconds(s2.fixed_time),
     s2.models_calls, toSeconds(s2.models_time));
+  auto s3 = SimpleSolver::s_stats();
+  printf(
+    "SimpleSolver (calls/time): sat %i/%.2fs fixed %i/%.2fs models %i/%.2fs\n",
+    s3.sat_calls, toSeconds(s3.sat_time),
+    s3.fixed_calls, toSeconds(s3.fixed_time),
+    s3.models_calls, toSeconds(s3.models_time));
 }
 
 void overview_mode() {

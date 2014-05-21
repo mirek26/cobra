@@ -216,6 +216,7 @@ uint breaker::min_fixed(vec<Experiment>& options) {
       if (min < max) return min;  // cannot have more than max
     }
     // prefer the experiment with a final outcome satisfiable
+    if (o.NumOfSat()==1) return -1;
     auto f = o.type().final_outcome();
     if (f > -1 && o.IsSat(f)) return min + 0.5;
     return min;
@@ -223,16 +224,13 @@ uint breaker::min_fixed(vec<Experiment>& options) {
 }
 
 uint breaker::exp_fixed(vec<Experiment>& options) {
-  return maximize([](Experiment& o, double max) ->double {
-    uint min = 0;
+  return maximize([](Experiment& o, double) ->double {
+    int sum = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
-      min = std::min(min, o.NumOfFixedVars(i));
-      if (min < max) return min;  // cannot have more than max
+      sum += o.NumOfModels(i)*o.NumOfFixedVars(i);
     }
-    // prefer the experiment with a final outcome satisfiable
-    auto f = o.type().final_outcome();
-    if (f > -1 && o.IsSat(f)) return min + 0.5;
-    return min;
+    if (o.NumOfSat()==1) return -1;
+    return static_cast<double>(sum)/o.TotalNumOfModels();
   }, options);
 }
 
