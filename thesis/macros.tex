@@ -17,13 +17,13 @@
 \newcommand{\Zset}{\mathbb{Z}}
 
 % Formulas - basics
-\newcommand{\Val}{\mathtt{Val}} % all valuations
-\newcommand{\Vals}{\mathtt{Val}^*} % all valuations sat. init
+\newcommand{\Val}{\textsc{val}} % all valuations
+\newcommand{\Vals}{\textsc{val}'} % all valuations sat. init
 \newcommand{\val}{v} % a valuation
 \newcommand{\numval}[1]{\##1} % number of sat valutaions
-\renewcommand{\Form}{\mathtt{Form}} % all formulas
-\newcommand{\Formr}{{\mathtt{Form}^*}} % all reachable formulas
-\newcommand{\PForm}{\mathtt{PForm}} % all param formulas
+\renewcommand{\Form}{\textsc{form}} % all formulas
+\newcommand{\Formr}{{\textsc{form}'}} % all reachable formulas
+%\newcommand{\PForm}{\mathtt{PForm}} % all param formulas
 \newcommand{\form}{\varphi} % a formula
 \newcommand{\formx}{\psi} % another 'a formula'
 \newcommand{\pform}{\psi} % a parametrized formula
@@ -51,10 +51,10 @@
 \newcommand{\outcome}{\Phi}
 
 % Permutations
-\newcommand{\Perm}{\mathtt{Perm}} % set of all permutations (_X over X)
+\newcommand{\Perm}{\textsc{perm}} % set of all permutations (_X over X)
 \newcommand{\perm}{\pi} % a permutation
 \newcommand{\permx}{\rho} % another 'a permutation'
-\newcommand{\idperm}{\mathtt{id}} % identity
+\newcommand{\idperm}{\textsc{id}} % identity
 
 % Solving process
 \newcommand{\proc}{\lambda}
@@ -82,12 +82,15 @@
 \newcommand{\lenexp}[1]{\len^{#1}_\textrm{exp}}
 
 % Macro operators
-\newcommand{\exactly}{\mathtt{Exactly}}
-\newcommand{\atleast}{\mathtt{AtLeast}}
-\newcommand{\atmost}{\mathtt{AtMost}}
+\newcommand{\exactly}{\textsc{exactly}}
+\newcommand{\atleast}{\textsc{atleast}}
+\newcommand{\atmost}{\textsc{atmost}}
 \newcommand{\exactlyk}[1]{\exactly_{#1}\:}
 \newcommand{\atleastk}[1]{\atleast_{#1}\:}
 \newcommand{\atmostk}[1]{\atmost_{#1}\:}
+
+\newcommand{\symb}[1]{\textcolor{DarkBlue}{$<$#1$>$}}
+\newcommand{\msymb}[1]{\textcolor{DarkBlue}{<\!\textrm{#1}\!>}}
 
 \renewcommand{\setminus}{\smallsetminus}
 \newcommand{\numpred}[2]{|\{#1 \| #2\}|}

@@ -38,9 +38,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Non-adaptive strategies}{25}{section*.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Memory-less strategies}{25}{section*.23}
+\contentsline {subsection}{\rmfamily Memory-less strategies}{26}{section*.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{27}{section.3.4}
+\contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{28}{section.3.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.5}\slshape Experiment equivalence}{29}{section.3.5}
 \defcounter {refsection}{0}\relax 
@@ -48,48 +48,48 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.6}\slshape Optimal strategy synthesis}{31}{section.3.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{33}{chapter.4}
+\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{35}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}\slshape Input language}{33}{section.4.1}
+\contentsline {section}{\numberline {4.1}\slshape Input language}{35}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{33}{section*.25}
+\contentsline {subsection}{\rmfamily Low-level language}{35}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{35}{section*.26}
+\contentsline {subsection}{\rmfamily Python preprocessing}{37}{section*.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{36}{section.4.2}
+\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{38}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{37}{section.4.3}
+\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{39}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{37}{section*.28}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{39}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{38}{section*.30}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{40}{section*.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{39}{section*.33}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{41}{section*.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{39}{section*.34}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{41}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape SAT solving}{39}{section.4.4}
+\contentsline {section}{\numberline {4.4}\slshape SAT solving}{41}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{42}{section*.38}
+\contentsline {subsection}{\rmfamily PicoSat}{44}{section*.38}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{42}{section*.39}
+\contentsline {subsection}{\rmfamily MiniSat}{44}{section*.39}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{42}{section*.40}
+\contentsline {subsection}{\rmfamily Simple solver}{44}{section*.40}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{43}{section*.41}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{45}{section*.41}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape Symmetry breaking}{44}{section.4.5}
+\contentsline {section}{\numberline {4.5}\slshape Graph isomorphism}{46}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Modularity and extensibility}{44}{section.4.6}
+\contentsline {section}{\numberline {4.6}\slshape Modularity and extensibility}{46}{section.4.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{44}{section.4.7}
+\contentsline {section}{\numberline {4.7}\slshape Implementation details}{47}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{44}{section*.42}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{47}{section*.42}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{45}{section*.43}
+\contentsline {subsection}{\rmfamily Requirements}{47}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{45}{section*.44}
+\contentsline {subsection}{\rmfamily Unit testing}{47}{section*.44}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{47}{chapter.5}
+\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{49}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{49}{chapter.6}
+\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{51}{chapter.6}

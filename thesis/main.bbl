@@ -889,6 +889,73 @@
       \endverb
       \keyw{other}
     \endentry
+    \entry{nauty}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=d2820085942ebaab5f10695801c66857}{McKay}{M\bibinitperiod}{Brendan\bibnamedelima D.}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+        {{hash=939fedd4d01e887a147e9bfc0637b133}{Piperno}{P\bibinitperiod}{Adolfo}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=d2820085942ebaab5f10695801c66857}{McKay}{M\bibinitperiod}{Brendan\bibnamedelima D.}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+        {{hash=939fedd4d01e887a147e9bfc0637b133}{Piperno}{P\bibinitperiod}{Adolfo}{A\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{88df3288caee15efaaa8cbdba1f9c081}
+      \strng{fullhash}{88df3288caee15efaaa8cbdba1f9c081}
+      \field{sortinit}{0}
+      \field{labeltitle}{Practical graph isomorphism, \{II\}}
+      \field{issn}{0747-7171}
+      \field{journaltitle}{Journal of Symbolic Computation}
+      \field{title}{Practical graph isomorphism, \{II\}}
+      \field{volume}{60}
+      \field{year}{2014}
+      \field{pages}{94\bibrangedash 112}
+      \verb{doi}
+      \verb http://dx.doi.org/10.1016/j.jsc.2013.09.003
+      \endverb
+      \verb{url}
+      \verb http://www.sciencedirect.com/science/article/pii/S0747717113001193
+      \endverb
+    \endentry
+    \entry{bliss}{inproceedings}{}
+      \name{labelname}{2}{}{%
+        {{hash=71ee64ca9a187dd5648029791c4fe655}{Junttila}{J\bibinitperiod}{Tommi\bibnamedelima A}{T\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=577a9b82a2cc5f487c5d1526cf9708f8}{Kaski}{K\bibinitperiod}{Petteri}{P\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=71ee64ca9a187dd5648029791c4fe655}{Junttila}{J\bibinitperiod}{Tommi\bibnamedelima A}{T\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=577a9b82a2cc5f487c5d1526cf9708f8}{Kaski}{K\bibinitperiod}{Petteri}{P\bibinitperiod}{}{}{}{}}%
+      }
+      \list{organization}{1}{%
+        {SIAM}%
+      }
+      \strng{namehash}{b261f19fcf9039d2a349d06544f67e76}
+      \strng{fullhash}{b261f19fcf9039d2a349d06544f67e76}
+      \field{sortinit}{0}
+      \field{labeltitle}{Engineering an Efficient Canonical Labeling Tool for Large and Sparse Graphs.}
+      \field{booktitle}{ALENEX}
+      \field{title}{Engineering an Efficient Canonical Labeling Tool for Large and Sparse Graphs.}
+      \field{volume}{7}
+      \field{year}{2007}
+      \field{pages}{135\bibrangedash 149}
+    \endentry
+    \entry{nautyblissoverview}{article}{}
+      \name{labelname}{3}{}{%
+        {{hash=80310c9019020eca3efff4536cb99d6a}{Katebi}{K\bibinitperiod}{Hadi}{H\bibinitperiod}{}{}{}{}}%
+        {{hash=07cbb4bcee3e261e57f698ecf1309688}{Sakallah}{S\bibinitperiod}{Karem\bibnamedelima A}{K\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=ae9d3233fdc65ff516fcd347cd5f0185}{Markov}{M\bibinitperiod}{Igor\bibnamedelima L}{I\bibinitperiod\bibinitdelim L\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{3}{}{%
+        {{hash=80310c9019020eca3efff4536cb99d6a}{Katebi}{K\bibinitperiod}{Hadi}{H\bibinitperiod}{}{}{}{}}%
+        {{hash=07cbb4bcee3e261e57f698ecf1309688}{Sakallah}{S\bibinitperiod}{Karem\bibnamedelima A}{K\bibinitperiod\bibinitdelim A\bibinitperiod}{}{}{}{}}%
+        {{hash=ae9d3233fdc65ff516fcd347cd5f0185}{Markov}{M\bibinitperiod}{Igor\bibnamedelima L}{I\bibinitperiod\bibinitdelim L\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{1b08f39d9f30114712641b012b3acddb}
+      \strng{fullhash}{1b08f39d9f30114712641b012b3acddb}
+      \field{sortinit}{0}
+      \field{labeltitle}{Graph symmetry detection and canonical labeling: Differences and synergies}
+      \field{journaltitle}{arXiv preprint arXiv:1208.6271}
+      \field{title}{Graph symmetry detection and canonical labeling: Differences and synergies}
+      \field{year}{2012}
+    \endentry
     \entry{googlestyle}{online}{}
       \name{labelname}{1}{}{%
         {{hash=8b36e9207c24c76e6719268e49201d94}{Google}{G\bibinitperiod}{}{}{}{}{}{}}%

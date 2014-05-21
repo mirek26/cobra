@@ -45,8 +45,8 @@ An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $
    \{ (\form\wedge\formx)^\perm \| \formx\in\outcome(\exp_2) \} $.
 \end{definition}
 
-The following theorem gives us a right to neglect equivalent experiments
-  during analysis of a one-step look-ahead strategy.
+The following theorem gives us a right to disregard equivalent experiments
+  during analysis of a one-step look-ahead strategies.
 
 \begin{theorem}
 Let $f: 2^\Formr ->\Rset$ be a function such that
@@ -124,146 +124,262 @@ In the rest of the section, we suggest an algorithm that decides
 \TODO{Running example. Ukázka základního grafu. Ukázka grafu pro stejnou formuli jak minule. } \eqed
 \end{example}
 
-\TODO{Algoritmus v pseudokódu.}
-
 \section{Optimal strategy synthesis}
 
-\TODO{Idea: first we show that there exists optimal consistent strategy.
-Then we show that consistent strategies that select equivalent experiments are
-equivalent.}
+Backtracking is the basic method for worst-case and average-case
+  optimal strategy synthesis.
+Our goal in this section is to prove that we can disregard
+  equivalent experiments and thus significantly
+  reduce branching of the algorithm in every step.
 
-\begin{definition}[Consistent strategy]
-A memory-less strategy $\stg$ is \emph{consistent} if and only if
-  for every $\form\in\Form_\Var$ and every $\perm\in\symg$, there
-  exists $\permx\in\symg$ such that $\form^\perm \equiv \form^\permx$ and
-  $\stg(\form^\permx) = \stg(\form)^\permx$.
-\end{definition}
+\newcommand{\optval}{\kappa}
+\newcommand{\optexp}{\varepsilon}
+\newcommand{\optvale}{\kappa_\textrm{exp}}
+\newcommand{\optexpe}{\varepsilon_\textrm{exp}}
 
-\TODO{Example, na kterém bude vidět, že jednoduchá definice nevyhovuje, protože můžu vzít symetrie $\form$ a dostanu, že to má dávat různé věci.}
+First, let us define $\optval(\form)$ and $\optvale(\form)$ as
+ the optimal number of experiments needed to reveal the secret code
+  when starting with knowledge $\form$
+  in the worst-case and in the average-case, respectively.
+We can say that $\optval(\form)$, resp. $\optvale(\form)$ is
+  the worst-case, resp. average-case number of experiments of
+  a worst-case, resp. average-case optimal strategy
+  if we change the initial constraint of the game to $\form$.
+
+Similarly, we define $\optval(\form, e)$ and $\optvale(\form, e)$ as
+  the optimal number of experiment needed to reveal the secret code
+  when starting with knowledge $\form$ and
+  with $e$ as the first experiment.
+
+There is an obvious relationship between $\optval(\form)$ and $\optval(\form,e)$
+  and between $\optvale(\form)$ and $\optvale(\form,e)$.
+For any $\form\in\Formr$,
+\begin{equation}
+\optval(\form) = \min_{e\in\Exp}\optval(\form, e),\textrm{ and }
+\hspace{1cm}
+\optvale(\form) = \min_{e\in\Exp}\optvale(\form, e).
+\label{opttriv}
+\end{equation}
+
+Further, we can compute $\optval(\form, e)$ and $\optvale(\form, e)$
+  from the optimal values for the subproblems after one experiment.
+These relationships are based on the definitions of the worst-case
+  and average-case number of experiments of a strategy
+  ($\lenmax{\stg}$ and $\lenexp{\stg}$).
+For any $\form\in\Formr$ and $e\in E$,
+\begin{align}
+\optval(\form, e) &= \left\{\begin{array}{ll}
+ 0 & \textrm{ if }\numval{\form} = 1, \\
+ \infty & \textrm{ if }\exists\formx\in\outcome(e).\; \form\wedge\formx\equiv\form, \\
+ 1 + \max_{\formx\in\outcome(e)}\optval(\form\wedge\formx) &
+ \textrm{ otherwise. }
+\end{array}\right.\label{optval}\\
+\optvale(\form, e) &= \left\{\begin{array}{ll}
+ 0 & \textrm{ if }\numval{\form} = 1, \\
+ \infty & \textrm{ if }\exists\formx\in\outcome(e).\; \form\wedge\formx\equiv\form, \\
+ 1 + \frac{\sum_{\formx\in\outcome(e)}\numval{(\form\wedge\formx)}\cdot\optvale(\form\wedge\formx)}{\numval{\form}} &
+ \textrm{ otherwise. }
+\end{array}\right.\label{optvale}\\
+\end{align}
+
+Let us now define a set of optimal choices in a state.
+For a $\form\in\Formr$, we define
+\begin{align*}
+\optexp(\form) &= \{ e\in E \| \forall e'\in E.\; \optval(\form, e) <= \optval(\form, e') \},\textrm{ and }\\
+\optexpe(\form) &= \{ e\in E \| \forall e'\in E.\; \optvale(\form, e) <= \optvale(\form, e') \}.
+\end{align*}
+
+The following lemma is a straightforward consequence of the definitions of $\optval$ and~$\optexp$.
 
 \begin{lemma}
-Let $\stg$ be a memory-less strategy.
-There exists a consistent memory-less strategy $\stgx$ such that
-  $\stglen{\stg}{\val} >= \stglen{\stgx}{\val}$
-  for all $\val\in\Val_X$ satisfying $\init$.
+Let $\stg$ be a strategy such that $\stg(\form)\in\optexp(\form)$ for every $\form\in\Formr$.
+Then $\stg$ is worst-case optimal.
+Similarly, let $\stg'$ be a strategy such that $\stg'(\form)\in\optexpe(\form)$ for every $\form\in\Formr$.
+Then $\stg'$ is average-case optimal.
 \end{lemma}
 
-\begin{proof}
-Similar to the proof of Lemma \ref{lma-opt-memoryless}.
-Let us choose any total order $\form_1, \form_2, ...$ of $\Form_\Var$ such that
-if $\form_i$ implies $\form_j$, then $i <= j$.
-We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$ in the following way:
-Let $\stg_0 = \stg$ and for $i > 0,$
-\begin{equation}
-\stg_i(\form) = \left\{
- \begin{array}{lll}
- \stg_{i-1}(\form) & \textrm{ if } \not\exists\perm\in\symg.\form^\perm\equiv\form_i \\
- \procstg{\stg_{i-1}}{\val_i}(k_i + 1) &
-    \textrm{ if } \exists\perm\in\symg.\form^\perm\equiv\form_i\textrm{, where }
-    (v_i, k_i) = \argmin_K \stglen{\stg_{i-1}}{v} - k,\\
-    & \textrm{ and }
-    K = \{(v, k)\in\Val\times\Nseto \| \exists\perm.\stgknow{\stg_{i-1}}{v}{k}^\perm\equiv\form_i\}.
-    \vspace{-2.5ex}
- \end{array}
- \right.
- \vspace{2.5ex}
-\end{equation}
-We prove that $\stglen{\stg_{i}}{v} <= \stglen{\stg_{i-1}}{v}$.
-If there is no $k$ and $\perm$ such that $\stgknow{\stg_i}{v}{k}^\perm\equiv\form_i$ then
-  the processes $\procstg{\stg_i}{v}$ and $\procstg{\stg_{i-1}}{v}$ are the same.
-If the is such $k$ and \TODO{...}.
-
-The last strategy of the sequence is consistent and satisfies the
-  condition in the lemma. \qed
-\end{proof}
+Now we are ready for the main theorem, which gives as a right to consider
+  only one experiment from
+  each equivalence class of $E/\expeq{\form}$
+  in the state where the
+  accumulated knowledge is $\form$.
+The exact algorithm for optimal strategy synthesis
+  with further optimizations is described in \autoref{s:cobra-modes}.
 
 \begin{theorem}
-Let $\stg, \stgx$ be two consistent memory-less strategies, such that
-$\stg(\form) \expeq{\form} \stgx(\form)$ for any $\form\in\Form_\Var$.
-There is a bijection $f:\Val_\Var -> \Val_\Var$ such that
-$\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
+For every $\form\in\Formr$,
+\begin{enumerate}
+\item $\optval(\form) = \optval(\form^\perm)$ and $\optvale(\form) = \optvale(\form^\perm)$ for all $\perm\in\symg$, and
+\item if $e_1\expeq{\form} e_2$, then $e_1\in\optexp(\form) \Leftrightarrow e_2\in\optexp(\form)$ and
+  $e_1\in\optexpe(\form) \Leftrightarrow e_2\in\optexpe(\form)$.
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}
-First, we prove by induction for any $k\in\Nseto$,
-  there is a permutation $\perm\in \symg$ such that
-  $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{\val^\perm}{i}$
-  for all $i\in\Nseto$, $i<=k$.
-For better readability, let
-  $\know_k = \stgknow{\stg}{\val}{k}$ and
-  $\knowx_{k, \perm} = \stgknow{\stgx}{\val^\perm}{k}$
+The proof for the worst case ($\optval, \optexp$)
+  and for the average-case ($\optvale, \optexpe$) is exactly the same,
+  so we prove it only for worst-case.
 
-For $k=0$, take $\perm = \idperm_\Var$.
-Clearly, $\stgknow{\stg}{\val}{0} = \init = \stgknow{\stgx}{\val^\idperm}{0}$.
+Since $\perm\in\symg$, there exists a $\perm$-symmetric experiment $e^\perm$
+  for every $e\in E$.
+Recall that $\outcome(e^\perm) = \{ \formx^\perm \| \formx\in\outcome(e)\}$.
+We show by induction on the number of models of $\form$
+  that $\optval(\form, \exp) = \optval(\form^\perm, \exp^\perm)$,
+  which is sufficient for the first part.
 
-For the induction step, suppose we have $\perm\in\symg$ such that
-  $\know_i^\perm = \knowx_{i, \perm}$ for $i <= k$.
-Further, suppose $\perm$ is such that
-  $\stg(\know_k^\perm) = \stg(\know_k)^\perm$. \TODO{Víc zdůvodnit.}
+As $\numval{\form} = \numval{\form^\perm}$, the statements follows directly from
+  (\refeq{opttriv}) and (\refeq{optval}) for formulas with one model.
+For the induction step, observe that
+  $\numval(\form^\perm \wedge \formx^\perm) = \numval(\form\wedge\formx)$
+  and
+  $\optval(\form^\perm \wedge \formx^\perm) = \optval(\form\wedge\formx)$
+  if $\form \not\equiv \form\wedge\formx$, by the induction hypothesis.
+The statement now follows from (\refeq{optval})
+  as the right sides are equal.
 
-Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$
-  be the $(k+1)$-th experiments  of the strategies.
-It holds
-\begin{equation}
-e_2 = \stgx(\knowx_{k, \perm})
-    \expeq{\knowx_{k, \perm}}  \stg(\knowx_{k, \perm})
-    \stackrel{IH}{=} \stg(\know_k^\perm)
-    = \stg(\know_k)^\perm
-    = e_1^\perm \label{eq:expsym}\tag{$\sim$}
-\end{equation}
-
-and, therefore, there exists $\permx\in\symg$ such that
-\begin{align}
- \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \} &= %\stackrel{(\refeq{eq:expsym})}{=}
- \{ (\knowx_{k, \perm} \wedge \formx)^\permx \| \formx\in\outcome(\exp_1^\perm) \} = \label{eq:sets}\tag{*}\\
-&= \{ (\know_k^\perm \wedge \formx^\perm)^\permx \| \formx\in\outcome(\exp_1) \} =
- \{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}
-\end{align}
-As $\permx\in\symg$ and $\symg$ is a permutation group, $\permx\perm\in\symg$.
-
-Since the game is well-formed,
-  $v$ satisfies exactly one formula in
-  $\{ \know_k \wedge \formx \| \formx\in\outcome(\exp_1) \}$.
-Therefore $v^{\permx\perm}$ satisfies exactly one formula
-  in
-  $\{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}  =
-   \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \}$,
-  which means that $v^{\permx\perm}$ satisfies $\knowx_{k, \perm}$.
-\TODO{Tohle nefugujeee!}
-From Lemma \ref{lma-accruedknowledge},
-  $\knowx_{k, \perm} = \knowx_{k, \permx\perm}$.
-Both $\know_{k+1}^{\permx\perm}$ and $\knowx_{k+1, \permx\perm}$ is thus the only
-  formula from (\refeq{eq:sets}) satisfied by $v^{\permx\perm}$ and, therefore,
-  $\know_{k+1}^{\permx\perm} = \knowx_{k+1, \permx\perm}$.
-
-
-Now for a fixed $\val$, take $k = \stglen{\stg}{\val}$, take
-  $\perm\in\symg$ such that
-  $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$
-  and define $f(\val) = \val^\perm$.
-Since
- $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{f(\val)}{i}$
- for $i <= k$
- and variable permutation preserves the number of models of a formula, i.e.
-  $\numval{\form} = \numval{\form^\perm}$ for any
-  $\form\in\Form_\Var$, $\perm\in\Perm_\Var$,
- we have
-  $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
-% \TODO{It remains to show that $f$ is a bijection.}
-  % Suppose $f$ is not injective, and $f(\val_1) = f(\val_2)$.
-  % By definition, the only model of
-  \qed
+For the second part, it suffices to prove that
+  $\optval(\form, e_1) = \optval(\form, e_2)$.
+As the experiments are equivalent, there exists a permutation $\perm\in\symg$,
+ such that
+ $\{\form\wedge\formx \|\formx\in\outcome(e_1)\} =
+ \{(\form\wedge\formx)^\perm \|\formx\in\outcome(e_2)\}$.
+The equation now follows from (\refeq{optval}) and the facts that
+ $\numval\form=\numval\form^\perm$ and $\optval(\form) = \optval(\form^\perm)$
+ (proven in the first part). \qed
 \end{proof}
 
-\begin{corollary}
-Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
-  $\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
-Then $\lenmax{\stg_1} = \lenmax{\stg_2}$
-  and $\lenexp{\stg_1} = \lenexp{\stg_2}$.
-\end{corollary}
+% \begin{definition}[Consistent strategy]
+% A memory-less strategy $\stg$ is \emph{consistent} if and only if
+%   for every $\form\in\Form_\Var$ and every $\perm\in\symg$, there
+%   exists $\permx\in\symg$ such that $\form^\perm \equiv \form^\permx$ and
+%   $\stg(\form^\permx) = \stg(\form)^\permx$.
+% \end{definition}
 
-For any accrued knowledge $\form$, this lemma gives us the right
-to consider only one of the experiments
-$\exp_1, \exp_2$ if $\exp_1 \sim_\form \exp_2$.
+% \TODO{Example, na kterém bude vidět, že jednoduchá definice nevyhovuje, protože můžu vzít symetrie $\form$ a dostanu, že to má dávat různé věci.}
 
-\TODO{algorithm for optimal algorithm synthesis}
+% \begin{lemma}
+% Let $\stg$ be a memory-less strategy.
+% There exists a consistent memory-less strategy $\stgx$ such that
+%   $\stglen{\stg}{\val} >= \stglen{\stgx}{\val}$
+%   for all $\val\in\Val_X$ satisfying $\init$.
+% \end{lemma}
+
+% \begin{proof}
+% Similar to the proof of Lemma \ref{lma-opt-memoryless}.
+% Let us choose any total order $\form_1, \form_2, ...$ of $\Form_\Var$ such that
+% if $\form_i$ implies $\form_j$, then $i <= j$.
+% We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$ in the following way:
+% Let $\stg_0 = \stg$ and for $i > 0,$
+% \begin{equation}
+% \stg_i(\form) = \left\{
+%  \begin{array}{lll}
+%  \stg_{i-1}(\form) & \textrm{ if } \not\exists\perm\in\symg.\form^\perm\equiv\form_i \\
+%  \procstg{\stg_{i-1}}{\val_i}(k_i + 1) &
+%     \textrm{ if } \exists\perm\in\symg.\form^\perm\equiv\form_i\textrm{, where }
+%     (v_i, k_i) = \argmin_K \stglen{\stg_{i-1}}{v} - k,\\
+%     & \textrm{ and }
+%     K = \{(v, k)\in\Val\times\Nseto \| \exists\perm.\stgknow{\stg_{i-1}}{v}{k}^\perm\equiv\form_i\}.
+%     \vspace{-2.5ex}
+%  \end{array}
+%  \right.
+%  \vspace{2.5ex}
+% \end{equation}
+% We prove that $\stglen{\stg_{i}}{v} <= \stglen{\stg_{i-1}}{v}$.
+% If there is no $k$ and $\perm$ such that $\stgknow{\stg_i}{v}{k}^\perm\equiv\form_i$ then
+%   the processes $\procstg{\stg_i}{v}$ and $\procstg{\stg_{i-1}}{v}$ are the same.
+% If the is such $k$ and \TODO{...}.
+
+% The last strategy of the sequence is consistent and satisfies the
+%   condition in the lemma. \qed
+% \end{proof}
+
+% \begin{theorem}
+% Let $\stg, \stgx$ be two consistent memory-less strategies, such that
+% $\stg(\form) \expeq{\form} \stgx(\form)$ for any $\form\in\Form_\Var$.
+% There is a bijection $f:\Val_\Var -> \Val_\Var$ such that
+% $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
+% \end{theorem}
+
+% \begin{proof}
+% First, we prove by induction for any $k\in\Nseto$,
+%   there is a permutation $\perm\in \symg$ such that
+%   $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{\val^\perm}{i}$
+%   for all $i\in\Nseto$, $i<=k$.
+% For better readability, let
+%   $\know_k = \stgknow{\stg}{\val}{k}$ and
+%   $\knowx_{k, \perm} = \stgknow{\stgx}{\val^\perm}{k}$
+
+% For $k=0$, take $\perm = \idperm_\Var$.
+% Clearly, $\stgknow{\stg}{\val}{0} = \init = \stgknow{\stgx}{\val^\idperm}{0}$.
+
+% For the induction step, suppose we have $\perm\in\symg$ such that
+%   $\know_i^\perm = \knowx_{i, \perm}$ for $i <= k$.
+% Further, suppose $\perm$ is such that
+%   $\stg(\know_k^\perm) = \stg(\know_k)^\perm$. \TODO{Víc zdůvodnit.}
+
+% Let $e_1 = \stg(\know_k)$, $e_2 = \stgx(\knowx_{k, \perm})$
+%   be the $(k+1)$-th experiments  of the strategies.
+% It holds
+% \begin{equation}
+% e_2 = \stgx(\knowx_{k, \perm})
+%     \expeq{\knowx_{k, \perm}}  \stg(\knowx_{k, \perm})
+%     \stackrel{IH}{=} \stg(\know_k^\perm)
+%     = \stg(\know_k)^\perm
+%     = e_1^\perm \label{eq:expsym}\tag{$\sim$}
+% \end{equation}
+
+% and, therefore, there exists $\permx\in\symg$ such that
+% \begin{align}
+%  \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \} &= %\stackrel{(\refeq{eq:expsym})}{=}
+%  \{ (\knowx_{k, \perm} \wedge \formx)^\permx \| \formx\in\outcome(\exp_1^\perm) \} = \label{eq:sets}\tag{*}\\
+% &= \{ (\know_k^\perm \wedge \formx^\perm)^\permx \| \formx\in\outcome(\exp_1) \} =
+%  \{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}
+% \end{align}
+% As $\permx\in\symg$ and $\symg$ is a permutation group, $\permx\perm\in\symg$.
+
+% Since the game is well-formed,
+%   $v$ satisfies exactly one formula in
+%   $\{ \know_k \wedge \formx \| \formx\in\outcome(\exp_1) \}$.
+% Therefore $v^{\permx\perm}$ satisfies exactly one formula
+%   in
+%   $\{ (\know_k \wedge \formx)^{\permx\perm} \| \formx\in\outcome(\exp_1) \}  =
+%    \{ \knowx_{k, \perm} \wedge \formx \| \formx\in\outcome(\exp_2) \}$,
+%   which means that $v^{\permx\perm}$ satisfies $\knowx_{k, \perm}$.
+% \TODO{Tohle nefugujeee!}
+% From Lemma \ref{lma-accruedknowledge},
+%   $\knowx_{k, \perm} = \knowx_{k, \permx\perm}$.
+% Both $\know_{k+1}^{\permx\perm}$ and $\knowx_{k+1, \permx\perm}$ is thus the only
+%   formula from (\refeq{eq:sets}) satisfied by $v^{\permx\perm}$ and, therefore,
+%   $\know_{k+1}^{\permx\perm} = \knowx_{k+1, \permx\perm}$.
+
+
+% Now for a fixed $\val$, take $k = \stglen{\stg}{\val}$, take
+%   $\perm\in\symg$ such that
+%   $(\stgknow{\stg}{\val}{k})^\perm = \stgknow{\stgx}{\val^\perm}{k}$
+%   and define $f(\val) = \val^\perm$.
+% Since
+%  $(\stgknow{\stg}{\val}{i})^\perm = \stgknow{\stgx}{f(\val)}{i}$
+%  for $i <= k$
+%  and variable permutation preserves the number of models of a formula, i.e.
+%   $\numval{\form} = \numval{\form^\perm}$ for any
+%   $\form\in\Form_\Var$, $\perm\in\Perm_\Var$,
+%  we have
+%   $\stglen{\stg}{\val} = \stglen{\stgx}{f(\val)}$.
+% % \TODO{It remains to show that $f$ is a bijection.}
+%   % Suppose $f$ is not injective, and $f(\val_1) = f(\val_2)$.
+%   % By definition, the only model of
+%   \qed
+% \end{proof}
+
+% \begin{corollary}
+% Let $\stg_1, \stg_2$ be two consistent memory-less strategies, such that
+%   $\stg_1(\form) \expeq{\form} \stg_2(\form)$ for any $\form\in\Form_\Var$.
+% Then $\lenmax{\stg_1} = \lenmax{\stg_2}$
+%   and $\lenexp{\stg_1} = \lenexp{\stg_2}$.
+% \end{corollary}
+
+% For any accrued knowledge $\form$, this lemma gives us the right
+% to consider only one of the experiments
+% $\exp_1, \exp_2$ if $\exp_1 \sim_\form \exp_2$.
+
+% \TODO{algorithm for optimal algorithm synthesis}

@@ -141,8 +141,8 @@ The only minor issue with this approach is that the variable $a$ is wasted,
   the solver will remember it somewhere and may consume more memory.
 
 Bindings to Minisat are implemented in \texttt{MiniSolver} class.
-This class implements the context opening and closing in the way described above.
-\TODO{Model counting?}.
+This class implements the context opening and closing in the way described above
+and also model counting algorithm \ref{alg:modelcounting3}.
 
 \subsection{Simple solver}
 
@@ -220,10 +220,30 @@ Although this is not polynomial in the size of the input
   as a conjunction of the $n\choose k$ possibilities,
   which would be double exponential.
 
-\section{Symmetry breaking}
-\TODO{Bliss, vs saucy vs nauty}
+\section{Graph isomorphism}
+
+To implement the suggested algorithm for detection of equivalent experiments,
+  we need to solve the graph isomorphism problem, i.e. decide whether
+  two given graphs are isomorphic.
+Note that this problem is famous for not being proven either P-complete or
+  NP-complete.
+Although no polynomial algorithm for the problem is known,
+  software tools are available for graph canonization problem,
+  which are quite efficient for sparse graphs and can be used to
+  decide graph isomorphism by comparison of canonical forms of the graphs.
+
+Nauty\footnote{\url{http://pallini.di.uniroma1.it}}\cite{nauty} and
+  Bliss\footnote{\url{http://www.tcs.hut.fi/software/bliss}}\cite{bliss}
+  are programs primarily designed to compute automorphism groups of graphs
+  but can produce a canonical labelling of the graph as well.
+For various reasons including simple integration, we decided to choose Bliss.
+For comparison of Nauty and Bliss,
+  read an overview of the algorithms used by these tools in \cite{nautyblissoverview}
+  and see benchmarks on the Nauty's website.
 
 \section{Modularity and extensibility}
+
+\TODO{Blah blah blah. Motivace, upravit texty, obrázek.}
 
 If you want to analyze a new heuristics to selects experiments,
   all you need to do is to implement a new function
@@ -306,7 +326,7 @@ Correctness is automatically a top priority for a tool of this kind and
 Lots of unit tests framework for C++ are available.
 We focused on simplicity, minimal amount of work needed to add new tests
   and good assertion support, and opted for
-  \emph{Google Test}\footnote{https://code.google.com/p/googletest/}.
+  \emph{Google Test}\footnote{\url{https://code.google.com/p/googletest/}}.
 
 All available tests are compiled and executed if you run \texttt{make test}
   in the tool directory.
