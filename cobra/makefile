@@ -17,11 +17,11 @@ EXEC = cobra-backend
 SOURCES = $(filter-out src/main.cpp, $(wildcard src/*.cpp))
 OBJECTS = $(SOURCES:.cpp=.o) src/cobra.yy.o
 
-default: cobra 
+default: cobra
 cobra: $(OBJECTS) src/main.o
-	@if [[ ! -f tools/bliss/libbliss.a ]]; then echo "Compiling BLISS..."; $(MAKE) -C tools/bliss; fi
-	@if [[ ! -f tools/picosat/libpicosat.a ]]; then echo "Compiling PICOSAT"; $(MAKE) -C tools/picosat; fi
-	@if [[ ! -f tools/minisat/core/libminisat.a ]]; then echo "Compiling MINISAT"; $(MAKE) libr -C tools/minisat/core; fi
+	@if [ ! -f tools/bliss/libbliss.a ]; then echo "Compiling BLISS..."; $(MAKE) -C tools/bliss; fi
+	@if [ ! -f tools/picosat/libpicosat.a ]; then echo "Compiling PICOSAT"; $(MAKE) -C tools/picosat; fi
+	@if [ ! -f tools/minisat/core/libminisat.a ]; then echo "Compiling MINISAT"; $(MAKE) libr -C tools/minisat/core; fi
 	$(CC) $(OBJECTS) src/main.o $(LINKWITHSAT) -o $(EXEC)
 
 # parser
