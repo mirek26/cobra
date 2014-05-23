@@ -1,0 +1,484 @@
+\section{Strategies in general}
+
+This section introduces the concept of a strategy for experiment selection.
+We define worst-case and average-case number of experiments of a strategy
+ and optimal strategies. Further, we examine several strategy classes.
+
+\begin{definition}[Strategy]\label{def:strategy}
+A \emph{strategy} is a function $\stg: \Omega^* -> \Exp$,
+  determining the next experiment for a given finite solving process.
+\end{definition}
+
+A strategy $\stg$ together with a valuation $\val\in\Vals$
+  induce an infinite solving process
+  \[
+  \procstg{\stg}{\val} = \exp_1, \form_1, \exp_2, \form_2, ...,
+  \]
+  where
+  $\exp_{i+1} = \stg(\exp_1, \form_1, ..., \exp_i, \form_i)$
+  and
+  $\form_{i+1}$ is the formula from $\outcome(\exp_{i+1})$
+  satisfied by $\val$,
+  for all $i\in\Nset$.
+Note that thanks to the well-formed property,
+  $\form_{i+1}$ is uniquely defined.
+
+We define \emph{length} of a strategy $\stg$ on a valuation $\val$,
+  denoted $\stglen{\stg}{\val}$,
+  as the smallest $k\in\Nseto$ such that
+  $\stgknow{\stg}{\val}{k}$ uniquely determines the code, i.e.
+  \[
+  \stglen{\stg}{\val} = \min \;\{ k\in\Nseto \| \numval{\stgknow{\stg}{\val}{k}} = 1 \}
+  \]
+
+
+The \emph{worst-case number of experiments} $\lenmax{\stg}$
+  of a strategy $\stg$ is the maximal length of the strategy on a valuation $\val$,
+  over all $\val\in\Vals$, i.e.
+  \[
+  \lenmax{\stg} = \max_{\val\in\Vals} \stglen{\stg}{\val}.
+  \]
+
+The \emph{average-case number of experiments} $\lenexp{\stg}$
+  of a strategy $\stg$ is the expected number of experiments if the code
+  is selected from models of $\init$ with uniform distribution, i.e.
+  \[
+  \lenexp{\stg} = \frac{
+    \sum_{\val\in\Vals} \stglen{\stg}{\val}
+    }{\numval{\init}}.
+  \]
+
+We say that a strategy $\stg$ \emph{solves the game} if $\lenmax{\stg}$ is finite.
+Note that $\lenmax{\stg}$ is finite if and only if $\lenexp{\stg}$ is finite.
+The game is \emph{solvable} if there exists a strategy that solves the game.
+
+\medskip
+
+\begin{definition}[Optimal strategy]
+A strategy $\stg$ is \emph{worst-case optimal} if
+  $\lenmax{\stg} <= \lenmax{\stg'}$ for any strategy $\stg'$.
+A strategy $\stg$ is \emph{average-case optimal} if
+  $\lenexp{\stg} <= \lenexp{\stg'}$ for any strategy $\stg'$.
+\end{definition}
+
+The following lemma provides us with a lower bound on the number of
+experiments of a worst-case optimal strategy.
+
+\begin{lemma} \label{lma:lbound}
+Let $b = \max_{\expt\in\Expt} |\outcome(\expt)|$ be the maximal number of
+  possible outcomes of an experiment. Then for every strategy $\stg$,
+  \[
+  \lenmax{\stg} >= \lceil \log_b(\numval{\init}) \rceil.
+  \]
+\end{lemma}
+
+\begin{proof}
+Let us fix a strategy $\stg$ and $k = \lenmax{\stg}$.
+For an unknown model $\val$ of $\init$,
+  $\stgknow{\stg}{\val}{k}$ can take up to
+  $b^k$ different values.
+By pigeon-hole principle, if $\numval{\init} > b^k$, there must be a valuation
+  $v$ such that $\numval{\stgknow{\stg}{\val}{k}} > 1$.
+This would be a contradiction with $k = \lenmax{\stg}$ and, therefore,
+  $\numval{\init} <= b^k$, which is equivalent with the statement of the lemma.
+  \qed
+\end{proof}
+
+\begin{lemma} \label{lma:accumulatedknowledge}
+Let $\stg$ be a strategy and let $\val_1, \val_2 \in\Vals$.
+If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
+  then $\procstg{\stg}{\val_1}[1..k] = \procstg{\stg}{\val_2}[1..k]$.
+\end{lemma}
+
+\begin{proof}
+Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
+and consider the first place where $\proc_1$ and $\proc_2$ differs.
+It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
+  values of the same strategy on the same process:
+$\proc_1(i) = \stg(\proc_1[1..i-1]) =
+              \stg(\proc_2[1..i-1]) = \proc_2(i)$.
+
+Suppose it is an outcome of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
+  and $i <= k$.
+Since $\val_1$ satisfies $\aknow{\proc_2}{k}$ and $i <= k$,
+  it satisfies $\proc_2[i]$ as well.
+However, $\val_1$ always satisfies $\proc_1[i]$ and
+  both $\proc_1[i]$ and $\proc_2[i]$ are from the set
+  $\outcome(\proc_1(i)) = \outcome(\proc_2(i))$.
+Since there is exactly one satisfied experiment for each valuation in the set,
+  $\proc_1[i]$ and $\proc_2[i]$ must be the same.
+Contradiction. \qed
+\end{proof}
+
+\begin{example} \label{ex:run2}
+Recall our running example of the counterfeit coin problem with 4 coins,
+as defined in \ref{ex:run2}.
+
+Consider a strategy $\stg$ defined as follows.
+For simplicity, we denote experiments by their parametrizations only
+  and the outcomes by a symbol $<$, $>$ and $=$,
+  instead of the corresponding formula.
+\[
+\stg(\proc) = \left\{\begin{array}{ll}
+13 & \textrm{ if } \proc = (12, <), \\
+23 & \textrm{ if } \proc = (12, >),\\
+14 & \textrm{ if } \proc = (12, =), (12, =), \\
+34 & \textrm{ if } \proc = (12, =), (12, =), (14, =), \\
+12 & \textrm{ otherwise.}
+\end{array}\right.
+\]
+
+Let $\val\in\Vals$ be a valuation such that $v(x_3) = v(y) = 1$.
+The induced solving process is
+\[
+\procstg{\stg}{\val} = (12, =), (12, =), (14, =), (34, >), (12, =), (12, =), ...
+\]
+The length of $\stg$ on $\val$ is 4, because $v$ is the only model of
+  the accumulated knowledge after 4 experiments,
+\[
+\exactly_1(x_1,x_2,x_3,x_4) \wedge \neg(x_1 \vee x_2) \wedge \neg(x_1 \vee x_2)
+\wedge \neg(x_1 \vee x_4) \wedge ((x_3 \wedge y) \vee (x_4 \wedge \neg y)).
+\]
+
+The strategy is intentionally inefficient and repeats the experiment $12$
+if the outcome in the first step is `$=$'.
+In fact, every valuation is discovered by $\stg$ in at most 4 experiments,
+  so $\lenmax{\stg} = 4$.
+
+\autoref{lma:lbound} gives us a lower bound $ \lceil\log_3(8)\rceil = 2$
+ on the worst-case number of experiments of an optimal strategy.
+However, we already know from \autoref{th:coins12} that the minimal number
+  of experiments needed to reveal the code is 3.
+\end{example}
+
+\subsection{Non-adaptive strategies}
+
+Non-adaptive strategies correspond to the well-studied problems of
+  static Mastermind and
+  non-adaptive strategies for
+  the counterfeit coin problem\cite{mm-static}\cite{coins-nonadaptive}.
+We define them here only to show the possibility of formulating the
+  corresponding problems
+  in our framework but we do not study them any further.
+
+\begin{definition}[Non-adaptive strategy]
+A strategy $\stg$ is \emph{non-adaptive} if it decides the next experiment
+  based on the length of the solving process only, i.e.
+  whenever $\proc_1$ and $\proc_2$ are processes such that
+  $|\proc_1| = |\proc_2|$,
+  then
+  $\stg(\proc_1) = \stg(\proc_2)$.
+
+Non-adaptive strategies can be considered functions $\stgx: \Nseto -> \Exp$,
+where $\tau(|\proc|) = \stg(\proc)$.
+\end{definition}
+
+\subsection{Memory-less strategies}
+
+The general definition of a strategy allows for the next experiment
+  to depend on the exact history of the solving process,
+  not only on the accumulated knowledge.
+This is in a sense unintuitive, as
+  the nature of code-breaking games is memory-less
+  and the course of a game depends only on the accumulated knowledge.
+
+\begin{definition}[Memory-less strategy]
+A strategy $\stg$ is \emph{memory-less} if it decides the next experiment
+  based on the accumulated knowledge only, i.e.
+  whenever $\proc_1$ and $\proc_2$ are processes such that if
+  $\tknow{\proc_1} \equiv \tknow{\proc_2}$
+  then
+  $\stg(\proc_1) = \stg(\proc_2)$.
+
+Memory-less strategies can be considered functions
+  $\stgx: \Formr -> \Exp$ such that
+  $\form_1\equiv\form_2 ==> \stgx(\form_1)=\stgx(\form_2)$.
+Then $\stg(\proc) = \stgx(\tknow{\proc})$.
+\end{definition}
+
+Note that the number of non-equivalent formulas over variable $\Var$
+  is finite and, therefore, the number of memory-less strategies for a fixed
+  code-breaking game
+  is finite as well.
+
+Now we prove some basic properties of memory-less strategies.
+The following lemma says that once we do not get any new information
+  from the experiment selected by a experiment,
+  we never get any new information with the strategy.
+Then, the theorem below proves that there exists an optimal
+  memory-less strategy.
+
+\begin{lemma}
+Let $\stg$ be a memory-less strategy and $\val\in\Vals$.
+If there exists $k\in\Nset$ such that
+  $\numval{\stgknow{\stg}{\val}{k}} = \numval{\stgknow{\stg}{\val}{k+1}}$,
+ then
+  $\numval{\stgknow{\stg}{\val}{k}} = \numval{\stgknow{\stg}{\val}{k+l}}$
+ for any $l\in\Nset$.
+\end{lemma}
+
+\begin{proof}
+To simplify the notation, let $\know^k = \stgknow{\stg}{\val}{k}$.
+There is a formula $\form\in\outcome(\know^k)$,
+  such that $\know^{k+1} \equiv \know^{k} \wedge \form$.
+Therefore, if $\know^{k+1}$ is satisfied by valuation $\val$, so must be $\know^{k}$.
+Since $\numval{\know^{k}} = \numval{\know^{k+1}}$, the sets of
+  valuations satisfying $\know^{k}$ and $\know^{k+1}$ are exactly the same
+  and the formulas are thus equivalent.
+This implies $\stg(\know^{k}) = \stg(\know^{k+1})$ and $\know^{k+2} \equiv \know^{k+1}\wedge \form \equiv \know^{k+1}$.
+
+By induction,
+  $\stg(\know^{k+l}) = \stg(\know^{k})$ and
+  $\know^{k+l} \equiv \know^{k}$
+  for any $l\in\Nset$.\qed
+\end{proof}
+
+\TODO{W-c vs A-c???}
+\begin{theorem} \label{th:memless}
+Let $\stg$ be a strategy.
+Then there exists a memory-less strategy $\stgx$ such that
+  $\stglen{\stg}{\val} >= \stglen{\stgx}{\val}$ for all $\val\in\Vals$.
+\end{theorem}
+
+\begin{proof}
+Let us choose any total order $\form_1, \form_2, ...$ of $\Formr$ such that
+  if $\form_i$ implies $\form_j$, then $i <= j$.
+We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$ inductively in the following way.
+Let $\stg_0 = \stg$.
+\begin{itemize}
+\item If there is no $v\in\Vals, k\in\Nseto$ such that
+  $\stgknow{\stg_{i-1}}{v}{k} \equiv \form_i$, select any $\exp\in\Exp$ and
+  define $\stg_i$ by
+\[
+\stg_i(\proc) = \left\{
+ \begin{array}{lll}
+ \stg_{i-1}(\proc)  & \textrm{ if } \tknow{\proc}\not\equiv\form_i,\\
+ \exp               & \textrm{ if } \tknow{\proc}\equiv\form_i.
+ \end{array}
+ \right.
+\]
+Clearly, all induced solving processes for $\stg_i$ and $\stg_{i-1}$ are the same
+  and $\stglen{\stg_i}{v} = \stglen{\stg_{i-1}}{v}$.
+
+\item If there exists $v\in\Vals, k\in\Nseto$ such that
+  $\stgknow{\stg_{i-1}}{v}{k} \equiv \form_i$, choose the largest $l$ such that
+  $\stgknow{\stg_{i-1}}{v}{l} \equiv \form_i$ and define
+\[
+\stg_i(\proc) = \left\{
+ \begin{array}{lll}
+ \stg_{i-1}(\proc)            & \textrm{ if } \tknow{\proc}\not\equiv\form_i,\\
+ \procstg{\stg_{i-1}}{v}(l)   & \textrm{ if } \tknow{\proc}\equiv\form_i.
+ \end{array}
+ \right.
+\]
+First we prove that this definition is correct.
+Let $v_1, v_2, k_1, k_2$ be such that
+  $\stgknow{\stg_{i-1}}{v_1}{k_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{k_2}$.
+Take $l_1, l_2$ as the largest numbers such that
+  $\stgknow{\stg_{i-1}}{v_1}{l_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{l_2}$.
+Since $v_1$ satisfies $\stgknow{\stg_{i-1}}{v_2}{l_2}\equiv\form_i$,
+  then $\procstg{\stg_{i-1}}{v_2}[1..l_2] = \procstg{\stg_{i-1}}{v_1}[1..l_2]$
+  by \autoref{lma:accumulatedknowledge}.
+The same holds for $l_1$ which means that $l_1 = l_2$ and
+  $\procstg{\stg_{i-1}}{v_1}(l_1) = \procstg{\stg_{i-1}}{v_1}(l_2)$, which
+  proves that the definition of $\stg_i$ is independent of the exact choices
+  of $v$ and $k$.
+
+Now $\stglen{\stg_i}{v} = \stglen{\stg_{i-1}}{v} - (l-k)$, where
+  $k$ and $l$ is the smallest and the largest number such that
+  $\stgknow{\stg_{i-1}}{v}{k}\equiv\form_i $ and
+  $\stgknow{\stg_{i-1}}{v}{l}\equiv\form_i $, respectively,
+  because
+  $\procstg{\stg_{i-1}}{v}(l) = \procstg{\stg_{i}}{v}(k)$ and due to the ordering,
+  the rest of the process is independent of the beginning.
+\end{itemize}
+
+The last strategy of the sequence is clearly memory-less and satisfies the
+  condition in the lemma. \qed
+\end{proof}
+
+% \begin{lemma}
+% Let $b = \max_{\expt\in\Expt} |\outcome(\expt)|$ be the maximal number of
+%   possible outcomes of an experiment.
+% If for any $\form\in\Formr$,
+% \[
+%   \exists\exp . \max_{\formx\in\outcome(\exp)} \numval{(\form\wedge\formx)} =
+%   \left\lceil \frac{\numval{\form}}{b} \right\rceil,
+% \]
+% then a greedy strategy $\stg$ is optimal and
+% \[
+%   \lenmax{\stg} = \lceil \log_b(\numval{\init}) \rceil.
+% \]
+% \end{lemma}
+
+% \begin{proof}
+% \TODO{Napsat důkaz.}
+% \end{proof}
+
+\begin{example}
+Recall the game and the strategy $\stg$ from \autoref{ex:run2}.
+The strategy is clearly not non-adaptive, as
+  $\stg((12, <)) \not= \stg((12, >))$.
+It is neither memory-less as
+  $\stg((12, =)) \not= \stg((12,=),(12,=))$ but
+  the accumulated knowledge of the solving processes is the same.
+
+Consider a non-adaptive strategy
+ $\stgx:\; 1 \mapsto 12,\; 2\mapsto 13,\; 3\mapsto 14$.
+If the counterfeit coin is among the first three,
+  it is discovered by the strategy in two experiments.
+If the counterfeit coin is coin 4, it requires three experiments.
+Hence $\lenmax{\stgx} = 3$ and the value of $\stgx$ on
+  greater numbers is irrelevant.
+
+If we apply the construction in \autoref{th:memless} on $\stg$,
+we get a memory-less strategy $\stg'$, given by
+
+\[
+\stg'(\form) = \left\{\begin{array}{ll}
+13 & \textrm{ if } \form \equiv (x_1 \wedge \neg y) \vee (x_2 \wedge y), \\
+23 & \textrm{ if } \form \equiv (x_1 \wedge y) \vee (x_2 \wedge \neg y),\\
+14 & \textrm{ if } \form \equiv \neg x_1 \wedge \neg x_2, \\
+34 & \textrm{ if } \form \equiv \neg x_1 \wedge \neg x_2 \wedge \neg x_4, \\
+12 & \textrm{ otherwise.}
+\end{array}\right.
+\]
+
+Notice that the valuation $v$ with $v(x_3) = v(y) = 1$ is discovered in
+  3 experiments as the strategy does not repeat the experiment 12 now.
+Therefore, $\lenmax{\stg'} = 3$.
+
+Both strategies $\tau$ and $\stg'$ are worst-case optimal. \eqed
+\end{example}
+
+\section{One-step look-ahead strategies} \label{sec:oslas}
+
+Specification of a strategy in general can be very complicated.
+In this section, we study a subclass of memory-less strategies that we call
+  \emph{one-step look-ahead}.
+These strategies select an experiment that
+  minimizes the value of a given function
+  on the set of possible knowledge in the next step.
+
+\newcommand{\formset}{\Psi}
+\begin{definition}[One-step look-ahead strategy]\label{def:oslas}
+Let $f$ be a function of type $2^{\Formr} -> \Rset$.
+A one-step look-ahead strategy with respect to $f$ is
+  a memory-less strategy such that
+  for every $\form\in\Form_X$ and $\exp'\in\Exp$,
+\[
+f(\{\:\form \wedge \formx \| \formx\in\outcome(e) \:\}) <=
+  f(\{\: \form \wedge \formx \| \formx\in\outcome(e') \:\}).
+\]
+\end{definition}
+
+Note that one-step look-ahead strategy with respect to $f$ is not unique.
+For some formulas, there can be more experiments with the same value of $f$.
+To uniquely specify a strategy, we must provide the function $f$ and
+  a resolution method for these ambiguous states.
+Typically, we specify a total order on experiments and select the least
+  experiment in the order satisfying the condition of \autoref{def:oslas}.
+
+A few one-step look-ahead strategies for Mastermind
+  have been already introduced in \autoref{sec:mm}.
+We now define them formally in the general code-breaking games.
+In the Mastermind case,
+  the experiments are ordered lexicographically by the colour combination.
+
+\begin{description}
+\item[Maximal number of models.]
+This strategy minimizes the worst-case number of remaining codes.
+For Mastermind, this was suggested by Knuth\cite{mm-knuth}.
+\[
+f(\formset) = \max_{\form\in\formset} \numval{\form}
+\]
+
+\item[Expected number of models.]
+This strategy minimizes the expected number of remaining codes.
+  For Mastermind, this was suggested by Irwing\cite{mm-expnum}.
+\[
+f(\formset) = \frac{\sum_{\form\in\formset}(\numval{\form})^2}{\sum_{\form\in\formset} \numval{\form}}
+\]
+
+\item[Entropy of the number of models.]
+This strategy maximizes the entropy of the numbers of remaining codes,
+For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
+\[
+f(\formset) = \sum_{\form\in\formset} \frac{\numval{\form}}{N} \cdot \log \frac{\numval{\form}}{N}
+  \textrm{, where } N = \sum_{\form\in\formset}\numval{\form}
+\]
+
+\item[Number of satisfiable outcomes.]
+This strategy maximizes the number of possible outcomes.
+For Mastermind, this was suggested by Kooi\cite{mm-mostparts}.
+\[
+f(\formset) = - \:|\{ \form \| \form\in\formset, \;\SAT{\form} \}|
+\]
+\end{description}
+
+\newcommand{\fixed}{\#_\textrm{fixed}\:}
+We suggest and analyse one-step look ahead strategies based on fixed variables.
+Let
+\[
+\fixed\form = |\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=1 \}
+                  \cup\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=0 \}|
+\]
+be the number of variables that have same value in all models of $\form$.
+Note that while the aforementioned strategies does not depend on the exact
+  formalization of a problem, the number of fixed variables may differ for
+  different encodings.
+For example, the choice of the following strategies in \autoref{ex:cc1} differs
+  for the two possible formalisations.
+
+\begin{description}
+\item[Minimal number of fixed variables.]
+\[
+f(\formset) = -\min_{\form\in\formset} \fixed{\form}
+\]
+\item[Expected number of fixed variables.]
+\[
+f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\sum_{\form\in\formset}\numval{\form}}
+\]
+\end{description}
+
+\begin{example}
+Recall \autoref{eq:run1} and consider two experiments in the first step.
+
+First, consider an experiment of weighing coin 1 against coin 2.
+All the 3 outcomes are satisfiable, the number of models is
+  2, 2 and 4 for outcome $<$, $>$, and $=$, respectively.
+If the experiment results in $<$ or $>$, we know that the counterfeit coin
+is coin 1 or coin 2. If it results in $=$, the counterfeit coin is coin 3 or coin 4.
+Therefore, every outcome fixes two variables.
+
+Second, consider an experiment of weighing coins 1 and 2 agains coins 3 and 4.
+As exactly one coin must be counterfeit, outcome $=$ is not possible.
+Outcomes $<$ and $>$ are symmetrical, both have $4$ models and fix no variables.
+
+\autoref{tbl:run-oslas} shows the values of the defined
+  strategies on these two experiments.
+The experiment $12$ wins with all strategies except for Maximal number of models,
+  where the values are the same.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{l|cc}
+& 12 & 1234 \\\hline
+Maximal number of models & 4 & 4 \\
+Expected number of models & 3 & 4 \\
+Entropy of the number of models & -1.04 & -0.69 \\
+Number of satisfiable outcomes & -3 & -2 \\
+Minimal number of fixed variables & -2 & 0 \\
+Expected number of fixed variables & -2 & 0 \\
+\end{tabular}
+\caption{Values of various one-step look-ahead strategies on experiments 12 and 1234.}
+\label{tbl:run-oslas}
+\end{center}
+\end{table}
+
+\end{example}
+
+% Greedy strategies are optimal in the fake-coin game $\mathcal{F}_n$.
+
+% \TODO{Napsat důkaz.}
+
+

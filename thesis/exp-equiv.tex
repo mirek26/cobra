@@ -248,6 +248,59 @@ The equation now follows from (\refeq{optval}) and the facts that
  (proven in the first part). \qed
 \end{proof}
 
+A recursive algorithm for the computation of the value
+  of an average-case optimal strategy,
+  $\optvale(\form)$ is shown in \autoref{alg:acopt}.
+The algorithm is based on equation (\refeq{optvale}) and
+  the previous theorem.
+
+Apart from formula $\form$, the recursive function takes another argument, $opt$,
+  which is used for branch pruning.
+The value of $opt$ is the best value of $\optvale(\form, e)$
+  that was found so far.
+Clearly, if we can be sure that $\optvale(\form, e') > opt$, we are not interested
+  in the exact value as the experiment will not be selected anyway.
+A lower bound on $\optvale(\form, e')$ can be computed using \autoref{lma:lbound}.
+
+The inital value of $opt$ should be $\infty$ or an upper bound on $\optvale(\init, e)$.
+
+
+\begin{algorithm}[h]
+\caption{Synthesis of average-case optimal strategy.}
+\label{alg:acopt}
+\DontPrintSemicolon
+\SetKwProg{optfun}{Function}{}{}
+\optfun{\textsc{Optimum}\textnormal{($\form$, $opt$)}}{
+\lIf{$\numval{\form} = 1$}{\Return{0}}
+$ lb <- \textsc{LowerBound}(\form)$\;
+\lIf{$lb > opt$}{\Return{$\infty$}}
+compute subset of experiments $S$ such that
+  $e\in E ==> \exists e'\in S.\;e\expeq{\form}e'$\;
+% $ b <- $ maximal number of satisfiable outcomes of an experiment in $S$\;
+% $ lb <- \textsc{LowerBound}(\form, b)$\;
+% \lIf{$lb > opt$}{\Return{$\infty$}}
+\For{$s\in S$, ordered by $\max_{\formx\in\outcome(s)}\numval(\form\wedge\formx)$}
+{
+  \lIf{only one of $\form\wedge\formx$, $\formx\in\outcome(s)$ is satisfiable}{continue}
+  $ val <- 0 $\;
+  \For{$\formx\in\outcome(s)$} {
+    \lIf{$\SAT{\form\wedge\formx}$}{
+    $~\;\;\;\;\;val <- val + \numval(\form\wedge\formx)\cdot
+      (1 + \textsc{Optimum}(\form\wedge\formx,\; opt))$}
+  }
+  $val <- val \;/\; \numval(\form)$\;
+  \lIf{$val < opt$}{$opt <- val$}
+}
+\Return{$opt$}
+}{}
+\end{algorithm}
+
+Note that the order of experiments on line 7
+  is not necessary for correctness of the algorithm.
+Our goal is to find a good experiment as soon as possible,
+  because this allows us to prune many branches in the beginning.
+
+
 % \begin{definition}[Consistent strategy]
 % A memory-less strategy $\stg$ is \emph{consistent} if and only if
 %   for every $\form\in\Form_\Var$ and every $\perm\in\symg$, there

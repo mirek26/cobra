@@ -1,3 +1,59 @@
+\section{Modularity and extensibility}
+
+COBRA uses external tools for SAT solving and graph canonization.
+Nowadays, many high-performance SAT solvers are available
+  and multiple tools for graph canonization exists.
+COBRA was developed so that other external tools with the same functionality
+  can be easily integrated.
+\autoref{fig:components} shows a component diagram.
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{pictures/modularity.pdf}
+\caption{Component diagram of COBRA.}
+\label{fig:components}
+\end{figure}
+
+Detailed requirements on a SAT solver and
+  on a graph canonization tool are listed in the next sections.
+
+If you want to try another SAT solver, alter the algorithm for model counting,
+  or test any other modification,
+  you can implement your own solver class that inherits from \texttt{Solver} and
+  implements all the necessary methods.
+
+Check the \texttt{solver.h} file and the documentation therein
+  for the information about the exact functions required.
+Further, you need to to include the file with your class in
+  \texttt{main.cpp} and add a new case
+  into the \texttt{get\_solver} function in this file.
+
+
+COBRA can be easily extended with a new strategy or heuristics to selects experiments.
+All available strategies are implemented in \texttt{strategy.h/strategy.cpp} file.
+If you want to add a new strategy, create a corresponding function in this file
+  and add an entry about the strategy
+  to the \texttt{breaker\_strategies} table in \texttt{strategy.h}.
+A strategy function takes a list of experiments as the only argument
+  and returns the index of the selected one.
+
+If the strategy is one-step look-ahead,
+  you can use a provided template with a corresponding lambda function.
+We demonstrate this possibility with a code snippet of
+  the exact implementation of the \emph{exp-models} strategy below.
+For exact details, see the documentation in the file.
+
+\begin{lstlisting}[language=C++]
+uint breaker::exp_num(vec<Option>& options) {
+  return minimize([](Option& o){
+    auto models = o.GetNumOfModels();
+    int sumsq = 0;
+    for (uint i = 0; i < o.type().outcomes().size(); i++) {
+      sumsq += models[i] * models[i];
+    }
+    return (double)sumsq / o.GetTotalNumOfModels();
+  }, options);
+}
+\end{lstlisting}
+
 \section{SAT solving} \label{s:cobra-sat}
 
 COBRA uses a SAT solver for the following tasks.
@@ -241,48 +297,6 @@ For comparison of Nauty and Bliss,
   read an overview of the algorithms used by these tools in \cite{nautyblissoverview}
   and see benchmarks on the Nauty's website.
 
-\section{Modularity and extensibility}
-
-\TODO{Blah blah blah. Motivace, upravit texty, obrázek.}
-
-If you want to analyze a new heuristics to selects experiments,
-  all you need to do is to implement a new function
-  in \texttt{strategy.h/strategy.cpp} file and add a corresponding entry
-  to the \texttt{...} table in \texttt{strategy.h}.
-A strategy function takes a list of sensible experiments as an argument
-  and it returns the index of the selected one.
-
-If your strategy only \emph{maximizes} or \emph{minimizes}
-  some metrics on the experiments,
-  you can use a provided template with a corresponding lambda function.
-We demonstrate this possibility with a code snippet of
-  the exact implementation of the \emph{Min-exp} strategy below.
-For exact details, see the documentation in the file.
-
-\begin{lstlisting}[language=C++]
-uint breaker::exp_num(vec<Option>& options) {
-  return minimize([](Option& o){
-    auto models = o.GetNumOfModels();
-    int sumsq = 0;
-    for (uint i = 0; i < o.type().outcomes().size(); i++) {
-      sumsq += models[i] * models[i];
-    }
-    return (double)sumsq / o.GetTotalNumOfModels();
-  }, options);
-}
-\end{lstlisting}
-
-If you want to try another SAT solver, alter the algorithm for model counting,
-  or test any other modification,
-  you can implement your own solver class that inherits from \texttt{Solver} and
-  implements all the necessary methods.
-
-Check the \texttt{solver.h} file and the documentation therein
-  for the information about the exact functions required.
-Further, you need to to include the file with your class in
-  \texttt{main.cpp} and add a new case
-  into the \texttt{get\_solver} function in this file.
-
 \section{Implementation details}
 
 \subsection{Programming Language and Style}
@@ -312,9 +326,8 @@ We recommend using standard \texttt{gcc} version $4.8$ or higher, or
  \texttt{clang} version $3.2$ or higher.
 
 The tool is platform independent.
-  We tested compilation and functionality on
-  all three major operating systems, on Linux (Ubuntu 12.04),
-  Mac OS X (10.9) and Windows (8.1).
+  We have tested compilation and functionality on
+  on Linux (Ubuntu 14.04) and Mac OS X (10.9).
 
 \subsection{Unit testing}
 Unit testing has became a common part of software development process
@@ -333,3 +346,5 @@ All available tests are compiled and executed if you run \texttt{make test}
 This should serve as a basic sanity test and we highly recommend
   doing this in case you make any changes in the code.
 
+\subsection{Functional tests}
+\TODO{Blah.}
