@@ -16,12 +16,12 @@ Using the tool, we reproduced some of the existing results for Mastermind,
   evaluated strategies for experiment selection
   based on the number of fixed variables.
 
-There are many more interesting things to try in this framework,
-  which were, however, beyond the scope of this work.
-We present a few suggestion for future work in the next paragraphs.
+There are many more interesting things to try in this framework.
+We present a few suggestions for future work in the next paragraphs.
 
 First, our code-breaking game model can be further generalized in many ways.
-Numerous possibilities arise if we allow different experiment prices.
+Numerous possibilities arise if we allow experiments to have different costs.
+
 Imagine Mastermind with another type of experiment
   that directly tells you a colour at a specified position.
 What price must the new experiment have so that
@@ -48,9 +48,9 @@ However, if some experiments are assigned the same value, the
   may lead to many interesting results.
 
 Third, look-ahead strategies can be naturally extended to more than one step.
-This would lead to the \emph{minimax algorithm} applied on the tree of
+This would lead to the \emph{minimax algorithm} applied to the tree of
   possible outcomes and experiments in the next rounds.
-Evaluation of such strategies would be much more computational demanding.
+Evaluation of such strategies would be much more computationally demanding.
 Would their performance be significantly better?
 
 Finally, several completely different approaches for strategy synthesis

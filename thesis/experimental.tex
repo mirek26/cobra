@@ -16,7 +16,7 @@ SM($n$,$m$) refers to the Mastermind variant with black markers only, i.e.
 All experiments have been run on Intel Core i7-3770 3.40GHz and COBRA was
 compiled with \texttt{gcc} 4.8.2.
 The symmetry breaking engine has been turned off for this section,
-  so that the differences among SAT solvers become more apparent.
+  so that the differences between SAT solvers become more apparent.
 
 The numbers in the following tables are running times in seconds with
   respective SAT solvers.
@@ -43,7 +43,7 @@ BG(12,12) & 3,539 &  \textbf{0.5} & 1.1 & 271 \\\hline
 \end{center}
 \end{table}
 
-The first two lines of \autoref{tbl:exp-sat-sim} shows execution times of the
+The first two lines of \autoref{tbl:exp-sat-sim} show execution times of the
   first experiment selection in Mastermind with $4$ pegs and $6$ colours.
 The last two lines of the table list running times of the simulation of
   respective strategies on EDEE code.
@@ -51,7 +51,7 @@ The last two lines of the table list running times of the simulation of
 As can be seen from the numbers, evaluation of ``parts'' strategy is slightly
   faster with Minisat than with simple solver.
 However, since our model counting algorithm implemented on top of Minisat and Picosat
-  is na\"ive and unoptimized, ``max-models'' strategy evaluation is significantly faster
+  is naive and unoptimized, ``max-models'' strategy evaluation is significantly faster
   with simple solver.
 
 \begin{table}[h]
@@ -74,7 +74,7 @@ A clear winner in this case is the simple solver based on
   model enumeration,
   which is not unexpected.
 On lower levels of the backtracking algorithm,
-  the analysed formulas has only very few models and the
+  the analysed formulas have only very few models and the
   overhead with calling a proper SAT solver is greater
   than the na\"ive approach of a simple solver.
 
@@ -85,7 +85,7 @@ That is the reason why the analysis of ``max-models'' strategy takes Minisat and
   much more time than analysis of ``parts'' strategy.
 
 To summarize the results of this section,
-Picosat turned out to be very slow on instances of this size. Minisat proved
+Picosat turned out to be very slow on instances of this size. Minisat proved to be
 useful for strategy evaluation in the first rounds, when the number of possible
 models of the formula is relatively large.
 Simple solver is a clear winner for strategy analysis.
@@ -137,7 +137,7 @@ For example, the ``max-models'' strategy needs
   3.44 experiments on average to identify the counterfeit coin
   among 16 coins but only 3.41 if the number of coins is 17.
 That is because the additional coin changes
-  the numbers of models of some outcomes,
+  the number of models of some outcomes,
   which may lead to better experiment selection.
 
 Interestingly, ``exp-fixed'' strategy outperforms all others

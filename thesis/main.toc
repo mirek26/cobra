@@ -46,19 +46,17 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.1}\slshape Experiment equivalence}{31}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Algorithm for experiment equivalence}{32}{section.4.2}
-\defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Base graph construction}{32}{section*.25}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Experiment graph}{33}{section*.27}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Improvement by fixed variables}{34}{section*.29}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Well-formed check}{35}{section.4.3}
+\contentsline {section}{\numberline {4.2}\slshape Well-formed check}{36}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape Strategy analysis}{36}{section.4.4}
+\contentsline {section}{\numberline {4.3}\slshape Analysis of one-step look-ahead strategies}{37}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape Optimal strategy synthesis}{36}{section.4.5}
+\contentsline {section}{\numberline {4.4}\slshape Optimal strategy synthesis}{38}{section.4.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {5}\bfseries COBRA tool}{41}{chapter.5}
 \defcounter {refsection}{0}\relax 
