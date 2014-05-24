@@ -42,6 +42,7 @@ typedef struct Args {
   string stg_experiment;
   string stg_outcome;
   bool symmetry_detection;
+  double opt_bound;
 } Args;
 
 Args args;
@@ -219,9 +220,28 @@ void simulation_mode() {
   delete solver;
 }
 
-double optimum(Solver& solver, vec<EvalExp>& history,
-               double opt) {
+
+
+std::unordered_map<bliss::Graph*, double, GraphHash, GraphEquals> opt_hash;
+double optimum(ExpGenerator& gen, Solver& solver, vec<EvalExp>& history,
+               double opt, bool worst);
+
+double optimum_cache(Solver& solver, vec<EvalExp>& history,
+                     double opt, bool worst) {
   ExpGenerator gen(m.game(), solver, history, args.symmetry_detection);
+  auto simp = dynamic_cast<SimpleSolver&>(solver);
+  if (opt_hash.count(gen.graph())) {
+    return opt_hash[gen.graph()];
+  } else {
+    opt = optimum(gen, solver, history, opt, worst);
+    auto graph = new bliss::Graph(*gen.graph());
+    opt_hash[graph] = opt;
+    return opt;
+  }
+}
+
+double optimum(ExpGenerator& gen, Solver& solver, vec<EvalExp>& history,
+               double opt, bool worst) {
   vec<Experiment> options = gen.All();
 
   // Lower bound check
@@ -236,13 +256,12 @@ double optimum(Solver& solver, vec<EvalExp>& history,
       return 1;
   }
 
-  // TODO: projit, najít max parts s final sat, vyradit sat 1
   int last = -1;
   uint maxparts = 0;
   for (uint i = 0; i < options.size(); i++) {
     auto parts = options[i].NumOfSat();
     maxparts = std::max(maxparts, parts);
-    if (parts == models) {  // this solves the game -> check for FINAL todo: projit vsechny s parts=models
+    if (parts == models) {  // this solves the game -> check for FINAL
       last = i;
       auto final_out = options[i].type().final_outcome();
       if (final_out == -1 || options[i].IsSat(final_out)) break;
@@ -256,12 +275,15 @@ double optimum(Solver& solver, vec<EvalExp>& history,
   if (last > -1) {
     auto final_out = options[last].type().final_outcome();
     if (final_out == -1) return 1;
-    else if (not options[last].IsSat(final_out)) return 2;
+    else if (worst || not options[last].IsSat(final_out)) return 2;
     else return 2 - (static_cast<double>(1) / models);
   }
 
   double d = log(models)/log(maxparts);
-  if (d > opt) return opt; // non-perspective branch
+  if (worst) d = ceil(d);
+  if (d > opt) {
+    return opt; // non-perspective branch
+  }
 
   // Sort according to the 'minnum' stg
   assert(!options.empty());
@@ -284,17 +306,25 @@ double optimum(Solver& solver, vec<EvalExp>& history,
       auto outcome = e.type().outcomes()[i];
       solver.AddConstraint(outcome.formula, e.params());
       history.push_back({ e, i });
-      val += (1 + optimum(solver, history, opt)) * solver.NumOfModels();
+      if (worst) {
+        val = std::max(val, 1 + optimum_cache(solver, history, opt, worst));
+      } else {
+        val += (1 + optimum_cache(solver, history, opt, worst))
+                * solver.NumOfModels();
+      }
       history.pop_back();
       solver.CloseContext();
     }
-    val /= models;
+    if (!worst) {
+      val /= models;
+    }
     if (val < opt) {
       opt = val;
       nej = &e;
     }
   }
   if (!nej) return opt;
+
   // printf("\n---\n");
   // for (auto e : history) {
   //   printf("%s : %i\n", e.exp.pretty().c_str(), e.outcome_id);
@@ -303,13 +333,17 @@ double optimum(Solver& solver, vec<EvalExp>& history,
   return opt;
 }
 
-void optimal_mode() {
-  print_head("AVERAGE-CASE OPTIMAL STRATEGY");
+void optimal_mode(bool worst) {
+  string head = worst ? "WORST-CASE" : "AVERAGE-CASE";
+  print_head(head + " OPTIMAL STRATEGY");
   Game& game = m.game();
   Solver* solver = get_solver(game.vars().size(), game.constraint());
   vec<EvalExp> history;
-  auto r = optimum(*solver, history, 5);
-  printf("Average-case expected optimum: %.2f\n", r);
+  if (args.opt_bound == -1) args.opt_bound = std::numeric_limits<double>::max();
+  auto r = optimum_cache(*solver, history, args.opt_bound, worst);
+  printf("Optimal number of experiments: %.2f\n", r);
+  for (auto g: opt_hash)
+    delete g.first;
 }
 
 void analyze(Solver& solver, vec<EvalExp>& history,
@@ -366,13 +400,13 @@ void parse_args(int argc, char* argv[]) {
   using namespace TCLAP;
   CmdLine cmd("", ' ', "");
 
-  vec<string> modes = { "d", "s", "simulation",
-                        "a", "analysis", "o", "optimal" };
+  vec<string> modes = { "o", "s", "simulation", "a", "analysis",
+                        "ow", "optimal-worst", "oa", "optimal-average" };
   ValuesConstraint<string> modeConstraint(modes);
   ValueArg<string> mode_arg(
     "m", "mode",
-    "Specifies the mode of operation. Overview mode is default (d).", false,
-    "d", &modeConstraint);
+    "Specifies the mode of operation. Overview mode is default (o).", false,
+    "o", &modeConstraint);
 
   vec<string> backends = { "picosat", "minisat", "simple" };
   ValuesConstraint<string> backendConstraint(backends);
@@ -404,19 +438,23 @@ void parse_args(int argc, char* argv[]) {
     "Default: interactive." + e_man, false,
     "interactive", &e_constr);
   SwitchArg sym_arg(
-    "n", "no-symmetry",
+    "", "no-symmetry",
     "Disables the symmetry detection based on graph isomorphism.");
-
+  ValueArg<double> optbound_arg(
+    "", "opt-bound",
+    "Sets the upper bound on the number of experiments in the optimal mode",
+    false, -1, "double");
   UnlabeledValueArg<std::string> filename_arg(
     "filename",
     "Input file name.", false,
     "", "file name");
 
+  cmd.add(sym_arg);
+  cmd.add(optbound_arg);
   cmd.add(e_arg);
   cmd.add(o_arg);
   cmd.add(backend_arg);
   cmd.add(mode_arg);
-  cmd.add(sym_arg);
   cmd.add(filename_arg);
   cmd.parse(argc, argv);
 
@@ -426,6 +464,7 @@ void parse_args(int argc, char* argv[]) {
   args.stg_experiment = e_arg.getValue();
   args.stg_outcome = o_arg.getValue();
   args.symmetry_detection = !sym_arg.getValue();
+  args.opt_bound = optbound_arg.getValue();
 }
 
 int main(int argc, char* argv[]) {
@@ -454,7 +493,7 @@ int main(int argc, char* argv[]) {
     g_makerStg = strategy::maker_strategies.at(args.stg_outcome).second;
     m.game().Precompute();
 
-    if (args.mode == "d") {
+    if (args.mode == "o") {
       overview_mode();
     } else if (args.mode == "s" || args.mode == "simulation") {
       try {
@@ -467,8 +506,10 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
       }
       analyze_mode();
-    } else if (args.mode == "o" || args.mode == "optimal") {
-      optimal_mode();
+    } else if (args.mode == "ow" || args.mode == "optimal-worst") {
+      optimal_mode(true);
+    } else if (args.mode == "oa" || args.mode == "optimal-average") {
+      optimal_mode(false);
     }
 
     time_overview(t1);

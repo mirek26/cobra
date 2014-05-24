@@ -160,6 +160,7 @@ class ExpGenerator {
   // TODO: incremental generation
   // Experiment Next();
   vec<Experiment> All();
+  bliss::Graph* graph() const { return graph_; }
 
  private:
   // Helper functions for parametrizations generation.

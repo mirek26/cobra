@@ -395,11 +395,19 @@ Two variants on the algorithm have been presented,
 By default, the symmetry detection in turned on
   but can be turned off with \texttt{--no-symmetry} switch.
 
-\subsection{Optimal strategy mode [o, optimal]}
+\subsection{Optimal strategy mode [ow, optimal-worst, oa, optimal-average]}
+
+\centerline{\texttt{./cobra -m optimal-worst [--opt-bound <double>] <input file> }}
+\centerline{\texttt{./cobra -m optimal-average [--opt-bound <double>] <input file> }}
 
 In the optimal strategy mode, the tool computes either the worst-case optimal,
   or the average-case optimal strategy for a given code-breaking game.
-Which strategy is computed is specified
-  with \texttt{--worst-case} and \texttt{--average-case} switches.
 
 The algorithm for this purpose has been described in \autoref{alg:acopt}.
+An upper bound can be specified with \texttt{--opt-bound} switch.
+In some cases, this can significantly speed up the process.
+
+Note that the optimal strategy synthesis is currently very slow even for
+  small instances of code-breaking games.
+Further optimizations would be necessary for the tool to synthesise the optimal
+  strategy for Mastermind with 4 pegs and 6 colors in a reasonable time.

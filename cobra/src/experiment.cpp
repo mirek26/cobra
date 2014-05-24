@@ -225,7 +225,7 @@ ExpGenerator::ExpGenerator(const Game& game, Solver& solver,
   }
   game.constraint()->PropagateFixed(fixed_vars_, nullptr);
   game.constraint()->AddToGraphRooted(*graph_, nullptr,
-                                       vertex_type::kKnowledgeRoot);
+                                      vertex_type::kKnowledgeRoot);
   for (auto& e : history) {
     auto formula = e.exp.type().outcomes()[e.outcome_id].formula;
     formula->PropagateFixed(fixed_vars_, &e.exp.params());

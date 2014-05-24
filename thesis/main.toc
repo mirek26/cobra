@@ -76,13 +76,13 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{47}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{47}{section*.44}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [ow, optimal-worst, oa, optimal-average]}{47}{section*.44}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.4}\slshape Modularity and extensibility}{48}{section.5.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.5}\slshape SAT solving}{49}{section.5.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{51}{section*.49}
+\contentsline {subsection}{\rmfamily PicoSat}{50}{section*.49}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily MiniSat}{51}{section*.50}
 \defcounter {refsection}{0}\relax 
@@ -92,28 +92,28 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.6}\slshape Graph isomorphism}{53}{section.5.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}\slshape Implementation details}{53}{section.5.7}
+\contentsline {section}{\numberline {5.7}\slshape Implementation details}{54}{section.5.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{53}{section*.53}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{54}{section*.53}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Requirements}{54}{section*.54}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Testing}{54}{section*.55}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Experimental results}{55}{chapter.6}
+\contentsline {chapter}{\numberline {6}\bfseries Experimental results}{57}{chapter.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {6.1}\slshape Performance}{55}{section.6.1}
+\contentsline {section}{\numberline {6.1}\slshape Performance}{57}{section.6.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {6.2}\slshape One-step look-ahead strategies}{57}{section.6.2}
+\contentsline {section}{\numberline {6.2}\slshape One-step look-ahead strategies}{59}{section.6.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily The counterfeit coin problem}{57}{section*.59}
+\contentsline {subsection}{\rmfamily The counterfeit coin problem}{59}{section*.59}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Mastermind}{58}{section*.61}
+\contentsline {subsection}{\rmfamily Mastermind}{60}{section*.61}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Mastermind with black markers only (string matching)}{58}{section*.63}
+\contentsline {subsection}{\rmfamily Mastermind with black markers only (string matching)}{60}{section*.63}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {7}\bfseries Conclusions}{61}{chapter.7}
+\contentsline {chapter}{\numberline {7}\bfseries Conclusions}{63}{chapter.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{66}{chapter*.65}
+\contentsline {chapter}{Bibliography}{68}{chapter*.65}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Contents of the electronic attachment}{67}{chapter*.66}
+\contentsline {chapter}{Contents of the electronic attachment}{69}{chapter*.66}
