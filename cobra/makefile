@@ -6,7 +6,7 @@ ifeq ($(CC),cc)
   CC = clang++
 endif
 
-CCFLAGS = -g -O3 -isystem tools/ -isystem tools/minisat -isystem include/ -isystem /opt/local/include -Wall -Wextra -pedantic -pthread -std=c++11
+CCFLAGS = -g -O3 -isystem tools/ -isystem tools/minisat -isystem src/ -isystem /opt/local/include -Wall -Wextra -pedantic -pthread -std=c++11
 LINKWITHSAT = -L tools/picosat -L tools/bliss -L tools/minisat/core -l picosat -l bliss -l minisat
 FLEX = flex
 BISON = bison -d

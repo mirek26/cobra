@@ -14,7 +14,7 @@
 #include <ctime>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
-#include <tclap/CmdLine.h>
+#include <./tclap/CmdLine.h>
 #include "./formula.h"
 #include "./game.h"
 #include "./experiment.h"
