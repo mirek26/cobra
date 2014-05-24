@@ -286,8 +286,8 @@ void ExpGenerator::GenParamsFill(uint n) {
   set<CharId> done;
   if (n == curr_type_->num_params()) {
     stats_.ph1++;
-    experiments_.push_back({solver_, *curr_type_, params_, static_cast<uint>(experiments_.size())});
-    //GenParamsGraphFilter();
+    //experiments_.push_back({solver_, *curr_type_, params_, static_cast<uint>(experiments_.size())});
+    GenParamsGraphFilter();
     return;
   }
   for (CharId a = 0; a < game_.alphabet().size(); a++) {

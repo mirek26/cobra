@@ -20,6 +20,9 @@ In the counterfeit-coin problem, for example,
   all of them are equivalent
   as they give us symmetrical knowledge.
 
+%Algorithms for symmetry detection in Mastermind
+%   based on graph isomorphism have been suggested in \cite{cbg-nauty}.
+
 This chapter formally introduces the concept of experiment equivalence.
 We prove that in various situations, it is sufficient to consider
   one experiment from each equivalence class.
@@ -116,7 +119,7 @@ Base graph for the counterfeit coin problem with 4 coins is shown in
 Note that vertices $y$ and $f_x$ have separate labels while
   other vertices are labelled ``variable''.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=.6\textwidth]{pictures/base-graph.pdf}
 \caption{Base graph for the counterfeit coin problem with 4 coins (left) and\\
@@ -193,7 +196,7 @@ Let $\form=\init\wedge\neg(x_1\vee x_2)$ be the accumulated knowledge
   of the solving process $(12, =)$ and let $e$ be experiment $3124$.
 Experiment graph $B_{\form, e}$ is shown in \autoref{fig:exp-graph};
   Ex$_1$ denotes the $\exactlyk{1}$ operator.
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=.7\textwidth]{pictures/exp-graph.pdf}
 \caption{Experiment graph for 3124 with knowledge $\init\wedge\neg(x_1\vee x_2)$.}
@@ -233,7 +236,7 @@ $x_1$ and $x_2$ to 0.
 \autoref{fig:exp-graph-sim} shows the constructed experiment graph
   after the simplification of the formulas.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=.7\textwidth]{pictures/exp-graph-sim.pdf}
 \caption{Simplified experiment graph for 3124 with knowledge $\init\wedge\neg(x_1\vee x_2)$.}
@@ -252,7 +255,7 @@ Note that the graph is now isomorphic to the graph of experiment $43$.\eqed
 We assume we have a method to construct canonical labelling of a graph,
   which is used to decide the graph isomorphism.
 
-\begin{algorithm}[h!]
+\begin{algorithm}[!ht]
 \caption{Elimination of equivalent experiments}
 \KwIn{formula $\form$}
 \KwOut{set $S\subseteq E$, such that $\forall e\in E \;\exists s \in S.\;e\expeq{\form}s$}
@@ -343,7 +346,7 @@ Since $e_1 < e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
 \end{proof}
 
 \vspace{-5mm}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Analysis of a one-step look-ahead strategy}
 \label{alg:stganalysis}
 \DontPrintSemicolon
@@ -537,7 +540,7 @@ A lower bound on $\optvale(\form, e')$ can be computed using \autoref{lma:lbound
 The inital value of $opt$ should be $\infty$ or an upper bound on $\optvale(\init, e)$.
 
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Synthesis of average-case optimal strategy.}
 \label{alg:acopt}
 \DontPrintSemicolon

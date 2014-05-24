@@ -72,7 +72,7 @@ The optimal solution for $n=12$ requires 3 weighings.
 One of the optimal
   strategies is shown in \autoref{fig:coins12tree} as a decision tree.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics[width=\textwidth]{pictures/coins12.pdf}
 \caption{Decision tree for The Twelve Coin Problem. \\
 Leaf $x$ means that the coin number $x$ is lighter, $\underline{x}$ means that
@@ -316,13 +316,13 @@ Using a backtracking algorithm, Koyama and Lai\cite{mm-exp-opt} found
   guesses on average.
 The comparison of the described strategies is shown in \autoref{tbl:one-step}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
 \hline Strategy & First guess & Expected-case & Worst-case \\ \hline
 Maximal num. & AABB & 4.476 & 5 \\ \hline
-Expected num. & AABC & 4.395/4.602\footnotemark & 6 \\ \hline
-Entropy & ABCD & 4.416 & 6 \\ \hline
+Expected num. & AABC & 4.395/4.626\footnotemark & 6 \\ \hline
+Entropy & ABCD & 4.416/4.643\footnotemark & 6 \\ \hline
 Most parts & AABC & 4.373 & 6 \\ \hline
 Exp-case optimal & AABC & 4.340 & 6 \\ \hline
 \end{tabular}
@@ -330,6 +330,7 @@ Exp-case optimal & AABC & 4.340 & 6 \\ \hline
 \label{tbl:one-step}
 \end{center}
 \end{table}
+\addtocounter{footnote}{-1}
 \footnotetext{Irwing's paper reports 4.395 as the expected number
  of experiments of this strategy.
  However, he states that his strategy selects the first two experiments
@@ -338,7 +339,13 @@ Exp-case optimal & AABC & 4.340 & 6 \\ \hline
  We were not able to reproduce this result and the
  paper contains several other irreproducible results,
  which has been already pointed out in \cite{mm-mostparts}.
- The number reported by our tool when using this strategy only is 4.602.}
+ The number reported by our tool when using this strategy only is 4.626.}
+\stepcounter{footnote}
+\footnotetext{We were not able to reproduce the result of Neuwirth as he does not
+ always follow the choice of the strategy as described.
+ The number reported by our tool is 4.643.
+}
+
 
 Apart from \emph{one-step look-ahead} strategies, which are, in general,
   computationally intensive and do not scale well for bigger $n$ or $c$,
@@ -417,7 +424,7 @@ The marbles interact with rays in three ways:
   even before entering the box according to the second rule).
 \end{description}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=.3\textwidth]{pictures/blackbox2.pdf} ~
 \includegraphics[width=.3\textwidth]{pictures/blackbox1.pdf} ~
@@ -426,17 +433,6 @@ The marbles interact with rays in three ways:
 \caption{Illustration of the rules of Black Box game\protect\footnotemark.}
 \label{fig:blackbox-rules}
 \end{figure}
-
-\addtocounter{footnote}{-1}
-\begin{wrapfigure}{r}{0.35\textwidth}
-  \vspace{-10mm}
-  \begin{center}
-  \includegraphics[width=0.3\textwidth]{pictures/blackbox-a.pdf}
-  \end{center}
-  \caption{An example of ambigous configuration\protect\footnotemark.}
-  \label{fig:blackbox-ambigous}
-\end{wrapfigure}
-
 \footnotetext{Images adopted from \url{http://en.wikipedia.org/wiki/Black\_Box\_(game)} under GFDL 1.2. with minor modifications.}
 
 A few examples are shown in \autoref{fig:blackbox-rules}.
@@ -444,6 +440,16 @@ The first image shows cases in which the ray hits the marble,
   the second shows rays deflected multiple times, emerging from
   the box at a different place, and the third demonstrates
   the two cases in which reflection happens.
+
+\addtocounter{footnote}{-1}
+\begin{wrapfigure}{r}{0.35\textwidth}
+  %\vspace{-10mm}
+  \begin{center}
+  \includegraphics[width=0.3\textwidth]{pictures/blackbox-a.pdf}
+  \end{center}
+  \caption{An example of ambigous configuration\protect\footnotemark.}
+  \label{fig:blackbox-ambigous}
+\end{wrapfigure}
 
 Note that if the game is played with 5 or more marbles,
   they can be placed in the grid so that their position can

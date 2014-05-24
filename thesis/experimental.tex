@@ -29,7 +29,7 @@ Naturally, proper SAT solvers are orders of magnitude faster than simple solver
 as well-formed check is based on verification of unsatisfiability of
   a (relatively) large formula.
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|} \hline
 Game & Simple & Minisat & Picosat  & \# calls \\ \hline
@@ -53,7 +53,7 @@ However, since our model counting algorithm implemented on top of Minisat and Pi
   is naive and unoptimized, ``max-models'' strategy evaluation is significantly faster
   with simple solver.
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|} \hline
 Task & Simple & Minisat & Picosat & \# calls \\ \hline
@@ -145,7 +145,7 @@ Interestingly, ``exp-fixed'' strategy outperforms all others
 Strategies ``parts'' and ``min-fixed'' are clearly unsuitable for
   a problem of this kind.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=\textwidth]{pictures/graph-cc.pdf}
 \caption{Average-case number of experiments in the counterfeit coin problem.}
@@ -162,15 +162,18 @@ A clear winner in the average case is ``parts'' strategy,
 
 In the worst case, ``max-models'' outperforms other
   strategies in all cases except MM(3,2).
-This case was already mentioned in \TODO{..};
-  the strategy needs four experiments due to an ``unlucky''
-  choice of the first experiments.
+In this case, ``max-models'' is unlucky in the initial state
+  and selects guess AAA,
+  which has the same maximal number of models over the outcomes as AAB
+  but is lexicographically smaller.
+All other strategies select AAB,
+  which turns out to be a better choice in this case.
 
 Again, notice that larger size of the problem does not necessarily mean that
   revealing the secret is more difficult,
   as can be seen on the values for MM(5,2) and MM(5,3).
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline
 Game & \multicolumn{2}{c|}{max-mod} & \multicolumn{2}{c|}{parts}
@@ -206,7 +209,7 @@ The best one-step look-ahead startegy for this game is ``ent-models'',
   the strategy based on the entropy of the number of models,
   closely followed by ``parts'' strategy.
 
-\begin{table}[f]
+\begin{table}[ht]
 \begin{center}
 \begin{small}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline

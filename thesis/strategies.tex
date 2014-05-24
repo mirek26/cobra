@@ -87,7 +87,7 @@ This would be a contradiction with $k = \lenmax{\stg}$ and, therefore,
 \begin{lemma} \label{lma:accumulatedknowledge}
 Let $\stg$ be a strategy and let $\val_1, \val_2 \in\Vals$.
 If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
-  then $\procstg{\stg}{\val_1}[1..k] = \procstg{\stg}{\val_2}[1..k]$.
+  then $\procstg{\stg}{\val_1}[1:k] = \procstg{\stg}{\val_2}[1:k]$.
 \end{lemma}
 
 \begin{proof}
@@ -95,8 +95,8 @@ Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
 and consider the first place where $\proc_1$ and $\proc_2$ differs.
 It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
   values of the same strategy on the same process:
-$\proc_1(i) = \stg(\proc_1[1..i-1]) =
-              \stg(\proc_2[1..i-1]) = \proc_2(i)$.
+$\proc_1(i) = \stg(\proc_1[1:i-1]) =
+              \stg(\proc_2[1:i-1]) = \proc_2(i)$.
 
 Suppose it is an outcome of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
   and $i <= k$.
@@ -277,7 +277,7 @@ Let $v_1, v_2, k_1, k_2$ be such that
 Take $l_1, l_2$ as the largest numbers such that
   $\stgknow{\stg_{i-1}}{v_1}{l_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{l_2}$.
 Since $v_1$ satisfies $\stgknow{\stg_{i-1}}{v_2}{l_2}\equiv\form_i$,
-  then $\procstg{\stg_{i-1}}{v_2}[1..l_2] = \procstg{\stg_{i-1}}{v_1}[1..l_2]$
+  then $\procstg{\stg_{i-1}}{v_2}[1:l_2] = \procstg{\stg_{i-1}}{v_1}[1:l_2]$
   by \autoref{lma:accumulatedknowledge}.
 The same holds for $l_1$ which means that $l_1 = l_2$ and
   $\procstg{\stg_{i-1}}{v_1}(l_1) = \procstg{\stg_{i-1}}{v_1}(l_2)$, which
@@ -442,7 +442,7 @@ f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\s
 \end{description}
 
 \begin{example}
-Recall \autoref{eq:run1} and consider two experiments in the first step.
+Recall \autoref{ex:run1} and consider two experiments in the first step.
 
 First, consider an experiment of weighing coin 1 against coin 2.
 All the 3 outcomes are satisfiable, the number of models is
@@ -459,7 +459,7 @@ Outcomes $<$ and $>$ are symmetrical, both have $4$ models and fix no variables.
   strategies on these two experiments.
 The experiment $12$ wins with all strategies except for Maximal number of models,
   where the values are the same.
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
 \begin{tabular}{l|cc}
 & 12 & 1234 \\\hline

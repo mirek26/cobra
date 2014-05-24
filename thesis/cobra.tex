@@ -109,7 +109,7 @@ Then the formula $\form$ is satisfied by $v$ if and only
   for $X$ being $\atleast$, $\atmost$ and $\exactly$, respectively.
 These operators are non-standard and could be cut out,
   however, they are quite common and useful in specification of code-breaking games
-  and their na\"ive expansion to standard operators causes exponential
+  and their naive expansion to standard operators causes exponential
   expansion of the formula (with respect to $k$).
 Hence we support these operators in the language and we handle
   them specifically during the transformation to CNF,
@@ -123,7 +123,9 @@ The first part, \symb{ident$_2$}, must be an identifier of a defined mapping,
   of the currently defined experiment.
 
 \begin{example}
-\TODO{Running example.}
+Recall the running example introduced in \autoref{ex:run1}.
+The counterfeit-coin problem with four coins
+ can be specified in the low-level language as follows.
 \begin{lstlisting}
 VARIABLES y, x1, x2, x3, x4
 CONSTRAINT Exactly-1(x1, x2, x3, x4)
@@ -135,7 +137,7 @@ EXPERIMENT 'weighing2x2' 4
   OUTCOME 'lighter' ((X$1 | X$2) & !y) | ((X$3 | X$4) & y)
   OUTCOME 'heavier' ((X$1 | X$2) & y) | ((X$3 | X$4) & !y)
   OUTCOME 'same' !(X$1 | X$2 | X$3 | X$4)
-\end{lstlisting}
+\end{lstlisting}\eqed
 \end{example}
 
 To parse this language, we use a standard combination of
@@ -219,24 +221,19 @@ for m in range(1, N//2 + 1):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Compilation and basic usage}
 
-COBRA is written in C++ and uses some features of the modern C++11 standard
-  so you need a modern C++ compiler to build the tool.
-We have tested and can recommend \texttt{gcc} version $4.8$ or higher,
-  or \texttt{clang} version $3.2$ or higher.
-To compile the tool, run
-  \texttt{make}
-  in the program folder.
-It automatically compiles external tools and builds the necessary libraries.
+To compile COBRA, run \texttt{make} in the program folder.
+This automatically compiles external tools and builds the necessary libraries.
 If everything finishes successfully,
   the binary executable \texttt{cobra-backend} is created
   and ready for being used.
+In case of a problem during the compilation, please refer to the \emph{Requirements}
+paragraph of \autoref{sec:impl}.
 
 The basic syntax to launch the tool is the following.
 
 \medskip
 \centerline{\texttt{./cobra [-m <mode>] [-b <backend>] [other options] <input file>}}
 \medskip
-
 
 Mode of operation, specified by \texttt{-m} switch,
   specifies what the tool will do with the game.
@@ -245,21 +242,20 @@ The four possible modes are described in \autoref{s:cobra-modes},
   of other options that depend on the mode.
 Backend, specified by \texttt{-b} switch, specifies which backend should be
   used for SAT solving and model counting.
-In most cases, you should be fine with the default backend and can ignore this option.
 Details can be found in \autoref{s:cobra-sat}.
 
 The main executable, \texttt{cobra}, is a Python script that preprocesses
   the input file and writes the low-level game specification to \texttt{.cobra.in}.
 Then it executes \texttt{cobra-backend} and passes on all the options given
   by the user.
-Thus, if you want to run COBRA on a low-level input format, you can run
-  \texttt{cobra-backend} directly with the same syntax..
+Therefore, you can run COBRA on a low-level input format by launching
+  \texttt{cobra-backend} directly with the same syntax.
 
 Before \texttt{cobra-backend} finishes, it always outputs a \emph{time overview},
   with information on how much time was spend on which operations and
   how many calls to the SAT solver and to the symmetry breaker has been made.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{lstlisting}
 ===== TIME OVERVIEW =====
 Total time: 74.68s
@@ -280,30 +276,28 @@ SAT solvers         sat             fixed           models
 \centerline{\texttt{./cobra -m overview <input file> }}
 \medskip
 
-Overview mode serves as a basic check that your input file is
-  syntactically correct and that the game you specified is sensible.
+Overview mode serves as a basic check that the input file is
+  syntactically correct and that the specified game is sensible.
 In this mode, the tool prints basic information about the loaded game, such as
   number of variables, number of experiments, size of the search space,
   size of the preprocessed input file,
   trivial bounds on the worst-case and expected-case number of experiments, etc.
 
-It also performs a \emph{well-formed} check, i.e. verifies that the
+It also performs a \emph{well-formed check}, i.e. verifies that the
   specified game is well-formed according to \autoref{def:wellformed}.
-
 Algorithm for the verification follows directly from \autoref{lma:well-formed}.
-We generate all non-equivalent experiments in the first round
-  and for each of them, we verify that
+For each experiment, we verify that
   $\init->\exactlyk{1}(\formx_1, ..., \formx_k)$,
-  where $\formx_1,...\formx_k$ are the outcomes of the formula,
+  where $\formx_1,...\formx_k$ are the outcomes of the experiment,
   is a tautology.
-This can be done by negating the formula,
+This is be done by negating the formula,
   passing it to a SAT solver, asking for satisfiability
   and expecting a negative result.
 
 If a problem is found, the tool outputs an assignment and an experiment
   for which no outcome, or more that one outcome, is satisfied.
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{lstlisting}[xleftmargin=.2\textwidth]
 Well-formed check... failed!
 EXPERIMENT: weighing1 1 2
@@ -312,25 +306,26 @@ PROBLEMATIC ASSIGNMENT:
   FALSE: x1 x2 x4 x5 x6 x7 x8 x9 x10 x11 x12
 \end{lstlisting}
 \caption{An example of a failed well-formed check in the\\ counterfeit coin problem
- with missing ``='' outcome.}
+ with no ``='' outcome.}
 \end{figure}
 
 \subsection{Simulation mode [s, simulation]}
 
 \centerline{\texttt{./cobra -m simulation -e <strategy> -o <strategy> <input file> }}
 
-In the simulation mode, you specify a strategy for
-  the codebreaker (which chooses an experiment) and for the codemaker
-   (which chooses an outcome).
+In the simulation mode, you specify a strategy
+  for the codebreaker (for experiment selection)
+  and for the codemaker (for outcome selection).
 This can be done using \texttt{-e} or \texttt{--codebreaker} switch, and
 \texttt{-o} or \texttt{--codemaker} switch, respectively.
 
-We do not consider the codemaker a player who just chooses the secret code
-and evaluates experiment but a player who chooses the outcomes
-of experiments as they come according to his will.
+Here, the codemaker is not considered a player who chooses
+  the secret code in the beginning and then only evaluates experiments,
+  but a player who chooses the outcomes
+  of the experiments as they come according to his will.
 The only condition is that the outcomes are consistent.
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|p{7cm}|} \hline
 COBRA specification & Strategy \\\hline
@@ -345,7 +340,7 @@ COBRA specification & Strategy \\\hline
 \end{center}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|p{7cm}|} \hline
 COBRA specification & Strategy \\\hline
@@ -356,10 +351,9 @@ COBRA specification & Strategy \\\hline
 \end{center}
 \end{table}
 
-Implemented strategies for both codebreaker and codemaker
-  are listed in \autoref{tbl:stge} and \autoref{tbl:stgo}.
-All one-step look-ahead strategies presented in \autoref{sec:oslas}
-  are available.
+Implemented one-step look-ahead strategies for the codebreaker
+  are listed in \autoref{tbl:stge}.
+Options for the codemaker are given in \autoref{tbl:stgo}.
 Apart from these, the tool supports two extra options for both players,
   \textbf{interactive} and \textbf{random},
   which are not strategies in the sense of \autoref{def:strategy}.
@@ -386,19 +380,26 @@ The default values for both players are interactive,
 
 \centerline{\texttt{./cobra -m analysis -e <strategy> <input file> }}
 
-This makes the tool compute worst-case number of experiments and
-average-case number of experiments for a given codebreaker's strategy.
+In the analysis mode the tool computes
+  the worst-case number of experiments and
+  the average-case number of experiments needed by
+  a given codebreaker's strategy
+  to reveal the valution of the variables.
 
-Options for the strategy are the same as in the simulation mode and
-can be found in \autoref{tbl:stge}.
+Supported strategy are the same as in the simulation mode and
+  can be found in \autoref{tbl:stge}.
 
-The algorithm for this task has been described in \autoref{sec:expeq}.
+The algorithm for this task has been described in \autoref{alg:stganalysis}.
+Two variants on the algorithm have been presented,
+  one with and one without the symmetry detection.
+By default, the symmetry detection in turned on
+  but can be turned off with \texttt{--no-symmetry} switch.
 
 \subsection{Optimal strategy mode [o, optimal]}
 
-In this mode the tool computes either the worst-case optimal,
-  or the average-case optimal strategy for the given code-breaking game.
+In the optimal strategy mode, the tool computes either the worst-case optimal,
+  or the average-case optimal strategy for a given code-breaking game.
+Which strategy is computed is specified
+  with \texttt{--worst-case} and \texttt{--average-case} switches.
 
-The backtracking algorithm has been described in \autoref{sec:expeq}.
-
-
+The algorithm for this purpose has been described in \autoref{alg:acopt}.

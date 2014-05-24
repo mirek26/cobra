@@ -1,5 +1,4 @@
 # CC = g++
-
 ifndef CC
   CC = clang++
 endif
@@ -66,16 +65,16 @@ $(GTEST_DIR)/test.o: $(GTEST_DIR)/test.cpp src/*.h $(GTEST_HEADERS)
 $(GTEST_DIR)/test: $(GTEST_DIR)/test.o $(OBJECTS) $(GTEST_DIR)/gtest_main.a
 	$(CC) $(IGNFLAGS) $^ $(LINKWITHSAT) -lpthread -o $@
 
-test: $(GTEST_DIR)/test
+utest: $(GTEST_DIR)/test
 	./test/test
 
-test-clean:
+utest-clean:
 	rm -rf $(GTEST_DIR)/*.o $(GTEST_DIR)/*.a $(GTEST_DIR)/test
 
 # functional tests
 
 ftest: cobra
-	@(export COBRA=`pwd`/cobra; cd ftest;\
+	@(export COBRA_HOME=`pwd`; cd test/ftest;\
 	for t in *.sh; do\
 	  printf $$t;\
 	  printf "... ";\
@@ -86,8 +85,7 @@ ftest: cobra
   done)
 
 
-# clean
-.PHONY: test ftest bison
+.PHONY: utest ftest bison
 
 clean:
 	rm -rf src/*.o $(EXEC)

@@ -1,16 +1,19 @@
 \section{Modularity and extensibility}
 
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{pictures/modularity.pdf}
+\caption{Component diagram of COBRA.}
+\label{fig:components}
+\end{figure}
+
+
 COBRA uses external tools for SAT solving and graph canonization.
 Nowadays, many high-performance SAT solvers are available
   and multiple tools for graph canonization exists.
 COBRA was developed so that other external tools with the same functionality
   can be easily integrated.
-\autoref{fig:components} shows a component diagram.
-\begin{figure}[h]
-\includegraphics[width=\textwidth]{pictures/modularity.pdf}
-\caption{Component diagram of COBRA.}
-\label{fig:components}
-\end{figure}
+\autoref{fig:components} shows a component diagram of
+  the modular design of COBRA.
 
 Detailed requirements on a SAT solver and
   on a graph canonization tool are listed in the next sections.
@@ -72,7 +75,7 @@ Without this feature, we would have to call the solver from a clean state
   many times on the whole formula, which would ruin the computation time.
 
 COBRA uses a SAT solver as an abstract class, which can have multiple implementations.
-This allows a simple extension with another SAT backend.
+This allows a simple extension with another SAT solver.
 The solver to be used can be specified with
   the \texttt{-b} or \texttt{--backend} switch.
 
@@ -117,7 +120,7 @@ Third option is to use a SAT solver and a simple backtracking approach,
 The pseudocode is shown as a recursive function in \autoref{alg:modelcounting3}.
 \end{itemize}
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Decision whether a formula has exactly one model.}
 \label{alg:onlyonemodel}
 \DontPrintSemicolon
@@ -130,7 +133,7 @@ $sat <- $\textsc{Satisfiable()}\;
 \textsc{CloseContext()}\;
 \Return{$\neg sat$}
 \end{algorithm}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Model counting, second option.}
 \label{alg:modelcounting2}
 \DontPrintSemicolon
@@ -153,11 +156,11 @@ $models <- 0$\;
 $x <- $ any variable from $vars$\;
 \textsc{OpenContext()}\;
 \textsc{AddConstraint}($x$)\;
-\lIf{\textsc{Satifiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
+\lIf{\textsc{Satisfiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
 \textsc{CloseContext()}\;
 \textsc{OpenContext()}\;
 \textsc{AddConstraint}($\neg x$)\;
-\lIf{\textsc{Satifiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
+\lIf{\textsc{Satisfiable()}}{$models <- models \:+ $ \textsc{count}($vars\setminus \{x\}$)}
 \textsc{CloseContext()}\;
 \Return{$models$}
 \end{algorithm}
@@ -272,32 +275,32 @@ Special cases $l = m$ and $l = 0$ are equivalent to AND and OR formulas, respect
 The size of the resulting sub-formula is linear in $n\cdot k$.
 Although this is not polynomial in the size of the input
   (supposing $k$ is encoded in binary form) but it is much better
-  than the na\"ive solution to express the formula
+  than the naive solution to express the formula
   as a conjunction of the $n\choose k$ possibilities,
   which would be double exponential.
 
 \section{Graph isomorphism}
 
-To implement the suggested algorithm for detection of equivalent experiments,
+To implement the suggested method for detection of equivalent experiments,
   we need to solve the graph isomorphism problem, i.e. decide whether
   two given graphs are isomorphic.
-Note that this problem is famous for not being proven either P-complete or
-  NP-complete.
-Although no polynomial algorithm for the problem is known,
-  software tools are available for graph canonization problem,
+This problem is famous for not being proven either P-complete or
+  NP-complete, so no polynomial algorithm for the problem is known.
+However software tools are available for graph canonization,
   which are quite efficient for sparse graphs and can be used to
-  decide graph isomorphism by comparison of canonical forms of the graphs.
+  decide graph isomorphism by comparison of the canonical forms of the graphs.
 
 Nauty\footnote{\url{http://pallini.di.uniroma1.it}}\cite{nauty} and
   Bliss\footnote{\url{http://www.tcs.hut.fi/software/bliss}}\cite{bliss}
-  are programs primarily designed to compute automorphism groups of graphs
-  but can produce a canonical labelling of the graph as well.
-For various reasons including simple integration, we decided to choose Bliss.
+  are the most well-known tools for this purpose.
+These programs are primarily designed to compute automorphism groups of graphs
+  but they can produce a canonical labelling of the graph as well.
+For various reasons including simple integration, we decided to integrate Bliss.
 For comparison of Nauty and Bliss,
   read an overview of the algorithms used by these tools in \cite{nautyblissoverview}
   and see benchmarks on the Nauty's website.
 
-\section{Implementation details}
+\section{Implementation details} \label{sec:impl}
 
 \subsection{Programming Language and Style}
 
@@ -320,31 +323,36 @@ due to various reasons,
  but we think they are more beneficial than harmful in this project.
 
 \subsection{Requirements}
-As noted earlier, compilation of COBRA requires a compiler,
-  which supports all the C++11 features we use.
-We recommend using standard \texttt{gcc} version $4.8$ or higher, or
- \texttt{clang} version $3.2$ or higher.
+
+Usage of a modern language requires a modern compiler
+  that supports all the C++11 features we use.
+We have successfully tested compilation with
+ \texttt{gcc} version $4.8.2$ and
+ \texttt{clang} version $3.2$.
 
 The tool is platform independent.
-  We have tested compilation and functionality on
+We have been able to successfully compile and test the functionality of the tool
   on Linux (Ubuntu 14.04) and Mac OS X (10.9).
 
-\subsection{Unit testing}
-Unit testing has became a common part of software development process
-  in the recent years.
-Correctness is automatically a top priority for a tool of this kind and
-  unit tests are a perfect way to capture potential programmer's error
-  as soon as possible and avoid regression.
+\subsection{Testing}
+Correctness is automatically a top priority for a tool of this kind so
+  we implemented two automatic testing methods to
+  capture potential programmer's error as soon as possible.
 
-Lots of unit tests framework for C++ are available.
-We focused on simplicity, minimal amount of work needed to add new tests
-  and good assertion support, and opted for
-  \emph{Google Test}\footnote{\url{https://code.google.com/p/googletest/}}.
-
-All available tests are compiled and executed if you run \texttt{make test}
+Unit testing has became a popular part of software development process
+  in the last decades and is very effective for testing the functionality
+  of particular modules and functions.
+From the large amount of unit tests frameworks available for C++,
+  we have chosen \emph{Google Test}\footnote{\url{https://code.google.com/p/googletest/}},
+  because of its simplicity, minimal amount of work needed to add new tests
+  and very good assertion support.
+The unit tests are automatically compiled and executed if you run \texttt{make utest}
   in the tool directory.
-This should serve as a basic sanity test and we highly recommend
-  doing this in case you make any changes in the code.
 
-\subsection{Functional tests}
-\TODO{Blah.}
+Functional tests provide a great method to test end-to-end functionality
+  of the software.
+These tests execute the program on sample inputs and compare the output
+  with their expectations.
+We have implemented several functional tests for the most common
+  operations with a small instance of Mastermind.
+They can be run by \texttt{make ftest} in the tool directory.
