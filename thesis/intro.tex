@@ -56,26 +56,24 @@ In some games, the optimal strategy might have a simple
   structure and can be described easily, such as in
   the counterfeit coin problem (see section \autoref{s:coins} for details).
 In general, however, the strategy may have complicated structure and
-
-
-the only way
-  to discover an optimal strategy is by considering all possible experiments
-  in a given state and analysing the subproblems.
+  the there may be no other way to discover an optimal strategy
+  than to consider all possible experiments
+  in a given state and analyse the subproblems.
 
 Therefore, one may prefer a suboptimal strategy or heuristic
-  for experiment selection,
-  which is easier to compute.
+  for experiment selection, which is easier to compute.
 This brings about another kind of questions.
-Given a strategy,
+\emph{Given a strategy,
   how can we compute the worst-case and the average-case number
-  of experiments the strategy needs to reveal the code?
+  of experiments the strategy needs to reveal the code?}
 
-Mastermind and the counterfeit coin problem have been subject to
-heavy research and most of these questions are at least partially answered.
-The exact results and summary of the research in this area are presented
-  in \autoref{ch:games}.
+Some particular code-breaking games,
+  such as Mastermind and the counterfeit coin problem,
+  have been intensively studied in the last decades
+  and most of these questions are at least partially answered.
+A detailed summary of the existing results is presented in \autoref{ch:games}.
 Nevertheless, little has been written about code-breaking games in general.
-Some authors have suggested general methods (and applied them in one of the games,
+Some authors have suggested general methods (and applied them in one particular game,
   e.g. \cite{cbg-stgopt, cbg-gen}),
   some have vaguely stated that their approach can be applied
   to other games of the same kind but,
@@ -83,58 +81,58 @@ Some authors have suggested general methods (and applied them in one of the game
   create a general framework and provide
    results for code-breaking games in general.
 
-This work proposes to bridge the gap and provide
-  a general framework for code-breaking games.
-We develop a general formalism that uses propositional logic to
-  represent the secret code and the partial knowledge.
-In short, the secret code is encoded as a valuation of
+This work proposes to bridge the gap and provides
+  a general framework for code-breaking games
+  based on propositional logic.
+The secret code is encoded as a valuation of
   a set of propositional variables
   and the codebreaker's goal is to discover the valuation
-  using a series of experiments.
+  through a series of experiments.
 Each experiment can result in several outcomes,
-  which are given in the form of a prepositional formula.
+  which are given in the form of a propositional formula.
 
-We study strategies for the games in general, with a focus on
-  a special class of \emph{one-step look-ahead} strategies,
-  strategy analysis and synthesis of an optimal strategy.
-For these problems to be computationally feasible, one needs to exploit
-  symmetries of the game and neglect symmetric experiments during the analysis
-  or strategy synthesis.
-Algorithms for symmetry breaking in Mastermind
-  based on graph isomorphism have been suggested in \cite{cbg-nauty}.
-We generalize this approach and present
-  an algorithm for elimination of symmetric experiments
-  in general code-breaking games.
-
-The main contribution of this thesis is the design of a computer language for
-  code-breaking game specification
-  and the development of a computer program that
-  loads a game from a file in the defined format
-  and performs various tasks with the game.
-We name the tool COBRA, the code-breaking game analyser.
-COBRA's currently supported tasks are
+We address the following challenges in the suggested framework.
 \begin{itemize}
-\item verifying that a game specification is correct
-  and sensible (overview mode),
-\item simulating the game either interactively, with input from the user, or
-  with decisions by specified strategies (simulation mode),
-\item analysing a given strategy for experiment selection --
-  computing the worst-case and average-case number of experiments needed (analysis mode),
-\item synthesizing the worst-case or average-case optimal strategy (optimal mode).
+\item Formally define code-breaking games and strategies.
+\item Propose general strategies or heuristics for experiment selection.
+\item Suggest efficient methods for state-space reduction based on symmetry detection.
+\item Propose algorithms for strategy evaluation and optimal strategy synthesis.
+\item Design a computer language for game specification.
+\item Develop a computer program that parses a game description from the
+  designed language and implements suggested algorithms.
 \end{itemize}
-Using this tool, we can easily reproduce some of the known results
-  for Mastermind and evaluate the same ideas in other code-breaking games.
+
+Suggested methods for code-breaking game analysis depend
+  on algorithms for some related problems.
+To analyse propositional formulas emerging during the course of the game,
+  we need to decide satisfiability or count the number of models of
+  a formula, which can be done using a modern SAT solver.
+Further, our symmetry detection approach is based on the reduction
+  of experiment equivalence to graph isomorphism.
+For this purpose, we need a tool that computes the canonical labelling of a graph.
+
+% exploit symmetries in the game
+% Algorithms for symmetry detection in Mastermind
+%   based on graph isomorphism have been suggested in \cite{cbg-nauty}.
+% \item verifying that a game specification is correct
+%   and sensible (overview mode),
+
+We created a computer program for code-breaking game analysis and named it COBRA,
+  the code-breaking game analyser.
+Using this tool, we can reproduce some of the existing results
+  for Mastermind, analyse new code-breaking games and and easily evaluate new heuristics
+  for experiment selection.
 
 The thesis is structured as follows.
-Chapter 2 introduces several examples of code-breaking games and
-  discusses known results, variants of the games and related research.
-The general formalism, definitions and symmetry breaking approach
-  are described in Chapter 3.
-Chapter 4 is dedicated to our tool, COBRA, with descriptions of its usage and
-  abilities.
+\autoref{ch:games} introduces several examples of code-breaking games and
+  discusses existing results, variants of the games and related research.
+The general code-breaking game model is described in \autoref{ch:model}.
+\autoref{ch:expeq} is dedicated to the method for symmetry detection and other algorithms.
+Our computer program, COBRA, with descriptions of its usage and
+  abilities is introduced in \autoref{ch:cobra}.
 Experimental results with comparisons of analysed strategies
-  are presented in Chapter 5.
-Finally, Chapter 6 concludes the work with many suggestions for future work
+  are presented in \autoref{ch:exp}.
+Finally, \autoref{ch:conclusions} concludes the work with suggestions for future work
   and possible extensions of the tool.
 
 

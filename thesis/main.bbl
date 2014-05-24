@@ -70,30 +70,6 @@
       \field{year}{2006}
       \field{pages}{170\bibrangedash 179}
     \endentry
-    \entry{cbg-nauty}{article}{}
-      \name{labelname}{2}{}{%
-        {{hash=a3cd1b57c4a1c9b4cd005ad0b02bd88b}{Jäger}{J\bibinitperiod}{Gerold}{G\bibinitperiod}{}{}{}{}}%
-        {{hash=003deb31173d142c036c208199c185d5}{Peczarski}{P\bibinitperiod}{Marcin}{M\bibinitperiod}{}{}{}{}}%
-      }
-      \name{author}{2}{}{%
-        {{hash=a3cd1b57c4a1c9b4cd005ad0b02bd88b}{Jäger}{J\bibinitperiod}{Gerold}{G\bibinitperiod}{}{}{}{}}%
-        {{hash=003deb31173d142c036c208199c185d5}{Peczarski}{P\bibinitperiod}{Marcin}{M\bibinitperiod}{}{}{}{}}%
-      }
-      \list{publisher}{1}{%
-        {Elsevier}%
-      }
-      \strng{namehash}{edbc4430549700ebd55ec70bcf1fae35}
-      \strng{fullhash}{edbc4430549700ebd55ec70bcf1fae35}
-      \field{sortinit}{0}
-      \field{labeltitle}{The number of pessimistic guesses in Generalized Mastermind}
-      \field{journaltitle}{Information Processing Letters}
-      \field{number}{12}
-      \field{title}{The number of pessimistic guesses in Generalized Mastermind}
-      \field{volume}{109}
-      \field{year}{2009}
-      \field{pages}{635\bibrangedash 641}
-      \keyw{other}
-    \endentry
     \entry{coins-grossman1945}{article}{}
       \name{labelname}{1}{}{%
         {{hash=dc0aa4cd7dc12d1ea49e8a5b0a727f0f}{Grossman}{G\bibinitperiod}{Howard\bibnamedelima D}{H\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%

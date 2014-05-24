@@ -2,27 +2,27 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}\bfseries Introduction}{3}{chapter.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}\bfseries Examples and existing results}{7}{chapter.2}
+\contentsline {chapter}{\numberline {2}\bfseries Examples of code-breaking games and existing results}{7}{chapter.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.1}\slshape The counterfeit coin}{7}{section.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Known results}{8}{section*.8}
+\contentsline {subsection}{\rmfamily Known results}{8}{section*.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Generalizations and related research}{9}{section*.10}
+\contentsline {subsection}{\rmfamily Generalizations and related research}{9}{section*.11}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.2}\slshape Mastermind}{11}{section.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Known results and related research}{12}{section*.12}
+\contentsline {subsection}{\rmfamily Known results and related research}{12}{section*.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Variations and applications}{13}{section*.14}
+\contentsline {subsection}{\rmfamily Variations and applications}{13}{section*.15}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.3}\slshape Other games}{13}{section.2.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Black Box}{13}{section*.15}
+\contentsline {subsection}{\rmfamily Black Box}{13}{section*.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Code 777}{15}{section*.18}
+\contentsline {subsection}{\rmfamily Code 777}{15}{section*.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Bags of gold}{15}{section*.19}
+\contentsline {subsection}{\rmfamily Bags of gold}{15}{section*.20}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {3}\bfseries Code-breaking game model}{17}{chapter.3}
 \defcounter {refsection}{0}\relax 
@@ -30,15 +30,15 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.2}\slshape Basic definitions}{17}{section.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Course of the game}{20}{section*.20}
+\contentsline {subsection}{\rmfamily Course of the game}{20}{section*.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Examples}{21}{section*.21}
+\contentsline {subsection}{\rmfamily Examples}{21}{section*.22}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.3}\slshape Strategies in general}{23}{section.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Non-adaptive strategies}{25}{section*.22}
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{25}{section*.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Memory-less strategies}{26}{section*.23}
+\contentsline {subsection}{\rmfamily Memory-less strategies}{26}{section*.24}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{28}{section.3.4}
 \defcounter {refsection}{0}\relax 
@@ -46,11 +46,11 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.1}\slshape Experiment equivalence}{31}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Base graph construction}{32}{section*.25}
+\contentsline {subsection}{\rmfamily Base graph construction}{32}{section*.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Experiment graph}{33}{section*.27}
+\contentsline {subsection}{\rmfamily Experiment graph}{33}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Improvement by fixed variables}{34}{section*.29}
+\contentsline {subsection}{\rmfamily Improvement by fixed variables}{34}{section*.30}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.2}\slshape Well-formed check}{36}{section.4.2}
 \defcounter {refsection}{0}\relax 
@@ -62,45 +62,45 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.1}\slshape Input language}{41}{section.5.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{41}{section*.34}
+\contentsline {subsection}{\rmfamily Low-level language}{41}{section*.35}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{43}{section*.35}
+\contentsline {subsection}{\rmfamily Python preprocessing}{43}{section*.36}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.2}\slshape Compilation and basic usage}{44}{section.5.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.3}\slshape Modes of operation}{45}{section.5.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{45}{section*.37}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{45}{section*.38}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{46}{section*.39}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{46}{section*.40}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{47}{section*.42}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{47}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{47}{section*.43}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{47}{section*.44}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.4}\slshape Modularity and extensibility}{47}{section.5.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.5}\slshape SAT solving}{49}{section.5.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{50}{section*.48}
+\contentsline {subsection}{\rmfamily PicoSat}{50}{section*.49}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{51}{section*.49}
+\contentsline {subsection}{\rmfamily MiniSat}{51}{section*.50}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{51}{section*.50}
+\contentsline {subsection}{\rmfamily Simple solver}{51}{section*.51}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{52}{section*.51}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{52}{section*.52}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.6}\slshape Graph isomorphism}{53}{section.5.6}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.7}\slshape Implementation details}{53}{section.5.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{53}{section*.52}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{53}{section*.53}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{54}{section*.53}
+\contentsline {subsection}{\rmfamily Requirements}{54}{section*.54}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{54}{section*.54}
+\contentsline {subsection}{\rmfamily Unit testing}{54}{section*.55}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Functional tests}{54}{section*.55}
+\contentsline {subsection}{\rmfamily Functional tests}{54}{section*.56}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {6}\bfseries Experimental results}{55}{chapter.6}
 \defcounter {refsection}{0}\relax 
@@ -108,14 +108,14 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {6.2}\slshape One-step look-ahead strategies}{57}{section.6.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily The counterfeit coin problem}{57}{section*.59}
+\contentsline {subsection}{\rmfamily The counterfeit coin problem}{57}{section*.60}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Mastermind}{58}{section*.61}
+\contentsline {subsection}{\rmfamily Mastermind}{58}{section*.62}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Mastermind with black markers only (string matching)}{58}{section*.63}
+\contentsline {subsection}{\rmfamily Mastermind with black markers only (string matching)}{58}{section*.64}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {7}\bfseries Conclusions}{61}{chapter.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{66}{chapter*.65}
+\contentsline {chapter}{Bibliography}{66}{chapter*.66}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Contents of the electronic attachment}{67}{chapter*.66}
+\contentsline {chapter}{Contents of the electronic attachment}{67}{chapter*.67}
