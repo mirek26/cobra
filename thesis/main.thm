@@ -55,30 +55,42 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {example}{{Example}{3.{20}}{}}{29}{example.3.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{22}}{Symmetric experiment}}{30}{definition.3.22}
+\contentsline {definition}{{Definition}{4.{1}}{Symmetric experiment}}{31}{definition.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{23}}{Symmetry group}}{31}{definition.3.23}
+\contentsline {definition}{{Definition}{4.{2}}{Symmetry group}}{31}{definition.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{24}}{Experiment equivalence}}{31}{definition.3.24}
+\contentsline {definition}{{Definition}{4.{3}}{Experiment equivalence}}{31}{definition.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{{Theorem}{3.{25}}{}}{31}{theorem.3.25}
+\contentsline {example}{{Example}{4.{4}}{}}{31}{example.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{6}{}}{31}{proof.6}
+\contentsline {example}{{Example}{4.{5}}{}}{32}{example.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{26}}{}}{31}{example.3.26}
+\contentsline {lemma}{{Lemma}{4.{7}}{}}{32}{lemma.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{27}}{}}{31}{lemma.3.27}
+\contentsline {proof}{{\proofname }{6}{}}{33}{proof.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{7}{}}{31}{proof.7}
+\contentsline {theorem}{{Theorem}{4.{8}}{}}{33}{theorem.4.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{28}}{}}{32}{example.3.28}
+\contentsline {proof}{{\proofname }{7}{}}{33}{proof.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{{Lemma}{3.{29}}{}}{33}{lemma.3.29}
+\contentsline {example}{{Example}{4.{9}}{}}{33}{example.4.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{{Theorem}{3.{30}}{}}{33}{theorem.3.30}
+\contentsline {example}{{Example}{4.{11}}{}}{34}{example.4.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{8}{}}{33}{proof.8}
+\contentsline {lemma}{{Lemma}{4.{14}}{}}{35}{lemma.4.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{4.{1}}{}}{37}{example.4.1}
+\contentsline {proof}{{\proofname }{8}{}}{36}{proof.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{4.{2}}{}}{38}{example.4.2}
+\contentsline {theorem}{{Theorem}{4.{15}}{}}{36}{theorem.4.15}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{9}{}}{36}{proof.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{{Lemma}{4.{17}}{}}{38}{lemma.4.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {theorem}{{Theorem}{4.{18}}{}}{38}{theorem.4.18}
+\defcounter {refsection}{0}\relax 
+\contentsline {proof}{{\proofname }{10}{}}{38}{proof.10}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{5.{1}}{}}{43}{example.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{5.{2}}{}}{44}{example.5.2}

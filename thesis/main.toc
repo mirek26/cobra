@@ -2,7 +2,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}\bfseries Introduction}{3}{chapter.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}\bfseries Sample games and related research}{7}{chapter.2}
+\contentsline {chapter}{\numberline {2}\bfseries Examples and existing results}{7}{chapter.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.1}\slshape The counterfeit coin}{7}{section.2.1}
 \defcounter {refsection}{0}\relax 
@@ -42,70 +42,82 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.4}\slshape One-step look-ahead strategies}{28}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}\slshape Experiment equivalence}{30}{section.3.5}
+\contentsline {chapter}{\numberline {4}\bfseries Experiment equivalence and algorithms}{31}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Algorithm for experiment equivalence}{32}{section*.25}
+\contentsline {section}{\numberline {4.1}\slshape Experiment equivalence}{31}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.6}\slshape Optimal strategy synthesis}{32}{section.3.6}
+\contentsline {section}{\numberline {4.2}\slshape Algorithm for experiment equivalence}{32}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}\bfseries COBRA tool}{35}{chapter.4}
+\contentsline {subsection}{\rmfamily Base graph construction}{32}{section*.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}\slshape Input language}{35}{section.4.1}
+\contentsline {subsection}{\rmfamily Experiment graph}{33}{section*.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Low-level language}{35}{section*.27}
+\contentsline {subsection}{\rmfamily Improvement by fixed variables}{34}{section*.29}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Python preprocessing}{37}{section*.28}
+\contentsline {section}{\numberline {4.3}\slshape Well-formed check}{35}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Compilation and basic usage}{38}{section.4.2}
+\contentsline {section}{\numberline {4.4}\slshape Strategy analysis}{36}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}\slshape Modes of operation}{39}{section.4.3}
+\contentsline {section}{\numberline {4.5}\slshape Optimal strategy synthesis}{36}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{39}{section*.30}
+\contentsline {chapter}{\numberline {5}\bfseries COBRA tool}{41}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{40}{section*.32}
+\contentsline {section}{\numberline {5.1}\slshape Input language}{41}{section.5.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{41}{section*.35}
+\contentsline {subsection}{\rmfamily Low-level language}{41}{section*.34}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{41}{section*.36}
+\contentsline {subsection}{\rmfamily Python preprocessing}{43}{section*.35}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}\slshape Modularity and extensibility}{41}{section.4.4}
+\contentsline {section}{\numberline {5.2}\slshape Compilation and basic usage}{44}{section.5.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}\slshape SAT solving}{43}{section.4.5}
+\contentsline {section}{\numberline {5.3}\slshape Modes of operation}{45}{section.5.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily PicoSat}{44}{section*.41}
+\contentsline {subsection}{\rmfamily Overview mode [o, overview] (default)}{45}{section*.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily MiniSat}{45}{section*.42}
+\contentsline {subsection}{\rmfamily Simulation mode [s, simulation]}{46}{section*.39}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Simple solver}{45}{section*.43}
+\contentsline {subsection}{\rmfamily Strategy analysis mode [a, analysis]}{47}{section*.42}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Transformation to CNF}{46}{section*.44}
+\contentsline {subsection}{\rmfamily Optimal strategy mode [o, optimal]}{47}{section*.43}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}\slshape Graph isomorphism}{47}{section.4.6}
+\contentsline {section}{\numberline {5.4}\slshape Modularity and extensibility}{47}{section.5.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}\slshape Implementation details}{47}{section.4.7}
+\contentsline {section}{\numberline {5.5}\slshape SAT solving}{49}{section.5.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Programming Language and Style}{47}{section*.45}
+\contentsline {subsection}{\rmfamily PicoSat}{50}{section*.48}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Requirements}{48}{section*.46}
+\contentsline {subsection}{\rmfamily MiniSat}{51}{section*.49}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Unit testing}{48}{section*.47}
+\contentsline {subsection}{\rmfamily Simple solver}{51}{section*.50}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Functional tests}{48}{section*.48}
+\contentsline {subsection}{\rmfamily Transformation to CNF}{52}{section*.51}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}\bfseries Experimental Results}{49}{chapter.5}
+\contentsline {section}{\numberline {5.6}\slshape Graph isomorphism}{53}{section.5.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}\slshape Performance}{49}{section.5.1}
+\contentsline {section}{\numberline {5.7}\slshape Implementation details}{53}{section.5.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}\slshape One-step look-ahead strategies}{50}{section.5.2}
+\contentsline {subsection}{\rmfamily Programming Language and Style}{53}{section*.52}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Counterfeit coin problem}{50}{section*.52}
+\contentsline {subsection}{\rmfamily Requirements}{54}{section*.53}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Mastermind}{51}{section*.54}
+\contentsline {subsection}{\rmfamily Unit testing}{54}{section*.54}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily String matching (Mastermind with black markers only)}{51}{section*.56}
+\contentsline {subsection}{\rmfamily Functional tests}{54}{section*.55}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}\bfseries Conclusions}{53}{chapter.6}
+\contentsline {chapter}{\numberline {6}\bfseries Experimental results}{55}{chapter.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{58}{chapter*.58}
+\contentsline {section}{\numberline {6.1}\slshape Performance}{55}{section.6.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Contents of the electronic attachment}{59}{chapter*.59}
+\contentsline {section}{\numberline {6.2}\slshape One-step look-ahead strategies}{57}{section.6.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily The counterfeit coin problem}{57}{section*.59}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Mastermind}{58}{section*.61}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\rmfamily Mastermind with black markers only (string matching)}{58}{section*.63}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {7}\bfseries Conclusions}{61}{chapter.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{66}{chapter*.65}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Contents of the electronic attachment}{67}{chapter*.66}

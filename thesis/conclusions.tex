@@ -3,71 +3,61 @@
 We presented a general model of code-breaking games based on propositional logic,
   which can fit Mastermind, the counterfeit coin problem and many others.
 Experiment equivalence was introduced and we proved that
-  equivalent experiments can be neglected during the analysis of the game.
-We suggested an algorithm for equivalence testing based on graph isomorphism.
+  equivalent experiments can be disregarded during strategy analysis and
+  optimal strategy synthesis.
+We suggested an algorithm for equivalence
+  testing based on graph isomorphism.
 
-A computer language for game specification was suggested,
-  and we developed a computer tool COBRA for code-breaking game analysis,
-  which is able to perform various tasks with the game.
+A computer language for code-breaking game specification was introduced
+  and we developed a computer program that can perform various tasks
+  with a given code-breaking game.
+Using the tool, we reproduced some of the existing results for Mastermind,
+  analysed other code-breaking games and
+  evaluated strategies for experiment selection
+  based on the number of fixed variables.
 
-Using the tool, we can reproduce some known results and easily examine
-  new strategies or heuristics for experiment selection.
-We provided experimental results and evaluated performances of
-  several one-step look-ahead strategies in other games than Mastermind.
-We also suggested new strategies based on the number of fixed variables,
-  and analysed their performance.
+There are many more interesting things to try in this framework,
+  which were, however, beyond the scope of this work.
+We present a few suggestion for future work in the next paragraphs.
 
-There are many interesting things to try in our framework,
-  which were, however, beyond the scope of the thesis.
-In the next paragraphs, we present a few suggestion for future work.
-
-Our model of a code-breaking games is general,
-  the are many ways to extend it further.
-Numerous possibilities arise with if we allowing different experiment prices.
-Imagine a Mastermind with a unit cost of a guess and another
-  experiment that directly tells
-  you a colour at a specified position.
+First, our code-breaking game model can be further generalized in many ways.
+Numerous possibilities arise if we allow different experiment prices.
+Imagine Mastermind with another type of experiment
+  that directly tells you a colour at a specified position.
 What price must the new experiment have so that
-  it is worth using it?
+  it is worth using it, given that the standard guess has unit cost?
+%Another possibility is to limit the number of experiments of a type.
 
-Similarly, it may be interesting to limit
-  the number of experiments of a type.
-In the previous case, how would you play if you can
-  perform the new experiment only once?
+% Similarly, it may be interesting to limit
+%   the number of experiments of a type.
+% In the previous case, how would you play if you can
+%   perform the new experiment only once?
 
-One-step look-ahead strategies provide us a simple heuristics to select experiments.
-However, if the value of some experiments is the same,
-  they select the first experiment according to some order.
-In fact, the most-parts strategy for Mastermind with 4 pegs and 6 colours
-  performs really well in the average case
-  only due to a ``lucky'' choice in the first step.
-Experiments AABC and ABCD have both 14 satisfiable outcome
-  but the strategy chooses AABC because it is lexicographically smaller.
-It would be very interesting to considered \emph{randomized strategies}
-  in which the experiment would be selected out of the experiment
-  with the best value with uniform distribution.
-We do not dare guess what function would prove the best in that case.
+Second, one-step look-ahead strategies provide us with
+  a simple heuristics to select experiments.
+However, if some experiments are assigned the same value, the
+  lexicographically smaller experiment is chosen,
+  which is not very reasonable.
+% In fact, the ``parts'' strategy for Mastermind with 4 pegs and 6 colours
+%   performs so well only due to a ``lucky'' choice in the first step.
+% Experiments AABC and ABCD have both 14 satisfiable outcome
+%   but the strategy chooses AABC because as it is lexicographically smaller.
+\emph{Randomized strategies},
+  where the experiment is selected from the experiments
+  with the best value with uniform distribution
+  may lead to many interesting results.
 
-Look-ahead strategies can also be naturally extended to more than one step.
+Third, look-ahead strategies can be naturally extended to more than one step.
 This would lead to the \emph{minimax algorithm} applied on the tree of
-  possible outcomes and experiments in the next steps.
+  possible outcomes and experiments in the next rounds.
 Evaluation of such strategies would be much more computational demanding.
 Would their performance be significantly better?
 
-Completely different approaches for strategy synthesis
+Finally, several completely different approaches for strategy synthesis
   were suggested for Mastermind.
-In particular, genetic algorithm
-  proved to be very useful for bigger problems
-  as they scale much better than the backtracking approach.
-How to generalize these approaches to our model?
+In particular, genetic algorithms proved to be very useful for problems
+  of larger sizes as they scale much better than the backtracking approach.
+Can we apply these methods in our model?
 
-Finally, SAT solvers proved useful only when the number
-  of possible codes is large enough.
-If the number of models of a formula is small, simple approach based
-  on model enumeration is much faster.
-Can we benefit from a hybrid approach of
-  using a SAT solver in the first steps and
-  switching to the simple solver when the number of possibilities shrinks?
-
-These are interesting research questions that remain open.
-We hope that they will lead to further research of this area.
+For now, these interesting questions remain open.
+We hope they will lead to further research in this area.

@@ -2,9 +2,9 @@
 
 
 Code-breaking games (sometimes also called \emph{deductive games} or \emph{searching games})
-  are games for two players in which the first,
+  are games of two players in which the first player,
   usually referred to as \emph{the codemaker},
-    chooses a secret code from a given set, and the second,
+    chooses a secret code from a given set, and the second player,
   usually referred to as \emph{the codebreaker},
     strives to reveal the code through a series
     of experiments that give him partial information about the code.
@@ -20,8 +20,8 @@ Code-breaking games (sometimes also called \emph{deductive games} or \emph{searc
 \end{wrapfigure}
 \footnotetext{Image adopted from \url{http://commons.wikimedia.org/wiki/File:Mastermind\_beispiel.svg}, by Thomas Steiner under GFDL.}
 
-The famous board game \emph{Mastermind} is one prominent example
-  of a code-breaking game.
+One prominent example of a code-breaking game is famous board game
+  \emph{Mastermind}.
 In this game, the codemaker creates a puzzle for the codebreaker by choosing a
   combination of four coloured pegs (with colour repetitions allowed).
 The codebreaker makes guesses about the colours, which are evaluated by the codemaker with
@@ -32,28 +32,33 @@ A white marker means that some colour is present both in the code
 
 Another example of a code-breaking game is the \emph{counterfeit coin problem},
   the problem of identifying an odd-weight coin among
-  a collection of authentic coins using only a balance scale.
+  a collection of genuine coins using only a balance scale.
 The codemaker is not a real player here; the balance scale takes his function
   and evaluates the weighings performed by the codebreaker.
 Numerous other examples can be found among various board games and logic puzzles;
- some of which are presented in the next chapter.
+ we present some of them in the next chapter.
 
-Code-breaking games present many interesting problems for research.
-Most importantly,
- \emph{how should the codebreaker play in order to minimize the number of experiments
+Code-breaking games offer many interesting research problems.
+
+\begin{itemize}
+\item \emph{How should the codebreaker play in order to minimize the number of experiments
    needed to undoubtedly determine the code?}
- \emph{Is there a strategy that would guarantee
+\item \emph{Is there a strategy that would guarantee
    revealing the code in at most $k$ steps?}
- \emph{What strategy is optimal with respect
+\item \emph{What strategy is optimal with respect
    to the average-case number of experiments,
    given that the code is selected
    from the given set with uniform distribution?}
+\end{itemize}
 
 Synthesis of an optimal strategy is a computationally intensive task.
 In some games, the optimal strategy might have a simple
   structure and can be described easily, such as in
   the counterfeit coin problem (see section \autoref{s:coins} for details).
-In general, however, the strategy may have arbitrary structure and the only way
+In general, however, the strategy may have complicated structure and
+
+
+the only way
   to discover an optimal strategy is by considering all possible experiments
   in a given state and analysing the subproblems.
 

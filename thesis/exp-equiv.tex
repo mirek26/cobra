@@ -1,5 +1,6 @@
-\section{Experiment equivalence} \label{sec:expeq}
+\chapter{Experiment equivalence and algorithms} \label{ch:expeq}
 
+\TODO{Spravit text}.
 During the analysis of code-breaking games,
   we repeatedly need to select the next experiment.
 When we analyse a strategy, we must prepare a list of experiments
@@ -18,6 +19,8 @@ However, in the initial state
   (i.e. with no knowledge except for the initial constraint),
   all of them are equivalent -- they give us
   the same information regardless of symmetries.
+
+\section{Experiment equivalence}
 
 In this section, we formally define equivalence of two experiments
  and show that we can neglect all but one experiment in each equivalence class.
@@ -45,31 +48,200 @@ An experiment $\exp_1\in\Exp$ is equivalent to $\exp_2\in\Exp$ with respect to $
    \{ (\form\wedge\formx)^\perm \| \formx\in\outcome(\exp_2) \} $.
 \end{definition}
 
-The following theorem gives us a right to disregard equivalent experiments
-  during analysis of a one-step look-ahead strategies.
+\begin{example}
+Recall the running example from previous chapter, introduced in \autoref{ex:cc-run1}.
+
+Experiment 23 is a $(x_1x_3)$-symmetric experiment of 12, as ($\perm = (x_1x_3)$)
+\[
+\{ ((x_1 \wedge \neg y) \vee (x_2\wedge y))^\perm,
+   ((x_1 \wedge y) \vee (x_2\wedge\neg y))^\perm,
+   (\neg (x_1  \vee x_2))^\perm \} =
+\{ (x_2 \wedge \neg y) \vee (x_2\wedge y),
+   (x_2 \wedge y) \vee (x_2\wedge\neg y),
+   \neg (x_2 \vee x_2) \}.
+\]
+
+In fact, for each experiment and every permutation $\perm$ stabilizing $y$,
+  we can permute the parameters accordingly and get a $\perm$-symmetric experiment.
+Therefore, $\symg = \{\perm\in\Perm_\Var \| \perm(y) = y\}$.
+
+Since $\symg$ is also the symmetry group of $\init$, the quotient set of $E$
+   by $\expeq{\init}$ has only two equivalence classes --
+   weighings of one coin against one and of two coins against two.
+For a more complex example, let $\form = \init\wedge\neg(x_1\vee x_2)$.
+Experiment $3124$ is now equivalent to $43$ even though the corresponding formulas
+  are syntactically different.
+\end{example}
+
+\section{Algorithm for experiment equivalence}
+
+In the rest of the section, we suggest an algorithm that decides
+  whether two given experiments are equivalent with respect to a given formula.
+
+First, we show a construction of a \emph{base graph}, a graph automorphisms of which are a subset of
+  symmetry group $\symg$.
+Then we describe construction of a \emph{experiment graph}, which is build on top of the base graph, and prove
+  that if graphs of two experiments are isomorphic, the experiments are equivalent.
+
+\subsection{Base graph construction}
+Base graph of a game $\game = (\Var, \init, \Sigma, F, \Expt)$ is a coloured graph $B = (V,E,c)$, where
+\begin{itemize}
+\item $V = \Var \cupdot F$,
+\item $(f, x) \in E$ if $f\in F$, $x\in\Var$ and there is a symbol $a\in\Sigma$ such that $f(a) = x$,
+\item $(x_1, x_2) \in E$ if $x_1,x_2\in\Var$, there is a symbol $a\in\Sigma$ and two mappings
+  $f_1,f_2\in F$ such that $f_1(a) = x_1$, $f_2(a) = x_2$, and
+  the mappings appear in the outcomes of an experiment with the same parameter, i.e.
+  there is a parametrized experiment $t\in T$ and a number $k <= n_t$ such that
+  both $f_1(\$k)$ and $f_2(\$k)$ appear in the outcome formulas of $t$.
+\item
+  vertices corresponding to the mappings have their own colour, i.e. $c(f) = c_f$
+  variables corresponding to variables have one colour $c_{var}$,
+  expect for variables that appear directly in some outcome formula of an experiment.
+\end{itemize}
+
+\begin{example} \label{ex:cc-runbase}
+Base graph for the counterfeit coin problem with 4 coins is shown in
+\autoref{fig:base-graph} on the left.
+Note that vertices $y$ and $f_x$ have separate labels while
+  other vertices are labelled ``variable''.
+
+A more complicated example is the base graph of Mastermind with 3 pegs and 3 colours,
+  shown on the right-hand side.
+Vertices $f_1, f_2, f_3$ have separate labels, all other vertices are labelled ``variable''.
+For simplicity, we leave out symbol $x$ in the figure, e.g.
+  write $1A$ instead of $x_{1A}$.\eqed
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.7\textwidth]{pictures/base-graph.pdf}
+\caption{Base graph for the counterfeit coin problem with 4 coins (left) and\\
+  for Mastermind with 3 pegs and 3 colours (right).}
+\label{fig:base-graph}
+\end{center}
+\end{figure}
+\end{example}
+
+\begin{lemma}
+Let  $\perm$ be an automorphism of $B$. Then $\perm|_\Var \in\symg$.
+\end{lemma}
+
+\begin{proof}
+Blah. \qed
+\end{proof}
+
+\subsection{Experiment graph}
+
+Let $\form\in\Form_X$.
+A \emph{tree of $\form$ rooted with label $l$}
+  is a graph created from the syntax tree of $\form$
+  by unification of leaves that correspond to the same variable.
+The vertices of the graph are labelled by their type (e.g. ``variable'', ``and-operator'', etc.)
+and one special node with label $l$ is added and connected to the root of the syntax tree,
+  i.e. to the top-level operator of $\form$.
+
+Let $B$ be a base graph of the game, $\form\in\Formr$ some partial knowledge
+  and $e$ an experiment.
+The experiment graph $B_{\form, e}$ is constructed as follows:
+\begin{itemize}
+\item Start with $B$.
+\item Add a tree of $\form$ rooted with label ``knowledge''.
+\item For each outcome $\formx\in\outcome(e)$, add a tree of $\formx$ rooted with label ``outcome''.
+\end{itemize}
 
 \begin{theorem}
-Let $f: 2^\Formr ->\Rset$ be a function such that
-$f(\formset) = f(\{\form^\pi \| \form\in\formset\})$ for any permutation
-$\pi\in\Perm_\Var$. Let $<$ be a total order of experiments $E$.
-Let $\stg$ be a one-step look-ahead strategy with respect to $f$ and $<$, and
-let $\form$ be a formula.
-Suppose there are experiment $e_1$, $e_2$ such that $e_1\expeq{\form}e_2$ and $e_1<=e_2$.
-Then $\stg(\form) \not= e_2$.
+If $B_{\form, e_1}$ is isomorphic to $B_{\form, e_2}$, then
+ $e_1 \expeq{\form} e_2$.
 \end{theorem}
 
 \begin{proof}
-If follows directly from \autoref{def:expeq} and the property of $f$ that
-$f(\{\form\wedge\formx\| \formx\in\outcome(e_1)\}) =
- f(\{\form\wedge\formx\| \formx\in\outcome(e_2)\})$.
-Since $e_1 < e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
+Blah. \qed
 \end{proof}
 
 \begin{example}
-\TODO{Running example. Ukázka symetrického experimentu, jaká je symgrupa.
-Jaké experimenty jsou ekvivalentní vzhledem k nějaké formuli (= v prvním kroku)}
-12 =, 3124 je ekviv 43. \eqed
+Recall the running example of the counterfeit coin problem with 4 coins.
+Base graph for the game was shown in \autoref{ex:cc-runbase}.
+Let $\form=\init\wedge\neg(x_1\vee x_2)$ (knowledge after the experiment 12
+  that resulted in ``='' outcome) and $e$ is experiment $3124$.
+Experiment graph $B_{\form, e}$ is shown in \autoref{fig:exp-graph},
+  Ex$_1$ denotes the $\exactlyk{1}$ operator.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.7\textwidth]{pictures/exp-graph.pdf}
+\caption{Experiment graph for 3124 with knowledge $\init\wedge\neg(x_1\vee x_2)$.}
+\label{fig:exp-graph}
+\end{center}
+\end{figure}
+
+Unfortunately, the graph for experiment 43 is clearly not isomorphic to this graph,
+although the experiments are equivalent with respect to $\form$.
+We address this problem in the following.
 \end{example}
+
+\subsection{Improvement by fixed variables}
+
+The previous example shows that the formulated method, as explained above,
+  does not detect some basic equivalences.
+To address the problem, we suggest the following improvement to the construction
+  of $B_{\form, e}$.
+\begin{enumerate}
+\item Compute fixed variables of formula $\form$.
+\item Simplify formula $\form$ with the knowledge of fixed variable.
+\item Simplify the outcomes of $e$, formulas $\formx\in\outcome(e)$, with
+  the knowledge of fixed variables in $\form$.
+\item Construct the graph as described above.
+\item Label the vertices corresponding to fixed variables with ``false'' or ``true''
+  according to their fixed value.
+\end{enumerate}
+
+\begin{example}
+Let us apply the suggested improvement on the previous example.
+\autoref{fig:exp-graph-sim} shows the experiment graph $B_{\form, e}$
+  constructed after the simplification with the knowledge of fixed variables.
+Compare the structure with the graph in \autoref{fig:exp-graph}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.7\textwidth]{pictures/exp-graph-sim.pdf}
+\caption{Simplified experiment graph for 3124 with knowledge $\init\wedge\neg(x_1\vee x_2)$.}
+\label{fig:exp-graph-sim}
+\end{center}
+\end{figure}
+Now, vertices $x_1$ and $x_2$ are labelled ``false'' and are connected
+  only to vertex $f_x$.
+The graph is now isomorphic to the graph of experiment $43$.\eqed
+\end{example}
+
+The algorithm for generation of non-equivalent experiments with respect to a formula $\form$
+  is now a straightforward application of the method described in this section.
+Details are described in \autoref{alg:noneqexp}.
+
+\begin{algorithm}[h!]
+\caption{Generation of non-equivalent experiments with respect to~$\form$}
+\label{alg:noneqexp}
+\DontPrintSemicolon
+$B <- $ contruct the base graph for the game\;
+$fixed <- $ compute the fixed variables of $\form$\;
+$\form' <- $ substitude values for $fixed$ in $\form$ and simplify\;
+colour nodes in $B$ corresponding to fixed variables with special colors (special color for true, special color for false)\;
+$B <- B$ joined with graph for formula $\form'$ rooted with a node of special color ``knowledge''\;
+$S <- \emptyset$\;
+$hash <- $ an empty hash table for graphs\;
+\For{$e\in E$}{
+  $B_e <- $ clone $B$\;
+  \For{$\formx\in\outcome(e)$} {
+    $\formx' <- $ substitude values for $fixed$ in $\formx$ and simplify\;
+    $B_e <- B_e $ joined with graph for formula $\formx'$ rooted with a node of special color ``outcome''\;
+  }
+  $B_e <- $ canonize $B_e$\;
+  \If{$B_e$ is not present in $hash$}{
+    $hash$.insert($B_e$)\;
+    $S <- S \cup \{e\}$\;
+  }
+}
+\Return{$S$}
+\end{algorithm}
+
+
+\section{Well-formed check}
 
 Experiment equivalence can be used in the verification
   of the well-formed property of a game.
@@ -95,7 +267,7 @@ Otherwise, there exists $e'\in S$ such that $e\expeq{\init}e'$, i.e.
 $\{ \init\wedge\formx \| \formx\in\outcome(e) \} =
  \{ (\init\wedge\formx)^\perm \| \formx\in\outcome(e') \}$.
 Since $\init ==> \exactlyk{1}(\outcome(e'))$ is a tautology,
-  the permutated formula
+  the permuted formula
   $\init^\perm ==> \exactlyk{1}(\formx^\perm \| \formx\in\outcome(e'))$
   is a tautology as well.
 Therefore, exactly one formula from the set
@@ -108,21 +280,58 @@ Therefore, exactly one formula from the set
 \end{proof}
 
 
-\subsection{Algorithm for experiment equivalence}
-In the rest of the section, we suggest an algorithm that decides
-  whether two given experiments are equivalent with respect to a given formula.
+\section{Strategy analysis}
 
-\TODO{Konstrukce základního grafu}
+The following theorem gives us a right to disregard equivalent experiments
+  during analysis of a one-step look-ahead strategies.
 
-\TODO{Lemma, že automorfismy odpovídají symmetry group}
+\begin{theorem}
+Let $f: 2^\Formr ->\Rset$ be a function such that
+$f(\formset) = f(\{\form^\pi \| \form\in\formset\})$ for any permutation
+$\pi\in\Perm_\Var$. Let $<$ be a total order of experiments $E$.
+Let $\stg$ be a one-step look-ahead strategy with respect to $f$ and $<$, and
+let $\form$ be a formula.
+Suppose there are experiment $e_1$, $e_2$ such that $e_1\expeq{\form}e_2$ and $e_1<=e_2$.
+Then $\stg(\form) \not= e_2$.
+\end{theorem}
 
-\TODO{Konstrukce grafu pro experiment.}
+\begin{proof}
+If follows directly from \autoref{def:expeq} and the property of $f$ that
+$f(\{\form\wedge\formx\| \formx\in\outcome(e_1)\}) =
+ f(\{\form\wedge\formx\| \formx\in\outcome(e_2)\})$.
+Since $e_1 < e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
+\end{proof}
 
-\TODO{Th: pokud jsou grafy isomorfní, pak jsou experimenty ekvivalentní.}
-
-\begin{example}
-\TODO{Running example. Ukázka základního grafu. Ukázka grafu pro stejnou formuli jak minule. } \eqed
-\end{example}
+\begin{algorithm}[h]
+\caption{Strategy analysis of one-step look-ahead with respect to $f$}
+\label{alg:stganalysis}
+\DontPrintSemicolon
+$globalsum <- 0$\;
+$globalmax <- 0$\;
+\textsc{Analyze}($\init$, 1)\;
+\Return$ (global-max,\; global-sum \;/\; \numval\init)$\\\hrulefill\;
+\SetKwProg{optfun}{Function}{}{}
+\optfun{\textsc{Analyse}\textnormal{($\form$, $depth$)}}{
+$choice <- $None\;
+$bestvalue <- \infty$\;
+\For{$e\in E$(variant 1) or $e\in$\textsc{Non-Equiv-Experiments($\form$)} (variant 2)}{
+  $value <- f(e)$
+  \If{$value < bestvalue$} {
+    $choice <- e$\;
+    $bestvalue <- value$\;
+  }
+}
+\For{$\formx\in\outcome(e)$}{
+  \lIf{not $\SAT{\form\wedge\formx}$}{continue}
+  \eIf{$\numval(\form\wedge\formx) == 1$}{
+    $globalsum <- globalsum + depth$\;
+    $globalmax <- max(globalmax, depth)$\;
+  }{
+    \textsc{Analyse}($\form\wedge\formx$, $depth + 1$)\;
+  }
+}
+}{}
+\end{algorithm}
 
 \section{Optimal strategy synthesis}
 
