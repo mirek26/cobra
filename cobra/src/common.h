@@ -23,7 +23,7 @@ equiv - equivalence
 */
 
 // common types
-typedef unsigned int uint;  // TODO(myreg): zkusit uint fast
+typedef unsigned int uint;
 typedef unsigned char CharId;
 typedef int VarId;  // VarId must se signed, -1 denotes negation of var 1
 typedef unsigned char MapId;
@@ -89,6 +89,8 @@ void transform(const vec<T>& from, const vec<R>& to, std::function<R(T)>& fun) {
   std::transform(from.begin(), from.end(), to.begin(), fun);
 }
 
+void print_head(string name);
+string toUpper(string str);
 vec<string> split(string s);
 bool readIntOrString(uint& i, string& str);
 double toSeconds(clock_t time);

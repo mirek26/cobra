@@ -135,6 +135,7 @@ struct GraphEquals : std::binary_function<bliss::Graph*, bliss::Graph*, bool> {
 class ExpGenerator {
   const Game& game_;
   Solver& solver_;
+  bool use_bliss_;
 
   vec<VarId> fixed_vars_;
 
@@ -152,7 +153,8 @@ class ExpGenerator {
   vec<Experiment> experiments_;
 
  public:
-  ExpGenerator(const Game& game, Solver& solver, const vec<EvalExp>& history);
+  ExpGenerator(const Game& game, Solver& solver, const vec<EvalExp>& history,
+               bool use_bliss);
   ~ExpGenerator();
 
   // TODO: incremental generation

@@ -211,9 +211,10 @@ void ExpType::Precompute() {
 }
 
 ExpGenerator::ExpGenerator(const Game& game, Solver& solver,
-                           const vec<EvalExp>& history)
+                           const vec<EvalExp>& history, bool use_bliss)
   : game_(game),
-    solver_(solver) {
+    solver_(solver),
+    use_bliss_(use_bliss) {
   stats_ = GenParamsStats();
   // Preprare symmetry Graph
   graph_ = game.CreateGraph();
@@ -259,12 +260,7 @@ vec<Experiment> ExpGenerator::All() {
     curr_type_ = t;
 
     params_.resize(t->num_params());
-    // params_basic_.clear();
-    // auto pre2 = stats_.ph2;
     GenParamsFill(0);
-    // printf("=== Gen params stats: %i %i %i.\n", gen_stats_.ph1,
-    //    gen_stats_.ph2, gen_stats_.ph3);
-    // assert(stats_.ph2 - pre2 == params_basic_.size());
   }
   return experiments_;
 }
@@ -286,8 +282,12 @@ void ExpGenerator::GenParamsFill(uint n) {
   set<CharId> done;
   if (n == curr_type_->num_params()) {
     stats_.ph1++;
-    //experiments_.push_back({solver_, *curr_type_, params_, static_cast<uint>(experiments_.size())});
-    GenParamsGraphFilter();
+    if (use_bliss_) {
+      GenParamsGraphFilter();
+    } else {
+      experiments_.push_back({ solver_, *curr_type_, params_,
+                               static_cast<uint>(experiments_.size()) });
+    }
     return;
   }
   for (CharId a = 0; a < game_.alphabet().size(); a++) {

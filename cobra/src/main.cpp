@@ -32,16 +32,23 @@ extern Parser m;
 std::function<uint(vec<Experiment>&)> g_breakerStg;
 std::function<uint(Experiment&)> g_makerStg;
 
+/**
+ * Helper structure for command line arguments
+ */
 typedef struct Args {
   string filename;
   string mode;
   string backend;
   string stg_experiment;
   string stg_outcome;
+  bool symmetry_detection;
 } Args;
 
 Args args;
 
+/**
+ * Creates a new SAT solver instance according the specified backend.
+ */
 Solver* get_solver(uint var_count, Formula* constraint = nullptr) {
   if (args.backend == "picosat") {
     return new PicoSolver(var_count, constraint);
@@ -53,10 +60,9 @@ Solver* get_solver(uint var_count, Formula* constraint = nullptr) {
   assert(false);
 }
 
-void print_head(string name) {
-  printf("\n%s===== %s =====%s\n", color::shead, name.c_str(), color::snormal);
-}
-
+/**
+ * Prints TIME OVERVIEW section.
+ */
 void time_overview(clock_t start) {
   print_head("TIME OVERVIEW");
   printf("Total time: %.2fs\n", toSeconds(clock() - start));
@@ -124,7 +130,7 @@ void overview_mode() {
 
   auto t1 = clock();
 
-  ExpGenerator gen(game, *solver, vec<EvalExp>());
+  ExpGenerator gen(game, *solver, vec<EvalExp>(), args.symmetry_detection);
   for (auto& e : gen.All()) {
     auto f1 = new vec<Formula*>();
     for (auto o : e.type().outcomes()) f1->push_back(o.formula);
@@ -158,7 +164,7 @@ void simulation_mode() {
   int exp_num = 1;
   vec<EvalExp> process;
   while (true) {
-    ExpGenerator gen(game, *solver, process);
+    ExpGenerator gen(game, *solver, process, args.symmetry_detection);
     auto options = gen.All();
 
     // Choose and print an experiment
@@ -196,9 +202,12 @@ void simulation_mode() {
     assert(sat);
     auto model = solver->GetModel();
     int final = experiment.type().final_outcome();
-    if (solver->OnlyOneModel() && (final == -1 || final == static_cast<int>(oid))) {
+    if (solver->OnlyOneModel()) {
       printf("%sSOLVED in %i experiments!%s\n",
              color::shead, exp_num, color::snormal);
+      if (final > -1 && final != static_cast<int>(oid)) {
+        printf("Note: there is only one possible code but the last outcome is not marked as final.\n");
+      }
       game.PrintModel(model);
       break;
     }
@@ -212,7 +221,7 @@ void simulation_mode() {
 
 double optimum(Solver& solver, vec<EvalExp>& history,
                double opt) {
-  ExpGenerator gen(m.game(), solver, history);
+  ExpGenerator gen(m.game(), solver, history, args.symmetry_detection);
   vec<Experiment> options = gen.All();
 
   // Lower bound check
@@ -306,7 +315,7 @@ void optimal_mode() {
 void analyze(Solver& solver, vec<EvalExp>& history,
              uint depth, uint& max, uint& sum, uint& num) {
   Game& game = m.game();
-  ExpGenerator gen(game, solver, history);
+  ExpGenerator gen(game, solver, history, args.symmetry_detection);
   auto options = gen.All();
   auto x = g_breakerStg(options);
   assert(x < options.size());
@@ -350,67 +359,73 @@ void analyze_mode() {
          static_cast<double>(sum)/models, sum, models);
 }
 
-// Parse program arguments with TCLAP library.
+/**
+ * Parses command-line arguments with TCLAP library.
+ */
 void parse_args(int argc, char* argv[]) {
   using namespace TCLAP;
-  CmdLine cmd("Code Breaking Game Analyzer blah blah blah", ' ', "0.1");
+  CmdLine cmd("", ' ', "");
 
   vec<string> modes = { "d", "s", "simulation",
                         "a", "analysis", "o", "optimal" };
   ValuesConstraint<string> modeConstraint(modes);
-  ValueArg<string> modeArg(
+  ValueArg<string> mode_arg(
     "m", "mode",
-    "Mode of operation. Overview mode is default (d).", false,
+    "Specifies the mode of operation. Overview mode is default (d).", false,
     "d", &modeConstraint);
 
   vec<string> backends = { "picosat", "minisat", "simple" };
   ValuesConstraint<string> backendConstraint(backends);
-  ValueArg<string> backendArg(
+  ValueArg<string> backend_arg(
     "b", "backend",
-    "Specifies SAT solver that will be used. Default: picosat.", false,
+    "Specifies SAT solver. Default: simple.", false,
     "simple", &backendConstraint);
 
   vec<string> e_stgs, o_stgs;
   string e_man = "", o_man = "";
   for (auto s : strategy::breaker_strategies) {
     e_stgs.push_back(s.first);
-    e_man += color::emph + s.first + ": " + color::normal + s.second.first;
+    e_man += " " + toUpper(s.first) + ": " + s.second.first;
   }
   for (auto s : strategy::maker_strategies) {
     o_stgs.push_back(s.first);
-    o_man += color::emph + s.first + ": " + color::normal + s.second.first;
+    o_man += " " + toUpper(s.first) + ": " + s.second.first;
   }
   ValuesConstraint<string> o_constr(o_stgs);
   ValueArg<string> o_arg(
     "o", "codemaker",
-    "Strategy that selects an outcome, played by the codemaker. "
+    "Strategy for outcome selection (played by the codemaker). "
     "Default: interactive." + o_man, false,
     "interactive", &o_constr);
   ValuesConstraint<string> e_constr(e_stgs);
   ValueArg<string> e_arg(
     "e", "codebreaker",
-    "Strategy that selects an experiment, played by the codebreaker. "
+    "Strategy for experiment selection (played by the codebreaker). "
     "Default: interactive." + e_man, false,
     "interactive", &e_constr);
+  SwitchArg sym_arg(
+    "n", "no-symmetry",
+    "Disables the symmetry detection based on graph isomorphism.");
 
-
-  UnlabeledValueArg<std::string> filenameArg(
+  UnlabeledValueArg<std::string> filename_arg(
     "filename",
     "Input file name.", false,
     "", "file name");
 
   cmd.add(e_arg);
   cmd.add(o_arg);
-  cmd.add(backendArg);
-  cmd.add(modeArg);
-  cmd.add(filenameArg);
+  cmd.add(backend_arg);
+  cmd.add(mode_arg);
+  cmd.add(sym_arg);
+  cmd.add(filename_arg);
   cmd.parse(argc, argv);
 
-  args.filename = filenameArg.getValue();
-  args.mode = modeArg.getValue();
-  args.backend = backendArg.getValue();
+  args.filename = filename_arg.getValue();
+  args.mode = mode_arg.getValue();
+  args.backend = backend_arg.getValue();
   args.stg_experiment = e_arg.getValue();
   args.stg_outcome = o_arg.getValue();
+  args.symmetry_detection = !sym_arg.getValue();
 }
 
 int main(int argc, char* argv[]) {
