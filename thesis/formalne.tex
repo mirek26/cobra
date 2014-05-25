@@ -4,38 +4,17 @@ In this chapter, we formally define code-breaking games
   within the framework of propositional logic,
   where we represent a secret code as a valuation
   of propositional variables.
-We discuss various strategies for code-breaking games and
-  define a concept of experiment equivalence,
-  which is fundamental for strategy synthesis and analysis.
+We define strategies in general, study several strategy classes and
+  introduce \emph{one-step look-ahead strategies}.
 
-\section{Notation and terminology}
-For a set $X$, notation $X^n$ is used to denote sequences of $X$ of length $n$
-  and $X^*$ denotes all finite sequences of $X$.
+\section{Notation and terminology} \label{sec:not}
+
+Symbols $\Nseto$ and $\Nset$ denote the set of natural numbers with and without zero;
+ the set of real numbers is denoted by $\Rset$.
+The number of elements of a set $X$ is denoted by $|X|$.
+Notation $X^* = \cup_{i\in\Nseto} X^i$ is used to denote the set of
+  finite sequences of elements of $X$.
 The $k$-th element of a sequence $s \in X^*$ is denoted by $s[k]$.
-
-Let $\Form_\Var$ denote the set of propositional formulas over
-  the set of variables $\Var$ and let
-  $\Val_\Var$ be the set of valuations (boolean interpretations)
-  of variables $\Var$.
-Apart from standard logical operators, we allow $n$-ary numerical operators
-  $\exactlyk{k}\!$, $\atleastk{k}\!$, $\atmostk{k}\!$.
-For a valuation $v\in\Val_\Var$ and propositional formulas
-  $\form_1, ...,\form_n\in\Form_\Var$,
-  the operator $\exactlyk{k}$ has the semantics
-  $\val(\exactlyk{k}(\form_1,...,\form_n)) = 1$ if and only if
-  $|\{i \| v(\form_i) = 1 \}| = k$.
-The semantics of $\atmost$ and $\atleast$ is defined analogically.
-
-Formulas $\form_0, \form_1 \in \Form_\Var$ are equivalent,
-  written $\form_0 \equiv \form_1$, if
-  $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
-We say that \emph{$\val$ is a model of $\form$}
-  or that \emph{$\val$ satisfies $\form$}
-  if $\val(\form) = 1$.
-For a formula $\form\in\Form_\Var$, let
-  $\numval_{\!_\Var}{\form} = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
-  be the number of models of $\form$.
-We often omit the index $\Var$ if it is clear from the context.
 
 The set of all permutations of a set $\Var$ (bijections $\Var->\Var$)
   is denoted by $\Perm_\Var$ and
@@ -45,6 +24,38 @@ A \emph{partition} $P$ of a set $X$ is a set of disjoint subsets of $X$,
 Members of $P$ are called \emph{cells}.
 Let $P(x)$ be the cell containing $x$,
   i.e. $P(x) = A$, where $A\in P$ and $x\in A$.
+For a function $f:X->Y$ and a set $Z\subseteq X$, the \emph{restriction of $f$ to $Z$}
+  is denoted by $f|_Z:Z->Y$.
+
+
+Let $\Form_\Var$ denote the set of \emph{propositional formulas} over
+  the set of variables $\Var$ and let
+  $\Val_\Var$ be the set of \emph{valuations} (boolean interpretations)
+  of variables $\Var$.
+Apart from standard logical operators, we allow $n$-ary \emph{numerical operators}
+  $\exactlyk{k}\!$, $\atleastk{k}\!$, $\atmostk{k}\!$.
+For a valuation $v\in\Val_\Var$ and propositional formulas
+  $\form_1, ...,\form_n\in\Form_\Var$,
+  the operator $\exactlyk{k}$ has the semantics
+  $\val(\exactlyk{k}(\form_1,...,\form_n)) = 1$ if and only if
+  $|\{i \| v(\form_i) = 1 \}| = k$.
+The semantics of $\atmost$ and $\atleast$ is defined analogically.
+
+Formulas $\form_0, \form_1 \in \Form_\Var$ are \emph{equivalent},
+  written $\form_0 \equiv \form_1$, if
+  $\val(\form_0) = \val(\form_1)$ for all $\val\in\Val_\Var$.
+We say that \emph{$\val$ is a model of $\form$}
+  or that \emph{$\val$ satisfies $\form$}
+  if $\val(\form) = 1$.
+For a formula $\form\in\Form_\Var$, let
+  $\numval_{\!_\Var}{\form} = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
+  be the number of models of $\form$.
+We often omit the index $\Var$ if it is clear from the context.
+A \emph{fixed variable} $x$ of a formula $\form$ is a
+  variable that is assigned the same value in all models of $\form$.
+If $\val(x) = 1$ for all $\val\in\Val$ such that $\val(\form)=1$, we that
+that $x$ is fixed to 1 (or \emph{true}). Similarly, if $\val(x) = 0$, we say
+that $x$ is fixed to 0 (or \emph{false}).
 
 %-------------------------------------------------------------------------------
 % DEF: CODE BREAKING GAME
@@ -77,11 +88,12 @@ A \emph{code-breaking game} is a quintuple
   \item $\init \in \Form_\Var$ is a satisfiable propositional formula,
   %\item $\Expt$ is a finite set of types of experiments,
   \item $\Sigma$ is a finite alphabet,
-  \item $F$ is a collection of mappings of type $\Sigma -> \Var$,
+  \item $F$ is a collection of mappings of type $\Sigma -> \Var$ with pairwise disjoint images,
   \item $\Expt$ is a set of \emph{parametrized experiments}, defined below.
   \end{itemize}
+\vspace{5mm}
 \end{definition}
-
+\vspace{-12mm}
 \begin{definition}[Parametrized experiment] \label{def:exp}
 A \emph{parametrized experiment} for a game
   $\game = (\Var, \init, \Sigma, F, \Expt)$
@@ -96,13 +108,13 @@ If $k$ and $l$ are in the same cell of the partition $P$, then the $k$-th and
 the $l$-th parameter must be different.
 We denote the components of a parametrized experiment $t\in\Expt$
   by $n_t$, $P_t$, and $\outcome_t$.
+\vspace{5mm}
 \end{definition}
-
+\vspace{-12mm}
 \begin{definition}[Parametrized formula] \label{def-pform}
-The set of all \emph{parametrized formulas} for a parametrized experiment
+A \emph{parametrized formula} for a~parametrized experiment
 $t$ of a game $\game = (\Var, \init, \Sigma, F, \Expt)$
-  is the set of
-  all strings $\pform$ generated by the following grammar, specified in Backus–Naur Form.
+  is a string $\pform$ generated by the following grammar, specified in Backus–Naur Form.
 \begin{align*}
 \msymb{form} &::= x \| f(\$k) \| \msymb{form} \circ \msymb{form} \| O(\msymb{form-list})  \| \neg\; \msymb{form},\\
 \msymb{form-list} &::= \msymb{form-list} \;,\; \msymb{form} \| \msymb{form}

@@ -56,7 +56,7 @@ In some games, the optimal strategy might have a simple
   structure and can be described easily, such as in
   the counterfeit coin problem (see section \autoref{s:coins} for details).
 In general, however, the strategy may have complicated structure and
-  the there may be no other way to discover an optimal strategy
+  there may be no other way to discover an optimal strategy
   than to consider all possible experiments
   in a given state and analyse the subproblems.
 
@@ -102,14 +102,15 @@ We address the following challenges in the suggested framework.
   designed language and implements suggested algorithms.
 \end{itemize}
 
-Suggested methods for code-breaking game analysis depend
-  on algorithms for some related problems.
+Some of the proposed methods for code-breaking game analysis depend
+  on algorithms for related problems.
 To analyse propositional formulas emerging during the course of the game,
   we need to decide satisfiability or count the number of models of
   a formula, which can be done using a modern SAT solver.
 Further, our symmetry detection approach is based on the reduction
   of experiment equivalence to graph isomorphism.
-For this purpose, we need a tool that computes the canonical labelling of a graph.
+For this purpose, we need a tool that computes the canonical labelling of a
+ given graph.
 
 We created a computer program for code-breaking game analysis and named it COBRA,
   the code-breaking game analyser.
@@ -121,7 +122,7 @@ The thesis is structured as follows.
 \autoref{ch:games} introduces several examples of code-breaking games and
   discusses existing results, variants of the games and related research.
 The general code-breaking game model is described in \autoref{ch:model}.
-\autoref{ch:expeq} is dedicated to the method for symmetry detection and other algorithms.
+\autoref{ch:expeq} is dedicated to our method for symmetry detection and other algorithms.
 Our computer program, COBRA, with descriptions of its usage and
   abilities is introduced in \autoref{ch:cobra}.
 Experimental results with comparisons of analysed strategies

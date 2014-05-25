@@ -59,10 +59,10 @@ All my friends deserve a special thanks for their patience with me
 
 
 \begin{ThesisKeyWords}
-code-braking games, \\
+code-breaking games, \\
 deductive games,\\
 strategy synthesis, \\
-greedy strategy,\\
+one-step look-ahead strategies,\\
 SAT solving,\\
 model counting, \\
 Mastermind, \\
@@ -75,10 +75,10 @@ Code-breaking games are two-player games in which the first player selects
   a code from a given set and the second player strives to reveal it using a
   minimal number of experiments.
 A prominent example of a code-breaking game is the board game Mastermind,
-  where the code-breaker tries to guess a combination of coloured pegs.
+  where the codebreaker tries to guess a combination of coloured pegs.
 
 There are many natural questions regarding code-breaking games.
-What strategy for experiment selection should the code-breaker use?
+What strategy for experiment selection should the codebreaker use?
 Is it possible to compute a lower or upper bound for the number of experiments needed?
 Can we compute the optimal strategy?
 What is the performance of a given heuristic?
@@ -115,9 +115,9 @@ Using the tool, we can reproduce existing results for Mastermind,
 \input{conclusions}
 
 \pagestyle{plain}
-\printbibliography
-\clearpage
-\addcontentsline{toc}{chapter}{Bibliography}
+% \clearpage
+% /\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography[heading=bibintoc]
 
 \input{attachment}
 \addcontentsline{toc}{chapter}{Contents of the electronic attachment}

@@ -233,7 +233,6 @@ By induction,
   for any $l\in\Nset$.\qed
 \end{proof}
 
-\TODO{W-c vs A-c???}
 \begin{theorem} \label{th:memless}
 Let $\stg$ be a strategy.
 Then there exists a memory-less strategy $\stgx$ such that
@@ -297,23 +296,10 @@ The last strategy of the sequence is clearly memory-less and satisfies the
   condition in the lemma. \qed
 \end{proof}
 
-% \begin{lemma}
-% Let $b = \max_{\expt\in\Expt} |\outcome(\expt)|$ be the maximal number of
-%   possible outcomes of an experiment.
-% If for any $\form\in\Formr$,
-% \[
-%   \exists\exp . \max_{\formx\in\outcome(\exp)} \numval{(\form\wedge\formx)} =
-%   \left\lceil \frac{\numval{\form}}{b} \right\rceil,
-% \]
-% then a greedy strategy $\stg$ is optimal and
-% \[
-%   \lenmax{\stg} = \lceil \log_b(\numval{\init}) \rceil.
-% \]
-% \end{lemma}
-
-% \begin{proof}
-% \TODO{Napsat důkaz.}
-% \end{proof}
+\begin{corollary}
+There exists a worst-case optimal strategy that is memory-less
+and there exists an average-case optimal strategy that is memory-less.
+\end{corollary}
 
 \begin{example}
 Recall the game and the strategy $\stg$ from \autoref{ex:run2}.
@@ -386,33 +372,33 @@ In the Mastermind case,
   the experiments are ordered lexicographically by the colour combination.
 
 \begin{description}
-\item[Maximal number of models.]
+\item[Max-models.]
 This strategy minimizes the worst-case number of remaining codes.
 For Mastermind, this was suggested by Knuth\cite{mm-knuth}.
 \[
-f(\formset) = \max_{\form\in\formset} \numval{\form}
+f(\formset) = \max_{\form\in\formset} \numval{\form}.
 \]
 
-\item[Expected number of models.]
+\item[Exp-models.]
 This strategy minimizes the expected number of remaining codes.
   For Mastermind, this was suggested by Irwing\cite{mm-expnum}.
 \[
-f(\formset) = \frac{\sum_{\form\in\formset}(\numval{\form})^2}{\sum_{\form\in\formset} \numval{\form}}
+f(\formset) = \frac{\sum_{\form\in\formset}(\numval{\form})^2}{\sum_{\form\in\formset} \numval{\form}}.
 \]
 
-\item[Entropy of the number of models.]
+\item[Ent-models.]
 This strategy maximizes the entropy of the numbers of remaining codes,
 For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
 \[
 f(\formset) = \sum_{\form\in\formset} \frac{\numval{\form}}{N} \cdot \log \frac{\numval{\form}}{N}
-  \textrm{, where } N = \sum_{\form\in\formset}\numval{\form}
+  \textrm{, where } N = \sum_{\form\in\formset}\numval{\form}.
 \]
 
-\item[Number of satisfiable outcomes.]
-This strategy maximizes the number of possible outcomes.
+\item[Parts.]
+This strategy maximizes the number of satisfiable outcomes.
 For Mastermind, this was suggested by Kooi\cite{mm-mostparts}.
 \[
-f(\formset) = - \:|\{ \form \| \form\in\formset, \;\SAT{\form} \}|
+f(\formset) = - \:|\{ \form \| \form\in\formset, \;\SAT{\form} \}|.
 \]
 \end{description}
 
@@ -431,19 +417,18 @@ For example, the choice of the following strategies in \autoref{ex:cc1} differs
   for the two possible formalisations.
 
 \begin{description}
-\item[Minimal number of fixed variables.]
+\item[Min-fixed.] Maximize the worst-case number of fixed variables, i.e.
 \[
-f(\formset) = -\min_{\form\in\formset} \fixed{\form}
+f(\formset) = -\min_{\form\in\formset} \fixed{\form}.
 \]
-\item[Expected number of fixed variables.]
+\item[Exp-fixed.] Maximize the expected number of fixed variables, i.e.
 \[
-f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\sum_{\form\in\formset}\numval{\form}}
+f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\sum_{\form\in\formset}\numval{\form}}.
 \]
 \end{description}
 
 \begin{example}
 Recall \autoref{ex:run1} and consider two experiments in the first step.
-
 First, consider an experiment of weighing coin 1 against coin 2.
 All the 3 outcomes are satisfiable, the number of models is
   2, 2 and 4 for outcome $<$, $>$, and $=$, respectively.
@@ -455,26 +440,27 @@ Second, consider an experiment of weighing coins 1 and 2 agains coins 3 and 4.
 As exactly one coin must be counterfeit, outcome $=$ is not possible.
 Outcomes $<$ and $>$ are symmetrical, both have $4$ models and fix no variables.
 
-\autoref{tbl:run-oslas} shows the values of the defined
-  strategies on these two experiments.
-The experiment $12$ wins with all strategies except for Maximal number of models,
-  where the values are the same.
 \begin{table}[ht]
 \begin{center}
 \begin{tabular}{l|cc}
 & 12 & 1234 \\\hline
-Maximal number of models & 4 & 4 \\
-Expected number of models & 3 & 4 \\
-Entropy of the number of models & -1.04 & -0.69 \\
-Number of satisfiable outcomes & -3 & -2 \\
-Minimal number of fixed variables & -2 & 0 \\
-Expected number of fixed variables & -2 & 0 \\
+Max-models & 4 & 4 \\
+Exp-models & 3 & 4 \\
+Ent-models & -1.04 & -0.69 \\
+Parts & -3 & -2 \\
+Min-fixed & -2 & 0 \\
+Exp-fixed & -2 & 0 \\
 \end{tabular}
-\caption{Values of various one-step look-ahead strategies on experiments 12 and 1234.}
+\caption{Values of various one-step look-ahead strategies in the counterfeit \\
+  coin problem with four coins on experiments 12 and 1234.}
 \label{tbl:run-oslas}
 \end{center}
 \end{table}
 
+\autoref{tbl:run-oslas} shows the values of the defined
+  strategies on these two experiments.
+The experiment $12$ wins with all strategies except for Maximal number of models,
+  where the values are the same. \eqed
 \end{example}
 
 % Greedy strategies are optimal in the fake-coin game $\mathcal{F}_n$.

@@ -49,11 +49,13 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {proof}{{\proofname }{5}{}}{27}{proof.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{18}}{}}{27}{example.3.18}
+\contentsline {corollary}{{Corollary}{3.{18}}{}}{27}{corollary.3.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{{Definition}{3.{19}}{One-step look-ahead strategy}}{28}{definition.3.19}
+\contentsline {example}{{Example}{3.{19}}{}}{27}{example.3.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{3.{20}}{}}{29}{example.3.20}
+\contentsline {definition}{{Definition}{3.{20}}{One-step look-ahead strategy}}{28}{definition.3.20}
+\defcounter {refsection}{0}\relax 
+\contentsline {example}{{Example}{3.{21}}{}}{29}{example.3.21}
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{{Definition}{4.{1}}{Experiment equivalence}}{31}{definition.4.1}
 \defcounter {refsection}{0}\relax 
@@ -75,7 +77,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {lemma}{{Lemma}{4.{12}}{}}{36}{lemma.4.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{8}{}}{36}{proof.8}
+\contentsline {proof}{{\proofname }{8}{}}{37}{proof.8}
 \defcounter {refsection}{0}\relax 
 \contentsline {lemma}{{Lemma}{4.{13}}{}}{37}{lemma.4.13}
 \defcounter {refsection}{0}\relax 
@@ -85,8 +87,8 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {theorem}{{Theorem}{4.{16}}{}}{39}{theorem.4.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {proof}{{\proofname }{10}{}}{39}{proof.10}
+\contentsline {proof}{{\proofname }{10}{}}{40}{proof.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{5.{1}}{}}{43}{example.5.1}
+\contentsline {example}{{Example}{5.{2}}{}}{45}{example.5.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {example}{{Example}{5.{2}}{}}{44}{example.5.2}
+\contentsline {example}{{Example}{5.{3}}{}}{46}{example.5.3}

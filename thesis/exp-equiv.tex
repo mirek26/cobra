@@ -94,7 +94,14 @@ Then we describe the construction of \emph{experiment graph},
   that if the experiment graphs are isomorphic,
   the corresponding experiments are equivalent.
 
+Recall that a \emph{labelled graph} is a triple $(V, E, l)$, where
+  $(V, E)$ is a graph and $l: V->L$ ($L$ being the set of labels)
+  is a labelling function.
+Isomorphism of two labelled graphs is a bijection between their sets of vertices
+that preserves edges and labels.
+
 \subsection{Base graph construction}
+
 Base graph of a game $\game = (\Var, \init, \Sigma, F, \Expt)$ is a labelled graph $B = (V,E,l)$ described below.
 \begin{itemize}
 \item There is a vertex for every proposition variable and every mapping, i.e. $V = \Var \cupdot F$.
@@ -140,8 +147,29 @@ Let  $\perm$ be an automorphism of $B$. Then $\perm|_\Var \in\symg$.
 \end{lemma}
 
 \begin{proof}
-As all vertices corresponding to mappings have separate labels, $\perm(f) = f$ for every $f\in F$.
-\TODO{...} \qed
+Let $\perm$ be an automorphism of $B$ and $(t, p)$, $p=p_1,p_2,...,p_n$ an experiment.
+We show that there exists a $\perm$-symmetrical experiment to $(t, p)$.
+
+Let $F_i\subseteq F$ be a set of mapping that are present in an outcome formula
+  of $t$ with parameter $\$i$.
+The vertices $f(p_i)$ for $f\in F_i$ form a clique in $B$ and so must vertices
+$\perm(f(p_i))$, $f\in F_i$.
+
+Since mappings $F$ have pairwise disjoint images, two variables $x_1, x_2$
+  can be connected by an edge only if there is a symbol $k\in\Sigma$ and
+  mappings $f,g\in F$ such that $f(k)=x_1$, $g(k)=x_2$.
+
+Define $r_i$ as a symbol in $\Sigma$ satisfying $f(r_i) = \perm(f(p_i))$ for some $f\in F_i$.
+Note that such $r_i$ always exists because $\perm(f) = f$ for every $f\in F$.
+Thanks to the aforementioned property,
+  if $f(r_i) = \perm(f(p_i))$ holds
+  for \emph{some} $f\in F_i$,
+  it holds for \emph{all} $f\in F_i$ and the definition is thus correct.
+
+Now, consider the experiment $(t, r)$, $r=r_1,r_2,...,r_n$.
+All variables appearing directly in the parametrized formula are stabilized by $\perm$ and,
+  for all expressions $f(\$i)$ it holds $f(r_i)=\perm(f(p_i))$ by the construction of $r_i$,
+  which means that $(t, r)$ is $\perm$-symmetrical to $(t, p)$. \qed
 \end{proof}
 
 \subsection{Experiment graph}

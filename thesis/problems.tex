@@ -1,20 +1,20 @@
 \chapter[Examples of code-breaking games and existing results]{Game examples and existing results}
 \label{ch:games}
 We introduce a few examples of code-breaking games in this chapter.
-The Counterfeit Coin problem and Mastermind game are quite well known,
+The counterfeit coin problem and Mastermind are quite well known,
   the other examples are based on various board games or less known
   logic puzzles.
 We briefly summarize related research for each game, discuss
   its variations and applications and give a list of
   references.
 
-Our goal in this work is neither to answer the research questions, nor
-  to study possible generalizations.
-We aim to create a general formalism and a computer language which could
-  be used to describe arbitrary code-breaking game, if possible.
-This chapter provides an overview of what we had in mind
-  when we designed the framework and the language described
-  in the rest of the thesis.
+% Our goal in this work is neither to answer the research questions, nor
+%   to study possible generalizations.
+% We aim to create a general formalism and a computer language which could
+%   be used to describe arbitrary code-breaking game, if possible.
+% This chapter provides an overview of what we had in mind
+%   when we designed the framework and the language described
+%   in the rest of the thesis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The counterfeit coin} \label{s:coins}
@@ -32,13 +32,14 @@ This chapter provides an overview of what we had in mind
   \url{http://pixabay.com/en/justice-silhouette-scales-law-147214},
   under CC0 1.0 License.}
 
-The problem of finding a counterfeit coin among regular coins in the fewest
+The problem of finding a counterfeit coin among
+  a collection of genuine coins in the fewest
   number of weighings on a balance scale is a folklore of
   recreational mathematics.
 
 In all problems of this kind, you can only use the scale to weigh the coins.
 You put some coins on the left pan, the same number of coins on the right pan
-  and get one of the 3 possible outcomes.
+  and get one of the three possible outcomes.
 Either both the sides weigh the same (denoted ``='')
   or the left side is lighter (``$<$''),
   or the right side is lighter (``$>$'').
@@ -51,12 +52,12 @@ Identify the counterfeit coin in minimal number of weighings.
 \end{problem}
 
 This problem is very easy as one can use \emph{ternary search} algorithm.
-In short, we divide the coins into thirds, put one third against another
-  on the scale.
+In short, we divide the coins into thirds and put one third on the left pan and
+  another on the right pan of the balance scale.
 If both pans weigh the same, the counterfeit coin must be in the last third,
   otherwise it must be on the lighter pan.
 In this way, the size of the search space is reduced
-  by a factor of 3 in each step, which is optimal.
+  by a factor of three in each step, which is optimal.
 
 In 1940s, more complicated version was introduced by Grossman\cite{coins-grossman1945}.
 
@@ -97,7 +98,7 @@ There exists a strategy that identifies the counterfeit coin and
 \begin{proof}
 We show the main part of the original Dyson's proof\cite{coins-dyson1946}
   here because of its elegant combinatorial idea.
-We show a scheme for $n = \frac{1}{2}(3^w - 3)$.
+We show a strategy for $n = \frac{1}{2}(3^w - 3)$.
 
 Let us number the coins from $1$ to $n$.
 To a coin number $i$, we assign
@@ -298,33 +299,34 @@ These two problems are quite different and strategies performing well
 Knuth\cite{mm-knuth} proposes a strategy that chooses a guess
   that minimizes the maximal number of remaining possibilities over all
   possible responses by the codemaker.
-This strategy requires at most 5 guesses in the standard $n=4$, $c=6$ variant,
+In the following, we call this strategy ``max-models''.
+In the worst-case, it requires 5 guesses in the standard $n=4$, $c=6$ variant,
   which can be shown optimal.
 In the average case, the strategy makes $4.48$ guesses.
 
 Other authors proposed other \emph{one-step look-ahead} strategies.
 Irving\cite{mm-expnum} suggested minimizing the expected number
-  of remaining possibilities,
+  of remaining possibilities (exp-models),
 Neuwirth\cite{mm-entropy} maximized the entropy of the number
-  of possibilities in the next round.
+  of possibilities in the next round (ent-models).
 Much later, Kooi\cite{mm-mostparts} came up with a simple strategy that
-  maximizes the number of possible responses by the codemaker,
+  maximizes the number of possible responses by the codemaker (parts),
   which is computationally easier and performs better that the previous two.
 
 Using a backtracking algorithm, Koyama and Lai\cite{mm-exp-opt} found
-  the optimal strategy for the expected case, which requires $4.34$
+  the optimal strategy for the expected case, which performs $4.34$
   guesses on average.
 The comparison of the described strategies is shown in \autoref{tbl:one-step}.
 
 \begin{table}[ht]
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
-\hline Strategy & First guess & Expected-case & Worst-case \\ \hline
-Maximal num. & AABB & 4.476 & 5 \\ \hline
-Expected num. & AABC & 4.395/4.626\footnotemark & 6 \\ \hline
-Entropy & ABCD & 4.416/4.643\footnotemark & 6 \\ \hline
-Most parts & AABC & 4.373 & 6 \\ \hline
-Exp-case optimal & AABC & 4.340 & 6 \\ \hline
+\hline Strategy & First guess & Average-case & Worst-case \\ \hline
+Max-models & AABB & 4.476 & 5 \\ \hline
+Exp-models & AABC & 4.395/4.626\footnotemark & 6 \\ \hline
+Ent-models & ABCD & 4.416/4.643\footnotemark & 6 \\ \hline
+Parts & AABC & 4.373 & 6 \\ \hline
+Avg-case optimal & AABC & 4.340 & 6 \\ \hline
 \end{tabular}
 \caption{Comparison of one-step look-ahead strategies. Data from \cite{mm-ville} and \cite{mm-mostparts}.}
 \label{tbl:one-step}
@@ -347,8 +349,8 @@ Exp-case optimal & AABC & 4.340 & 6 \\ \hline
 }
 
 
-Apart from \emph{one-step look-ahead} strategies, which are, in general,
-  computationally intensive and do not scale well for bigger $n$ or $c$,
+Apart from \emph{one-step look-ahead} strategies,
+  which do not scale very well for bigger $n$ or $c$,
   other approaches has been suggested.
 Many authors tried to apply genetic algorithms
   (see \cite{mm-ga} for an exhaustive overview and references therein),
@@ -435,21 +437,21 @@ The marbles interact with rays in three ways:
 \end{figure}
 \footnotetext{Images adopted from \url{http://en.wikipedia.org/wiki/Black\_Box\_(game)} under GFDL 1.2. with minor modifications.}
 
-A few examples are shown in \autoref{fig:blackbox-rules}.
-The first image shows cases in which the ray hits the marble,
-  the second shows rays deflected multiple times, emerging from
-  the box at a different place, and the third demonstrates
-  the two cases in which reflection happens.
-
 \addtocounter{footnote}{-1}
 \begin{wrapfigure}{r}{0.35\textwidth}
-  %\vspace{-10mm}
+  \vspace{-10mm}
   \begin{center}
   \includegraphics[width=0.3\textwidth]{pictures/blackbox-a.pdf}
   \end{center}
   \caption{An example of ambigous configuration\protect\footnotemark.}
   \label{fig:blackbox-ambigous}
 \end{wrapfigure}
+
+A few examples are shown in \autoref{fig:blackbox-rules}.
+The first image shows cases in which the ray hits the marble,
+  the second shows rays deflected multiple times, emerging from
+  the box at a different place, and the third demonstrates
+  the two cases in which reflection happens.
 
 Note that if the game is played with 5 or more marbles,
   they can be placed in the grid so that their position can
