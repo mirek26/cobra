@@ -1,7 +1,7 @@
 \section{Strategies in general}
 
 This section introduces the concept of a strategy for experiment selection.
-We define worst-case and average-case number of experiments of a strategy
+We define the worst-case and the average-case number of experiments of a strategy
  and optimal strategies. Further, we examine several strategy classes.
 
 \begin{definition}[Strategy]\label{def:strategy}
@@ -12,7 +12,7 @@ A \emph{strategy} is a function $\stg: \Omega^* -> \Exp$,
 A strategy $\stg$ together with a valuation $\val\in\Vals$
   induce an infinite solving process
   \[
-  \procstg{\stg}{\val} = \exp_1, \form_1, \exp_2, \form_2, ...,
+  \procstg{\stg}{\val} = (\exp_1, \form_1), (\exp_2, \form_2), ...,
   \]
   where
   $\exp_{i+1} = \stg(\procstg{\stg}{\val}[1:i])$
@@ -20,10 +20,10 @@ A strategy $\stg$ together with a valuation $\val\in\Vals$
   $\form_{i+1}$ is the formula from $\outcome(\exp_{i+1})$
   satisfied by $\val$,
   for all $i\in\Nset$.
-Thanks to the well-formed property,
+Due to the well-formed property of the game,
   there is exactly one such $\form_{i+1}$.
 
-We define \emph{length} of a strategy $\stg$ on a valuation $\val$,
+We define the \emph{length} of a strategy $\stg$ on a valuation $\val$,
   denoted $\stglen{\stg}{\val}$,
   as the smallest $k\in\Nseto$ such that
   $\stgknow{\stg}{\val}{k}$ uniquely determines the code, i.e.
@@ -63,6 +63,8 @@ A strategy $\stg$ is \emph{average-case optimal} if
 
 The following lemma provides us with a lower bound on the number of
 experiments of a worst-case optimal strategy.
+The next lemma presents an important observation about the induced solving processes,
+  which is needed in several upcoming theorems.
 
 \begin{lemma} \label{lma:lbound}
 Let $b = \max_{\expt\in\Expt} |\outcome(\expt)|$ be the maximal number of
@@ -92,31 +94,33 @@ If $\val_1$ is a model of $\stgknow{\stg}{\val_2}{k}$,
 
 \begin{proof}
 Let $\proc_1 = \procstg{\stg}{\val_1}$, $\proc_2 = \procstg{\stg}{\val_2}$
-and consider the first place where $\proc_1$ and $\proc_2$ differs.
-It cannot be an experiment $\proc_1(i) \not= \proc_2(i)$ as they are both
-  values of the same strategy on the same process:
+and consider the first place where $\proc_1$ and $\proc_2$ differ.
+It cannot be the $i$-th experiment as both $\proc_1(i)$ and $\proc_2(i)$
+  are values of the same strategy on the same solving process:
 $\proc_1(i) = \stg(\proc_1[1:i-1]) =
               \stg(\proc_2[1:i-1]) = \proc_2(i)$.
 
-Suppose it is an outcome of the $i$-th experiment, $\proc_1[i] \not= \proc_2[i]$
-  and $i <= k$.
+Therefore, it must be an outcome of the $i$-th experiment,
+  i.e. $\proc_1[i] \not= \proc_2[i]$
+  for some $i <= k$.
 Since $\val_1$ satisfies $\aknow{\proc_2}{k}$ and $i <= k$,
   it satisfies $\proc_2[i]$ as well.
 However, $\val_1$ always satisfies $\proc_1[i]$ and
   both $\proc_1[i]$ and $\proc_2[i]$ are from the set
   $\outcome(\proc_1(i)) = \outcome(\proc_2(i))$.
 Since there is exactly one satisfied experiment for each valuation in the set,
-  $\proc_1[i]$ and $\proc_2[i]$ must be the same.
-Contradiction. \qed
+  $\proc_1[i]$ and $\proc_2[i]$ must be the same, which is
+  a contradiction. \qed
 \end{proof}
 
 \begin{example} \label{ex:run2}
-Recall our running example of the counterfeit coin problem with 4 coins,
-as defined in \autoref{ex:run1}.
+Recall our running example of the counterfeit coin problem with four coins,
+introduced in \autoref{ex:run1}.
 
 Consider a strategy $\stg$ defined as follows.
-For simplicity, we denote experiments by their parametrizations only
-  and the outcomes by a symbol $<$, $>$ and $=$,
+For simplicity, we denote experiments by their parametrizations
+  (this is sufficient, because the parametrized experiments have different number of parameters)
+  and the outcomes by symbols $<$, $>$ and $=$,
   instead of the corresponding formula.
 \[
 \stg(\proc) = \left\{\begin{array}{ll}
@@ -129,7 +133,7 @@ For simplicity, we denote experiments by their parametrizations only
 \]
 
 Let $\val\in\Vals$ be a valuation such that $v(x_3) = v(y) = 1$.
-The induced solving process is
+The solving process induced by $\stg$ on $v$ is
 \[
 \procstg{\stg}{\val} = (12, =), (12, =), (14, =), (34, >), (12, =), (12, =), ...
 \]
@@ -140,15 +144,15 @@ The length of $\stg$ on $\val$ is 4, because $v$ is the only model of
 \wedge \neg(x_1 \vee x_4) \wedge ((x_3 \wedge y) \vee (x_4 \wedge \neg y)).
 \]
 
-The strategy is intentionally inefficient and repeats the experiment $12$
-if the outcome in the first step is `$=$'.
-In fact, every valuation is discovered by $\stg$ in at most 4 experiments,
-  so $\lenmax{\stg} = 4$.
+The strategy pointlessly repeats the experiment $12$
+  if the outcome in the first step is $=$.
+In fact, every valuation is revealed by $\stg$ in at most 4 experiments,
+  which means that $\lenmax{\stg} = 4$.
 
-\autoref{lma:lbound} gives us a lower bound $ \lceil\log_3(8)\rceil = 2$
+\autoref{lma:lbound} gives us the lower bound $ \lceil\log_3(8)\rceil = 2$
  on the worst-case number of experiments of an optimal strategy.
 However, we already know from \autoref{th:coins12} that the minimal number
-  of experiments needed to reveal the code is 3.
+  of experiments needed to reveal the code in the worst-case is 3. \eqed
 \end{example}
 
 \subsection{Non-adaptive strategies}
@@ -175,12 +179,13 @@ where $\tau(|\proc|) = \stg(\proc)$.
 
 \subsection{Memory-less strategies}
 
-The general definition of a strategy allows for the next experiment
-  to depend on the exact history of the solving process,
-  not only on the accumulated knowledge.
-This is in a sense unintuitive, as
-  the nature of code-breaking games is memory-less
+According to the general definition,
+  a strategy can decide the next experiment on the basis of the exact history
+  of the solving process.
+In can be argued that the accumulated knowledge should be sufficient for
+  the decision as the overall nature of code-breaking games is memory-less
   and the course of a game depends only on the accumulated knowledge.
+Here we define memory-less strategies and prove that it is indeed the case.
 
 \begin{definition}[Memory-less strategy]
 A strategy $\stg$ is \emph{memory-less} if it decides the next experiment
@@ -198,8 +203,7 @@ Then $\stg(\proc) = \stgx(\tknow{\proc})$.
 
 Note that the number of non-equivalent formulas over variable $\Var$
   is finite and, therefore, the number of memory-less strategies for a fixed
-  code-breaking game
-  is finite as well.
+  code-breaking game is finite as well.
 
 Now we prove some basic properties of memory-less strategies.
 The following lemma says that once we do not get any new information
@@ -218,15 +222,13 @@ If there exists $k\in\Nset$ such that
 \end{lemma}
 
 \begin{proof}
-To simplify the notation, let $\know^k = \stgknow{\stg}{\val}{k}$.
-There is a formula $\form\in\outcome(\know^k)$,
-  such that $\know^{k+1} \equiv \know^{k} \wedge \form$.
-Therefore, if $\know^{k+1}$ is satisfied by valuation $\val$, so must be $\know^{k}$.
-Since $\numval{\know^{k}} = \numval{\know^{k+1}}$, the sets of
-  valuations satisfying $\know^{k}$ and $\know^{k+1}$ are exactly the same
+To simplify the notation, let $\know^k = \stgknow{\stg}{\val}{k}$ be the accumulated knowledge after $k$ experiments.
+Since every model of $\know^{k+1}$ is also a model of $\know^k$ and
+  $\numval{\know^{k}} = \numval{\know^{k+1}}$, the sets of
+  models of $\know^{k}$ and $\know^{k+1}$ are exactly the same
   and the formulas are thus equivalent.
-This implies $\stg(\know^{k}) = \stg(\know^{k+1})$ and $\know^{k+2} \equiv \know^{k+1}\wedge \form \equiv \know^{k+1}$.
-
+This implies $\stg(\know^{k}) = \stg(\know^{k+1})$
+  and $\know^{k+2} \equiv \know^{k+1}$.
 By induction,
   $\stg(\know^{k+l}) = \stg(\know^{k})$ and
   $\know^{k+l} \equiv \know^{k}$
@@ -240,12 +242,14 @@ Then there exists a memory-less strategy $\stgx$ such that
 \end{theorem}
 
 \begin{proof}
-Let us choose any total order $\form_1, \form_2, ...$ of $\Formr$ such that
-  if $\form_i$ implies $\form_j$, then $i <= j$.
-We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$ inductively in the following way.
+Let us show the exact construction of $\stgx$ from $\stg$.
+First, we order the formulas of $\Formr$ by their number of models
+  from the least. Let $\form_i$ be the $i$-th formula in this order.
+We build a sequence of strategies $\stg_0, \stg_1, \stg_2, ...$
+  inductively in the following way.
 Let $\stg_0 = \stg$.
 \begin{itemize}
-\item If there is no $v\in\Vals, k\in\Nseto$ such that
+\item If there is no $v\in\Vals$, $k\in\Nseto$ such that
   $\stgknow{\stg_{i-1}}{v}{k} \equiv \form_i$, select any $\exp\in\Exp$ and
   define $\stg_i$ by
 \[
@@ -256,8 +260,7 @@ Let $\stg_0 = \stg$.
  \end{array}
  \right.
 \]
-Clearly, all induced solving processes for $\stg_i$ and $\stg_{i-1}$ are the same
-  and $\stglen{\stg_i}{v} = \stglen{\stg_{i-1}}{v}$.
+Clearly, the induced solving processes for $\stg_i$ and $\stg_{i-1}$ are the same.
 
 \item If there exists $v\in\Vals, k\in\Nseto$ such that
   $\stgknow{\stg_{i-1}}{v}{k} \equiv \form_i$, choose the largest $l$ such that
@@ -272,11 +275,11 @@ Clearly, all induced solving processes for $\stg_i$ and $\stg_{i-1}$ are the sam
 \]
 First we prove that this definition is correct.
 Let $v_1, v_2, k_1, k_2$ be such that
-  $\stgknow{\stg_{i-1}}{v_1}{k_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{k_2}$.
-Take $l_1, l_2$ as the largest numbers such that
+  $\stgknow{\stg_{i-1}}{v_1}{k_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{k_2}$
+and let $l_1, l_2$ be the largest numbers such that
   $\stgknow{\stg_{i-1}}{v_1}{l_1}\equiv\form_i\equiv\stgknow{\stg_{i-1}}{v_2}{l_2}$.
 Since $v_1$ satisfies $\stgknow{\stg_{i-1}}{v_2}{l_2}\equiv\form_i$,
-  then $\procstg{\stg_{i-1}}{v_2}[1:l_2] = \procstg{\stg_{i-1}}{v_1}[1:l_2]$
+  $\procstg{\stg_{i-1}}{v_2}[1:l_2] = \procstg{\stg_{i-1}}{v_1}[1:l_2]$
   by \autoref{lma:accumulatedknowledge}.
 The same holds for $l_1$ which means that $l_1 = l_2$ and
   $\procstg{\stg_{i-1}}{v_1}(l_1) = \procstg{\stg_{i-1}}{v_1}(l_2)$, which
@@ -284,12 +287,13 @@ The same holds for $l_1$ which means that $l_1 = l_2$ and
   of $v$ and $k$.
 
 Now $\stglen{\stg_i}{v} = \stglen{\stg_{i-1}}{v} - (l-k)$, where
-  $k$ and $l$ is the smallest and the largest number such that
-  $\stgknow{\stg_{i-1}}{v}{k}\equiv\form_i $ and
-  $\stgknow{\stg_{i-1}}{v}{l}\equiv\form_i $, respectively,
+  $k$ is the smallest number such that
+  $\stgknow{\stg_{i-1}}{v}{k}\equiv\form_i$ and
+  $l$ is the largest number such that
+  $\stgknow{\stg_{i-1}}{v}{l}\equiv\form_i $,
   because
-  $\procstg{\stg_{i-1}}{v}(l) = \procstg{\stg_{i}}{v}(k)$ and due to the ordering,
-  the rest of the process is independent of the beginning.
+  $\procstg{\stg_{i-1}}{v}(l) = \procstg{\stg_{i}}{v}(k)$ and due to the order of the formulas,
+  the rest of the process is already independent of the beginning.
 \end{itemize}
 
 The last strategy of the sequence is clearly memory-less and satisfies the
@@ -311,9 +315,9 @@ It is neither memory-less as
 
 Consider a non-adaptive strategy
  $\stgx:\; 1 \mapsto 12,\; 2\mapsto 13,\; 3\mapsto 14$.
-If the counterfeit coin is among the first three,
+If the counterfeit coin is among the first three coins,
   it is discovered by the strategy in two experiments.
-If the counterfeit coin is coin 4, it requires three experiments.
+If the counterfeit coin is the fourth coin, it requires three experiments.
 Hence $\lenmax{\stgx} = 3$ and the value of $\stgx$ on
   greater numbers is irrelevant.
 
@@ -322,16 +326,16 @@ we get a memory-less strategy $\stg'$, given by
 
 \[
 \stg'(\form) = \left\{\begin{array}{ll}
-13 & \textrm{ if } \form \equiv (x_1 \wedge \neg y) \vee (x_2 \wedge y), \\
-23 & \textrm{ if } \form \equiv (x_1 \wedge y) \vee (x_2 \wedge \neg y),\\
-14 & \textrm{ if } \form \equiv \neg x_1 \wedge \neg x_2, \\
-34 & \textrm{ if } \form \equiv \neg x_1 \wedge \neg x_2 \wedge \neg x_4, \\
+13 & \textrm{ if } \form \equiv \init \wedge (x_1 \wedge \neg y) \vee (x_2 \wedge y), \\
+23 & \textrm{ if } \form \equiv \init \wedge (x_1 \wedge y) \vee (x_2 \wedge \neg y),\\
+14 & \textrm{ if } \form \equiv \init \wedge \neg x_1 \wedge \neg x_2, \\
+34 & \textrm{ if } \form \equiv \init \wedge \neg x_1 \wedge \neg x_2 \wedge \neg x_4, \\
 12 & \textrm{ otherwise.}
 \end{array}\right.
 \]
 
-Notice that the valuation $v$ with $v(x_3) = v(y) = 1$ is discovered in
-  3 experiments as the strategy does not repeat the experiment 12 now.
+Notice that the valuation $v$ with $v(x_3) = v(y) = 1$ is now discovered in
+  3 experiments as the strategy does not repeat the experiment 12.
 Therefore, $\lenmax{\stg'} = 3$.
 
 Both strategies $\tau$ and $\stg'$ are worst-case optimal. \eqed
@@ -360,18 +364,11 @@ A one-step look-ahead strategy with respect to $f$ and $\eord$ and is
 \end{definition}
 
 We refer to the value $f(\{\form \wedge \formx \| \formx\in\outcome(e)\})$
-  as the value of the function $f$ on experiment $e$.
+  as the value of the function $f$ on the experiment $e$.
 The purpose of $\eord$ is to resolve the cases in which
-  the value of the function is the same for more experiments.
+  the value of the function is the same on more experiments.
 
-% Note that one-step look-ahead strategy with respect to $f$ is not unique.
-% For some formulas, there can be more experiments with the same value of $f$.
-% To uniquely specify a strategy, we must provide the function $f$ and
-%   a resolution method for these ambiguous states.
-% Typically, we specify a total order on experiments and select the least
-%   experiment in the order satisfying the condition of \autoref{def:oslas}.
-
-A few one-step look-ahead strategies for Mastermind
+Several one-step look-ahead strategies for Mastermind
   have been already introduced in \autoref{sec:mm}.
 In the following, we define them formally for the general model of code-breaking games.
 Unless otherwise stated, the total order $\eord$ is
@@ -393,7 +390,7 @@ f(\formset) = \frac{\sum_{\form\in\formset}(\numval{\form})^2}{\sum_{\form\in\fo
 \]
 
 \item[Ent-models.]
-This strategy maximizes the entropy of the numbers of remaining codes,
+This strategy maximizes the entropy of the numbers of remaining codes.
 For Mastermind, this was suggested by Neuwirth\cite{mm-entropy}.
 \[
 f(\formset) = \sum_{\form\in\formset} \frac{\numval{\form}}{N} \cdot \log \frac{\numval{\form}}{N}
@@ -409,19 +406,20 @@ f(\formset) = - \:|\{ \form \| \form\in\formset, \;\SAT{\form} \}|.
 \end{description}
 
 \newcommand{\fixed}{\#_\textrm{fixed}\:}
-We suggest and analyse two more one-step look ahead strategies based on
-the number of fixed variables of the formula.
+We suggest and analyse two more one-step look ahead strategies that are based on
+the number of fixed variables of the formulas.
 Let
 \[
 \fixed\form = |\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=1 \}
                   \cup\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=0 \}|
 \]
-be the number of variables of $\form$.
-Note that while the aforementioned strategies does not depend on the exact
+be the number of fixed variables of $\form$.
+Note that while the strategies above does not depend on the exact
   formalization of a problem, the number of fixed variables may differ for
   different encodings.
-For example, the choice of the following strategies in \autoref{ex:cc1} differs
-  for the two possible formalisations.
+For example, recall the two possible formalisations of the counterfeit coin problem defined in \autoref{ex:cc1}.
+The numbers of the fixed variables in the outcome formulas differ, which
+  means that the strategy may select different experiments.
 
 \begin{description}
 \item[Min-fixed.] Maximize the worst-case number of fixed variables, i.e.
@@ -436,17 +434,17 @@ f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\s
 \pagebreak
 
 \begin{example}
-Recall \autoref{ex:run1} and consider two experiments in the first step.
-First, consider an experiment of weighing coin 1 against coin 2.
-All the 3 outcomes are satisfiable, the number of models is
-  2, 2 and 4 for outcome $<$, $>$, and $=$, respectively.
+Recall \autoref{ex:run1} and consider the following two experiments in the first step.
+First, the experiment of weighing coin 1 against coin 2.
+All the three outcomes are satisfiable, the number of models is
+  2 for the outcome $<$, 2 for $>$ and 4 for $=$.
 If the experiment results in $<$ or $>$, we know that the counterfeit coin
-is coin 1 or coin 2. If it results in $=$, the counterfeit coin is coin 3 or coin 4.
+is the first or the second coin. If it results in $=$, it must be the third or the fourth coin.
 Therefore, every outcome fixes two variables.
 
-Second, consider an experiment of weighing coins 1 and 2 agains coins 3 and 4.
-As exactly one coin must be counterfeit, outcome $=$ is not possible.
-Outcomes $<$ and $>$ are symmetrical, both have $4$ models and fix no variables.
+Second, the experiment of weighing coins 1 and 2 against coins 3 and 4.
+As exactly one coin must be counterfeit, the outcome $=$ is impossible.
+The outcomes $<$ and $>$ are symmetrical, both have 4 models and fix no variables.
 
 \begin{table}[!ht]
 \begin{center}
@@ -465,14 +463,12 @@ Exp-fixed & -2 & 0 \\
 \end{center}
 \end{table}
 
-\autoref{tbl:run-oslas} shows the values of the defined
+\autoref{tbl:run-oslas} shows the values of the defined one-step look-ahead
   strategies on these two experiments.
-The experiment $12$ wins with all strategies except for Maximal number of models,
-  where the values are the same. \eqed
+In all strategies except for ``max-models'', the experiment 12 winds over 1234
+  and is selected as the first experiment.
+In ``max-models'', the values on 12 and 1234 are the same but the experiment
+  12 is still selected because it is lexicographically smaller. \eqed
 \end{example}
-
-% Greedy strategies are optimal in the fake-coin game $\mathcal{F}_n$.
-
-% \TODO{Napsat důkaz.}
 
 

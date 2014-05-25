@@ -20,7 +20,7 @@ Code-breaking games (sometimes also called \emph{deductive games} or \emph{searc
 \end{wrapfigure}
 \footnotetext{Image adopted from \url{http://commons.wikimedia.org/wiki/File:Mastermind\_beispiel.svg}, by Thomas Steiner under GFDL.}
 
-One prominent example of a code-breaking game is famous board game
+One prominent example of a code-breaking game is the famous board game
   \emph{Mastermind}.
 In this game, the codemaker creates a puzzle for the codebreaker by choosing a
   combination of four coloured pegs (with colour repetitions allowed).
@@ -43,8 +43,8 @@ Code-breaking games offer many interesting research problems.
 \begin{itemize}
 \item \emph{How should the codebreaker play in order to minimize the number of experiments
    needed to undoubtedly determine the code?}
-\item \emph{Is there a strategy that would guarantee
-   revealing the code in at most $k$ steps?}
+\item \emph{Is there a strategy for experiment selection that guarantees
+   revealing the code after at most $k$ experiments?}
 \item \emph{What strategy is optimal with respect
    to the average-case number of experiments,
    given that the code is selected
@@ -61,8 +61,8 @@ In general, however, the strategy may have complicated structure and
   in a given state and analyse the subproblems.
 
 Therefore, one may prefer a suboptimal strategy or heuristic
-  for experiment selection, which is easier to compute.
-This brings about another kind of questions.
+  for experiment selection that is computationally less demanding.
+This brings about more research questions.
 \emph{Given a strategy,
   how can we compute the worst-case and the average-case number
   of experiments the strategy needs to reveal the code?}
@@ -73,15 +73,14 @@ Some particular code-breaking games,
   and most of these questions are at least partially answered.
 A detailed summary of the existing results is presented in \autoref{ch:games}.
 Nevertheless, little has been written about code-breaking games in general.
-Some authors have suggested general methods (and applied them in one particular game,
-  e.g. \cite{cbg-stgopt, cbg-gen}),
+Some authors have suggested general methods and applied them in one particular game\cite[e.g.][]{cbg-stgopt, cbg-gen},
   some have vaguely stated that their approach can be applied
   to other games of the same kind but,
   to the best of our knowledge, no one has tried to
   create a general framework and provide
    results for code-breaking games in general.
 
-This work proposes to bridge the gap and provides
+We propose to bridge the gap and provide
   a general framework for code-breaking games
   based on propositional logic.
 The secret code is encoded as a valuation of
@@ -91,7 +90,7 @@ The secret code is encoded as a valuation of
 Each experiment can result in several outcomes,
   which are given in the form of a propositional formula.
 
-We address the following challenges in the suggested framework.
+This work addresses the following challenges in the suggested framework.
 \begin{itemize}
 \item Formally define code-breaking games and strategies.
 \item Propose general strategies or heuristics for experiment selection.
@@ -99,23 +98,23 @@ We address the following challenges in the suggested framework.
 \item Propose algorithms for strategy evaluation and optimal strategy synthesis.
 \item Design a computer language for game specification.
 \item Develop a computer program that parses a game description from the
-  designed language and implements suggested algorithms.
+  designed language and implements the suggested algorithms.
 \end{itemize}
 
 Some of the proposed methods for code-breaking game analysis depend
   on algorithms for related problems.
-To analyse propositional formulas emerging during the course of the game,
+To analyse propositional formulas emerging during the course of a game,
   we need to decide satisfiability or count the number of models of
-  a formula, which can be done using a modern SAT solver.
-Further, our symmetry detection approach is based on the reduction
+  a formula. This can be done using a modern SAT solver.
+Further, our symmetry detection approach is based on a reduction
   of experiment equivalence to graph isomorphism.
 For this purpose, we need a tool that computes the canonical labelling of a
  given graph.
 
 We created a computer program for code-breaking game analysis and named it COBRA,
   the code-breaking game analyser.
-Using this tool, we can reproduce some of the existing results
-  for Mastermind, analyse new code-breaking games and and easily evaluate new heuristics
+Using this program, we can reproduce some of the existing results
+  for Mastermind, analyse new code-breaking games and easily evaluate new heuristics
   for experiment selection.
 
 The thesis is structured as follows.
@@ -128,7 +127,7 @@ Our computer program, COBRA, with descriptions of its usage and
 Experimental results with comparisons of analysed strategies
   are presented in \autoref{ch:exp}.
 Finally, \autoref{ch:conclusions} concludes the work with suggestions for future work
-  and possible extensions of the tool.
+  and possible extensions of the program.
 
 
 

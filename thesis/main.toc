@@ -36,7 +36,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {3.3}\slshape Strategies in general}{23}{section.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Non-adaptive strategies}{25}{section*.23}
+\contentsline {subsection}{\rmfamily Non-adaptive strategies}{26}{section*.23}
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Memory-less strategies}{26}{section*.24}
 \defcounter {refsection}{0}\relax 

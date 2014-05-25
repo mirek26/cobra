@@ -51,9 +51,9 @@ For a formula $\form\in\Form_\Var$, let
   $\numval_{\!_\Var}{\form} = |\{ \val\in\Val_\Var \| \val(\form) = 1 \}|$
   be the number of models of $\form$.
 We often omit the index $\Var$ if it is clear from the context.
-A \emph{fixed variable} $x$ of a formula $\form$ is a
+A \emph{fixed variable} of a formula $\form$ is a
   variable that is assigned the same value in all models of $\form$.
-If $\val(x) = 1$ for all $\val\in\Val$ such that $\val(\form)=1$, we that
+If $\val(x) = 1$ for all $\val\in\Val$ such that $\val(\form)=1$, we say
 that $x$ is fixed to 1 (or \emph{true}). Similarly, if $\val(x) = 0$, we say
 that $x$ is fixed to 0 (or \emph{false}).
 
@@ -64,7 +64,7 @@ that $x$ is fixed to 0 (or \emph{false}).
 A code-breaking game can be represented by a \emph{set of variables},
   \emph{initial constraint} (a formula that is guaranteed to be satisfied),
   and a set of \emph{allowed experiments}.
-An experiment is defined by the set of possible outcomes in which it can result.
+An experiment is defined by the set of outcomes in which it can result.
 The outcomes are specified in the form of a propositional formula that
   represents the partial information
   that the codebreaker gains if the experiment results in the outcome.
@@ -76,7 +76,7 @@ For example, in the counterfeit coin problem defined in \autoref{s:coins},
 It can be calculated that there are 36,894 combinations for 12 coins.
 However, most of them have the same structure,
   so it would be inefficient to specify them one by one.
-Therefore we choose a compact representation with \emph{parametrized experiments},
+Therefore we have opted for a compact representation with \emph{parametrized experiments},
   where parametrization is a fixed-length string over a defined alphabet.
 This whole idea is formalized below.
 
@@ -88,12 +88,12 @@ A \emph{code-breaking game} is a quintuple
   \item $\init \in \Form_\Var$ is a satisfiable propositional formula,
   %\item $\Expt$ is a finite set of types of experiments,
   \item $\Sigma$ is a finite alphabet,
-  \item $F$ is a collection of mappings of type $\Sigma -> \Var$ with pairwise disjoint images,
+  \item $F$ is a collection of mappings $\Sigma -> \Var$ with pairwise disjoint images,
   \item $\Expt$ is a set of \emph{parametrized experiments}, defined below.
   \end{itemize}
-\vspace{5mm}
+\vspace{8mm}
 \end{definition}
-\vspace{-12mm}
+\vspace{-15mm}
 \begin{definition}[Parametrized experiment] \label{def:exp}
 A \emph{parametrized experiment} for a game
   $\game = (\Var, \init, \Sigma, F, \Expt)$
@@ -102,15 +102,16 @@ A \emph{parametrized experiment} for a game
   \begin{itemize}
   \item $n$ is the number of parameters of the experiment,
   \item $P$ is a partition of the set $\{1, ..., n\}$,
-  \item $\outcome$ is a set of parametrized formulas, defined below.
+  \item $\outcome$ is a set of \emph{parametrized formulas}, defined below.
   \end{itemize}
-If $k$ and $l$ are in the same cell of the partition $P$, then the $k$-th and
+Parameters of the experiment are elements of the alphabet $\Sigma$.
+If $k$ and $l$ are in the same cell of the partition $P$, the $k$-th and
 the $l$-th parameter must be different.
 We denote the components of a parametrized experiment $t\in\Expt$
   by $n_t$, $P_t$, and $\outcome_t$.
-\vspace{5mm}
+\vspace{8mm}
 \end{definition}
-\vspace{-12mm}
+\vspace{-15mm}
 \begin{definition}[Parametrized formula] \label{def-pform}
 A \emph{parametrized formula} for a~parametrized experiment
 $t$ of a game $\game = (\Var, \init, \Sigma, F, \Expt)$
@@ -130,7 +131,7 @@ The set $\Exp$ of all experiments in the game $\game$ is given by
 \[
   \Exp =
      \big\{ (\expt, \param) \| t\in\Expt,\; \param \in\Sigma^{n_t},\;
-     \forall x,y<={n_t}:\; P_t(x)=P_t(y) ==> \param[x] \not= \param[y] \big\}
+     \forall x,y<={n_t}.\; P_t(x)=P_t(y) ==> \param[x] \not= \param[y] \big\}
 \]
 
 An experiment $e\in\Exp$ is thus a pair $(t, p)$, where
@@ -151,30 +152,30 @@ O(\pform_1, ..., \pform_m)(\param) &= O(\pform_1(\param), ..., \pform_m(\param))
 (\neg\pform)(\param) &= \neg(\pform(\param)).
 \end{align}
 
-To simplify the notation, let us denote the set of possible outcomes for
+To simplify the notation, let us denote the set of outcomes of
   an experiment $\exp = (\expt, \param) \in \Exp$ by
   $\outcome(\exp) = \{ \pform(\param) \| \pform\in\outcome_\expt\}$.
 
 \begin{example} \label{ex:run1}
-Consider the counterfeit coin problem for 4 coins.
+Consider the counterfeit coin problem with 4 coins.
 We use this game as a running example throughout this chapter.
 
-The counterfeit coin and its relative weight to others can be encoded
+The counterfeit coin and its relative weight to the others can be encoded
   as a valuation of variables $x_1, x_2, x_3, x_4$ and $y$,
   $v(x_i)$ being 1 if and only if the $i$-th coin is counterfeit and
   $y$ determining its relative weight
-  ($v(y) = 0$ meaning lighter, $v(y) = 1$ meaning heavier).
+  ($v(y) = 0$ means that the counterfeit coin of underweight, $v(y) = 1$ means overweight).
 The initial constraint $\init$ should capture the restriction that exactly one
   coin if counterfeit.
 Therefore, let $\init$ be $\exactlyk{1}(x_1, x_2, x_3, x_4)$.
 
 The experiments are parametrized by the coins on the pans of the balance scale.
 Let $\Sigma = \{1, 2, 3, 4\}$ and $F = \{ f_x \}$ where $f_x$
-maps $i$ to the corresponding variable $x_i$.
+maps the number $i$ to the corresponding variable $x_i$.
 
-The first parametrized experiment $t$ is weighing one coin against one.
+One parametrized experiment is weighing one coin against one, let us call it $t$.
 We need two parameters ($n_t = 2$),
-  the first determining the coin on the left pan,
+  the first determining the coin on the left pan and
   the second determining the coin on the right pan that must be different
   from the first.
 $P_t$ is therefore the trivial partition $\{\{1, 2\}\}$.
@@ -182,7 +183,7 @@ $P_t$ is therefore the trivial partition $\{\{1, 2\}\}$.
 If the left pan is lighter, it is either the case that the
   coin on the left is underweight ($f_x(\$1) \wedge \neg y$)
   or the coin on the right is overweight ($f_x(\$2) \wedge y$).
-If the right pan is lighter, we get symmetrical knowledge
+If the right pan is lighter, we get the symmetrical knowledge
   $(f_x(\$1)\wedge y) \vee (f_x(\$2)\wedge\neg y)$.
 If both sides weigh the same, the counterfeit coins is not present on either pan
   and we can conclude $\neg f_x(\$1) \wedge \neg f_x(\$2)$.
@@ -203,7 +204,7 @@ There are $4$ parameters, they must be pairwise distinct and the outcome
 Note that the compact representation with parametrized experiments
   does not restrict the class of games that can fit \autoref{def:game},
   compared to a possible definition with direct experiment enumeration.
-The thing is that there can always be a parametrized experiment
+The reason is that there can always be a parametrized experiment
   with no parameters for each actual experiment.
 
 \begin{definition}[Solving process]
@@ -215,15 +216,13 @@ A \emph{solving process} is a finite or infinite sequence
   of evaluated experiments.
 \end{definition}
 
-Let $\proc$ be a solving process.
-For simplicity, we omit parentheses around the pairs and write
-  $\proc = \exp_1, \form_1, \exp_2, \form_2, ...$.
-Let
+For a solving process $\proc = (\exp_1, \form_1), (\exp_2, \form_2), ...$,
+  let
 \begin{itemize}
 \item $|\proc|$ denote the length of the sequence,
 \item $\proc(k) = \exp_k$ denote the $k$-th experiment,
 \item $\proc[k] = \form_k$ denote the $k$-th outcome,
-\item $\proc[1:k] = \exp_1, \form_1, ..., \exp_k, \form_k$ denote the prefix of length $k$, and
+\item $\proc[1:k] = (\exp_1, \form_1), ..., (\exp_k, \form_k)$ denote the prefix of length $k$, and
 \item $\aknow{\proc}{k} = \init \wedge \form_1 \wedge ... \wedge \form_k$
   denote the accumulated knowledge after the first $k$ experiments
   (including the initial constraint $\init$). For finite $\proc$,
@@ -231,7 +230,8 @@ Let
 \end{itemize}
 
 We denote the set of valuations that satisfy $\init$ by $\Vals = \{ \val\in\Val_\Var \| \val(\init) = 1 \}$
-  and the set of \emph{reachable formulas} by $\Formr = \{ \tknow{\proc} \| \proc\in\Omega^* \}$.
+  and the set of \emph{reachable formulas} (formulas that represent some accumulated knowledge)
+   by $\Formr = \{ \tknow{\proc} \| \proc\in\Omega^* \}$.
 
 \subsection{Course of the game}
 
@@ -240,12 +240,12 @@ Let us now describe the course of the game in the defined terms.
 \item The codemaker chooses a valuation $\val$ from $\Vals$.
 \item The codebreaker chooses an experiment $e$ from $\Exp$.
 \item The codemaker gives the codebreaker a formula
-  $\form\in\outcome(e)$ that is satisfied by valuation $\val$.
+  $\form\in\outcome(e)$ that is satisfied by the valuation $\val$.
   In order for the codemaker to always be able to do so,
-  there must be a formula $\form\in\outcome(\exp)$ satisfied by any valuation
-  in $\Vals$. This is defined below as \emph{well-formed} property of the game.
+  $\outcome(\exp)$ must contain a satisfied formula for every valuation in $\Vals$.
+  This is defined below as \emph{well-formed} property of the game.
 \item The evaluated experiment $(e, \form)$ is appended to the
-  (initially empty) solving process $\proc$.
+  solving process $\proc$, which is initially empty.
 \item If $\numval{\tknow{\proc}} = 1$, the codebreaker can uniquely determine
 the valuation $\val$ and the game ends. Otherwise, it continues with step 2.
 \end{enumerate}
@@ -259,8 +259,8 @@ A code-breaking game is \emph{well-formed} if for all $\exp \in \Exp$,
 \end{equation}
 \end{definition}
 
-In the sequel, we focus only on well-formed games and, by default,
-  we assume a game is well-formed unless otherwise stated.
+In the sequel, we focus only on well-formed games and
+  we assume a given game is well-formed unless otherwise stated.
 
 %-------------------------------------------------------------------------------
 % EXAMPLE: FAKE-COIN PROBLEM
@@ -284,7 +284,7 @@ the following components.
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n, y\}$.
-  Variable $x_i$ tells whether coin $i$ is counterfeit,
+  Variable $x_i$ tells whether the $i$-th coin is counterfeit,
   variable $y$ tells whether it is lighter or heavier.
 \item
 $\init = \exactlyk{1}(x_1, ..., x_n)$,
@@ -303,7 +303,7 @@ $\Expt = \big\{ (2\cdot m,\; \{\{1,...,2m\}\},\; \outcome_m) \| 1 <= m <= n/2 \b
 & \neg (f_x(\$1) \vee ... \vee f_x(\$2m)) \big\}.
 \end{flalign*}
 
-For every $m\in\Nset$, $m <= n/2$, we have a parametrized experiment of weighing
+For every $m\in\Nset$, $m <= n/2$, there is a parametrized experiment of weighing
   $m$ coins against $m$ coins.
 It has $2m$ parameters, the first $m$ are put on the left pan, the last $m$ are put on the right pan.
 
@@ -325,7 +325,7 @@ Let $\mathcal{F'}_n = (\Var, \init, \Sigma, F, \expt)$ be a game
 \begin{itemize}
 \item
 $\Var = \{x_1, x_2, ..., x_n,\: y_1, y_2, ..., y_n\}$.
-Variable $x_i$ tells that coin $i$ is lighter, variable $y_i$ tells that coin $i$ is heavier.
+Variable $x_i$ tells that the $i$-th coin is lighter, variable $y_i$ tells that the $i$-th coin is heavier.
 \item
 $\init = \exactlyk{1}(x_1, ..., x_n, y_1, ..., y_n)$,
   saying that exactly one coin is odd-weight.
@@ -337,9 +337,9 @@ $\Expt = \big\{ (2\cdot m,\; \{\{1,...,2m\}\},\; \outcome_m) \| 1 <= m <= n/2 \b
 & f_y(\$1) \vee ... \vee f_y(\$m) \vee f_x(\$m+1) \vee ... \vee f_x(\$2m), & \\
 & \neg\; (f_x(\$1) \vee ... \vee f_x(\$2m) \vee f_y(\$1) \vee ... \vee f_y(\$2m)) \big\}. &
 \end{flalign*}
+\end{itemize}
 In this formalization, the variables correspond one-to-one to possible codes,
  so the outcome formulas effectively list all possibilities. \eqed
-\end{itemize}
 \end{example}
 
 %-------------------------------------------------------------------------------
@@ -354,7 +354,7 @@ $\mathcal{M}_{n,m} = (\Var, \init, \Sigma, F, \Expt)$
 \begin{itemize}
 \item
 $\Var = \{x_{i,j} \| 1<=i<=n, 1<=j<=m \}$.
-  Variable $x_{i,j}$ tells whether there is colour $j$ at position $i$.
+  Variable $x_{i,j}$ tells whether the $i$-th peg has the colour $j$.
 \item
 $\init = \bigwedge\left\{
   \exactlyk{1} \{x_{i,j} \| 1<=j<=m\} \| 1<=i<=n\right\}$, saying that
@@ -366,12 +366,12 @@ There is only one parametrized experiment with $n$ parameters corresponding
   to the colours.
 All parameters can be the same,
   so the partition $P$ is the discrete partition $\{\{1\},...,\{n\}\}$.
-\item $\outcome = \{ \texttt{Outcome}(b, w) \| 0<=b<=n, 0<=w<=n, b+w<=n \}$,
-where $\texttt{Outcome}$ function is computed by the algorithm described below.
+\item $\outcome = \{ \textsc{Outcome}(b, w) \| 0<=b<=n, 0<=w<=n, b+w<=n \}$,
+where $\textsc{Outcome}$ is the function computed by the algorithm described below.
 \end{itemize}
 
 As described in \autoref{sec:mm},
-  the outcome of an experiment corresponds
+  the outcome of an experiment in Mastermind corresponds
   to some maximal matching between
   the pegs in the code and the pegs in the guess.
 The idea here is to generate a formula that asserts
@@ -379,7 +379,7 @@ The idea here is to generate a formula that asserts
   with $b$ edges corresponding to black markers and
   $w$ edges corresponding to white markers.
 
-The computation of \texttt{Outcome} $(b, w)$ is performed as follows.
+The computation of \textsc{Outcome} $(b, w)$ is performed as follows.
 First, we generate all admissible matchings.
 Let $P = \{1,2,...,n\}$ be the set of positions.
 \begin{itemize}
@@ -394,9 +394,9 @@ Let $P = \{1,2,...,n\}$ be the set of positions.
   at position $i$ in the guess is at position $j$ in the code.
 \end{itemize}
 
-Recall that $\inguess{i}$ denotes position $i$ in the guess
-  and $\incode{i}$ denotes position $i$ in the code.
-For a fixed combination $(B, W)$, we define matchin $M$ by
+Recall that $\inguess{i}$ represents the $i$-th peg in the guess
+  and $\incode{i}$ represents the $i$-th peg in the code.
+For a fixed combination $(B, W)$, we define a matching $M$ by
  $M = \{(\inguess{i}, \incode{i}) \| i\in B \} \cup
       \{(\inguess{i}, \incode{j}) \| (i, j)\in W \}$.
 We construct a parametrized formula
@@ -408,14 +408,14 @@ The formula has a form of a conjunction constructed in the following way.
   This asserts that $(\inguess{i}, \incode{i})$ is an edge in the matching.
 \item For $(i,j)\in W$, we add $f_j(\$i) \wedge \neg f_i(\$i) \wedge \neg f_j(\$j)$.
   This asserts that the colour $\$i$ is at position $j$ in the code and that
-  $(\inguess{i}, \incode{i})$, $(\inguess{j}, \incode{j})$ cannot be edges
+  $(\inguess{i}, \incode{i})$, $(\inguess{j}, \incode{j})$ are not edges
   in the matching.
 \item For $(i,j)\in (P\setminus B\setminus p_1(W))
              \times (P\setminus B\setminus p_2(W))$, we add $\neg f_j(\$i)$.
-  This asserts that no edge can be added and the matching is maximal.
+  This asserts the matching is maximal as no edge can be added.
 \end{itemize}
 
-The result of $\texttt{Outcome}(b, w)$ is a disjunction
+The result of $\textsc{Outcome}(b, w)$ is a disjunction
   of all the conjunctions constructed in this way
   for all combinations of $B$ and $W$.
 For example, for $n = 4$, $B = \{1\}$ and $W = \{2, 3\}$, the generated formula is
@@ -423,8 +423,8 @@ For example, for $n = 4$, $B = \{1\}$ and $W = \{2, 3\}$, the generated formula 
   \wedge \neg f_2(\$3) \wedge \neg f_2(\$4) \wedge \neg f_4(\$3) \wedge \neg f_4(\$4). \]
 
 The number of combinations for $B$ and $W$ grows exponentially
-  with $n$ and so does the size of generated formulas.
-For $n = 4$, the result of $\texttt{Outcome}(1, 1)$
+  with $n$ and so does the size of the generated formulas.
+For $n = 4$, the result of $\textsc{Outcome}(1, 1)$
 contains 24 clauses at the top level with 192 literals in total.\eqed
 
 % For completeness, we show another way to formalize the Mastermind game,

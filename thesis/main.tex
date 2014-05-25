@@ -46,11 +46,11 @@ and a list of references is given.
 
 \begin{ThesisThanks}
 I would like to express my deepest appreciation and thanks to my advisor,
-  prof. RNDr. Antonín Kučera, Ph.D.,
+  prof.~RNDr.~Antonín Kučera, Ph.D.,
   for inspiring and valuable discussions and
-  for coming up with this fascinating topic in the first place.
+  for coming up with this fascinating topic.
 
-I would also like to thank friends of mine who
+I would also like to thank all the people who
   expressed their interest in this work and provided
   constructive comments.
 All my friends deserve a special thanks for their patience with me
@@ -62,7 +62,8 @@ All my friends deserve a special thanks for their patience with me
 code-breaking games, \\
 deductive games,\\
 strategy synthesis, \\
-one-step look-ahead strategies,\\
+optimal strategy, \\
+one-step look-ahead strategy,\\
 SAT solving,\\
 model counting, \\
 Mastermind, \\
@@ -77,13 +78,16 @@ Code-breaking games are two-player games in which the first player selects
 A prominent example of a code-breaking game is the board game Mastermind,
   where the codebreaker tries to guess a combination of coloured pegs.
 
-There are many natural questions regarding code-breaking games.
+There are many natural questions to ask about code-breaking games.
 What strategy for experiment selection should the codebreaker use?
-Is it possible to compute a lower or upper bound for the number of experiments needed?
-Can we compute the optimal strategy?
+Can we compute a lower and upper bound for the number of experiments needed
+  to reveal the code?
+Is it possible to compute an optimal strategy?
 What is the performance of a given heuristic?
-Much research on the topic has been done but it usually focuses
-  on one particular game and little has been written about code-breaking
+Much research on the topic has been done but
+  the authors usually focus
+  on one particular game and
+  little has been written about code-breaking
   games in general.
 
 In this work, we create a general model of code-breaking games
@@ -91,7 +95,7 @@ In this work, we create a general model of code-breaking games
   and design a computer language for game specification.
 Further, we suggest general algorithms for game analysis and strategy synthesis
   and implement them in a computer program.
-Using the tool, we can reproduce existing results for Mastermind,
+Using the program, we can reproduce existing results for Mastermind,
   analyse new code-breaking games and easily evaluate new heuristics
   for experiment selection.
 \end{ThesisAbstract}
