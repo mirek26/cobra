@@ -39,20 +39,11 @@ class MiniSolver: public CnfSolver {
   void OpenContext();
   void CloseContext();
 
-  // void WriteDimacs(FILE* f) {
-  //   minisat_print(minisat_, f);
-  // }
-
   VarId NewVarId() {
     return minisat_.newVar(true, false) + 1;
-    // assert(minisat_);
-    // int k = minisat_inc_max_var(minisat_);
-    // return k;
   }
 
   vec<bool> GetModel();
-
-  // uint NumOfModelsSharpSat();
 
  private:
   bool _MustBeTrue(VarId id);

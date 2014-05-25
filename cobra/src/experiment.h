@@ -40,6 +40,9 @@ struct EOutcome {
   int fixed;
 };
 
+/**
+ * Representation of a experiment, given by its type and parametrization.
+ */
 class Experiment {
   Solver* solver_;
   const ExpType* type_;
@@ -68,10 +71,12 @@ class Experiment {
   string pretty();
 };
 
-
+/**
+ * Representation of a parametrized experiment.
+ */
 class ExpType {
   const Game& game_;
-  uint alph_;
+  uint alph_;  // size of the parametrization alphabet
 
   string name_;
   uint num_params_;
@@ -101,9 +106,7 @@ class ExpType {
   void paramsDistinct(vec<uint>* list);
   void paramsSorted(vec<uint>* list);
 
-  set<vec<CharId>>& GenParams(vec<uint>&);
   void Precompute();
-
   uint64_t NumberOfParametrizations() const;
   bliss::Graph* CreateGraphForParams(const vec<EvalExp>& history,
                                      const vec<CharId>& params) const;
@@ -113,12 +116,17 @@ class ExpType {
   void PrecomputeUsed(Formula* f);
 };
 
+/**
+ * Simple structure representing evaluated experiment.
+ */
 struct EvalExp {
   Experiment exp;
   uint outcome_id;
 };
 
-
+/**
+ * Object for graph hashing, needed by hash map in ExpGenerator
+ */
 class GraphHash {
 public:
   size_t operator()(bliss::Graph* g) const {
@@ -126,12 +134,20 @@ public:
   }
 };
 
+/**
+ * Object for graph comparison, needed by hash map in ExpGenerator.
+ */
 struct GraphEquals : std::binary_function<bliss::Graph*, bliss::Graph*, bool> {
   result_type operator()(first_argument_type lhs, second_argument_type rhs) const {
     return lhs->cmp(*rhs) == 0;
   }
 };
 
+/**
+ * Experiment generator with equivalence detection.
+ * Generates a subset of experiments with at least one experiment
+ * from each equivalence class.
+ */
 class ExpGenerator {
   const Game& game_;
   Solver& solver_;
@@ -157,8 +173,6 @@ class ExpGenerator {
                bool use_bliss);
   ~ExpGenerator();
 
-  // TODO: incremental generation
-  // Experiment Next();
   vec<Experiment> All();
   bliss::Graph* graph() const { return graph_; }
 

@@ -26,7 +26,7 @@ cobra: $(OBJECTS) src/main.o
 # parser
 clean-bison:
 	rm src/cobra.tab.cpp src/cobra.tab.hpp src/cobra.yy.c
-bison: src/cobra.tab.cpp src/cobra.yy.c
+bison:
 	$(BISON) -o src/cobra.tab.cpp src/cobra.ypp
 	$(FLEX) -o src/cobra.yy.c src/cobra.l
 src/cobra.tab.o: src/cobra.tab.cpp src/cobra.ypp

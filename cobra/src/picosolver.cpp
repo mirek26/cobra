@@ -113,22 +113,6 @@ vec<bool> PicoSolver::GetModel() {
   return result;
 }
 
-// uint PicoSolver::NumOfModelsSharpSat(){
-//   FILE* f = fopen(".nummodels", "w");
-//   WriteDimacs(f);
-//   fclose(f);
-//   int r = system("./tools/sharpSAT/Release/sharpSAT -q"
-//        " .nummodels > .nummodels-result");
-//   if (r != 0) {
-//     printf("Error: sharpSAT failed :-(\n");
-//     return 0;
-//   }
-//   FILE* g = fopen(".nummodels-result", "r");
-//   uint k;
-//   fscanf(g, "%u", &k);
-//   return k;
-// }
-
 void PicoSolver::ForAllModels(VarId var, std::function<void()> callback) {
   assert(var > 0 && (unsigned)var < var_count_);
   for (VarId v : std::initializer_list<VarId>({var, -var})) {

@@ -15,13 +15,6 @@
 #ifndef COBRA_SRC_COMMON_H_
 #define COBRA_SRC_COMMON_H_
 
-/*
-var(s) - variable(s)
-param(s) - parametrization(s)
-gen - generate
-equiv - equivalence
-*/
-
 // common types
 typedef unsigned int uint;
 typedef unsigned char CharId;
@@ -36,6 +29,9 @@ template<typename T> using set = std::set<T>;
 template<typename T>
 struct identity { typedef T type; };
 
+/**
+ * Vertex labels for experiment graph construction.
+ */
 namespace vertex_type {
   const int
     kKnowledgeRoot = -1,
@@ -54,6 +50,9 @@ namespace vertex_type {
     kExactlyId = 22;
 }  // namespace vertex_type
 
+/**
+ * ASCII escape color codes for colored output.
+ */
 namespace color {
   extern const string head;
   extern const string emph;
@@ -65,34 +64,24 @@ namespace color {
   extern const char* const serror;
 }
 
-template<class T>
-void for_all_combinations(int k,
-                          const vec<T>& list,
-                          std::function<void(vec<T>)> action,
-                          int offset = 0) {
-  assert(k >= 0);
-  static vec<T> combination;
-  if (k == 0) {
-    action(combination);
-    return;
-  }
-  for (uint i = offset; i <= list.size() - k; ++i) {
-    combination.push_back(list[i]);
-    for_all_combinations(k-1, list, action, i+1);
-    combination.pop_back();
-  }
-}
-
-template<class T, class R>
-void transform(const vec<T>& from, const vec<R>& to, std::function<R(T)>& fun) {
-  to.resize(from.size());
-  std::transform(from.begin(), from.end(), to.begin(), fun);
-}
-
+/**
+ * Prints header of a section.
+ */
 void print_head(string name);
+
+/**
+ * Convert a string to upper case.
+ */
 string toUpper(string str);
-vec<string> split(string s);
+
+/**
+ * Reads a number OR string from the standard input, return true if successful
+ */
 bool readIntOrString(uint& i, string& str);
+
+/**
+ * Converts time from clock_t to double.
+ */
 double toSeconds(clock_t time);
 
 #endif  // COBRA_SRC_COMMON_H_

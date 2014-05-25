@@ -20,11 +20,13 @@
 namespace strategy {
 
 namespace {
-  // Helper function to select the experiment e with the largest f(e).
-  // First parameter of f is the experiment, second is the value of the
-  // best option found yet.
-  // This can save significant amount of time if the function evaluation
-  // is time demanind (because of model counting, for example).
+  /**
+   * Helper function to select the experiment e with the largest f(e).
+   * First parameter of f is the experiment, second is the value of the
+   * best option found yet.
+   * This can save significant amount of time if the function evaluation
+   * is time demanind (because of model counting, for example).
+   */
   uint maximize(std::function<double(Experiment&, double)> f,
                 vec<Experiment>& options) {
     double max = -std::numeric_limits<double>::max();
@@ -40,7 +42,9 @@ namespace {
     return std::distance(options.begin(), best);
   }
 
-  // Similar to the previous function, just minimizing value of f.
+  /**
+   * Similar to maximize, only minimizing value of f.
+   */
   uint minimize(std::function<double(Experiment&, double)> f,
                 vec<Experiment>& options) {
     double min = std::numeric_limits<double>::max();
@@ -155,12 +159,14 @@ uint maker::fixed(Experiment& option) {
   return best;
 }
 
+// ONE-STEP LOOK-AHEAD STRATEGIES FOR EXPERIMENT SELECTION
+
 uint breaker::max_models(vec<Experiment>& options) {
   return minimize([](Experiment& o, double min)->double {
     uint max = 0;
     for (uint i = 0; i < o.num_outcomes(); i++) {
       max = std::max(max, o.NumOfModels(i));
-      if (max > min) return max;        // cannot have less than min
+      if (max > min) return max;  // cannot have less than min
     }
     // prefer the experiment with a final outcome satisfiable
     if (o.IsFinalSat()) return max - 0.5;
@@ -189,7 +195,6 @@ uint breaker::ent_models(vec<Experiment>& options) {
       if (models > 0)
         value -= p * log2(p);
     }
-    // printf("%s ENTROPY: %.3f\n", o.type().game().ParamsToStr(o.params()).c_str(), value);
     return value;
   }, options);
 }

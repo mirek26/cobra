@@ -21,9 +21,6 @@ namespace color {
   const char* const serror = "\033[31m";
 }
 
-/**
- * Prints header of a section.
- */
 void print_head(string name) {
   printf("\n%s===== %s =====%s\n", color::shead, name.c_str(), color::snormal);
 }
@@ -31,18 +28,6 @@ void print_head(string name) {
 string toUpper(string s) {
   std::transform(s.begin(), s.end(), s.begin(), toupper);
   return s;
-}
-
-vec<string> split(string s) {
-  vec<string> result;
-  string delimiter = " ";
-  size_t pos = 0;
-  string token;
-  while ((pos = s.find(delimiter)) != string::npos) {
-      result.push_back(s.substr(0, pos));
-      s.erase(0, pos + delimiter.length());
-  }
-  return result;
 }
 
 bool readIntOrString(uint& i, string& str) {

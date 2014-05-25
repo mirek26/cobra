@@ -20,6 +20,9 @@ class ExpType;
 class AndOperator;
 class Experiment;
 
+/**
+ * Class for representation of a code-breaking game.
+ */
 class Game {
   vec<Variable*> vars_;
   std::map<string, VarId> vars_ids_;
@@ -27,8 +30,9 @@ class Game {
   vec<ExpType*> experiments_;
   vec<string> alphabet_;
 
-
-  // list of mappings between alphabet and vars
+  /**
+   * Collection of mappings between alphabet and vars
+   */
   vec<vec<VarId>> mappings_;
   std::map<string, MapId> mappings_ids_;
 
@@ -45,30 +49,24 @@ class Game {
 
   Variable* getVarByName(string) const;
 
-  void addConstraint(Formula* f);
   Formula* constraint() const;
+  void addConstraint(Formula* f);
 
+  const vec<string>& alphabet() const { return alphabet_; }
   void setAlphabet(vec<string>* alphabet) {
     assert(alphabet_.empty());
     alphabet_.insert(alphabet_.end(), alphabet->begin(), alphabet->end());
     delete alphabet;
   }
 
-  const vec<string>& alphabet() const { return alphabet_; }
-
-  // uint& bliss_calls() { return bliss_calls_; }
-  // clock_t& bliss_time() { return bliss_time_; }
-
   MapId addMapping(string, vec<Variable*>*);
   MapId getMappingId(string) const;
   VarId getMappingValue(MapId, CharId) const;
-
   ExpType* addExperiment(string name, uint num_params);
   const vec<ExpType*>& experiments() const {  return experiments_;  }
 
   void PrintModel(vec<bool> model) const;
   string ParamsToStr(const vec<CharId>& params, char sep = ' ') const;
-
   void Precompute();
 
   bliss::Graph* CreateGraph() const;

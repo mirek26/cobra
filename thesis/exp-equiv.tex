@@ -358,11 +358,11 @@ The following lemma gives us a right to disregard equivalent experiments
 \begin{lemma}
 Let $f: 2^\Formr ->\Rset$ be a function such that
   $f(\formset) = f(\{\form^\pi \| \form\in\formset\})$ for any
-  $\formset\subseteq\Formr$ and $\pi\in\Perm_\Var$.
-Let $<$ be a total order of experiments $E$.
-Let $\stg$ be a one-step look-ahead strategy with respect to $f$ and $<$, and
+  $\formset\subseteq\Formr$ and $\pi\in\Perm_\Var$ and
+  let $\eord$ be a total order of experiments $E$.
+Let $\stg$ be a one-step look-ahead strategy with respect to $f$ and $\eord$, and
 let $\form$ be a formula.
-Suppose there are experiment $e_1$, $e_2$ such that $e_1\expeq{\form}e_2$ and $e_1<=e_2$.
+Suppose there are experiment $e_1$, $e_2$ such that $e_1\expeq{\form}e_2$ and $e_1\eord e_2$.
 Then $\stg(\form) \not= e_2$.
 \end{lemma}
 
@@ -370,7 +370,7 @@ Then $\stg(\form) \not= e_2$.
 If follows directly from \autoref{def:expeq} and the property of $f$ that
 \[f(\{\form\wedge\formx\| \formx\in\outcome(e_1)\}) =
  f(\{\form\wedge\formx\| \formx\in\outcome(e_2)\}).\]
-Since $e_1 < e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
+Since $e_1 \eord e_2$, the strategy always prefers $e_1$ to $e_2$. \qed
 \end{proof}
 
 \vspace{-5mm}

@@ -65,14 +65,11 @@
   uint tint;
 }
 
-/* Lets inform Bison about the type of each terminal and non-terminal */
 %type <tstr>     T_IDENT
 %type <tstr>     T_STRING
 %type <tstr>     ident
 %type <tint>     T_INT
-
 %type <formula>  formula
-
 %type <string_list> string_list
 %type <int_list> int_list
 %type <variable_list> variable_list
@@ -81,7 +78,7 @@
 
 start :
     code
-  | formula    // hack to parse a formula only (for testing purposes)
+  | formula    // to parse a formula only (for testing purposes)
     {  m.set_only_formula($1);  }
 
 ident :

@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) 2014, Miroslav Klimos <miroslav.klimos@gmail.com>
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
 %option yylineno
 %option noyywrap
 %{
-#include "formula.h"
-#include "game.h"
-#include "cobra.tab.hpp"
+#include "./formula.h"
+#include "./game.h"
+#include "./cobra.tab.hpp"
 
 extern "C" int yyparse();
 #define YY_DECL extern "C" int yylex()
@@ -21,53 +26,58 @@ char* str_dup_strip(char* str) {
  /* white space */
 [ \t\n]         ;
  /* comments */
-\#.*\n          ;  /**/
+\#.*\n          ;
 
  /* number constants */
-[0-9]+             { yylval.tint = atoi(yytext); return T_INT; }
+[0-9]+           { yylval.tint = atoi(yytext);
+                   return T_INT; }
 
  /* operators */
--\>             { return T_IMPLIES; }
-→               { return T_IMPLIES; }
-⇒               { return T_IMPLIES; }
-\<-             { return T_IMPLIED; }
-←               { return T_IMPLIED; }
-\<-\>           { return T_EQUIV; }
-⇔               { return T_EQUIV; }
-↔               { return T_EQUIV; }
-\&\&            { return T_AND; }
-\&              { return T_AND; }
-∧               { return T_AND; }
-[aA][nN][dD]    { return T_AND; }
-\|\|            { return T_OR; }
-\|              { return T_OR; }
-∨               { return T_OR; }
-[oO][rR]        { return T_OR; }
-¬               { return T_NOT; }
-!               { return T_NOT; }
+-\>              { return T_IMPLIES; }
+→                { return T_IMPLIES; }
+⇒                { return T_IMPLIES; }
+\<-              { return T_IMPLIED; }
+←                { return T_IMPLIED; }
+\<-\>            { return T_EQUIV; }
+⇔                { return T_EQUIV; }
+↔                { return T_EQUIV; }
+\&\&             { return T_AND; }
+\&               { return T_AND; }
+∧                { return T_AND; }
+[aA][nN][dD]     { return T_AND; }
+\|\|             { return T_OR; }
+\|               { return T_OR; }
+∨                { return T_OR; }
+[oO][rR]         { return T_OR; }
+¬                { return T_NOT; }
+!                { return T_NOT; }
 
-"AtLeast"       { return T_ATLEAST; }
-"AtMost"        { return T_ATMOST; }
-"Exactly"       { return T_EXACTLY; }
+"AtLeast"        { return T_ATLEAST; }
+"AtMost"         { return T_ATMOST; }
+"Exactly"        { return T_EXACTLY; }
 
-"VARIABLE"      { return T_VARIABLE; }
-"VARIABLES"     { return T_VARIABLES; }
-"CONSTRAINT"   { return T_CONSTRAINT; }
-"ALPHABET"      { return T_ALPHABET; }
-"MAPPING"       { return T_MAPPING; }
-"EXPERIMENT"    { return T_EXPERIMENT; }
+ /* keywords */
+"VARIABLE"        { return T_VARIABLE; }
+"VARIABLES"       { return T_VARIABLES; }
+"CONSTRAINT"      { return T_CONSTRAINT; }
+"ALPHABET"        { return T_ALPHABET; }
+"MAPPING"         { return T_MAPPING; }
+"EXPERIMENT"      { return T_EXPERIMENT; }
 "PARAMS_DISTINCT" { return T_PARAMS_DISTINCT; }
-"PARAMS_SORTED" { return T_PARAMS_SORTED; }
-"OUTCOME"       { return T_OUTCOME; }
-"OUTCOMEX"      { return T_OUTCOMEX; }
+"PARAMS_SORTED"   { return T_PARAMS_SORTED; }
+"OUTCOME"         { return T_OUTCOME; }
+"OUTCOMEX"        { return T_OUTCOMEX; }
 
  /* identifiers */
-[a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext); return T_IDENT; }
-\"[^"]*\" { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
-\'[^']*\' { yylval.tstr = str_dup_strip(yytext); return T_STRING; }
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.tstr = strdup(yytext);
+                         return T_IDENT; }
+\"[^"]*\"              { yylval.tstr = str_dup_strip(yytext);
+                         return T_STRING; }
+\'[^']*\'              { yylval.tstr = str_dup_strip(yytext);
+                         return T_STRING; }
 
  /* default: return char on input */
- .              { return yytext[0]; }
+ .               { return yytext[0]; }
 %%
 
 void parse_string(string str) {

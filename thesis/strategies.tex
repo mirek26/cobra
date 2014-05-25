@@ -15,13 +15,13 @@ A strategy $\stg$ together with a valuation $\val\in\Vals$
   \procstg{\stg}{\val} = \exp_1, \form_1, \exp_2, \form_2, ...,
   \]
   where
-  $\exp_{i+1} = \stg(\exp_1, \form_1, ..., \exp_i, \form_i)$
+  $\exp_{i+1} = \stg(\procstg{\stg}{\val}[1:i])$
   and
   $\form_{i+1}$ is the formula from $\outcome(\exp_{i+1})$
   satisfied by $\val$,
   for all $i\in\Nset$.
-Note that thanks to the well-formed property,
-  $\form_{i+1}$ is uniquely defined.
+Thanks to the well-formed property,
+  there is exactly one such $\form_{i+1}$.
 
 We define \emph{length} of a strategy $\stg$ on a valuation $\val$,
   denoted $\stglen{\stg}{\val}$,
@@ -112,7 +112,7 @@ Contradiction. \qed
 
 \begin{example} \label{ex:run2}
 Recall our running example of the counterfeit coin problem with 4 coins,
-as defined in \ref{ex:run2}.
+as defined in \autoref{ex:run1}.
 
 Consider a strategy $\stg$ defined as follows.
 For simplicity, we denote experiments by their parametrizations only
@@ -348,28 +348,34 @@ These strategies select an experiment that
 
 \newcommand{\formset}{\Psi}
 \begin{definition}[One-step look-ahead strategy]\label{def:oslas}
-Let $f$ be a function of type $2^{\Formr} -> \Rset$.
-A one-step look-ahead strategy with respect to $f$ is
-  a memory-less strategy such that
-  for every $\form\in\Form_X$ and $\exp'\in\Exp$,
+Let $f$ be a function of type $2^{\Formr} -> \Rset$ and
+  $\eord$ a total order of experiments.
+A one-step look-ahead strategy with respect to $f$ and $\eord$ and is
+  a memory-less strategy $\stg$, such that
+  $\stg(\form) = e$ is the minimal element of $(E,\eord)$ satisfying
 \[
-f(\{\:\form \wedge \formx \| \formx\in\outcome(e) \:\}) <=
+\forall e'\in\Exp. \;\; f(\{\:\form \wedge \formx \| \formx\in\outcome(e) \:\}) <=
   f(\{\: \form \wedge \formx \| \formx\in\outcome(e') \:\}).
 \]
 \end{definition}
 
-Note that one-step look-ahead strategy with respect to $f$ is not unique.
-For some formulas, there can be more experiments with the same value of $f$.
-To uniquely specify a strategy, we must provide the function $f$ and
-  a resolution method for these ambiguous states.
-Typically, we specify a total order on experiments and select the least
-  experiment in the order satisfying the condition of \autoref{def:oslas}.
+We refer to the value $f(\{\form \wedge \formx \| \formx\in\outcome(e)\})$
+  as the value of the function $f$ on experiment $e$.
+The purpose of $\eord$ is to resolve the cases in which
+  the value of the function is the same for more experiments.
+
+% Note that one-step look-ahead strategy with respect to $f$ is not unique.
+% For some formulas, there can be more experiments with the same value of $f$.
+% To uniquely specify a strategy, we must provide the function $f$ and
+%   a resolution method for these ambiguous states.
+% Typically, we specify a total order on experiments and select the least
+%   experiment in the order satisfying the condition of \autoref{def:oslas}.
 
 A few one-step look-ahead strategies for Mastermind
   have been already introduced in \autoref{sec:mm}.
-We now define them formally in the general code-breaking games.
-In the Mastermind case,
-  the experiments are ordered lexicographically by the colour combination.
+In the following, we define them formally for the general model of code-breaking games.
+Unless otherwise stated, the total order $\eord$ is
+  the lexicographical order of the experiments.
 
 \begin{description}
 \item[Max-models.]
@@ -403,13 +409,14 @@ f(\formset) = - \:|\{ \form \| \form\in\formset, \;\SAT{\form} \}|.
 \end{description}
 
 \newcommand{\fixed}{\#_\textrm{fixed}\:}
-We suggest and analyse one-step look ahead strategies based on fixed variables.
+We suggest and analyse two more one-step look ahead strategies based on
+the number of fixed variables of the formula.
 Let
 \[
 \fixed\form = |\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=1 \}
                   \cup\{ x\in\Var \| \forall v.v(\form)=1 ==> v(x)=0 \}|
 \]
-be the number of variables that have same value in all models of $\form$.
+be the number of variables of $\form$.
 Note that while the aforementioned strategies does not depend on the exact
   formalization of a problem, the number of fixed variables may differ for
   different encodings.
@@ -426,6 +433,7 @@ f(\formset) = -\min_{\form\in\formset} \fixed{\form}.
 f(\formset) = -\frac{\sum_{\form\in\formset}\numval{\form}\cdot\fixed{\form}}{\sum_{\form\in\formset}\numval{\form}}.
 \]
 \end{description}
+\pagebreak
 
 \begin{example}
 Recall \autoref{ex:run1} and consider two experiments in the first step.
@@ -440,7 +448,7 @@ Second, consider an experiment of weighing coins 1 and 2 agains coins 3 and 4.
 As exactly one coin must be counterfeit, outcome $=$ is not possible.
 Outcomes $<$ and $>$ are symmetrical, both have $4$ models and fix no variables.
 
-\begin{table}[ht]
+\begin{table}[!ht]
 \begin{center}
 \begin{tabular}{l|cc}
 & 12 & 1234 \\\hline

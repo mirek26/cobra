@@ -282,6 +282,7 @@ void ExpGenerator::GenParamsFill(uint n) {
   set<CharId> done;
   if (n == curr_type_->num_params()) {
     stats_.ph1++;
+    // run symmetri detection ONLY if use_bliss_ set to true
     if (use_bliss_) {
       GenParamsGraphFilter();
     } else {
@@ -304,7 +305,7 @@ void ExpGenerator::GenParamsFill(uint n) {
       if (params_[p] > a) valid = false;
     }
     if (!valid) continue;
-    // Test equivalence.
+    // Simple equivalence test.
     if (curr_type_->interchangable_[n][a]) {
       for (auto b : done) {
         if (a == b) continue;
