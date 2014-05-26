@@ -291,7 +291,7 @@ We assume there is a tool available for construction of the canonical labelling
 \DontPrintSemicolon
 $B <-$ construct the base graph for the game\;
 $fixed <-$ compute fixed variables of $\form$ using a SAT solver\;
-$\form' <- $ substitude values for fixed variables in $\form$ and simplify\;
+$\form' <- $ substitute values for fixed variables in $\form$ and simplify\;
 Label the vertices in $B$ corresponding to the fixed variables with their fixed value\;
 Add the ``knowledge''-rooted tree of $\form'$ to $B$\;
 $S <- \emptyset$\;
@@ -299,7 +299,7 @@ $hash <- $ an empty hash table for graphs\;
 \For{$e\in E$}{
   $B_e <- $ clone $B$\;
   \For{$\formx\in\outcome(e)$} {
-    $\formx' <- $ substitude values for $fixed$ in $\formx$ and simplify\;
+    $\formx' <- $ substitute values for $fixed$ in $\formx$ and simplify\;
     Add the ``outcome''-rooted tree of $\formx'$ to $B_e$
   }
   $B_e <- $ canonize $B_e$\;
@@ -559,9 +559,9 @@ The equation now follows from (\refeq{optval}) and the facts that
  (proven in the first part). \qed
 \end{proof}
 
-A recursive algorithm for computation of the value
+A recursive algorithm for the computation of the value
   of the worst-case and the average-case optimal strategy,
-  $\optval(\form)$ and $\optvale(\form)$ is shown in \autoref{alg:acopt}.
+  $\optval(\form)$ and $\optvale(\form)$, is shown in \autoref{alg:acopt}.
 The lines marked with [W] applies only to the worst case,
   the lines marked with [A] applies only to the average case.
 
