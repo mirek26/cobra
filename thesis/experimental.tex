@@ -1,31 +1,29 @@
 \chapter{Experimental results} \label{ch:exp}
 In this chapter, we present experimental results of our tool on several code-breaking games.
-We compare running times of the tool on various tasks with different SAT solvers and
-  evaluate presented one-step look-ahead strategies.
+We compare the running times of the tool on various tasks with different SAT solvers and
+  evaluate the proposed one-step look-ahead strategies.
 
 In the tables below, MM($n$,$m$) refers to Mastermind with $n$ pegs and $m$ colours,
 CC($n$) refers to the counterfeit coin problem with $n$ coins,
-BG($n$,$m$) refers to Bags of gold problem with $n$ bags and balance scale capacity $m$ and
-SM($n$,$m$) refers to the Mastermind variant with black markers only, i.e.
-  for each guess, the codebreaker gets the number of positions at which the code
-  and the guess match.
+BG($n$,$m$) refers to the Bags of gold problem with $n$ bags and balance scale capacity $m$ and
+SM($n$,$m$) refers to Mastermind with black markers with $n$ pegs and $m$ colours.
 
 \section{Performance}
 
-All experiments have been run on Intel Core i7-3770 3.40GHz and COBRA was
+All experiments have been run on Intel Core i7-3770 3.40GHz and Cobra was
 compiled with \texttt{gcc} 4.8.2.
 The symmetry breaking engine has been turned off for this section,
   so that the differences between SAT solvers become more apparent.
 
-The numbers in the following tables are running times in seconds with
-  respective SAT solvers.
+The numbers in the following tables report the running times in seconds with
+  the respective SAT solvers.
 The last column (``\# calls'') states the total number of calls to
   the SAT solver during the task.
-Model counting and counting the number of fixed variables is considered one call.
+Model counting and counting of the number of fixed variables are considered one call.
 
-\autoref{tbl:exp-sat-wellformed} lists running times of the well-formed check
+\autoref{tbl:exp-sat-wellformed} lists the running times of the well-formed check
   of several code-breaking games.
-Naturally, proper SAT solvers are orders of magnitude faster than simple solver
+Naturally, proper SAT solvers are orders of magnitude faster than Simple solver
 as well-formed check is based on verification of unsatisfiability of
   a (relatively) large formula.
 
@@ -42,16 +40,16 @@ BG(12,12) & 3,539 &  \textbf{0.5} & 1.1 & 271 \\\hline
 \end{center}
 \end{table}
 
-The first two lines of \autoref{tbl:exp-sat-sim} show execution times of the
+The first two lines of \autoref{tbl:exp-sat-sim} show the execution times of the
   first experiment selection in Mastermind with $4$ pegs and $6$ colours.
-The last two lines of the table list running times of the simulation of
-  respective strategies on EDEE code.
+The last two lines of the table list the running times of the simulation of
+  the respective strategies on the EDEE code.
 
-As can be seen from the numbers, evaluation of ``parts'' strategy is slightly
-  faster with Minisat than with simple solver.
+As can be seen from the numbers, evaluation of the ``parts'' strategy is slightly
+  faster with Minisat than with Simple solver.
 However, since our model counting algorithm implemented on top of Minisat and Picosat
-  is naive and unoptimized, ``max-models'' strategy evaluation is significantly faster
-  with simple solver.
+  is naive and unoptimized, the evaluation of the ``max-models'' strategy
+  is significantly faster with Simple solver.
 
 \begin{table}[ht]
 \begin{center}
@@ -68,20 +66,19 @@ Simulate (max-models on EDEE) & \textbf{15.1} & 32.3 & 3,024 & 31,061 \\\hline
 \end{table}
 
 \autoref{tbl:exp-sat-analyse}
-  shows running times of strategy analysis.
-A clear winner in this case is the simple solver based on
-  model enumeration,
-  which is not unexpected.
+  shows the running times of strategy analysis.
+The clear winner in this case is Simple solver, which is not unexpected.
 On lower levels of the backtracking algorithm,
   the analysed formulas have only very few models and the
   overhead with calling a proper SAT solver is greater
-  than the na\"ive approach of a simple solver.
+  than the naive approach used by Simple solver.
 
-The results also show that model counting is harder than satisfiability questions.
-The difference is not that significant for simple solver
- but, as we have already mentioned, our model counting algorithm is much slower.
-That is the reason why the analysis of ``max-models'' strategy takes Minisat and Picosat
-  much more time than analysis of ``parts'' strategy.
+The results also show that for proper SAT solvers,
+  model counting is much harder than satisfiability questions.
+% The difference is not that significant for Simple solver
+%   but, as we have already mentioned, t model counting algorithm is much slower.
+That is the reason why the analysis of the ``max-models'' strategy takes Minisat and Picosat
+  much more time than analysis of the ``parts'' strategy.
 
 To summarize the results of this section,
 Picosat turned out to be very slow on instances of this size. Minisat proved to be
@@ -90,8 +87,8 @@ models of the formula is relatively large.
 Simple solver is a clear winner for strategy analysis.
 
 A question arises whether we can benefit from a hybrid approach of
-  using a SAT solver in the first steps and
-  switching to the simple solver when the number of possibilities shrinks.
+  using a proper SAT solver in the first steps and
+  switching to Simple solver when the number of possibilities shrinks.
 This was, however, beyond the scope of this thesis.
 
 \begin{table}
@@ -121,7 +118,7 @@ CC(20) & exp-fixed & 0.3 & 73 & $>$ 5,000 & 14,273 \\\hline
 \section{One-step look-ahead strategies}
 
 In this section, we compare performance of one-step look-ahead strategies
-defined in \autoref{sec:oslas} on the counterfeit coin problem,
+proposed in \autoref{sec:oslas} on the counterfeit coin problem,
 Mastermind, and Mastermind with black markers only.
 
 \subsection{The counterfeit coin problem}
@@ -139,10 +136,10 @@ That is because the additional coin changes
   the number of models of some outcomes,
   which may lead to better experiment selection.
 
-Interestingly, ``exp-fixed'' strategy outperforms all others
+Interestingly, the ``exp-fixed'' strategy outperforms all others
   on 20, 21, 23, 25 and 27 coins, while it seems to be
   generally worse.
-Strategies ``parts'' and ``min-fixed'' are clearly unsuitable for
+The strategies ``parts'' and ``min-fixed'' are clearly unsuitable for
   a problem of this kind.
 
 \begin{figure}[ht]
@@ -157,13 +154,13 @@ Strategies ``parts'' and ``min-fixed'' are clearly unsuitable for
 
 Results for Mastermind are shown in \autoref{tbl:exp-mm},
   rounded to three decimal places.
-A clear winner in the average case is ``parts'' strategy,
+The clear winner in the average case is the ``parts'' strategy,
   closely followed by ``max-models''.
 
 In the worst case, ``max-models'' outperforms other
   strategies in all cases except MM(3,2).
 In this case, ``max-models'' is unlucky in the initial state
-  and selects guess AAA,
+  and selects the guess AAA,
   which has the same maximal number of models over the outcomes as AAB
   but is lexicographically smaller.
 All other strategies select AAB,
@@ -205,9 +202,9 @@ Mastermind with black markers only is an example of a code-breaking game,
   where ``max-models'' does not perform so well.
 Exact values rounded to two decimal points are shown in \autoref{tbl:exp-mmb}.
 
-The best one-step look-ahead startegy for this game is ``ent-models'',
+The best one-step look-ahead strategy for this game is ``ent-models'',
   the strategy based on the entropy of the number of models,
-  closely followed by ``parts'' strategy.
+  closely followed by the ``parts'' strategy.
 
 \begin{table}[ht]
 \begin{center}
