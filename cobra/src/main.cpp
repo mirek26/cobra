@@ -237,10 +237,11 @@ uint optimum(Solver& solver, vec<EvalExp>& history,
   auto graph = gen.graph();
   bliss::Stats stats;
   clock_t t1 = clock();
-  //auto canonical = new bliss::Graph(*graph);
+  // auto canonical = new bliss::Graph(*graph);
   auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
   Game::bliss_calls += 1;
   Game::bliss_time += clock() - t1;
+
   if (opt_hash.count(canonical)) {
     // subproblem already analysed
     auto x = opt_hash[canonical];
@@ -249,9 +250,9 @@ uint optimum(Solver& solver, vec<EvalExp>& history,
   } else {
     opt_hash[canonical] = states.size();
   }
-  auto& simp = static_cast<SimpleSolver&>(solver);
-  printf("State %u - formula %s (opt %.2f)\n", states.size(), simp.pretty().c_str(), opt);
 
+  // auto& simp = static_cast<SimpleSolver&>(solver);
+  // printf("State %u - formula %s (opt %.2f)\n", states.size(), simp.pretty().c_str(), opt);
   states.push_back(stateInfo());
   auto id = states.size() - 1;
   states[id].opt = -1;
@@ -301,13 +302,14 @@ uint optimum(Solver& solver, vec<EvalExp>& history,
   }
 
   // Lower bound check
-  double d = log(models)/log(maxparts);
-  if (worst) d = ceil(d);
-  if (d >= opt) {
-    states[id].opt = opt;
-    return id; // non-perspective branch
+  if (worst) {
+    double d = log(models)/log(maxparts);
+    if (worst) d = ceil(d);
+    if (d >= opt) {
+      states[id].opt = opt;
+      return id; // non-perspective branch
+    }
   }
-
   // Sort according to the 'minnum' stg
   assert(!options.empty());
   vec<uint> sorted;
@@ -329,11 +331,13 @@ uint optimum(Solver& solver, vec<EvalExp>& history,
       auto outcome = e.type().outcomes()[i];
       solver.AddConstraint(outcome.formula, e.params());
       history.push_back({ e, i });
-      auto substate = optimum(solver, history, opt - 1, worst);
-      next[i] = substate;
       if (worst) {
+        auto substate = optimum(solver, history, opt - 1, worst);
+        next[i] = substate;
         val = std::max(val, 1 + states[substate].opt);
       } else {
+        auto substate = optimum(solver, history, opt, worst);
+        next[i] = substate;
         val += (1 + states[substate].opt) * solver.NumOfModels();
       }
       history.pop_back();
@@ -352,6 +356,7 @@ uint optimum(Solver& solver, vec<EvalExp>& history,
   if (best > -1) {
     states[id].exp = new Experiment(options[best]);
   }
+
   states[id].opt = opt;
   return id;
 }
@@ -389,7 +394,7 @@ void optimal_mode(bool worst) {
     printf("Invalid upper bound. No strategy found.\n");
   } else {
     printf("Optimal number of experiments: %.2f\n", states[x].opt);
-    opt_print(x);
+    // opt_print(x);
   }
   // Free aux structures
   for (auto g: opt_hash) delete g.first;
@@ -451,7 +456,7 @@ void parse_args(int argc, char* argv[]) {
   using namespace TCLAP;
   CmdLine cmd("", ' ', "");
 
-  vec<string> modes = { "o", "s", "simulation", "a", "analysis",
+  vec<string> modes = { "o", "overview", "s", "simulation", "a", "analysis",
                         "ow", "optimal-worst", "oa", "optimal-average" };
   ValuesConstraint<string> modeConstraint(modes);
   ValueArg<string> mode_arg(
@@ -462,8 +467,8 @@ void parse_args(int argc, char* argv[]) {
   vec<string> backends = { "picosat", "minisat", "simple" };
   ValuesConstraint<string> backendConstraint(backends);
   ValueArg<string> backend_arg(
-    "b", "backend",
-    "Specifies SAT solver. Default: simple.", false,
+    "s", "sat-solver",
+    "Specifies the SAT solver. Default: simple.", false,
     "simple", &backendConstraint);
 
   vec<string> e_stgs, o_stgs;
@@ -544,7 +549,7 @@ int main(int argc, char* argv[]) {
     g_makerStg = strategy::maker_strategies.at(args.stg_outcome).second;
     m.game().Precompute();
 
-    if (args.mode == "o") {
+    if (args.mode == "o" || args.mode == "overview") {
       overview_mode();
     } else if (args.mode == "s" || args.mode == "simulation") {
       try {
