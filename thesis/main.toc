@@ -50,9 +50,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\rmfamily Experiment graph}{34}{section*.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\rmfamily Improvement by fixed variables}{34}{section*.30}
+\contentsline {subsection}{\rmfamily Improvement by fixed variables}{35}{section*.31}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}\slshape Well-formed check}{36}{section.4.2}
+\contentsline {section}{\numberline {4.2}\slshape Well-formed check}{37}{section.4.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {4.3}\slshape Analysis of one-step look-ahead strategies}{37}{section.4.3}
 \defcounter {refsection}{0}\relax 
