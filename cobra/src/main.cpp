@@ -23,6 +23,7 @@
 #include "./strategy.h"
 #include "./minisolver.h"
 #include "./picosolver.h"
+#include "./optimal.h"
 #include "./simple-solver.h"
 
 extern "C" int yyparse();
@@ -31,19 +32,6 @@ extern Parser m;
 
 std::function<uint(vec<Experiment>&)> g_breakerStg;
 std::function<uint(Experiment&)> g_makerStg;
-
-/**
- * Helper structure for command line arguments
- */
-typedef struct Args {
-  string filename;
-  string mode;
-  string backend;
-  string stg_experiment;
-  string stg_outcome;
-  bool symmetry_detection;
-  double opt_bound;
-} Args;
 
 Args args;
 
@@ -220,217 +208,21 @@ void simulation_mode() {
   delete solver;
 }
 
-struct stateInfo {
-  double opt;
-  Experiment* exp;
-  vec<int> next;
-  bool solved = false;
-  bool printed = false;
-};
-
-std::vector<stateInfo> states;
-std::unordered_map<bliss::Graph*, uint, GraphHash, GraphEquals> opt_hash; // stores incides to 'states' vector
-
-// returns index of the corresponding state
-uint optimum(Solver& solver, vec<EvalExp>& history,
-             double opt, bool worst) {
-  // generate graph for the formula + canonize
-  ExpGenerator gen(m.game(), solver, history, args.symmetry_detection);
-  auto graph = gen.graph();
-  bliss::Stats stats;
-  clock_t t1 = clock();
-  // auto canonical = new bliss::Graph(*graph);
-  auto canonical = graph->permute(graph->canonical_form(stats, nullptr, nullptr));
-  Game::bliss_calls += 1;
-  Game::bliss_time += clock() - t1;
-
-  // if the value for this subproblem is already computed, simply return
-  if (opt_hash.count(canonical)) {
-    auto x = opt_hash[canonical];
-    delete canonical;
-    return x;
-  } else {
-    opt_hash[canonical] = states.size();
-  }
-
-  // auto& simp = static_cast<SimpleSolver&>(solver);
-  // printf("State %u - formula %s (opt %.2f)\n", states.size(), simp.pretty().c_str(), opt);
-
-  // initialize new state
-  states.push_back(stateInfo());
-  auto id = states.size() - 1;
-  states[id].opt = -1;
-  states[id].exp = nullptr;
-
-  // check whether the game is finished
-  if (solver.OnlyOneModel()) {
-    assert(!history.empty());
-    states[id].solved = true;
-    auto last = history.back();
-    auto final_out = last.exp.type().final_outcome();
-    if (final_out == -1 || static_cast<int>(last.outcome_id) == final_out) {
-      states[id].opt = 0;
-    } else {
-      states[id].opt = 1;
-    }
-    return id;
-  }
-
-  // check whether there is an experiment with #sat outcomes == models
-  vec<Experiment> options = gen.All();
-  auto models = solver.NumOfModels();
-  int last = -1;
-  uint maxparts = 0;
-  for (uint i = 0; i < options.size(); i++) {
-    auto parts = options[i].NumOfSat();
-    maxparts = std::max(maxparts, parts);
-    if (parts == models) {  // this solves the game -> check for FINAL
-      last = i;
-      auto final_out = options[i].type().final_outcome();
-      if (final_out == -1 || options[i].IsSat(final_out)) break;
-    }
-    if (parts == 1) {  // eliminate experiments with one sat outcome only
-      options[i] = options.back();
-      options.pop_back();
-      i--;
-    }
-  }
-  if (last > -1) {
-    auto final_out = options[last].type().final_outcome();
-    states[id].exp = new Experiment(options[last]);  // clone the experiment
-    states[id].solved = true;
-    if (final_out == -1) states[id].opt = 1;
-    else if (worst || not options[last].IsSat(final_out)) states[id].opt = 2;
-    else states[id].opt = 2 - (static_cast<double>(1) / models);
-    return id;
-  }
-
-  // Lower bound check
-  // if (worst) {
-    double d = log(models)/log(maxparts);
-    if (worst) d = ceil(d);
-    if (d >= opt) {
-      states[id].opt = opt;
-      //printf("lb kill\n");
-      return id; // non-perspective branch
-    }
-  // }
-
-  // Sort according to the 'minnum' stg
-  assert(!options.empty());
-  vec<uint> sorted;
-  sorted.resize(options.size());
-  for (uint i = 0; i < options.size(); i++) sorted[i] = i;
-  std::sort(sorted.begin(), sorted.end(), [&](const int a, const int b) {
-    return options[a].MaxNumOfModels() < options[b].MaxNumOfModels();
-  });
-
-  // Recurse down
-  int best = -1;
-  for (auto i : sorted) {
-    auto& e = options[i];
-    double val = 0;
-    vec<int> next(e.type().outcomes().size(), -1);
-
-    // compute lower bound (for average-case)
-    double lowert = 0;
-    vec<double> lower(e.type().outcomes().size(), 0);
-    if (!worst) {
-      for (uint i = 0; i < e.type().outcomes().size(); i++) {
-        double modelsi = static_cast<double>(e.NumOfModels(i));
-        if (modelsi > 1)
-          lower[i] += modelsi/models * (1 + log(modelsi)/log(maxparts)); // divide by numofsat instead of max-branch
-        else
-          lower[i] += modelsi/models;
-        lowert += lower[i];
-        //printf("%2.f\n", lowert);
-      }
-      if (lowert >= opt) {
-        // printf("exp skip %.2f %.2f\n", lowert, opt);
-        continue; // non-pespective experiment
-      }
-    }
-
-    for (uint i = 0; i < e.type().outcomes().size(); i++) {
-      if (!e.IsSat(i)) continue;
-      solver.OpenContext();
-      auto outcome = e.type().outcomes()[i];
-      solver.AddConstraint(outcome.formula, e.params());
-      history.push_back({ e, i });
-      if (worst) {
-        auto substate = optimum(solver, history, opt - 1, worst);
-        next[i] = substate;
-        val = std::max(val, 1 + states[substate].opt);
-      } else {
-        // compute n-opt so that
-        // lowert - lower[i] + modelsi/models*nopt = opt
-        double modelsi = e.NumOfModels(i);
-        double nopt = (opt - lowert + lower[i]) * models / modelsi - 1;
-        // printf("%.2f %.2f %.2f %i %.1f - %.2f\n", opt, lowert, lower[i], models, modelsi, nopt);
-        auto substate = optimum(solver, history, nopt, worst);
-        next[i] = substate;
-        val += (1 + states[substate].opt) * modelsi;
-      }
-      history.pop_back();
-      solver.CloseContext();
-    }
-    if (!worst) {
-      val /= models;
-    }
-    if (val < opt) {
-      opt = val;
-      best = i;
-      states[id].next.resize(next.size());
-      std::copy(next.begin(), next.end(), states[id].next.begin());
-    }
-  }
-  if (best > -1) {
-    states[id].exp = new Experiment(options[best]);
-  }
-
-  states[id].opt = opt;
-  return id;
-}
-
-void opt_print(uint x) {
-  assert(x < states.size());
-  if (states[x].printed) return;
-  states[x].printed = true;
-  if (states[x].solved) {
-    if (states[x].exp) printf("State %i: %s (Solved.)\n", x, states[x].exp->pretty().c_str());
-    else printf("State %i: Solved.\n", x);
-    return;
-  }
-  assert(states[x].exp);
-  printf("State %i: %s. Go to ", x, states[x].exp->pretty().c_str());
-  for (auto n: states[x].next) {
-    if (n > -1) printf("%i ", n);
-    else printf("-");
-  }
-  printf("\n");
-  for (auto n: states[x].next) {
-    if (n > -1) opt_print(n);
-  }
-}
-
 void optimal_mode(bool worst) {
   string head = worst ? "WORST-CASE" : "AVERAGE-CASE";
   print_head(head + " OPTIMAL STRATEGY");
-  Game& game = m.game();
-  Solver* solver = get_solver(game.vars().size(), game.constraint());
-  vec<EvalExp> history;
-  if (args.opt_bound == -1) args.opt_bound = std::numeric_limits<double>::max();
-  auto x = optimum(*solver, history, args.opt_bound, worst);
-  if (!states[x].exp) {
-    printf("Invalid upper bound. No strategy found.\n");
+  Solver* solver = get_solver(m.game().vars().size(), m.game().constraint());
+
+  // vec<EvalExp> history;
+  // if (args.opt_bound == -1) args.opt_bound = std::numeric_limits<double>::max();
+  if (args.opt_bound == -1) args.opt_bound = 100;
+  OptimalGenerator gen(*solver, m.game(), worst, args.opt_bound);
+
+  if (gen.success()) {
+    printf("Optimal number of experiments: %.5f\n", gen.value());
   } else {
-    printf("Optimal number of experiments: %.5f\n", states[x].opt);
-    // opt_print(x);
+    printf("Invalid upper bound. No strategy found.\n");
   }
-  // Free aux structures
-  for (auto g: opt_hash) delete g.first;
-  for (auto& x: states)
-    if (x.exp) delete x.exp;
 }
 
 void analyze(Solver& solver, vec<EvalExp>& history,

@@ -26,6 +26,19 @@ typedef std::string string;
 template<typename T> using vec = std::vector<T>;
 template<typename T> using set = std::set<T>;
 
+/**
+ * Helper structure for command line arguments
+ */
+typedef struct Args {
+  string filename;
+  string mode;
+  string backend;
+  string stg_experiment;
+  string stg_outcome;
+  bool symmetry_detection;
+  double opt_bound;
+} Args;
+
 template<typename T>
 struct identity { typedef T type; };
 
