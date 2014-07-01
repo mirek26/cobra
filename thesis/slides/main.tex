@@ -43,7 +43,7 @@
 \item 2 players: \textbf{codemaker + codebreaker}
 \item codemakers selects a \textbf{secret code}
 \item codebreaker strives to reveal the code through \textbf{experiments}
-\item for each experiment, codemaker releases some \\\textbf{partial information} about the code
+\item experiments provide \textbf{partial information} about the code
 \end{itemize}
 \end{frame}
 
@@ -68,16 +68,15 @@
 \end{frame}
 
 \begin{frame}{The counterfeit coin}
-\begin{quote}
-You are given 12 coins, all except one having the same weight.
-It is not known whether the counterfeit coin is heavier or lighter.
-Identify the counterfeit coin and its weight relative to the others
-  in the minimal number of weighings.
-\end{quote}
+\begin{itemize}\itemsep 3ex
+\item $n$ coins + balance scale
+\item All coins except one have the same weight
+\item Identify the odd-weight coin
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Challenges}
-\begin{enumerate}
+\begin{enumerate}\itemsep 2ex
 \item Formal model of code-breaking games
 \item Strategies for experiment selection
 \item Method for symmetry detection
@@ -102,7 +101,7 @@ Identify the counterfeit coin and its weight relative to the others
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Example -- the counterfeit coin}
+\begin{frame}{Example -- the counterfeit coin with 4 coins}
 \begin{itemize}
 \item variables $\{x_1, x_2, x_3, x_4, y\}$
 \item initial constraint $\textsc{exactly}_1(x_1, x_2, x_3, x_4)$
@@ -124,7 +123,7 @@ Select an experiment that minimizes the maximal number
 
 \bigskip
 \begin{itemize}\itemsep 5pt
-\item in Mastermind(4,6), this is worst-case optimal
+\item in Mastermind $4\times6$, this is worst-case optimal
 \item Generalization: one-step look-ahead strategies
 \end{itemize}
 
@@ -145,9 +144,9 @@ Select an experiment that minimizes the maximal number
 
 \begin{frame}{Algorithmic problems}
 \begin{block}{Strategy analysis}
-Compute the average-case/worst-case number of experiments needed
+Compute the average-case/worst-case number of experiments required
   to reveal the code by a given strategy.
-\end{block}\pause
+\end{block}
 \bigskip
 \begin{block}{Optimal strategy synthesis}
 Synthesise the average-case/worst-case optimal strategy.
@@ -199,6 +198,10 @@ for m in range(1, n//2 + 1):
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Experimental results}
+\centerline{\includegraphics[height=6cm]{graph.png}}
+\end{frame}
+
 \begin{frame}{Conclusions}
 \begin{itemize}
 \item Challenges
@@ -218,6 +221,10 @@ for m in range(1, n//2 + 1):
 \end{itemize}
 \end{itemize}
 \end{frame}
+
+% \begin{frame}{Monte-Carlo Tree Search}
+% \centerline{\includegraphics[height=7cm]{mcts.png}}
+% \end{frame}
 
 \end{document}
 
