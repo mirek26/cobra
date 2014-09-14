@@ -19,11 +19,8 @@
 
 \title{\LARGE Algorithmic Analysis of Code-Breaking Games}
 
-\author{Miroslav Klimoš, Prof. RNDr. Antonín Kučera Ph.D.}
-\institute[RWTH Aachen University] % (optional, but mostly needed)
-{
-  Faculty of Informatics, Masaryk University, Brno
-}
+\author{Mgr. Miroslav Klimoš, prof. RNDr. Antonín Kučera Ph.D.}
+\institute[]{ Faculty of Informatics, Masaryk University, Brno }
 
 \date[May. 28th, 2008]{May. 28th, 2008}
 
@@ -43,17 +40,18 @@
 \end{columns}\medskip}
 
 \begin{document}
+
 \begin{frame}{} 
 \begin{columns}[t]
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \begin{column}{.48\linewidth}
     
-    \begin{block}{Code-breaking games}
+    \begin{block}{Code-Breaking Games}
       \begin{itemize}
       \item 2 players: \emph{codemaker} and \emph{codebreaker}
-      \item codemaker selects a secret code
-      \item codebreaker strives to reveal the code through a series of \emph{experiments} whose outcomes give partial information about the code
+      \item Codemaker selects a \emph{secret code}
+      \item Codebreaker strives to reveal the code through a series of \emph{experiments} whose outcomes give partial information about the code
       \end{itemize}
     \end{block}
     
@@ -62,11 +60,11 @@
       \begin{column}{\parindent}\end{column}
       \begin{column}{.78\textwidth}
         \begin{itemize}
-        \item Code: combination of $n$ \emph{coloured pegs}
+        \item Secret code: combination of $n$ \emph{coloured pegs}
         \item Codebreaker makes guesses (experiments)
         \item Guesses are evaluated with \emph{black and white markers}
-        \item Black marker = correct both color and position
-        \item White marker = the color is present at different position
+        \item Black marker = correct both colour and position
+        \item White marker = the colour is present at a different position
         \end{itemize}
       \end{column}
 
@@ -76,15 +74,15 @@
     \end{columns}
     \end{block}
     
-    \begin{block}{Example: Counterfeit coin}
+    \begin{block}{Example: Counterfeit Coin}
     \begin{columns}
       \begin{column}{\parindent}\end{column}
       \begin{column}{.78\textwidth}
-      \begin{itemize}
-        \item Problem of identifying an odd-weight coin using balance scale
-        \item Code: identity of the unique countefeit coin
-        \item Codebreaker puts coins on the balance scale and observes the outcome (left pan is lighter / heavier / same)
-      \end{itemize}    
+        \begin{itemize}
+        \item Problem of finding an odd-weight coin using balance scale
+        \item Secret code: identity of the unique counterfeit coin 
+        \item Codebreaker puts coins on the balance scale and observes the outcome (the left pan is lighter / heavier / same)
+        \end{itemize}    
       \end{column}
       \begin{column}{.22\textwidth}
         \includegraphics[width=2cm]{../pictures/scales.pdf}
@@ -92,7 +90,7 @@
     \end{columns}
     \end{block}
       
-    \begin{block}{Questions and problems}
+    \begin{block}{Questions and Problems}
       \begin{itemize}
       \item How should the codebreaker play in order to minimize the number of experiments needed to undoubtedly determine the code?
       \item Is there a strategy for experiment selection that guarantees revealing the code after at most $k$ experiments?
@@ -104,9 +102,9 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \begin{column}{.48\linewidth}
-    \begin{block}{Challenges and solutions}
+    \begin{block}{Challenges and Solutions}
       \begin{enumerate}
-      \item Create a general, formal model of code breking games
+      \item Create a general, formal model of code-breaking games
         \thando{
         \item Model based on propositional logic
         \item Secret code = valuation of variables
@@ -118,7 +116,7 @@
       \item Suggest general strategies for experiment selection
         \thando{
         \item \emph{``Select an experiment that minimizes the maximal number of possibilities for the code in the next round''}
-        \item Several strategies of this kind are formalized within the~model
+        \item Several strategies of this kind formalized within the~model
         }{
           \hspace{-5mm}\includegraphics[width=3cm]{img-strategy.png}
         }{0.7}{0.3}
@@ -141,15 +139,15 @@
       \item Implement proposed algorithms in a computer program
         \thando{
         \item Command-line tool COBRA written in C++
-        \item Uses modern SAT solvers for satisfiability queries needed by the algorithms
-        \item Graph canonization tool Bliss is utilized for symmetry detection
+        \item Use of modern SAT solvers for satisfiability queries needed by the algorithms
+        \item Graph canonization tool Bliss utilized for symmetry detection
         }{
 
         }{0.95}{0.05}
       \item Use the tool to create new and reproduce existing results
         \thando{
         \item COBRA can easily reproduce some existing results for~Mastermind
-        \item Allows easy analysis of generalizations and other code-breaking games
+        \item Automatic analysis of generalizations and other code-breaking games
         }{
           \hspace{-5mm}
           \includegraphics[width=4.5cm]{img-results.png}

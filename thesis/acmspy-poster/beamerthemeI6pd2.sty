@@ -14,16 +14,16 @@
 
 \setbeamercolor{separation line}{bg=ta2butter}
 \setbeamercolor{title in headline}{fg=ta3gray}
-\setbeamercolor{author in headline}{fg=ta3orange}
-\setbeamercolor{institute in headline}{fg=ta2orange}
+\setbeamercolor{author in headline}{fg=ta3gray}
+\setbeamercolor{institute in headline}{fg=ta3gray}
 
 \setbeamercolor{framesubtitle}{fg=ta3orange, bg=ta2gray}
 \setbeamercolor{author in head/foot}{fg=ta2orange, bg=black}
 \setbeamercolor{title in head/foot}{fg=ta2orange, bg=black}
 
-\setbeamercolor*{normal text}{fg=black, bg=ta2aluminium}
+\setbeamercolor*{normal text}{fg=black, bg=ta2gray}
 \setbeamercolor*{block body}{bg=taaluminium, fg=black}
-\setbeamercolor*{block title}{fg=ta2butter, bg=tagray}
+\setbeamercolor*{block title}{fg=ta3gray, bg=tabutter}
 \setbeamerfont{block title}{size=\large,series=\bf}
 \setbeamercolor{upper separation line head}{fg=ta2orange}
 
@@ -34,16 +34,19 @@
 %\setbeamercolor{alerted text}{fg=ta3gray}
 
 %\setbeamercolor{example text}{fg=taorange}
-\setbeamercolor{structure}{fg=ta3skyblue}
+\setbeamercolor{structure}{fg=black}
+\setbeamercolor{itemize item}{fg=ta2gray}
 
 \setbeamertemplate{itemize items}[triangle]
 \setbeamertemplate{navigation symbols}{}  % no navigation on a poster
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \setbeamertemplate{block begin}{
   \begin{beamercolorbox}[ht=3.5ex,dp=0ex,center,leftskip=-1em,colsep*=.75ex]{block title}%
-    \hfill\usebeamerfont*{block title}%
-    {\phantom{Gg}\insertblocktitle}\hfill% phantom because of baseline problem
+    \centerline{\usebeamerfont*{block title}%
+    {\phantom{Gg}\insertblocktitle}}% phantom because of baseline problem
   \end{beamercolorbox}%
   \nointerlineskip\vskip-0.5pt
   %\begin{beamercolorbox}[ht=1mm, colsep*=0.75ex]{lower separation line head}
