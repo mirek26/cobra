@@ -39,13 +39,15 @@
 \end{column}
 \end{columns}\medskip}
 
+\setbeamersize{text margin left=8mm,text margin right=8mm}
+
 \begin{document}
 
 \begin{frame}{} 
-\begin{columns}[t]
+\begin{columns}[t, totalwidth=\textwidth]
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.48\linewidth}
+  \begin{column}{.48\textwidth}
     
     \begin{block}{Code-Breaking Games}
       \begin{itemize}
@@ -53,9 +55,8 @@
       \item Codemaker selects a \emph{secret code}
       \item Codebreaker strives to reveal the code through a series of \emph{experiments} whose outcomes give partial information about the code
       \end{itemize}
-    \end{block}
-    
-    \begin{block}{Example: Mastermind}
+    Example: Mastermind
+    \vskip-2ex
     \begin{columns}
       \begin{column}{\parindent}\end{column}
       \begin{column}{.78\textwidth}
@@ -72,24 +73,27 @@
         \includegraphics[width=1.8cm]{../pictures/mastermind.png}
       \end{column}
     \end{columns}
-    \end{block}
-    
-    \begin{block}{Example: Counterfeit Coin}
-    \begin{columns}
-      \begin{column}{\parindent}\end{column}
-      \begin{column}{.78\textwidth}
+    Example: Counterfeit Coin
+    % \begin{columns}
+    %   \begin{column}{\parindent}\end{column}
+    %   \begin{column}{.78\textwidth}
         \begin{itemize}
         \item Problem of finding an odd-weight coin using balance scale
         \item Secret code: identity of the unique counterfeit coin 
-        \item Codebreaker puts coins on the balance scale and observes the outcome (the left pan is lighter / heavier / same)
+        \item Codebreaker puts coins on the balance scale and observes the outcome %(the left pan is lighter / heavier / same)
         \end{itemize}    
-      \end{column}
-      \begin{column}{.22\textwidth}
-        \includegraphics[width=2cm]{../pictures/scales.pdf}
-      \end{column}
-    \end{columns}
+      % \end{column}
+      % \begin{column}{.22\textwidth}
+      %   % \includegraphics[width=2cm]{../pictures/scales.pdf}
+      % \end{column}
+    % \end{columns}
     \end{block}
       
+  \end{column}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \begin{column}{.48\textwidth}
+
     \begin{block}{Questions and Problems}
       \begin{itemize}
       \item How should the codebreaker play in order to minimize the number of experiments needed to undoubtedly determine the code?
@@ -99,10 +103,12 @@
     \end{block}
 
   \end{column}
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.48\linewidth}
+  \end{columns}
+
+    \vskip2.2ex
     \begin{block}{Challenges and Solutions}
+      \begin{columns}[T]
+      \begin{column}{0.48\textwidth}
       \begin{enumerate}
       \item Create a general, formal model of code-breaking games
         \thando{
@@ -110,54 +116,63 @@
         \item Secret code = valuation of variables
         \item Partial information = logical formula
         }{
-          \hspace{-12mm}
+          % \hspace{-12mm}
           \includegraphics[scale=0.45]{img-model.png}
         }{0.65}{0.35}
       \item Suggest general strategies for experiment selection
         \thando{
-        \item \emph{``Select an experiment that minimizes the maximal number of possibilities for the code in the next round''}
+        \item \emph{``Select an experiment that minimizes the maximal\\ number of possibilities for the code in the next round''}
         \item Several strategies of this kind formalized within the~model
         }{
-          \hspace{-5mm}\includegraphics[width=3cm]{img-strategy.png}
-        }{0.7}{0.3}
+          \vskip-2ex
+          \hspace{-8mm}\includegraphics[width=3cm]{img-strategy.png}
+        }{0.8}{0.2}
       \item Propose algorithms for strategy evaluation and synthesis
         \thando{
         \item Based on intelligent backtracking
         \item Symmetry detection reduces the size of the state-space
         }{
-          \hspace{-10mm}
+          \vskip-5ex
+          \hspace{-8mm}
           \includegraphics[width=4cm]{../pictures/exp-graph-sim.pdf}
-        }{0.65}{0.35}
-      \item Design a computer language for game specification
+        }{0.75}{0.25}
+      \end{enumerate}
+      \end{column}
+      \begin{column}{0.48\textwidth}
+      \begin{enumerate}
+      \item[4.] Design a computer language for game specification
         \thando{
-        \item Follows directly from the formal model
+        \item Corresponds to the formal model
         \item Built on top of Python for easier generation
         }{
-          \hspace{-22mm}
+          \hspace{-17mm}
           \includegraphics[width=4cm]{img-language.png}
         }{0.75}{0.25}
-      \item Implement proposed algorithms in a computer program
+      \item[5.] Implement proposed algorithms in a computer program
         \thando{
         \item Command-line tool COBRA written in C++
         \item Use of modern SAT solvers for satisfiability queries needed by the algorithms
-        \item Graph canonization tool Bliss utilized for symmetry detection
+        % \item Graph canonization tool Bliss utilized for symmetry detection
         }{
 
         }{0.95}{0.05}
-      \item Use the tool to create new and reproduce existing results
+      \item[6.] Use the tool to create new and reproduce existing results
         \thando{
         \item COBRA can easily reproduce some existing results for~Mastermind
         \item Automatic analysis of generalizations and other code-breaking games
         }{
-          \hspace{-5mm}
+          % \hspace{-5mm}
           \includegraphics[width=4.5cm]{img-results.png}
+          \vskip-2ex
         }{0.6}{0.4}
-      \end{enumerate}
+        \end{enumerate}
+      \end{column}
+      \end{columns}
     \end{block}       
-  \end{column}
+  % \end{column}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\end{columns}
+% \end{columns}
 \vfill
 \end{frame}
 
