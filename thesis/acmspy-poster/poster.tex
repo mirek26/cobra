@@ -47,16 +47,16 @@
 \begin{columns}[t, totalwidth=\textwidth]
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.5\textwidth}
+  \begin{column}{.485\textwidth}
     
     \begin{block}{Code-Breaking Games}
       \begin{itemize}
       \item 2 players: \emph{codemaker} and \emph{codebreaker}
       \item Codemaker selects a \emph{secret code}
       \item Codebreaker strives to reveal the code through a series of \emph{experiments} whose outcomes give partial information about the code
-      % \end{itemize}
+    \vskip1ex
     \item Example: Mastermind
-    \vskip-2ex
+    \vskip-2.5ex
     \begin{columns}
       \begin{column}{12mm}\end{column}
       \begin{column}{.78\textwidth}
@@ -90,13 +90,13 @@
     \end{itemize}
     \end{block}
       
-  \end{column}\hspace{4mm}~
+  \end{column}\hspace{4.2mm}~
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.47\textwidth}
+  \begin{column}{.485\textwidth}
 
     \begin{block}{Questions and Problems}
-      \bigskip
+      \medskip
       \begin{quote}
       How should the codebreaker play in order to minimize the number of~experiments needed to undoubtedly determine the code?
       \end{quote}
@@ -107,11 +107,24 @@
       What strategy is optimal with respect to the average-case number of~experiments, given that the code is selected from the given set with uniform distribution?
       \end{quote}
 
-
       \begin{itemize}
-      \item We create a computer program that reads a specification of a code-breaking game, performs automatic analysis and answers these questions
+      \item We create a computer program to automatically answer these questions
       \end{itemize}
-      \vspace{24mm}
+      \vskip1.1ex
+      \hspace{5mm}\begin{picture}(280,80)
+      \put(30,30){\includegraphics[width=15mm]{spec.png}}
+      \put(130,28){\includegraphics[width=16mm]{gears.png}}
+      \thicklines
+      \put(80,50){\vector(1,0){40}}
+      \put(0,10){\parbox{3.5cm}{\centering specification of \\a code-breaking game}}
+      \put(125,10){\parbox{2cm}{\centering computer \\program}}
+      \put(185,50){\vector(2,1){40}}
+      \put(185,50){\vector(2,0){40}}
+      \put(185,50){\vector(2,-1){40}}
+      \put(235,20){\parbox{5cm}{bounds on number \\of experiments}}
+      \put(235,45){\parbox{5cm}{value of a given strategy}}
+      \put(235,67){\parbox{5cm}{optimal strategy}}
+      \end{picture}
     \end{block}
 
   \end{column}
@@ -131,7 +144,7 @@
           % \hspace{-12mm}
           \includegraphics[scale=0.45]{img-model.png}
         }{0.65}{0.35}
-      \item Suggesting general strategies for experiment selection
+      \item Proposing general strategies for experiment selection
         \thando{
         \item \emph{``Select an experiment that minimizes the maximal\\ number of possibilities for the code in the next round''}
         \item Several strategies of this kind formalized within the~model
