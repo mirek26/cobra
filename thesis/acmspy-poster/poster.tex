@@ -47,18 +47,18 @@
 \begin{columns}[t, totalwidth=\textwidth]
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.48\textwidth}
+  \begin{column}{.5\textwidth}
     
     \begin{block}{Code-Breaking Games}
       \begin{itemize}
       \item 2 players: \emph{codemaker} and \emph{codebreaker}
       \item Codemaker selects a \emph{secret code}
       \item Codebreaker strives to reveal the code through a series of \emph{experiments} whose outcomes give partial information about the code
-      \end{itemize}
-    Example: Mastermind
+      % \end{itemize}
+    \item Example: Mastermind
     \vskip-2ex
     \begin{columns}
-      \begin{column}{\parindent}\end{column}
+      \begin{column}{12mm}\end{column}
       \begin{column}{.78\textwidth}
         \begin{itemize}
         \item Secret code: combination of $n$ \emph{coloured pegs}
@@ -73,10 +73,10 @@
         \includegraphics[width=1.8cm]{../pictures/mastermind.png}
       \end{column}
     \end{columns}
-    Example: Counterfeit Coin
-    % \begin{columns}
-    %   \begin{column}{\parindent}\end{column}
-    %   \begin{column}{.78\textwidth}
+    \item Example: Counterfeit Coin
+      \begin{columns}
+      \begin{column}{10mm}\end{column}
+      \begin{column}{\textwidth}
         \begin{itemize}
         \item Problem of finding an odd-weight coin using balance scale
         \item Secret code: identity of the unique counterfeit coin 
@@ -85,32 +85,44 @@
       % \end{column}
       % \begin{column}{.22\textwidth}
       %   % \includegraphics[width=2cm]{../pictures/scales.pdf}
-      % \end{column}
-    % \end{columns}
+      \end{column}
+      \end{columns}
+    \end{itemize}
     \end{block}
       
-  \end{column}
+  \end{column}\hspace{4mm}~
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \begin{column}{.48\textwidth}
+  \begin{column}{.47\textwidth}
 
     \begin{block}{Questions and Problems}
+      \bigskip
+      \begin{quote}
+      How should the codebreaker play in order to minimize the number of~experiments needed to undoubtedly determine the code?
+      \end{quote}
+      \begin{quote}
+      Is there a strategy for experiment selection that guarantees revealing the~code after at most $k$ experiments?
+      \end{quote}
+      \begin{quote}
+      What strategy is optimal with respect to the average-case number of~experiments, given that the code is selected from the given set with uniform distribution?
+      \end{quote}
+
+
       \begin{itemize}
-      \item How should the codebreaker play in order to minimize the number of experiments needed to undoubtedly determine the code?
-      \item Is there a strategy for experiment selection that guarantees revealing the code after at most $k$ experiments?
-      \item What strategy is optimal with respect to the average-case number of experiments, given that the code is selected from the given set with uniform distribution?
+      \item We create a computer program that reads a specification of a code-breaking game, performs automatic analysis and answers these questions
       \end{itemize}
+      \vspace{24mm}
     \end{block}
 
   \end{column}
   \end{columns}
 
     \vskip2.2ex
-    \begin{block}{Challenges and Solutions}
+    \begin{block}{Steps Towards Automatic Analysis}
       \begin{columns}[T]
       \begin{column}{0.48\textwidth}
       \begin{enumerate}
-      \item Create a general, formal model of code-breaking games
+      \item Creating a general, formal model of code-breaking games
         \thando{
         \item Model based on propositional logic
         \item Secret code = valuation of variables
@@ -119,7 +131,7 @@
           % \hspace{-12mm}
           \includegraphics[scale=0.45]{img-model.png}
         }{0.65}{0.35}
-      \item Suggest general strategies for experiment selection
+      \item Suggesting general strategies for experiment selection
         \thando{
         \item \emph{``Select an experiment that minimizes the maximal\\ number of possibilities for the code in the next round''}
         \item Several strategies of this kind formalized within the~model
@@ -127,20 +139,20 @@
           \vskip-2ex
           \hspace{-8mm}\includegraphics[width=3cm]{img-strategy.png}
         }{0.8}{0.2}
-      \item Propose algorithms for strategy evaluation and synthesis
+      \item Developing algorithms for strategy evaluation and synthesis
         \thando{
         \item Based on intelligent backtracking
         \item Symmetry detection reduces the size of the state-space
         }{
           \vskip-5ex
           \hspace{-8mm}
-          \includegraphics[width=4cm]{../pictures/exp-graph-sim.pdf}
+          ~\includegraphics[width=4cm]{../pictures/exp-graph-sim.pdf}
         }{0.75}{0.25}
       \end{enumerate}
       \end{column}
       \begin{column}{0.48\textwidth}
       \begin{enumerate}
-      \item[4.] Design a computer language for game specification
+      \item[4.] Designing a computer language for game specification
         \thando{
         \item Corresponds to the formal model
         \item Built on top of Python for easier generation
@@ -148,24 +160,24 @@
           \hspace{-17mm}
           \includegraphics[width=4cm]{img-language.png}
         }{0.75}{0.25}
-      \item[5.] Implement proposed algorithms in a computer program
+      \item[5.] Implementing proposed algorithms in a computer program
         \thando{
-        \item Command-line tool COBRA written in C++
+        \item Command-line tool written in C++
         \item Use of modern SAT solvers for satisfiability queries needed by the algorithms
         % \item Graph canonization tool Bliss utilized for symmetry detection
         }{
 
         }{0.95}{0.05}
-      \item[6.] Use the tool to create new and reproduce existing results
+      \item[6.] Using the program to create new and reproduce existing results
         \thando{
-        \item COBRA can easily reproduce some existing results for~Mastermind
-        \item Automatic analysis of generalizations and other code-breaking games
+        \item Easy reproduction of some of the existing results for~Mastermind
+        \item Automatic analysis of generalizations and \\other code-breaking games
         }{
           % \hspace{-5mm}
           \includegraphics[width=4.5cm]{img-results.png}
-          \vskip-2ex
         }{0.6}{0.4}
         \end{enumerate}
+        \vspace{-3ex}~
       \end{column}
       \end{columns}
     \end{block}       
