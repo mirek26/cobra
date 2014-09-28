@@ -112,40 +112,6 @@ bliss::Graph* Game::CreateGraph() const {
   return g;
 }
 
-void ComputeVarEquiv_NewGenerator(void* equiv, uint, const uint* aut) {
-  vec<int>& var_equiv = *((vec<int>*) equiv);
-  uint d = 0;
-  for (uint i = 1; i < var_equiv.size(); i++) {
-    if (aut[i - 1] <= i - 1) continue;
-    if (d > 0) return;
-    d = i;
-  }
-  if (d > 0 && aut[d - 1] + 1 < var_equiv.size()) {
-    uint v1 = d, v2 = aut[d - 1] + 1;
-    auto min = var_equiv[v2] > var_equiv[v1] ?
-                  var_equiv[v1] : var_equiv[v2];
-    var_equiv[v2] = var_equiv[v1] = min;
-  }
-}
-
-vec<uint> Game::ComputeVarEquiv(bliss::Graph& graph) const {
-  bliss::Stats stats;
-  vec<uint> var_equiv(vars_.size(), 0);
-  for (uint i = 1; i < vars_.size(); i++) {
-    var_equiv[i] = i;
-  }
-  clock_t t1 = clock();
-  graph.find_automorphisms(stats,
-                           ComputeVarEquiv_NewGenerator,
-                           reinterpret_cast<void*>(&var_equiv));
-  bliss_calls += 1;
-  bliss_time += clock() - t1;
-  for (uint i = 1; i < vars_.size(); i++) {
-    var_equiv[i] = var_equiv[var_equiv[i]];
-  }
-  return var_equiv;
-}
-
 void Game::PrintModel(vec<bool> model) const {
   printf("TRUE: ");
   for (uint id = 1; id < vars_.size(); id++)

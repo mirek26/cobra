@@ -62,6 +62,7 @@ class Game {
   MapId addMapping(string, vec<Variable*>*);
   MapId getMappingId(string) const;
   VarId getMappingValue(MapId, CharId) const;
+  uint numMappings() const { return mappings_.size(); }
   ExpType* addExperiment(string name, uint num_params);
   const vec<ExpType*>& experiments() const {  return experiments_;  }
 
@@ -70,7 +71,6 @@ class Game {
   void Precompute();
 
   bliss::Graph* CreateGraph() const;
-  vec<uint> ComputeVarEquiv(bliss::Graph& graph) const;
 };
 
 #endif  // COBRA_SRC_GAME_H_

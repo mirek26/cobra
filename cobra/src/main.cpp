@@ -14,7 +14,7 @@
 #include <ctime>
 #include <bliss/graph.hh>
 #include <bliss/utils.hh>
-#include <./tclap/CmdLine.h>
+#include <tclap/CmdLine.h>
 #include "./formula.h"
 #include "./game.h"
 #include "./experiment.h"
@@ -242,7 +242,7 @@ void analyze(Solver& solver, vec<EvalExp>& history,
     if (sat) one = solver.OnlyOneModel();
     if (one) {
       num += 1;
-      //printf("\b\b\b\b\b%5u", num);
+      printf("\b\b\b\b\b%5u", num);
       fflush(stdout);
       auto finaldepth = outcome.final ? depth : depth + 1;
       sum += finaldepth;

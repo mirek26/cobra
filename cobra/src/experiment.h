@@ -14,6 +14,10 @@
 #include <utility>
 #include <vector>
 #include <bliss/graph.hh>
+#include <permlib/permutation.h>
+#include <permlib/bsgs.h>
+#include <permlib/transversal/schreier_tree_transversal.h>
+#include <permlib/construct/schreier_sims_construction.h>
 #include "./common.h"
 #include "./formula.h"
 #include "./game.h"
@@ -85,9 +89,10 @@ class ExpType {
   vec<Outcome> outcomes_;
 
  public:
-  vec<set<MapId>> used_maps_;
+  vec<vec<bool>> maps_at_positions_;
+  UnionFind positions_dep_;
+
   set<VarId> used_vars_;
-  vec<vec<bool>> interchangable_;
 
   vec<set<uint>> params_different_;
   vec<set<uint>> params_smaller_than_;
@@ -100,6 +105,13 @@ class ExpType {
   int final_outcome() const { return final_outcome_; }
   const vec<Outcome>& outcomes() const { return outcomes_; }
   uint num_params() { return num_params_; }
+  bool map_at(uint p, uint m) { 
+    assert(p < maps_at_positions_.size() && m < game_.numMappings());
+    return maps_at_positions_[p][m];
+  }
+  bool pos_dep(uint p, uint q) { 
+    return positions_dep_.root(p) == positions_dep_.root(q);
+  }
 
   // Functions defining the experiment.
   void addOutcome(string name, Formula* outcome, bool final = true);
@@ -154,7 +166,6 @@ class ExpGenerator {
   bool use_bliss_;
 
   vec<VarId> fixed_vars_;
-
   std::unordered_map<bliss::Graph*, uint, GraphHash, GraphEquals> graphs_;
 
   GenParamsStats stats_;
@@ -163,9 +174,12 @@ class ExpGenerator {
 
   ExpType* curr_type_;
 
+  typedef permlib::Permutation Perm;
+  typedef permlib::SchreierTreeTransversal<Perm> Transversal;
+  permlib::BSGS<Perm, Transversal>* symmetry_bsgs_;
+
   //set<vec<CharId>> params_basic_;
   vec<CharId> params_;
-
   vec<Experiment> experiments_;
 
  public:
@@ -177,10 +191,10 @@ class ExpGenerator {
   bliss::Graph* graph() const { return graph_; }
 
  private:
+  bool TestDominance(int n, int a, int b);
+
   // Helper functions for parametrizations generation.
-  bool CharsEquiv(const set<MapId>& maps, CharId a, CharId b) const;
   void GenParamsFill(uint n);
-  void GenParamsBasicFilter();
   void GenParamsGraphFilter();
 };
 

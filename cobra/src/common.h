@@ -97,4 +97,33 @@ bool readIntOrString(uint& i, string& str);
  */
 double toSeconds(clock_t time);
 
+class UnionFind {
+  uint* id;
+
+ public:
+  UnionFind(uint n) {
+    id = new uint[n];
+    for (uint i = 0; i < n; i++) id[i] = i;
+  }
+
+  ~UnionFind() {
+    delete[] id;
+  }
+
+  uint root(uint p) {
+    uint root = p;
+    while (root != id[root]) root = id[root];
+    while (p != root) {
+      int newp = id[p];
+      id[p] = root;
+      p = newp;
+    }
+    return root;
+  }
+
+  void merge(uint i, uint j) {
+    id[root(i)] = root(j);
+  }
+};
+
 #endif  // COBRA_SRC_COMMON_H_
